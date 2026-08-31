@@ -1,0 +1,72 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import FinalCta from '../../components/FinalCta.astro';
+export const prerender = true;
+export async function getStaticPaths() {
+  return (await getCollection('articles')).map((article) => ({
+    params: { slug: article.id },
+    props: { article },
+  }));
+}
+interface Props {
+  article: CollectionEntry<'articles'>;
+}
+const { article } = Astro.props;
+const { Content } = await render(article);
+const a = article.data;
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: a.title,
+  description: a.description,
+  datePublished: a.publishedAt.toISOString(),
+  dateModified: a.updatedAt.toISOString(),
+  author: { '@type': 'Person', name: a.author },
+  mainEntityOfPage: a.canonical,
+  publisher: {
+    '@type': 'Organization',
+    name: 'Autoškola BuBu',
+    url: 'https://www.autoskolabubu.cz',
+  },
+};
+---
+
+<Base title={a.title} description={a.description} schema={schema}
+  ><article>
+    <header class="page-hero">
+      <div class="container content">
+        <nav class="breadcrumbs" aria-label="Drobečková navigace">
+          <a href="/">Domů</a><span>/</span><a href="/blog">Blog</a>
+        </nav><span class="eyebrow">{a.category}</span><h1 class="article-heading">{a.title}</h1><p
+          class="byline"
+        >
+          {a.author} · Publikováno {a.publishedAt.toLocaleDateString('cs-CZ')} · Aktualizováno {
+            a.updatedAt.toLocaleDateString('cs-CZ')
+          }
+        </p><p class="lead">{a.perex}</p>
+      </div>
+    </header><div class="section">
+      <div class="container content">
+        <Content /><p class="source small">
+          Článek převzat z <a href={a.sourceUrl}>dosavadního webu Autoškoly BuBu</a>. Datum výše je
+          původní redakční aktualizace.
+        </p><a class="btn primary" href="/kurzy/ridicak-skupina-b">Prohlédnout kurz skupiny B ↗</a>
+      </div>
+    </div>
+  </article><FinalCta /></Base
+><style>
+  .article-heading {
+    font-size: clamp(2rem, 4vw, 3.3rem);
+    line-height: 1.18;
+  }
+  .byline {
+    font-size: 0.7rem;
+    margin-top: 24px;
+  }
+  .source {
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    margin-top: 36px !important;
+  }
+</style>

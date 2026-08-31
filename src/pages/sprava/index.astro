@@ -1,0 +1,19 @@
+---
+export const prerender = false;
+Astro.response.headers.set('Cache-Control', 'no-store');
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="Interní správa" description="Interní správa Autoškoly BuBu." noindex
+  ><section class="section">
+    <div class="container content">
+      <span class="eyebrow">Interní část</span><h1>Správa Autoškoly BuBu</h1><div class="notice">
+        Přihlášení čeká na lokální Supabase Auth. Přístup bude vyžadovat individuální účet a MFA.
+        Žádný vývojový přístup bez přihlášení není povolen.
+      </div><p>
+        Správa objednávek není v této verzi implementována. Nenahrazujeme autentizaci fiktivní
+        přihlášenou obrazovkou.
+      </p><a class="text-link" href="/">Zpět na web</a>
+    </div>
+  </section></Base
+>

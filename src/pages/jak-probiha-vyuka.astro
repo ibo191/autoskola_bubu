@@ -1,0 +1,39 @@
+---
+export const prerender = true;
+import Base from '../layouts/Base.astro';
+import Roadmap from '../components/Roadmap.astro';
+import Faq from '../components/Faq.astro';
+import FinalCta from '../components/FinalCta.astro';
+---
+
+<Base
+  title="Jak probíhá výuka"
+  description="Pět kroků k řidičáku v Autoškole BuBu: online objednávka, osobní zápis, teorie, praktické jízdy a závěrečná zkouška."
+  ><section class="page-hero">
+    <div class="container">
+      <nav class="breadcrumbs" aria-label="Drobečková navigace">
+        <a href="/">Domů</a><span>/</span><span>Jak probíhá výuka</span>
+      </nav><span class="eyebrow">Ať víte, do čeho jdete</span><h1>
+        Od první otázky<br />k vlastní cestě.
+      </h1><p class="lead">
+        Nemusíte znát celý postup předem. Tady je přehled toho, co spolu projdeme.
+      </p>
+    </div>
+  </section><Roadmap /><section class="section tinted">
+    <div class="container content">
+      <h2>Osobní zápis si vyberete při objednávce</h2><p>
+        Spolu s kurzem a pobočkou si zvolíte konkrétní den a čas zápisu v otevírací době pobočky.
+        Rezervace se potvrdí po ověření e-mailu.
+      </p><p>
+        Online vyplňujete jen kontaktní údaje a výběr kurzu. Doklady, přihlášku a potřebné dokumenty
+        vyřídíme až při fyzickém zápisu.
+      </p><h2>Teorie a praxe na sebe navazují</h2><p>
+        Nejprve si uděláte jasno v pravidlech a ovládání vozidla. Při jízdách je postupně začnete
+        používat v běžném provozu.
+      </p><h2>Zkouška a další cesta</h2><p>
+        Na závěr prokážete své znalosti a řidičské dovednosti. Přesné podmínky pro vaši skupinu vám
+        vysvětlíme v průběhu kurzu.
+      </p>
+    </div>
+  </section><Faq /><FinalCta /></Base
+>

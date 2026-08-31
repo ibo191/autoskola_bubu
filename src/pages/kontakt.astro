@@ -1,0 +1,23 @@
+---
+export const prerender = true;
+import Base from '../layouts/Base.astro';
+import BranchCards from '../components/BranchCards.astro';
+import FinalCta from '../components/FinalCta.astro';
+---
+
+<Base
+  title="Kontakt a pobočky"
+  description="Ozvěte se Autoškole BuBu. Kontakty na Střížkov v Praze 8, Kladno a Statenice. Pomůžeme s výběrem kurzu i osobním zápisem."
+  ><section class="page-hero">
+    <div class="container">
+      <nav class="breadcrumbs" aria-label="Drobečková navigace">
+        <a href="/">Domů</a><span>/</span><span>Kontakt</span>
+      </nav><span class="eyebrow">Jsme tu pro vaše otázky</span><h1>
+        Ozvěte se.<br />Rádi vás poznáme.
+      </h1><p class="lead">
+        Vyberte si nejbližší pobočku. Probereme kurz, výcvik i všechno, co potřebujete vědět před
+        začátkem.
+      </p>
+    </div>
+  </section><BranchCards /><FinalCta /></Base
+>

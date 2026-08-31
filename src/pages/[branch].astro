@@ -1,0 +1,193 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Roadmap from '../components/Roadmap.astro';
+import Faq from '../components/Faq.astro';
+import FinalCta from '../components/FinalCta.astro';
+import { branches, money, type Branch } from '../lib/catalog';
+import car from '../assets/car.jpg';
+export const prerender = true;
+export function getStaticPaths() {
+  return branches.map((branch) => ({ params: { branch: branch.id }, props: { branch } }));
+}
+interface Props {
+  branch: Branch;
+}
+const { branch } = Astro.props;
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: `Autoškola BuBu ${branch.name}`,
+  url: `https://www.autoskolabubu.cz/${branch.id}`,
+  telephone: branch.phone,
+  email: branch.email,
+  address: branch.address,
+  parentOrganization: {
+    '@type': 'Organization',
+    name: 'Autoškola BuBu',
+    url: 'https://www.autoskolabubu.cz',
+  },
+};
+---
+
+<Base
+  title={`Autoškola ${branch.name}${branch.id === 'strizkov' ? ' – Praha 8' : ''}`}
+  description={`Autoškola BuBu ${branch.name}. ${branch.address}. Kurz B za ${money(branch.bPrice)}. Osobní zápis a výcvik s lidským přístupem.`}
+  schema={schema}
+>
+  <section class="page-hero">
+    <div class="container">
+      <nav class="breadcrumbs" aria-label="Drobečková navigace">
+        <a href="/">Domů</a><span>/</span><span>{branch.name}</span>
+      </nav><div class="split">
+        <div>
+          <span class="eyebrow">Vaše autoškola · {branch.locality}</span><h1>
+            Za řidičákem<br />do {
+              branch.id === 'strizkov'
+                ? 'Střížkova'
+                : branch.id === 'kladno'
+                  ? 'Kladna'
+                  : 'Statenic'
+            }.
+          </h1><p class="lead">
+            Začínáte od nuly? To je v pořádku. V BuBu vás provedeme od prvního rozjezdu až k
+            závěrečné zkoušce.
+          </p><div class="actions">
+            <button class="btn primary" data-order disabled data-branch={branch.id} data-course="b"
+              >Chci řidičák ↗</button
+            ><a class="btn secondary" href="#pobocka">Kde nás najdete</a>
+          </div><p class="branch-price">
+            Skupina B <strong>{money(branch.bPrice)}</strong> · jedna cena, bez balíčků
+          </p>
+        </div><Image
+          src={car}
+          alt="Výcviková Škoda Fabia Autoškoly BuBu"
+          widths={[480, 800]}
+          sizes="(max-width:640px) 90vw, 45vw"
+          format="webp"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+    </div>
+  </section>
+  <div class="local-trust">
+    <div class="container">
+      <span>✓ Manuál{branch.id === 'strizkov' ? ' i automat' : ''}</span><span>✓ Kurz L17</span
+      ><span>✓ Osobní zápis na pobočce</span>
+    </div>
+  </div>
+  <Roadmap />
+  <section class="section tinted" id="pobocka">
+    <div class="container split">
+      <div>
+        <span class="eyebrow">Pobočka {branch.name}</span><h2>
+          Stavte se.<br />Všechno probereme.
+        </h2><p class="lead">{branch.address}</p><dl>
+          <dt>Kdy nás zastihnete</dt><dd>
+            {branch.hours ?? 'Otevírací dobu si prosím ověřte telefonicky.'}
+          </dd><dt>Telefon</dt><dd>
+            <a href={`tel:${branch.phone}`}
+              >{branch.phone.replace(/(\+420)(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4')}</a
+            >
+          </dd><dt>E-mail</dt><dd><a href={`mailto:${branch.email}`}>{branch.email}</a></dd>
+        </dl>{
+          branch.id === 'kladno' && (
+            <p class="small">Přesné místo osobního zápisu vám potvrdí pobočka.</p>
+          )
+        }
+      </div><div class="location-panel">
+        <span aria-hidden="true">↗</span><span class="eyebrow">{branch.locality}</span><h3>
+          {branch.name}
+        </h3><p>{branch.address}</p><a
+          class="btn secondary"
+          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('Autoškola BuBu ' + branch.address)}`}
+          rel="noreferrer">Otevřít v mapách ↗</a
+        ><p class="small">Mapa se načte až po otevření odkazu.</p>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">V BuBu na to nejste sami</span><h2>
+            Místo pro otázky.<br />Prostor získat jistotu.
+          </h2>
+        </div>
+      </div><div class="grid">
+        <article class="card">
+          <h3>Začínáme základy</h3><p>Nečekáme, že už umíte řídit. Od toho je tu výcvik.</p>
+        </article><article class="card">
+          <h3>Propojujeme teorii s jízdou</h3><p>
+            Pravidla dostanou smysl ve skutečných situacích na silnici.
+          </p>
+        </article><article class="card">
+          <h3>Průběh znáte předem</h3><p>Online výběr, osobní zápis, teorie, jízdy a zkouška.</p>
+        </article>
+      </div>
+    </div>
+  </section><Faq /><FinalCta branch={branch.id} />
+</Base>
+<style>
+  .branch-price {
+    font-size: 0.75rem;
+    margin-top: 24px;
+  }
+  .branch-price strong {
+    color: var(--ink);
+  }
+  .local-trust {
+    border-bottom: 1px solid var(--line);
+    font-size: 0.77rem;
+    font-weight: 600;
+  }
+  .local-trust .container {
+    display: flex;
+    gap: 36px;
+    padding-block: 23px;
+    flex-wrap: wrap;
+  }
+  dl {
+    margin: 26px 0;
+  }
+  dt {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 18px;
+  }
+  dd {
+    margin: 3px 0 0;
+    font-size: 0.92rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+  .location-panel {
+    background: #e2eee8;
+    border: 1px solid #c4d8cb;
+    padding: 46px;
+    border-radius: var(--radius-lg);
+    position: relative;
+  }
+  .location-panel > span:first-child {
+    display: block;
+    font-size: 3rem;
+    color: var(--brand-dark);
+    margin-bottom: 35px;
+  }
+  .location-panel h3 {
+    font-size: 2.7rem;
+  }
+  .location-panel p {
+    margin-top: 18px;
+  }
+  .location-panel .btn {
+    margin-top: 26px;
+  }
+  @media (max-width: 640px) {
+    .local-trust .container {
+      gap: 12px 20px;
+      font-size: 0.65rem;
+    }
+  }
+</style>

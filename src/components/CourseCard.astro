@@ -1,0 +1,120 @@
+---
+import { Image } from 'astro:assets';
+import car from '../assets/car.jpg';
+import moto from '../assets/moto.jpeg';
+import trailer from '../assets/trailer.jpeg';
+import { displayPrice, money, type Course, type BranchId } from '../lib/catalog';
+interface Props {
+  course: Course;
+  branch?: BranchId;
+  photo?: boolean;
+}
+const { course, branch = 'strizkov', photo = false } = Astro.props;
+const asset = course.category === 'auto' ? car : course.category === 'moto' ? moto : trailer;
+---
+
+<article class:list={['course-card', { photographic: photo }]} data-category={course.category}>
+  {
+    photo && (
+      <Image
+        src={asset}
+        alt={
+          course.category === 'auto'
+            ? 'Výcvikové auto Autoškoly BuBu'
+            : course.category === 'moto'
+              ? 'Motocykly Autoškoly BuBu'
+              : 'Auto s přívěsem Autoškoly BuBu'
+        }
+        widths={[360, 600]}
+        sizes="(max-width:640px) 90vw, 360px"
+        format="webp"
+        loading="lazy"
+      />
+    )
+  }
+  <div class="course-body">
+    <span class="eyebrow">{course.label}</span><h3>
+      <a href={`/kurzy/${course.slug}`}>{course.name}</a>
+    </h3><p>{course.description}</p><div class="price">
+      {course.category === 'moto' && <small>od </small>}{money(displayPrice(course, branch))}
+    </div><p class="small">
+      {
+        course.category === 'moto'
+          ? 'Cena podle oprávnění a balíčku. Bez oprávnění pouze Moto Jistota.'
+          : 'Jedna cena kurzu. Bez volby balíčku.'
+      }
+    </p><div class="card-actions">
+      <button class="btn primary" data-order disabled data-course={course.id} data-branch={branch}
+        >Vybrat kurz ↗</button
+      ><a href={`/kurzy/${course.slug}`} aria-label={`Více o kurzu: ${course.label}`}>Podrobnosti</a
+      >
+    </div>
+  </div>
+</article>
+<style>
+  .course-card {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: white;
+    display: flex;
+    flex-direction: column;
+    transition:
+      transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 280ms ease,
+      border-color 280ms ease;
+  }
+  .course-card:hover {
+    transform: translateY(-5px);
+    border-color: #9ed6ce;
+    box-shadow: var(--shadow);
+  }
+  .course-card > img {
+    width: 100%;
+    aspect-ratio: 1.65;
+    object-fit: cover;
+  }
+  .course-body {
+    padding: 28px;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+  .course-body .eyebrow {
+    margin-bottom: 12px;
+  }
+  .course-body h3 {
+    font-size: 1.4rem;
+  }
+  .course-body h3 a {
+    text-decoration: none;
+  }
+  .course-body > p {
+    font-size: 0.88rem;
+    margin-top: 14px;
+  }
+  .course-body > p.small {
+    font-size: 0.74rem;
+    margin-top: 4px;
+  }
+  .price {
+    margin-top: auto;
+    padding-top: 25px;
+    font-size: 1.9rem;
+  }
+  .card-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+  .card-actions a {
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .card-actions .btn {
+    font-size: 0.8rem;
+    padding-inline: 16px;
+  }
+</style>

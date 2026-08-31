@@ -1,0 +1,332 @@
+---
+import { branches, courses } from '../lib/catalog';
+---
+
+<dialog id="order-dialog" aria-labelledby="order-title" aria-describedby="order-intro">
+  <div class="dialog-head">
+    <span class="dialog-brand">AUTOŠKOLA <strong>BuBu</strong></span><button
+      type="button"
+      class="close-dialog"
+      aria-label="Zavřít objednávku">×</button
+    >
+  </div>
+  <div class="dialog-body">
+    <span class="eyebrow">První krok k řidičáku</span><h2 id="order-title">
+      Pojďme vybrat váš kurz.
+    </h2><p id="order-intro">Nejprve kurz, potom kontakt a osobní zápis na pobočce.</p>
+    <ol class="wizard-steps" aria-label="Kroky objednávky">
+      <li aria-current="step">1. Kurz</li><li>2. Kontakt</li><li>3. Osobní zápis</li>
+    </ol>
+    <form id="order-form" novalidate>
+      <fieldset data-step="0">
+        <legend class="sr-only">Výběr kurzu a pobočky</legend><div class="form-grid">
+          <label
+            >Pobočka<select name="branch" required
+              ><option value="">Vyberte pobočku</option>{
+                branches.map((b) => <option value={b.id}>{b.name}</option>)
+              }</select
+            ></label
+          >
+          <label
+            >Kurz<select name="course" required
+              ><option value="">Vyberte kurz</option>{
+                courses.map((c) => (
+                  <option value={c.id}>
+                    {c.label} – {c.name}
+                  </option>
+                ))
+              }</select
+            ></label
+          >
+          <label id="transmission-field" hidden
+            >Převodovka<select name="transmission"
+              ><option value="manual">Manuální</option><option value="automatic"
+                >Automatická (Střížkov)</option
+              ></select
+            ></label
+          >
+          <label id="licence-field" hidden
+            >Jaké oprávnění už máte?<select name="heldLicence"
+              ><option value="">Zatím žádné</option><option value="B">B</option><option value="A1"
+                >A1</option
+              ><option value="A2">A2</option><option value="AM">AM</option><option value="A"
+                >A</option
+              ><option value="other">Jiné nebo více skupin</option></select
+            ></label
+          >
+          <label id="period-field" hidden
+            >Jak dlouho oprávnění držíte?<select name="holdingPeriod"
+              ><option value="unknown">Vyberte dobu držení</option><option value="less-than-two"
+                >Méně než 2 roky</option
+              ><option value="exactly-two">Přesně 2 roky</option><option value="more-than-two"
+                >Více než 2 roky</option
+              ></select
+            ></label
+          >
+          <label id="package-field" hidden
+            >Varianta výcviku<select name="package"
+              ><option value="single">Jednotná cena</option></select
+            ></label
+          >
+        </div><div class="quote-box" aria-live="polite">
+          <span id="quote-label">Cena vašeho kurzu</span><strong id="quote-amount"
+            >Vyberte kurz a pobočku</strong
+          ><p id="quote-note"></p>
+        </div>
+      </fieldset>
+      <fieldset data-step="1" hidden>
+        <legend class="sr-only">Kontaktní údaje</legend><div class="notice">
+          Lokální vývoj: zadávejte pouze fiktivní údaje. V této verzi se kontakt neodesílá ani
+          neukládá.
+        </div><div class="form-grid">
+          <label
+            >Jméno<input
+              name="firstName"
+              autocomplete="given-name"
+              required
+              maxlength="80"
+            /></label
+          ><label
+            >Příjmení<input
+              name="lastName"
+              autocomplete="family-name"
+              required
+              maxlength="80"
+            /></label
+          ><label
+            >E-mail<input
+              type="email"
+              name="email"
+              autocomplete="email"
+              required
+              maxlength="254"
+            /></label
+          ><label
+            >Telefon<input
+              type="tel"
+              name="phone"
+              autocomplete="tel"
+              required
+              maxlength="20"
+            /></label
+          >
+        </div><p class="small">Doklady, adresu ani zdravotní údaje online nevyplňujete.</p>
+      </fieldset>
+      <fieldset data-step="2" hidden>
+        <legend class="sr-only">Osobní zápis</legend><div class="notice">
+          <strong>Rezervace zatím není aktivní.</strong><p>
+            Pro místní testování čekáme na spuštění lokální databáze a konfiguraci zápisů.
+            Nenabízíme smyšlené termíny.
+          </p>
+        </div><div id="order-summary"></div><p class="small">
+          Po zapojení rezervací zde vyberete den a čas. Termín se potvrdí až po ověření vašeho
+          e-mailu.
+        </p><label class="checkbox"
+          ><input type="checkbox" name="terms" disabled /><span
+            >Souhlas s obchodními podmínkami – schválené znění bude dodáno.</span
+          ></label
+        ><p class="small">
+          <a href="/ochrana-osobnich-udaju">Informace o zpracování osobních údajů</a>
+        </p><label class="checkbox"
+          ><input type="checkbox" name="marketing" disabled /><span
+            >Dobrovolný marketingový souhlas – znění bude dodáno samostatně.</span
+          ></label
+        ><button type="button" class="btn primary" disabled
+          >Objednávky nejsou v tomto náhledu aktivní</button
+        >
+      </fieldset>
+      <p id="order-error" class="error" role="alert"></p><div class="wizard-actions">
+        <button type="button" id="order-back" class="btn secondary" hidden>Zpět</button><button
+          type="button"
+          id="order-next"
+          class="btn primary">Pokračovat →</button
+        >
+      </div>
+    </form><div id="discard-question" hidden role="alert">
+      <p>Chcete zavřít rozpracovaný výběr? Vyplněné údaje se smažou.</p><div class="actions">
+        <button class="btn secondary" id="keep-order">Pokračovat ve výběru</button><button
+          class="btn"
+          id="discard-order">Zahodit a zavřít</button
+        >
+      </div>
+    </div>
+  </div>
+</dialog>
+<script src="../scripts/order.ts"></script>
+<style>
+  dialog {
+    border: 0;
+    border-radius: 20px;
+    padding: 0;
+    max-width: 720px;
+    width: calc(100% - 32px);
+    max-height: 92dvh;
+    color: var(--ink);
+    box-shadow: 0 30px 100px #0003;
+  }
+  dialog::backdrop {
+    background: #122e2ba8;
+    backdrop-filter: blur(5px);
+  }
+  .dialog-head {
+    padding: 22px 30px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .dialog-brand {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+  }
+  .dialog-brand strong {
+    font-size: 1.3rem;
+    letter-spacing: -0.04em;
+  }
+  .close-dialog {
+    background: transparent;
+    border: 0;
+    font-size: 2rem;
+    width: 44px;
+    height: 44px;
+    line-height: 1;
+  }
+  .dialog-body {
+    padding: 32px;
+  }
+  .dialog-body h2 {
+    font-size: 2rem;
+  }
+  .dialog-body > p {
+    font-size: 0.9rem;
+    margin-top: 14px;
+  }
+  .wizard-steps {
+    list-style: none;
+    display: flex;
+    gap: 14px;
+    padding: 0;
+    margin: 28px 0;
+    font-size: 0.75rem;
+    font-weight: 650;
+  }
+  .wizard-steps li {
+    flex: 1;
+    border-bottom: 3px solid var(--line);
+    padding-bottom: 12px;
+  }
+  .wizard-steps [aria-current] {
+    border-color: var(--brand-dark);
+    color: var(--brand-dark);
+  }
+  fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin: 20px 0;
+  }
+  label {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.8rem;
+    font-weight: 650;
+    gap: 8px;
+  }
+  input,
+  select {
+    padding: 12px;
+    border: 1px solid #9aada5;
+    border-radius: 6px;
+    min-height: 49px;
+    background: #fff;
+    color: var(--ink);
+    width: 100%;
+    min-width: 0;
+    font-size: 0.85rem;
+  }
+  .checkbox {
+    flex-direction: row;
+    align-items: start;
+    margin: 22px 0;
+    font-weight: 500;
+  }
+  .checkbox input {
+    width: 20px;
+    min-height: 20px;
+    flex-shrink: 0;
+    margin: 2px 8px 0 0;
+  }
+  .quote-box {
+    background: var(--brand-soft);
+    border-radius: 10px;
+    padding: 22px;
+    margin-top: 24px;
+  }
+  .quote-box > span {
+    display: block;
+    font-size: 0.75rem;
+  }
+  .quote-box strong {
+    font-size: 1.5rem;
+    display: block;
+    margin-top: 5px;
+  }
+  .quote-box p {
+    font-size: 0.75rem;
+    margin-top: 8px;
+  }
+  .wizard-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  #order-error {
+    margin-top: 18px;
+  }
+  #order-summary {
+    padding: 20px 0;
+    font-weight: 600;
+  }
+  #discard-question {
+    border-top: 1px solid var(--line);
+    margin-top: 24px;
+    padding-top: 24px;
+  }
+  #discard-question p {
+    font-size: 0.85rem;
+  }
+  @media (max-width: 600px) {
+    dialog {
+      width: 100%;
+      max-width: 100%;
+      height: 100dvh;
+      max-height: 100dvh;
+      border-radius: 0;
+      margin: 0;
+    }
+    .dialog-head {
+      padding: 12px 20px;
+    }
+    .dialog-body {
+      padding: 24px 20px;
+    }
+    .dialog-body h2 {
+      font-size: 1.7rem;
+    }
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+    .wizard-steps {
+      gap: 8px;
+      font-size: 0.65rem;
+    }
+  }
+</style>

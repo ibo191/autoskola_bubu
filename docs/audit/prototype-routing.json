@@ -1,0 +1,121 @@
+{
+  "redirects": [
+    {
+      "source": "/autoskola-kladno",
+      "destination": "/kladno",
+      "permanent": true
+    },
+    {
+      "source": "/autoskola-statenice",
+      "destination": "/statenice",
+      "permanent": true
+    },
+    {
+      "source": "/autoskoly-praha-8",
+      "destination": "/strizkov",
+      "permanent": true
+    },
+    {
+      "source": "/doplnovaci-jizdy",
+      "destination": "/kurzy/kondicni-jizdy",
+      "permanent": true
+    },
+    {
+      "source": "/kurzy",
+      "destination": "/cenik",
+      "permanent": true
+    },
+    {
+      "source": "/motorky",
+      "destination": "/kurzy/ridicak-skupina-a",
+      "permanent": true
+    },
+    {
+      "source": "/motorky-a2",
+      "destination": "/kurzy/ridicak-skupina-a2",
+      "permanent": true
+    },
+    {
+      "source": "/ridicak-na-automat",
+      "destination": "/kurzy/ridicak-skupina-b-automat",
+      "permanent": true
+    },
+    {
+      "source": "/ridicak-skupina-b",
+      "destination": "/kurzy/ridicak-skupina-b",
+      "permanent": true
+    }
+  ],
+  "removedLegacyRewrites": [
+    {
+      "source": "/admin",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/students/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/lessons",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/calendar",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/lectures",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/evidence",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/exams",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/payments",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/communication",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/fleet",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/statistics",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/settings",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/mobile/:path*",
+      "destination": "/index.html"
+    }
+  ],
+  "removedCrons": [
+    {
+      "path": "/api/daily-student-summary",
+      "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/onboarding-reminders",
+      "schedule": "0 5 * * *"
+    }
+  ]
+}

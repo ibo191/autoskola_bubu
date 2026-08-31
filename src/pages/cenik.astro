@@ -1,0 +1,977 @@
+---
+export const prerender = true;
+import Base from '../layouts/Base.astro';
+import FinalCta from '../components/FinalCta.astro';
+import { branches, courses, fees, money, priceSource, examAuthorities } from '../lib/catalog';
+---
+
+<Base
+  title="Kurzy a ceník"
+  description="Vedený výběr a aktuální ceny kurzů Autoškoly BuBu pro auto, L17, motocykly a přívěsy."
+>
+  <section class="page-hero">
+    <div class="container">
+      <nav class="breadcrumbs" aria-label="Drobečková navigace">
+        <a href="/">Domů</a><span>/</span><span>Ceník</span>
+      </nav>
+      <span class="eyebrow">Jasný výběr. Přehledná cena.</span><h1>
+        Váš řidičák.<br />Vaše cesta.
+      </h1>
+      <p class="lead">
+        Provedeme vás jen otázkami, které jsou pro váš kurz důležité. Cenu ukážeme až po ověření
+        celé kombinace.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" data-reveal>
+    <div class="container">
+      <div class="decision-header">
+        <span class="eyebrow">Průvodce ceníkem</span><h2>Najděte správnou variantu.</h2><p>
+          Odpovědi můžete kdykoli změnit. Nabídku po každé změně znovu ověří server.
+        </p>
+      </div>
+
+      <div class="decision-card" id="pricing-wizard">
+        <fieldset class="question">
+          <legend><span>01</span> Co chcete řídit?</legend><div
+            class="choice-grid category-choices"
+          >
+            <button type="button" data-category="auto" aria-pressed="false"
+              ><img src="/icons/ui/blue-car.webp" alt="" width="192" height="192" />Auto a L17</button
+            >
+            <button type="button" data-category="moto" aria-pressed="false"
+              ><img
+                src="/icons/ui/blue-motorcycle.webp"
+                alt=""
+                width="192"
+                height="192"
+              />Motorku</button
+            >
+            <button type="button" data-category="prives" aria-pressed="false"
+              ><img src="/icons/ui/blue-hands-wheel.webp" alt="" width="192" height="192" />Auto s
+              přívěsem</button
+            >
+          </div>
+        </fieldset>
+
+        <fieldset class="question next-question" id="branch-question" hidden>
+          <legend><span>02</span> Kde chcete kurz absolvovat?</legend><div
+            class="choice-grid compact"
+          >
+            {
+              branches.map((item) => (
+                <button
+                  type="button"
+                  data-branch={item.id}
+                  data-b-price={item.bPrice}
+                  aria-pressed="false"
+                >
+                  {item.name}
+                  <small>{item.locality}</small>
+                </button>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <div id="availability-message" class="notice next-question" hidden role="status"></div>
+
+        <fieldset class="question next-question" id="transmission-question" hidden>
+          <legend><span>03</span> Jakou chcete převodovku?</legend><div class="choice-grid compact">
+            <button type="button" data-transmission="manual" aria-pressed="false">Manuál</button>
+            <button type="button" data-transmission="automatic" aria-pressed="false"
+              >Automat<small>pouze Střížkov</small></button
+            >
+          </div><p class="question-note" id="transmission-note"></p>
+        </fieldset>
+
+        <fieldset class="question next-question offer-picker" id="mode-question" hidden>
+          <legend>Vyberte si kurz pro zvolenou převodovku</legend><p class="picker-intro">
+            Cena je stejná pro klasický kurz i variantu L17.
+          </p><div class="choice-grid compact marketing-choices">
+            <button type="button" data-mode="standard" aria-pressed="false">
+              <span class="choice-kicker">Klasická cesta</span><strong>Kurz skupiny B</strong><span
+                class="choice-copy">Kompletní výuka a výcvik pro získání řidičáku na auto.</span
+              ><span class="choice-price" data-auto-card-price></span><small
+                >* bez poplatků za zkoušku</small
+              >
+            </button>
+            <button type="button" data-mode="l17" aria-pressed="false">
+              <span class="choice-kicker">Řidičák od 17 let</span><strong>Kurz L17</strong><span
+                class="choice-copy">Po zkoušce jezdíte do 18 let bezpečně s mentorem.</span
+              ><span class="choice-price" data-auto-card-price></span><small
+                >* bez poplatků za zkoušku</small
+              >
+            </button>
+          </div>
+        </fieldset>
+
+        <fieldset class="question next-question" id="moto-target-question" hidden>
+          <legend><span>03</span> Chci řidičák skupiny</legend><div class="choice-grid four">
+            {
+              (['am', 'a1', 'a2', 'a'] as const).map((id) => (
+                <button type="button" data-moto-target={id} aria-pressed="false">
+                  {id.toUpperCase()}
+                </button>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <fieldset class="question next-question" id="licence-status-question" hidden>
+          <legend><span>04</span> Jste držitelem řidičského oprávnění?</legend><div
+            class="choice-grid compact"
+          >
+            <button type="button" data-licence-status="none" aria-pressed="false"
+              >Nemám žádné</button
+            >
+            <button type="button" data-licence-status="yes" aria-pressed="false">Ano, mám</button>
+          </div>
+        </fieldset>
+
+        <fieldset class="question next-question" id="licences-question" hidden>
+          <legend><span>05</span> Označte všechny skupiny, které držíte</legend><div
+            class="check-grid"
+          >
+            {
+              ['B', 'AM', 'A1', 'A2', 'A'].map((licence) => (
+                <label>
+                  <>
+                    <input type="checkbox" name="held-licence" value={licence} />
+                    <span>{licence}</span>
+                  </>
+                </label>
+              ))
+            }
+            <label
+              ><input type="checkbox" name="held-licence" value="other" /><span>Jiná skupina</span
+              ></label
+            >
+          </div><p class="question-note">Můžete označit více oprávnění současně.</p>
+        </fieldset>
+
+        <fieldset class="question next-question" id="period-question" hidden>
+          <legend><span>06</span> Jak dlouho držíte rozhodující moto skupinu?</legend><div
+            class="choice-grid compact"
+          >
+            <button type="button" data-period="less-than-two" aria-pressed="false"
+              >2 roky nebo méně</button
+            >
+            <button type="button" data-period="more-than-two" aria-pressed="false"
+              >Déle než 2 roky</button
+            >
+          </div>
+        </fieldset>
+
+        <fieldset class="question next-question offer-picker" id="package-question" hidden>
+          <legend>Vyberte si moto balíček</legend><p class="picker-intro">
+            Obě varianty vás připraví na zkoušku. Jistota přidává více času pro klidnější výcvik.
+          </p><div class="choice-grid compact marketing-choices package-choices">
+            <button
+              type="button"
+              class="recommended-choice"
+              data-package="moto-confidence"
+              aria-pressed="false"
+            >
+              <span class="recommendation">Doporučujeme</span><span class="choice-kicker"
+                >Více prostoru na jistotu</span
+              ><strong>Moto Jistota</strong><span class="choice-copy"
+                >20 hodin jízd pro důkladnější nácvik a větší klid před zkouškou.</span
+              ><span class="choice-price">31 900 Kč*</span><small>* bez poplatků za zkoušku</small>
+            </button>
+            <button type="button" data-package="moto-basic" aria-pressed="false">
+              <span class="choice-kicker">Úspornější rozsah</span><strong>Moto Základ</strong><span
+                class="choice-copy">13 hodin jízd pro žadatele, kteří potřebují kratší výcvik.</span
+              ><span class="choice-price">24 900 Kč*</span><small>* bez poplatků za zkoušku</small>
+            </button>
+          </div>
+        </fieldset>
+
+        <fieldset class="question next-question" id="trailer-question" hidden>
+          <legend><span>03</span> Jaké oprávnění potřebujete?</legend><div
+            class="choice-grid compact"
+          >
+            <button type="button" data-trailer="b96" aria-pressed="false">Rozšíření B96</button>
+            <button type="button" data-trailer="be" aria-pressed="false">Skupina B+E</button>
+          </div>
+        </fieldset>
+      </div>
+
+      <section
+        id="pricing-results"
+        class="pricing-results"
+        hidden
+        aria-labelledby="result-title"
+        aria-live="polite"
+      >
+        <div class="result-heading">
+          <div>
+            <span class="eyebrow">Vaše ověřená nabídka</span><h2 id="result-title">
+              Kurz podle vašich odpovědí
+            </h2>
+          </div><button type="button" class="text-link reset-selection">Začít znovu</button>
+        </div>
+        <article class="offer-card">
+          <div>
+            <span class="eyebrow" id="offer-label"></span><h3 id="offer-title"></h3><p
+              id="offer-description"
+            >
+            </p><p class="offer-variant" id="offer-variant"></p>
+          </div>
+          <div class="offer-price">
+            <strong id="offer-price"></strong><span>*</span><small
+              >* Cena kurzu nezahrnuje poplatky za zkoušku.</small
+            >
+          </div>
+          <div class="offer-actions">
+            <button class="btn primary" data-order disabled>Vybrat kurz ↗</button><a
+              id="offer-detail"
+              class="text-link"
+              href="/cenik">Podrobnosti o kurzu</a
+            >
+          </div>
+        </article>
+      </section>
+
+      <section id="contact-result" class="contact-result notice" hidden aria-live="polite">
+        <h2>Výběr potřebujeme ověřit osobně.</h2><p id="contact-message"></p><a
+          class="btn secondary"
+          href="/kontakt">Kontaktovat Střížkov</a
+        >
+      </section>
+
+      <aside class="fees" data-reveal>
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">Mimo cenu kurzu</span><h2>Poplatky za zkoušku</h2><p>
+              Každá zobrazená cena kurzu je označena hvězdičkou a tyto poplatky nezahrnuje.
+            </p>
+          </div>
+        </div>
+        <div class="fee-grid">
+          <article>
+            <img
+              src="/icons/ui/blue-settings.webp"
+              alt=""
+              width="192"
+              height="192"
+              loading="lazy"
+            /><h3>Autoškole za organizaci</h3><strong>{money(fees.schoolOrganization)}</strong><p>
+              Samostatný poplatek Autoškole BuBu za organizaci zkoušky.
+            </p>
+          </article>
+          <article class="authority-fees">
+            <img
+              src="/icons/ui/blue-classroom-outline.webp"
+              alt=""
+              width="192"
+              height="192"
+              loading="lazy"
+            /><h3>Úřadu za první zkoušku</h3>{
+              examAuthorities.map((item) => (
+                <p>
+                  <>
+                    <span>{item.office}</span>
+                    <strong>{money(item.firstExam)}</strong>
+                  </>
+                </p>
+              ))
+            }
+          </article>
+          <article>
+            <img
+              src="/icons/ui/blue-warning.webp"
+              alt=""
+              width="192"
+              height="192"
+              loading="lazy"
+            /><h3>Opakované části</h3><p>Test z předpisů <strong>100 Kč</strong></p><p>
+              Ovládání a údržba <strong>200 Kč</strong>
+            </p><p>Praktická jízda <strong>400 Kč</strong></p>
+          </article>
+        </div><p class="small source-note">
+          Úřední poplatky jsou jednotné podle platného sazebníku. Zdroj: <a
+            href="https://portal.gov.cz/sluzby-vs/zkouska-k-ziskani-ridicskeho-opravneni-S47728"
+            >Portál veřejné správy</a
+          >. Ceny kurzů: <a href={priceSource.url}>aktuální ceník Autoškoly BuBu</a>, ověřeno 28. 8.
+          2026.
+        </p>
+      </aside>
+    </div>
+  </section>
+  <FinalCta />
+</Base>
+
+<script
+  is:inline
+  type="application/json"
+  id="course-catalog"
+  set:html={JSON.stringify(courses).replace(/</g, '\u003c')}
+/>
+<script>
+  import type { Quote } from '../lib/pricing/quote';
+  type CatalogCourse = {
+    id: string;
+    label: string;
+    name: string;
+    description: string;
+    slug: string;
+  };
+  const catalog = JSON.parse(
+    document.querySelector('#course-catalog')?.textContent ?? '[]',
+  ) as CatalogCourse[];
+  const state = {
+    category: '',
+    branch: '',
+    transmission: '',
+    mode: '',
+    motoTarget: '',
+    licenceStatus: '',
+    period: '',
+    package: '',
+    trailer: '',
+  };
+  const branchParam = new URLSearchParams(location.search).get('branch');
+  if (branchParam && ['strizkov', 'kladno', 'statenice'].includes(branchParam))
+    state.branch = branchParam;
+  let requestSequence = 0;
+  const show = (selector: string, visible: boolean) => {
+    const element = document.querySelector<HTMLElement>(selector);
+    if (element) element.hidden = !visible;
+  };
+  const press = (selector: string, value: string) =>
+    document
+      .querySelectorAll<HTMLButtonElement>(selector)
+      .forEach((button) =>
+        button.setAttribute('aria-pressed', String(Object.values(button.dataset).includes(value))),
+      );
+  const reveal = (selector: string) => {
+    show(selector, true);
+    document.querySelector(selector)?.classList.add('revealed');
+  };
+  const money = (amount: number) =>
+    new Intl.NumberFormat('cs-CZ', {
+      style: 'currency',
+      currency: 'CZK',
+      maximumFractionDigits: 0,
+    }).format(amount);
+  const heldLicences = () =>
+    [...document.querySelectorAll<HTMLInputElement>('input[name="held-licence"]:checked')].map(
+      (input) => input.value,
+    );
+  function clearResults() {
+    show('#pricing-results', false);
+    show('#contact-result', false);
+  }
+  function resetDependent() {
+    state.transmission = '';
+    state.mode = '';
+    state.motoTarget = '';
+    state.licenceStatus = '';
+    state.period = '';
+    state.package = '';
+    state.trailer = '';
+    document
+      .querySelectorAll<HTMLInputElement>('input[name="held-licence"]')
+      .forEach((input) => (input.checked = false));
+    clearResults();
+  }
+
+  function render() {
+    requestSequence += 1;
+    clearResults();
+    for (const selector of [
+      '#transmission-question',
+      '#mode-question',
+      '#moto-target-question',
+      '#licence-status-question',
+      '#licences-question',
+      '#period-question',
+      '#package-question',
+      '#trailer-question',
+      '#availability-message',
+    ])
+      show(selector, false);
+    press('[data-category]', state.category);
+    press('[data-branch]', state.branch);
+    press('[data-transmission]', state.transmission);
+    press('[data-mode]', state.mode);
+    press('[data-moto-target]', state.motoTarget);
+    press('[data-licence-status]', state.licenceStatus);
+    press('[data-period]', state.period);
+    press('[data-package]', state.package);
+    press('[data-trailer]', state.trailer);
+    show('#branch-question', !!state.category);
+    if (!state.category || !state.branch) return;
+    if ((state.category === 'moto' || state.category === 'prives') && state.branch !== 'strizkov') {
+      const message = document.querySelector('#availability-message')!;
+      message.textContent =
+        state.category === 'moto'
+          ? 'Motocyklové kurzy poskytujeme pouze na pobočce Střížkov v Praze.'
+          : 'Kurzy pro přívěsy poskytujeme pouze na pobočce Střížkov v Praze.';
+      reveal('#availability-message');
+      return;
+    }
+    if (state.category === 'auto') {
+      reveal('#transmission-question');
+      const automatic = document.querySelector<HTMLButtonElement>(
+        '[data-transmission="automatic"]',
+      )!;
+      automatic.disabled = state.branch !== 'strizkov';
+      document.querySelector('#transmission-note')!.textContent =
+        state.branch === 'strizkov'
+          ? 'Manuál i automat jsou dostupné pro klasický kurz i L17.'
+          : 'Na této pobočce poskytujeme pouze výcvik s manuální převodovkou.';
+      if (!state.transmission) return;
+      const selectedBranch = document.querySelector<HTMLButtonElement>(
+        `[data-branch="${state.branch}"]`,
+      );
+      const autoPrice = Number(selectedBranch?.dataset.bPrice ?? 0);
+      document
+        .querySelectorAll<HTMLElement>('[data-auto-card-price]')
+        .forEach((element) => (element.textContent = `${money(autoPrice)}*`));
+      reveal('#mode-question');
+      if (!state.mode) return;
+      const course =
+        state.mode === 'l17' ? 'l17' : state.transmission === 'automatic' ? 'b-automat' : 'b';
+      void requestQuote({
+        course,
+        branch: state.branch,
+        transmission: state.transmission,
+        package: 'single',
+      });
+      return;
+    }
+    if (state.category === 'prives') {
+      reveal('#trailer-question');
+      if (!state.trailer) return;
+      void requestQuote({ course: state.trailer, branch: state.branch, package: 'single' });
+      return;
+    }
+    reveal('#moto-target-question');
+    if (!state.motoTarget) return;
+    reveal('#licence-status-question');
+    if (!state.licenceStatus) return;
+    if (state.licenceStatus === 'none') {
+      void requestQuote({
+        course: state.motoTarget,
+        branch: state.branch,
+        heldLicences: [],
+        package: 'moto-confidence',
+      });
+      return;
+    }
+    reveal('#licences-question');
+    const licences = heldLicences();
+    if (!licences.length) return;
+    const ranks: Record<string, number> = { AM: 0, A1: 1, A2: 2, A: 3 };
+    const highest = licences
+      .filter((item) => item in ranks)
+      .sort((a, b) => ranks[b]! - ranks[a]!)[0];
+    const direct =
+      (highest === 'A1' && state.motoTarget === 'a2') ||
+      (highest === 'A2' && state.motoTarget === 'a');
+    if (direct) {
+      reveal('#period-question');
+      if (!state.period) return;
+    }
+    if (['moto-basic', 'moto-confidence'].includes(state.package)) reveal('#package-question');
+    void requestQuote({
+      course: state.motoTarget,
+      branch: state.branch,
+      heldLicences: licences,
+      package: state.package || 'single',
+      ...(direct ? { holdingPeriod: state.period } : {}),
+    });
+  }
+
+  async function requestQuote(selection: Record<string, unknown>) {
+    const sequence = ++requestSequence;
+    try {
+      const response = await fetch('/api/quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(selection),
+      });
+      const result = (await response.json()) as Quote;
+      if (sequence !== requestSequence) return;
+      if (!result.ok) {
+        if (result.code === 'PACKAGE_REQUIRED' && result.allowedPackages) {
+          if (result.allowedPackages.length === 1) {
+            state.package = result.allowedPackages[0]!;
+            render();
+            return;
+          }
+          reveal('#package-question');
+          return;
+        }
+        showContact(result.message);
+        return;
+      }
+      showOffer(selection, result);
+    } catch {
+      showContact('Cenu se nepodařilo bezpečně ověřit. Kontaktujte prosím pobočku Střížkov.');
+    }
+  }
+  function showContact(message: string) {
+    document.querySelector('#contact-message')!.textContent = message;
+    reveal('#contact-result');
+  }
+  function showOffer(selection: Record<string, unknown>, result: Extract<Quote, { ok: true }>) {
+    const course = catalog.find((item) => item.id === selection.course);
+    if (!course) return;
+    document.querySelector('#offer-label')!.textContent = course.label;
+    document.querySelector('#offer-title')!.textContent = course.name;
+    document.querySelector('#offer-description')!.textContent = course.description;
+    document.querySelector('#offer-price')!.textContent = money(result.amount);
+    const packageLabel =
+      result.training === 'supplement'
+        ? 'Doplňovací zkouška · 4 hodiny jízd'
+        : result.package === 'moto-basic'
+          ? 'Moto Základ · 13 hodin jízd'
+          : result.package === 'moto-confidence'
+            ? 'Moto Jistota · 20 hodin jízd' +
+              (result.extraTheoryHours ? ' · 2 hodiny teorie navíc' : '')
+            : state.mode === 'l17'
+              ? `L17 · ${state.transmission === 'automatic' ? 'automat' : 'manuál'}`
+              : state.category === 'auto'
+                ? state.transmission === 'automatic'
+                  ? 'Automat'
+                  : 'Manuál'
+                : 'Rozšíření oprávnění';
+    document.querySelector('#offer-variant')!.textContent = packageLabel;
+    const order = document.querySelector<HTMLButtonElement>('.offer-card [data-order]')!;
+    order.dataset.course = String(selection.course);
+    order.dataset.branch = state.branch;
+    const detail = document.querySelector<HTMLAnchorElement>('#offer-detail')!;
+    detail.href = `/kurzy/${course.slug}`;
+    reveal('#pricing-results');
+    document
+      .querySelector('#pricing-results')
+      ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-category]').forEach((button) =>
+    button.addEventListener('click', () => {
+      state.category = button.dataset.category!;
+      resetDependent();
+      render();
+    }),
+  );
+  document.querySelectorAll<HTMLButtonElement>('[data-branch]').forEach((button) =>
+    button.addEventListener('click', () => {
+      state.branch = button.dataset.branch!;
+      resetDependent();
+      render();
+    }),
+  );
+  for (const [selector, key] of [
+    ['[data-transmission]', 'transmission'],
+    ['[data-mode]', 'mode'],
+    ['[data-moto-target]', 'motoTarget'],
+    ['[data-licence-status]', 'licenceStatus'],
+    ['[data-period]', 'period'],
+    ['[data-package]', 'package'],
+    ['[data-trailer]', 'trailer'],
+  ] as const)
+    document.querySelectorAll<HTMLButtonElement>(selector).forEach((button) =>
+      button.addEventListener('click', () => {
+        state[key] = button.dataset[key] ?? '';
+        if (key !== 'package') state.package = '';
+        render();
+      }),
+    );
+  document.querySelectorAll<HTMLInputElement>('input[name="held-licence"]').forEach((input) =>
+    input.addEventListener('change', () => {
+      state.period = '';
+      state.package = '';
+      render();
+    }),
+  );
+  document.querySelector('.reset-selection')?.addEventListener('click', () => {
+    state.category = '';
+    state.branch = '';
+    resetDependent();
+    render();
+    document.querySelector('#pricing-wizard')?.scrollIntoView({ behavior: 'smooth' });
+  });
+  render();
+</script>
+
+<style>
+  .decision-header {
+    max-width: 760px;
+    margin-bottom: 30px;
+  }
+  .decision-header p {
+    margin-top: 14px;
+  }
+  .decision-card {
+    display: grid;
+    gap: 18px;
+  }
+  .question {
+    min-width: 0;
+    margin: 0;
+    padding: 28px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: #fff;
+  }
+  .question.revealed,
+  .next-question.revealed {
+    animation: question-enter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .question legend {
+    padding: 0 10px 0 0;
+    color: var(--ink);
+    font-weight: 750;
+  }
+  .question legend > span {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    margin-right: 9px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: #102f48;
+    font-size: 0.7rem;
+  }
+  .choice-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .choice-grid.compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .choice-grid.four {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .choice-grid button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 58px;
+    padding: 13px 18px;
+    border: 1px solid #aebfc9;
+    border-radius: 12px;
+    background: #fff;
+    color: var(--ink);
+    font-weight: 650;
+    transition:
+      transform var(--ease),
+      border-color var(--ease),
+      background var(--ease);
+  }
+  .choice-grid button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: var(--brand);
+    background: #eefaf8;
+    box-shadow: 0 8px 22px #4ab9ab1f;
+  }
+  .choice-grid button[aria-pressed='true'] {
+    border-color: var(--blue);
+    background: #e8f2fb;
+    color: var(--ink);
+    box-shadow:
+      inset 0 0 0 1px var(--blue),
+      0 8px 20px #2f5aa61f;
+  }
+  .choice-grid button:disabled {
+    background: #f0f2f3;
+    color: #7a8792;
+  }
+  .choice-grid button img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+  }
+  .choice-grid button strong,
+  .choice-grid button small {
+    display: block;
+  }
+  .choice-grid button small {
+    font-size: 0.68rem;
+    font-weight: 500;
+  }
+  .offer-picker {
+    padding: 32px;
+    border-color: #b8d8d3;
+    background: linear-gradient(145deg, #f5fcfb, #fff 58%);
+  }
+  .offer-picker legend {
+    font-size: clamp(1.25rem, 2vw, 1.55rem);
+  }
+  .picker-intro {
+    max-width: 690px;
+    margin: 7px 0 0;
+  }
+  .marketing-choices {
+    gap: 18px;
+    margin-top: 22px;
+  }
+  .marketing-choices button {
+    position: relative;
+    align-items: flex-start;
+    justify-content: flex-start;
+    min-height: 250px;
+    padding: 28px;
+    flex-direction: column;
+    text-align: left;
+    border-color: #b8c9d3;
+    overflow: hidden;
+  }
+  .marketing-choices button strong {
+    font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+    line-height: 1.1;
+  }
+  .marketing-choices .choice-kicker {
+    color: var(--blue);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .marketing-choices .choice-copy {
+    min-height: 3.7em;
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-weight: 500;
+    line-height: 1.55;
+  }
+  .marketing-choices .choice-price {
+    margin-top: auto;
+    color: var(--ink);
+    font-size: clamp(1.55rem, 3vw, 2.15rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+  .marketing-choices button small {
+    color: var(--muted);
+  }
+  .marketing-choices .recommended-choice {
+    border-color: var(--brand);
+    background: #edf9f7;
+    box-shadow: 0 16px 34px #174b5521;
+  }
+  .marketing-choices .recommendation {
+    position: absolute;
+    top: 18px;
+    right: -35px;
+    width: 145px;
+    padding: 7px 0;
+    transform: rotate(34deg);
+    background: var(--brand);
+    color: #102f48;
+    font-size: 0.62rem;
+    font-weight: 850;
+    letter-spacing: 0.04em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .question-note {
+    margin: 12px 0 0;
+    font-size: 0.78rem;
+  }
+  .check-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .check-grid label {
+    cursor: pointer;
+  }
+  .check-grid input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .check-grid input:focus-visible + span {
+    outline: 3px solid var(--brand);
+    outline-offset: 3px;
+  }
+  .check-grid span {
+    display: grid;
+    place-items: center;
+    min-height: 52px;
+    padding: 10px;
+    border: 1px solid #aebfc9;
+    border-radius: 10px;
+    background: #fff;
+    font-weight: 650;
+  }
+  .check-grid input:checked + span {
+    border-color: var(--blue);
+    background: #e8f2fb;
+    color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--blue);
+  }
+  .check-grid input:focus-visible + span {
+    outline: 3px solid var(--blue);
+    outline-offset: 3px;
+  }
+  .availability-message {
+    margin-top: 4px;
+  }
+  .pricing-results,
+  .contact-result {
+    margin-top: 42px;
+  }
+  .result-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 22px;
+  }
+  .result-heading h2 {
+    font-size: clamp(1.6rem, 3vw, 2.3rem);
+  }
+  .reset-selection {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+  .offer-card {
+    display: grid;
+    grid-template-columns: 1.4fr 0.7fr;
+    gap: 28px;
+    align-items: center;
+    padding: 34px;
+    border: 1px solid #a5d9d1;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, #effaf8, #fff 66%);
+    box-shadow: var(--shadow);
+  }
+  .offer-card h3 {
+    font-size: 1.65rem;
+  }
+  .offer-card p {
+    margin-top: 12px;
+  }
+  .offer-variant {
+    font-weight: 700;
+    color: var(--blue);
+  }
+  .offer-price strong {
+    font-size: clamp(2rem, 4vw, 3rem);
+    letter-spacing: -0.05em;
+  }
+  .offer-price > span {
+    font-size: 1.4rem;
+  }
+  .offer-price small {
+    display: block;
+    margin-top: 7px;
+    color: var(--muted);
+  }
+  .offer-actions {
+    grid-column: 1/-1;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .contact-result h2 {
+    font-size: 1.35rem;
+  }
+  .contact-result p {
+    margin: 10px 0 18px;
+  }
+  .fees {
+    margin-top: 72px;
+    padding-top: 52px;
+    border-top: 1px solid var(--line);
+  }
+  .fee-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .fee-grid article {
+    padding: 26px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--canvas);
+  }
+  .fee-grid img {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    margin-bottom: 18px;
+  }
+  .fee-grid h3 {
+    font-size: 1rem;
+  }
+  .fee-grid > article > strong {
+    display: block;
+    margin-top: 18px;
+    font-size: 1.7rem;
+  }
+  .fee-grid p {
+    margin-top: 10px;
+    font-size: 0.79rem;
+  }
+  .fee-grid p strong {
+    color: var(--ink);
+  }
+  .authority-fees p {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+  }
+  .source-note {
+    margin-top: 24px;
+  }
+  @keyframes question-enter {
+    from {
+      transform: translateY(12px);
+      clip-path: inset(0 0 12px 0);
+    }
+    to {
+      transform: translateY(0);
+      clip-path: inset(0);
+    }
+  }
+  @media (max-width: 760px) {
+    .choice-grid,
+    .choice-grid.compact {
+      grid-template-columns: 1fr;
+    }
+    .choice-grid.four {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .question {
+      padding: 22px;
+    }
+    .check-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .offer-card {
+      grid-template-columns: 1fr;
+      padding: 25px;
+    }
+    .offer-actions {
+      grid-column: auto;
+    }
+    .result-heading {
+      display: block;
+    }
+    .reset-selection {
+      margin-top: 12px;
+    }
+    .fee-grid {
+      grid-template-columns: 1fr;
+    }
+    .category-choices button {
+      justify-content: flex-start;
+    }
+  }
+</style>

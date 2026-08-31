@@ -1,0 +1,891 @@
+[
+  {
+    "source": "prototype",
+    "oldPath": "/404.html",
+    "proposedPath": "/404.html",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/autoskola-kladno",
+    "proposedPath": "/kladno",
+    "decision": "existing redirect",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/autoskola-statenice",
+    "proposedPath": "/statenice",
+    "decision": "existing redirect",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/autoskoly-praha-8",
+    "proposedPath": "/strizkov",
+    "decision": "existing redirect",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/4-nejcastejsi-chyby-kvuli-kterym-lide-neudelaji-zkousku-v-autoskole",
+    "proposedPath": "/blog/4-nejcastejsi-chyby-kvuli-kterym-lide-neudelaji-zkousku-v-autoskole",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/autoskola-praha-8-jak-vybrat",
+    "proposedPath": "/blog/autoskola-praha-8-jak-vybrat",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/autoskola-testy-jak-zvladnout-teoretickou-zkousku",
+    "proposedPath": "/blog/autoskola-testy-jak-zvladnout-teoretickou-zkousku",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/bezpecne-jizdni-navyky",
+    "proposedPath": "/blog/bezpecne-jizdni-navyky",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/co-komisar-sleduje",
+    "proposedPath": "/blog/co-komisar-sleduje",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/co-sleduje-komisar-u-zaverecne-zkousky-v-autoskole",
+    "proposedPath": "/blog/co-sleduje-komisar-u-zaverecne-zkousky-v-autoskole",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/darkovy-poukaz-na-ridicak-smysluplny-darek-ktery-ma-opravdovou-hodnotu",
+    "proposedPath": "/blog/darkovy-poukaz-na-ridicak-smysluplny-darek-ktery-ma-opravdovou-hodnotu",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/hra-o-preziti-zimni-jizda-prahou-jako-boss",
+    "proposedPath": "/blog/hra-o-preziti-zimni-jizda-prahou-jako-boss",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog",
+    "proposedPath": "/blog",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/jak-na-bezpecne-rizeni-praha-tipy-a-triky-pro-prahu-8",
+    "proposedPath": "/blog/jak-na-bezpecne-rizeni-praha-tipy-a-triky-pro-prahu-8",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/jak-probiha-autoskola-skupiny-b-bez-stresu",
+    "proposedPath": "/blog/jak-probiha-autoskola-skupiny-b-bez-stresu",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/jak-probiha-kurz-v-autoskole-praha-8",
+    "proposedPath": "/blog/jak-probiha-kurz-v-autoskole-praha-8",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/kolik-stoji-ridicak-v-roce-2026-v-praze-kompletni-prehled-cen",
+    "proposedPath": "/blog/kolik-stoji-ridicak-v-roce-2026-v-praze-kompletni-prehled-cen",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/nejlevnejsi-autoskola-praha-2026",
+    "proposedPath": "/blog/nejlevnejsi-autoskola-praha-2026",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/pozor-past-autoskoly-v-praze-jak-nenaletet-na-super-levne-kurzy-a-vybrat-kvalitu",
+    "proposedPath": "/blog/pozor-past-autoskoly-v-praze-jak-nenaletet-na-super-levne-kurzy-a-vybrat-kvalitu",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/proc-se-v-autoskole-bojim-delat-chyby-a-je-to-normalni",
+    "proposedPath": "/blog/proc-se-v-autoskole-bojim-delat-chyby-a-je-to-normalni",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/prvni-jizda-v-autoskole-priprava",
+    "proposedPath": "/blog/prvni-jizda-v-autoskole-priprava",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/ridicak-na-automat-kdy-dava-smysl",
+    "proposedPath": "/blog/ridicak-na-automat-kdy-dava-smysl",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/ridicak-na-motorku-priprava",
+    "proposedPath": "/blog/ridicak-na-motorku-priprava",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/ridicak-skupiny-b-tvoje-cesta-ke-svobode-krok-za-krokem",
+    "proposedPath": "/blog/ridicak-skupiny-b-tvoje-cesta-ke-svobode-krok-za-krokem",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/zdravotni-posudek-k-ridicskemu-opravneni-od-1-1-2026",
+    "proposedPath": "/blog/zdravotni-posudek-k-ridicskemu-opravneni-od-1-1-2026",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/blog/zlepsete-sve-ridicske-dovednosti-v-praze-8-bezpecne-rizeni-v-praze",
+    "proposedPath": "/blog/zlepsete-sve-ridicske-dovednosti-v-praze-8-bezpecne-rizeni-v-praze",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/cenik",
+    "proposedPath": "/cenik",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/dekujeme-za-vyplneni-objednavky",
+    "proposedPath": "/dekujeme-za-vyplneni-objednavky",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/doplnovaci-jizdy",
+    "proposedPath": "/kurzy/kondicni-jizdy",
+    "decision": "existing redirect",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/",
+    "proposedPath": "/",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/jak-probiha-vyuka",
+    "proposedPath": "/jak-probiha-vyuka",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/kampane/jesen",
+    "proposedPath": "/kampane/jesen",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/kladno",
+    "proposedPath": "/kladno",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/kontakt",
+    "proposedPath": "/kontakt",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/kurzy/b96",
+    "proposedPath": "/kurzy/b96",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/kurzy/be",
+    "proposedPath": "/kurzy/be",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/kurzy",
+    "proposedPath": "/cenik",
+    "decision": "existing redirect",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/kurzy/kondicni-jizdy",
+    "proposedPath": "/kurzy/kondicni-jizdy",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/kurzy/l17",
+    "proposedPath": "/kurzy/l17",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/kurzy/ridicak-skupina-a",
+    "proposedPath": "/kurzy/ridicak-skupina-a",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/kurzy/ridicak-skupina-a1",
+    "proposedPath": "/kurzy/ridicak-skupina-a1",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/kurzy/ridicak-skupina-a2",
+    "proposedPath": "/kurzy/ridicak-skupina-a2",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/kurzy/ridicak-skupina-am",
+    "proposedPath": "/kurzy/ridicak-skupina-am",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/kurzy/ridicak-skupina-b",
+    "proposedPath": "/kurzy/ridicak-skupina-b",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/kurzy/ridicak-skupina-b-automat",
+    "proposedPath": "/kurzy/ridicak-skupina-b-automat",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/motorky",
+    "proposedPath": "/kurzy/ridicak-skupina-a",
+    "decision": "existing redirect",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/motorky-a2",
+    "proposedPath": "/kurzy/ridicak-skupina-a2",
+    "decision": "existing redirect",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/o-nas",
+    "proposedPath": "/o-nas",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/ridicak-na-automat",
+    "proposedPath": "/kurzy/ridicak-skupina-b-automat",
+    "decision": "existing redirect",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/ridicak-skupina-b",
+    "proposedPath": "/kurzy/ridicak-skupina-b",
+    "decision": "existing redirect",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/shop",
+    "proposedPath": "/shop",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/statenice",
+    "proposedPath": "/statenice",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype",
+    "oldPath": "/strizkov",
+    "proposedPath": "/strizkov",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/",
+    "proposedPath": "/",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/a-kurz",
+    "proposedPath": "/kurzy/ridicak-skupina-a",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/b96",
+    "proposedPath": "/kurzy/b96",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/ba-ridicak-na-automat",
+    "proposedPath": "/kurzy/ridicak-skupina-b-automat",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/be",
+    "proposedPath": "/kurzy/be",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/blog",
+    "proposedPath": "/blog",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/book-online",
+    "proposedPath": null,
+    "decision": "owner decision: preserve content or approve replacement; do not redirect to home",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/casto-kladene-dotazy",
+    "proposedPath": "/casto-kladene-dotazy",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/cenik",
+    "proposedPath": "/cenik",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/cenik-autoskolabubu",
+    "proposedPath": "/cenik",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/copy-of-ucitelak",
+    "proposedPath": null,
+    "decision": "owner decision: preserve content or approve replacement; do not redirect to home",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/copy-of-vop-1",
+    "proposedPath": "/copy-of-vop-1",
+    "decision": "preserve; legal content requires approved version",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/dekujeme-za-vyplneni-objednavky",
+    "proposedPath": "/dekujeme-za-vyplneni-objednavky",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/kladno",
+    "proposedPath": "/kladno",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/kladnocenik",
+    "proposedPath": "/cenik?branch=kladno",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/kurz-a",
+    "proposedPath": "/kurzy/ridicak-skupina-a",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/kurz-a1",
+    "proposedPath": "/kurzy/ridicak-skupina-a1",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/kurz-a2",
+    "proposedPath": "/kurzy/ridicak-skupina-a2",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/kurz-am",
+    "proposedPath": "/kurzy/ridicak-skupina-am",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/kurz-b",
+    "proposedPath": "/kurzy/ridicak-skupina-b",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/kurz-b-stary",
+    "proposedPath": "/kurzy/ridicak-skupina-b",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/kurz-bl17",
+    "proposedPath": "/kurzy/l17",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/kurzy",
+    "proposedPath": "/cenik",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/onas",
+    "proposedPath": "/o-nas",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/post/4-nejčastější-chyby-kvůli-kterým-lidé-neudělají-zkoušku-v-autoškole",
+    "proposedPath": "/blog/4-nejcastejsi-chyby-kvuli-kterym-lide-neudelaji-zkousku-v-autoskole",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/post/autoskolа-testy-jak-zvladnout-teoretickou-zkousku",
+    "proposedPath": "/blog/autoskola-testy-jak-zvladnout-teoretickou-zkousku",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/post/co-komisař-sleduje-u-zkoušky-v-autoškole-checklist-pro-studenty-v-praze",
+    "proposedPath": "/blog/co-komisar-sleduje",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/post/co-sleduje-komisar-u-zaverecne-zkousky-v-autoskole",
+    "proposedPath": "/blog/co-sleduje-komisar-u-zaverecne-zkousky-v-autoskole",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/post/darkovy-poukaz-na-ridicak-smysluplny-darek-ktery-ma-opravdovou-hodnotu",
+    "proposedPath": "/blog/darkovy-poukaz-na-ridicak-smysluplny-darek-ktery-ma-opravdovou-hodnotu",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/post/hra-o-přežití-zimní-jízda-prahou-jako-boss",
+    "proposedPath": "/blog/hra-o-preziti-zimni-jizda-prahou-jako-boss",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/post/jak-na-bezpečné-řízení-praha-tipy-a-triky-pro-prahu-8",
+    "proposedPath": "/blog/jak-na-bezpecne-rizeni-praha-tipy-a-triky-pro-prahu-8",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/post/jak-probiha-autoskola-skupiny-b-bez-stresu",
+    "proposedPath": "/blog/jak-probiha-autoskola-skupiny-b-bez-stresu",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/post/jak-probiha-kurz-v-autoskole-praha-8",
+    "proposedPath": "/blog/jak-probiha-kurz-v-autoskole-praha-8",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/post/jak-vybrat-autoskolu-praha",
+    "proposedPath": "/blog/autoskola-praha-8-jak-vybrat",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/post/kolik-stojí-řidičák-v-roce-2026-v-praze-kompletní-přehled-cen",
+    "proposedPath": "/blog/kolik-stoji-ridicak-v-roce-2026-v-praze-kompletni-prehled-cen",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/post/nejlevnější-autoškola-v-praze-v-roce-2026-kde-se-opravdu-vyplatí",
+    "proposedPath": "/blog/nejlevnejsi-autoskola-praha-2026",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/post/pozor-past-autoškoly-v-praze-jak-nenaletět-na-super-levné-kurzy-a-vybrat-kvalitu",
+    "proposedPath": "/blog/pozor-past-autoskoly-v-praze-jak-nenaletet-na-super-levne-kurzy-a-vybrat-kvalitu",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/post/proč-je-důležité-řídit-s-jistotou-bezpečné-jízdní-návyky",
+    "proposedPath": "/blog/bezpecne-jizdni-navyky",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/post/proč-se-v-autoškole-bojím-dělat-chyby-a-je-to-normální",
+    "proposedPath": "/blog/proc-se-v-autoskole-bojim-delat-chyby-a-je-to-normalni",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/post/prvni-jizda-v-autoskole-priprava",
+    "proposedPath": "/blog/prvni-jizda-v-autoskole-priprava",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/post/ridicak-skupiny-b-tvoje-cesta-ke-svobode-krok-za-krokem",
+    "proposedPath": "/blog/ridicak-skupiny-b-tvoje-cesta-ke-svobode-krok-za-krokem",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/post/zdravotní-posudek-k-řidičskému-oprávnění-od-1-1-2026",
+    "proposedPath": "/blog/zdravotni-posudek-k-ridicskemu-opravneni-od-1-1-2026",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/post/zlepšete-své-řidičské-dovednosti-v-praze-8-bezpečné-řízení-v-praze",
+    "proposedPath": "/blog/zlepsete-sve-ridicske-dovednosti-v-praze-8-bezpecne-rizeni-v-praze",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/prihlasitse",
+    "proposedPath": "/prihlasitse",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/ridicak-podzim-praha",
+    "proposedPath": null,
+    "decision": "owner decision: preserve content or approve replacement; do not redirect to home",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/service-page/řidičák-skupiny-b-12",
+    "proposedPath": null,
+    "decision": "owner decision: preserve content or approve replacement; do not redirect to home",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/service-page/řidičák-skupiny-b-a-ba-automat",
+    "proposedPath": null,
+    "decision": "owner decision: preserve content or approve replacement; do not redirect to home",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/statenice",
+    "proposedPath": "/statenice",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/statenicecenik",
+    "proposedPath": "/cenik?branch=statenice",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/strizkov",
+    "proposedPath": "/strizkov",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/strizkovcenik",
+    "proposedPath": "/cenik?branch=strizkov",
+    "decision": "proposed 301 to equivalent prototype page; review canonical and content parity before implementation",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/team",
+    "proposedPath": "/team",
+    "decision": "preserve",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/terms-and-conditions",
+    "proposedPath": "/terms-and-conditions",
+    "decision": "preserve; legal content requires approved version",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "live",
+    "oldPath": "/ucitelak",
+    "proposedPath": null,
+    "decision": "owner decision: preserve content or approve replacement; do not redirect to home",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "prototype-js-link",
+    "oldPath": "/pobocky",
+    "proposedPath": null,
+    "decision": "link-only route; confirm target and provide actual page",
+    "status": "unresolved"
+  },
+  {
+    "source": "prototype-js-link",
+    "oldPath": "/faq",
+    "proposedPath": null,
+    "decision": "link-only route; confirm target and provide actual page",
+    "status": "unresolved"
+  },
+  {
+    "source": "prototype-js-link",
+    "oldPath": "/vseobecne-obchodni-podminky",
+    "proposedPath": null,
+    "decision": "link-only route; confirm target and provide actual page",
+    "status": "unresolved"
+  },
+  {
+    "source": "prototype-js-link",
+    "oldPath": "/zasady-ochrany-osobnich-udaju",
+    "proposedPath": null,
+    "decision": "link-only route; confirm target and provide actual page",
+    "status": "unresolved"
+  },
+  {
+    "source": "legacy-portal",
+    "oldPath": "/onboarding/*",
+    "proposedPath": null,
+    "decision": "remove legacy functionality; noindex 410 or explicit information page at launch; new staff access at /sprava",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "legacy-portal",
+    "oldPath": "/student/*",
+    "proposedPath": null,
+    "decision": "remove legacy functionality; noindex 410 or explicit information page at launch; new staff access at /sprava",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "legacy-portal",
+    "oldPath": "/admin/*",
+    "proposedPath": null,
+    "decision": "remove legacy functionality; noindex 410 or explicit information page at launch; new staff access at /sprava",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "legacy-portal",
+    "oldPath": "/dashboard",
+    "proposedPath": null,
+    "decision": "remove legacy functionality; noindex 410 or explicit information page at launch; new staff access at /sprava",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "legacy-portal",
+    "oldPath": "/students/*",
+    "proposedPath": null,
+    "decision": "remove legacy functionality; noindex 410 or explicit information page at launch; new staff access at /sprava",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "legacy-portal",
+    "oldPath": "/lessons",
+    "proposedPath": null,
+    "decision": "remove legacy functionality; noindex 410 or explicit information page at launch; new staff access at /sprava",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "legacy-portal",
+    "oldPath": "/calendar",
+    "proposedPath": null,
+    "decision": "remove legacy functionality; noindex 410 or explicit information page at launch; new staff access at /sprava",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "legacy-portal",
+    "oldPath": "/lectures",
+    "proposedPath": null,
+    "decision": "remove legacy functionality; noindex 410 or explicit information page at launch; new staff access at /sprava",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "legacy-portal",
+    "oldPath": "/evidence",
+    "proposedPath": null,
+    "decision": "remove legacy functionality; noindex 410 or explicit information page at launch; new staff access at /sprava",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "legacy-portal",
+    "oldPath": "/exams",
+    "proposedPath": null,
+    "decision": "remove legacy functionality; noindex 410 or explicit information page at launch; new staff access at /sprava",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "legacy-portal",
+    "oldPath": "/payments",
+    "proposedPath": null,
+    "decision": "remove legacy functionality; noindex 410 or explicit information page at launch; new staff access at /sprava",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "legacy-portal",
+    "oldPath": "/communication",
+    "proposedPath": null,
+    "decision": "remove legacy functionality; noindex 410 or explicit information page at launch; new staff access at /sprava",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "legacy-portal",
+    "oldPath": "/fleet",
+    "proposedPath": null,
+    "decision": "remove legacy functionality; noindex 410 or explicit information page at launch; new staff access at /sprava",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "legacy-portal",
+    "oldPath": "/statistics",
+    "proposedPath": null,
+    "decision": "remove legacy functionality; noindex 410 or explicit information page at launch; new staff access at /sprava",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "legacy-portal",
+    "oldPath": "/settings",
+    "proposedPath": null,
+    "decision": "remove legacy functionality; noindex 410 or explicit information page at launch; new staff access at /sprava",
+    "status": "proposed-not-implemented"
+  },
+  {
+    "source": "legacy-portal",
+    "oldPath": "/mobile/*",
+    "proposedPath": null,
+    "decision": "remove legacy functionality; noindex 410 or explicit information page at launch; new staff access at /sprava",
+    "status": "proposed-not-implemented"
+  }
+]

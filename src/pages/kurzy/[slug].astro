@@ -1,0 +1,180 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Roadmap from '../../components/Roadmap.astro';
+import Faq from '../../components/Faq.astro';
+import FinalCta from '../../components/FinalCta.astro';
+import {
+  courses,
+  branches,
+  availableAt,
+  displayPrice,
+  money,
+  type Course,
+} from '../../lib/catalog';
+import car from '../../assets/car.jpg';
+import moto from '../../assets/moto.jpeg';
+import trailer from '../../assets/trailer.jpeg';
+export const prerender = true;
+export function getStaticPaths() {
+  return courses.map((course) => ({ params: { slug: course.slug }, props: { course } }));
+}
+interface Props {
+  course: Course;
+}
+const { course } = Astro.props;
+const photo = course.category === 'auto' ? car : course.category === 'moto' ? moto : trailer;
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Course',
+  name: course.name,
+  description: course.description,
+  provider: {
+    '@type': 'Organization',
+    name: 'Autoškola BuBu',
+    url: 'https://www.autoskolabubu.cz',
+  },
+};
+---
+
+<Base
+  title={`${course.label} – ${course.name}`}
+  description={`${course.description} Podívejte se na průběh a cenu kurzu ${course.label} v Autoškole BuBu.`}
+  schema={schema}
+  ><section class="page-hero">
+    <div class="container">
+      <nav class="breadcrumbs" aria-label="Drobečková navigace">
+        <a href="/">Domů</a><span>/</span><a href="/cenik">Kurzy</a><span>/</span><span
+          >{course.label}</span
+        >
+      </nav><div class="split">
+        <div>
+          <span class="eyebrow">{course.label} · Autoškola BuBu</span><h1>{course.name}.</h1><p
+            class="lead"
+          >
+            {course.description}
+          </p><div class="actions">
+            <button class="btn primary" data-order disabled data-course={course.id}
+              >Vybrat kurz ↗</button
+            ><a class="btn secondary" href="#cena">Kolik kurz stojí</a>
+          </div>
+        </div><Image
+          src={photo}
+          alt={course.category === 'moto'
+            ? 'Výcvikové motocykly Autoškoly BuBu'
+            : course.category === 'prives'
+              ? 'Výcviková souprava s přívěsem'
+              : 'Auto Autoškoly BuBu pro praktický výcvik'}
+          widths={[480, 800]}
+          sizes="(max-width:640px) 90vw,45vw"
+          format="webp"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container split">
+      <div>
+        <span class="eyebrow">Je to kurz pro vás?</span><h2>Nový začátek.<br />Nebo další krok.</h2>
+      </div><div>
+        <p class="lead">
+          {
+            course.category === 'moto'
+              ? 'Začínáte na motorce, nebo už máte jiné oprávnění? Podle toho vybereme správný výcvik. Bez řidičského oprávnění nabízíme pouze Moto Jistota s rozšířenou teorií.'
+              : course.category === 'prives'
+                ? 'Potřebujete k autu připojit přívěs? Při výběru rozhoduje vaše současné oprávnění a parametry soupravy. V případě nejistoty je společně ověříme.'
+                : 'Ať se na první jízdu těšíte, nebo máte trochu obavy, začneme tím, co právě potřebujete zvládnout. Předchozí zkušenosti za volantem nepotřebujete.'
+          }
+        </p>
+      </div>
+    </div>
+  </section>
+  <section class="section tinted">
+    <div class="container">
+      <span class="eyebrow">Co vás čeká</span><h2>Výcvik, který má návaznost.</h2><div
+        class="grid includes"
+      >
+        <article class="card">
+          <h3>Srozumitelná příprava</h3><p>Od základů k řešení dopravních situací v praxi.</p>
+        </article><article class="card">
+          <h3>Praktický výcvik</h3><p>
+            Ovládání vozidla a postupné získávání zkušeností v provozu.
+          </p>
+        </article><article class="card">
+          <h3>Příprava ke zkoušce</h3><p>
+            Projdete dovednosti, které využijete při zkoušce i po ní.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section><Roadmap />
+  <section class="section tinted" id="cena">
+    <div class="container">
+      <div class="section-heading">
+        <div><span class="eyebrow">Cena a pobočky</span><h2>Vyberte, kde začnete.</h2></div><a
+          class="text-link"
+          href="/cenik">Kompletní ceník ↗</a
+        >
+      </div><div class="grid">
+        {
+          branches
+            .filter((b) => availableAt(course, b.id))
+            .map((b) => (
+              <article class="card">
+                <>
+                  <span class="eyebrow">{b.locality}</span>
+                  <h3>{b.name}</h3>
+                  <div class="price">
+                    {course.category === 'moto' && <small>od </small>}
+                    {money(displayPrice(course, b.id))}
+                  </div>
+                  <p>
+                    {course.category === 'moto'
+                      ? 'Moto Základ 24 900 Kč / Moto Jistota 31 900 Kč. Konečná varianta podle oprávnění.'
+                      : 'Jedna cena kurzu. Bez dalších balíčků.'}
+                  </p>
+                  <button
+                    class="btn primary"
+                    data-order
+                    disabled
+                    data-course={course.id}
+                    data-branch={b.id}
+                  >
+                    Vybrat {b.name} ↗
+                  </button>
+                </>
+              </article>
+            ))
+        }
+      </div><p class="fee-note">
+        Poplatky za zkoušku se hradí samostatně. <a href="/cenik"
+          >Přehled poplatků a podmínek ceny</a
+        >.
+      </p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container content">
+      <span class="eyebrow">Nemusíte všechno umět hned</span><h2>První chyby patří k učení.</h2><p
+        class="lead"
+      >
+        Když něco není jasné, zeptáte se. Když něco nejde napoprvé, vrátíme se k tomu. Cílem je
+        rozumět tomu, co za volantem děláte.
+      </p>
+    </div>
+  </section><Faq /><FinalCta />
+</Base>
+<style>
+  .includes {
+    margin-top: 32px;
+  }
+  .fee-note {
+    font-size: 0.8rem;
+    margin-top: 28px;
+  }
+  .content > .lead {
+    margin-top: 22px;
+  }
+</style>

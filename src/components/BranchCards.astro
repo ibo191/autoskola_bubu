@@ -1,0 +1,83 @@
+---
+import { branches, money } from '../lib/catalog';
+---
+
+<section class="section tinted" data-reveal>
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Najděte si svoji pobočku</span><h2>Jsme blíž, než si myslíte.</h2><p>
+          Praha, Kladno, nebo Statenice? Začněte tam, kde vám to vyhovuje.
+        </p>
+      </div>
+    </div><div class="grid">
+      {
+        branches.map((b, i) => (
+          <article class="card branch-card">
+            <>
+              <div class="branch-top">
+                <>
+                  <span class="eyebrow">
+                    0{i + 1} / {b.locality}
+                  </span>
+                  <img
+                    src="/icons/ui/blue-location.webp"
+                    alt=""
+                    width="192"
+                    height="192"
+                    loading="lazy"
+                  />
+                </>
+              </div>
+              <h3>
+                <a href={`/${b.id}`}>{b.name}</a>
+              </h3>
+              <p>{b.address}</p>
+              <p>{b.hours ?? 'Čas návštěvy si ověřte na pobočce.'}</p>
+              <div class="branch-bottom">
+                <>
+                  <span>
+                    Skupina B <strong>{money(b.bPrice)}</strong>
+                  </span>
+                  <a class="text-link" href={`/${b.id}`}>
+                    O pobočce →
+                  </a>
+                </>
+              </div>
+            </>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+<style>
+  .branch-top {
+    display: flex;
+    justify-content: space-between;
+  }
+  .branch-top img {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+  }
+  .branch-card h3 {
+    font-size: 1.8rem;
+  }
+  .branch-card h3 a {
+    text-decoration: none;
+  }
+  .branch-bottom {
+    border-top: 1px solid var(--line);
+    margin-top: 26px;
+    padding-top: 20px;
+    font-size: 0.8rem;
+  }
+  .branch-bottom strong {
+    display: block;
+    font-size: 1.1rem;
+  }
+  .branch-bottom .text-link {
+    margin-top: 12px;
+  }
+</style>

@@ -1,0 +1,50 @@
+---
+const { branch = '' } = Astro.props;
+---
+
+<section class="section">
+  <div class="container">
+    <div class="final-cta">
+      <div>
+        <span class="eyebrow">Vaše první jízda začíná tady</span><h2>
+          Na řidičák nemusíte být sami.
+        </h2><p>Vyberte si kurz. Zbytek projdeme společně.</p>
+      </div><button class="btn" data-order disabled data-branch={branch}
+        >Vybrat kurz <span aria-hidden="true">↗</span></button
+      >
+    </div>
+  </div>
+</section>
+<style>
+  .final-cta {
+    background: var(--brand-soft);
+    border: 1px solid #c8e5dc;
+    border-radius: var(--radius-lg);
+    padding: 44px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    justify-content: space-between;
+  }
+  .final-cta h2 {
+    font-size: 2rem;
+  }
+  .final-cta p {
+    margin-top: 16px;
+  }
+  .final-cta .btn {
+    flex-shrink: 0;
+  }
+  @media (max-width: 700px) {
+    .final-cta {
+      padding: 28px;
+      display: block;
+    }
+    .final-cta .btn {
+      margin-top: 24px;
+    }
+    .final-cta h2 {
+      font-size: 1.7rem;
+    }
+  }
+</style>

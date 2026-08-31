@@ -1,0 +1,297 @@
+---
+export const prerender = true;
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import car from '../assets/car.jpg';
+import CourseCard from '../components/CourseCard.astro';
+import Roadmap from '../components/Roadmap.astro';
+import BranchCards from '../components/BranchCards.astro';
+import Faq from '../components/Faq.astro';
+import FinalCta from '../components/FinalCta.astro';
+import { getCourse } from '../lib/catalog';
+---
+
+<Base
+  title="Řidičák s klidem. A s BuBu."
+  description="Autoškola BuBu v Praze 8 na Střížkově, v Kladně a Statenicích. Kurzy na auto, motorku i přívěs. Vyberte si svoji cestu k řidičáku."
+>
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <span class="pill">Praha 8 · Kladno · Statenice</span><h1>
+          Řidičák s klidem.<br />A s <span>BuBu.</span>
+        </h1><p class="lead">
+          První rozjezd. První křižovatka. První jízda, na kterou budete pyšní. Projdeme to s vámi,
+          krok za krokem.
+        </p><div class="actions">
+          <a class="btn primary" href="/cenik">Najít svůj kurz <span aria-hidden="true">↗</span></a
+          ><a class="btn secondary" href="/jak-probiha-vyuka">Jak to u nás chodí</a>
+        </div><div class="hero-details">
+          <span>✓ Lidský přístup</span><span>✓ Přehledné ceny</span><span>✓ 3 pobočky</span>
+        </div>
+      </div><div class="hero-visual">
+        <div class="photo-label">VAŠE CESTA ZAČÍNÁ TADY <span>↗</span></div><Image
+          src={car}
+          alt="Bílá Škoda Fabia Autoškoly BuBu připravená na výcvik"
+          widths={[480, 768, 1080]}
+          sizes="(max-width:640px) 90vw, 48vw"
+          format="webp"
+          loading="eager"
+          fetchpriority="high"
+        /><div class="photo-caption">
+          <span class="mini-ghost"
+            ><img src="/brand/bubak.png" alt="" width="250" height="250" /></span
+          ><div>
+            <strong>Za volantem nemusíte být sami.</strong><span>Od první jízdy až ke zkoušce.</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="trust-strip">
+    <div class="container">
+      <span>Auto i automat</span><span>L17 s mentorem</span><span>Motorky AM až A</span><span
+        >Přívěsy B96 a B+E</span
+      >
+    </div>
+  </div>
+  <section class="section tinted" data-reveal>
+    <div class="container">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">Jaká bude vaše cesta?</span><h2>Vyberte si svůj řidičák.</h2><p>
+            Každý začíná jinak. Najděte kurz, který odpovídá vašim plánům.
+          </p>
+        </div><a class="text-link" href="/cenik">Všechny kurzy a ceny ↗</a>
+      </div><div class="grid">
+        {(['b', 'l17', 'a'] as const).map((id) => <CourseCard course={getCourse(id)} photo />)}
+      </div>
+    </div>
+  </section>
+  <Roadmap />
+  <section class="section why" data-reveal>
+    <div class="container">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">Proč právě BuBu</span><h2>Učíme řídit.<br />S respektem k vám.</h2>
+        </div><p>
+          V autoškole jste od toho, abyste se učili. Na otázky, opakování i první chyby tu má být
+          místo.
+        </p>
+      </div><div class="grid">
+        <article>
+          <div class="why-top">
+            <img
+              src="/icons/ui/mint-conversation.webp"
+              alt=""
+              width="192"
+              height="192"
+              loading="lazy"
+            /><span class="why-number">01</span>
+          </div><h3>Vysvětlujeme srozumitelně</h3><p>
+            Pravidla propojujeme se situacemi, které za volantem opravdu zažijete.
+          </p>
+        </article><article>
+          <div class="why-top">
+            <img
+              src="/icons/ui/mint-target.webp"
+              alt=""
+              width="192"
+              height="192"
+              loading="lazy"
+            /><span class="why-number">02</span>
+          </div><h3>Postupujeme krok za krokem</h3><p>
+            Od ovládání auta po rozhodování v provozu. Každá jízda má svůj smysl.
+          </p>
+        </article><article>
+          <div class="why-top">
+            <img
+              src="/icons/ui/mint-safety-heart.webp"
+              alt=""
+              width="192"
+              height="192"
+              loading="lazy"
+            /><span class="why-number">03</span>
+          </div><h3>Víte, na čem jste</h3><p>
+            Kurz a cenu si vyberete předem. Osobní zápis vyřídíte na své pobočce.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+  <BranchCards /><Faq /><FinalCta />
+</Base>
+<style>
+  .hero {
+    background: linear-gradient(115deg, #f4fbf9 0%, #f4fbf9 58%, #d9f2ed 58%);
+    padding: 64px 0 72px;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: 50px;
+    align-items: center;
+  }
+  .hero-copy h1 {
+    margin-top: 28px;
+  }
+  .hero-copy h1 span {
+    color: var(--brand-dark);
+  }
+  .hero-copy .lead {
+    font-size: 1rem;
+    margin-top: 26px;
+    max-width: 460px;
+  }
+  .hero-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 28px;
+    font-size: 0.67rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .hero-visual {
+    position: relative;
+    padding-bottom: 28px;
+  }
+  .hero-visual > img {
+    aspect-ratio: 1.06;
+    object-fit: cover;
+    border-radius: 5px 5px 85px 5px;
+    object-position: 56% 50%;
+  }
+  .photo-label {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    font-size: 0.61rem;
+    letter-spacing: 0.16em;
+    font-weight: 700;
+  }
+  .photo-label span {
+    font-size: 1rem;
+  }
+  .photo-caption {
+    position: absolute;
+    bottom: 0;
+    left: -24px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    background: #fff;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    padding: 14px 22px;
+    border-radius: 10px;
+  }
+  .photo-caption strong {
+    display: block;
+    font-size: 0.73rem;
+  }
+  .photo-caption span:not(.mini-ghost) {
+    display: block;
+    font-size: 0.66rem;
+    color: var(--muted);
+  }
+  .mini-ghost {
+    width: 42px;
+    overflow: hidden;
+    border-radius: 50%;
+  }
+  .trust-strip {
+    border-block: 1px solid var(--line);
+  }
+  .trust-strip > .container {
+    display: flex;
+    justify-content: space-between;
+    padding-block: 22px;
+    gap: 20px;
+    font-size: 0.73rem;
+    font-weight: 650;
+  }
+  .trust-strip span::before {
+    content: '✳';
+    color: var(--brand-dark);
+    margin-right: 12px;
+  }
+  .why {
+    background: var(--blue);
+    color: white;
+  }
+  .why p {
+    color: #e4ebf7;
+  }
+  .why .eyebrow {
+    color: #b1eee5;
+  }
+  .why .section-heading > p {
+    max-width: 410px;
+    font-size: 0.93rem;
+  }
+  .why article {
+    border-top: 1px solid #6f8cc0;
+    padding-top: 24px;
+  }
+  .why-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+  }
+  .why-top img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+  }
+  .why article p {
+    font-size: 0.89rem;
+    margin-top: 16px;
+  }
+  .why-number {
+    font-size: 0.75rem;
+    color: #b1eee5;
+    display: block;
+  }
+  @media (max-width: 900px) {
+    .hero-grid {
+      gap: 28px;
+    }
+    .photo-caption {
+      left: -10px;
+      padding: 12px;
+    }
+    .hero-details {
+      gap: 12px;
+    }
+  }
+  @media (max-width: 640px) {
+    .hero {
+      padding: 38px 0 36px;
+    }
+    .hero-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    .hero-copy h1 {
+      font-size: 3rem;
+    }
+    .hero-visual > img {
+      aspect-ratio: 1.4;
+    }
+    .photo-caption {
+      left: 12px;
+    }
+    .trust-strip > .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      font-size: 0.65rem;
+    }
+    .trust-strip span::before {
+      margin-right: 7px;
+    }
+  }
+</style>

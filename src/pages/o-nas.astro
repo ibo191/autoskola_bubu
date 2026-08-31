@@ -1,0 +1,45 @@
+---
+export const prerender = true;
+import Base from '../layouts/Base.astro';
+import BranchCards from '../components/BranchCards.astro';
+import FinalCta from '../components/FinalCta.astro';
+---
+
+<Base
+  title="O nás"
+  description="Poznejte Autoškolu BuBu. Učíme řídit v Praze 8, Kladně a Statenicích. Srozumitelně, postupně a s respektem k tomu, že se teprve učíte."
+  ><section class="page-hero">
+    <div class="container">
+      <nav class="breadcrumbs" aria-label="Drobečková navigace">
+        <a href="/">Domů</a><span>/</span><span>O nás</span>
+      </nav><span class="eyebrow">Těší nás. Jsme BuBu.</span><h1>
+        Učíme řídit.<br />A věřit si za volantem.
+      </h1><p class="lead">
+        První jízda je začátek, ne zkouška. Vytváříme prostor, ve kterém se můžete ptát, zkoušet a
+        postupně zlepšovat.
+      </p>
+    </div>
+  </section><section class="section">
+    <div class="container">
+      <div class="grid">
+        <article class="card">
+          <span class="eyebrow">01 / Přístup</span><h2 class="value">Respekt k začátkům.</h2><p>
+            Každý někdy řídil poprvé. Počítáme s tím, že potřebujete čas i vysvětlení.
+          </p>
+        </article><article class="card">
+          <span class="eyebrow">02 / Výuka</span><h2 class="value">Pravidla v souvislostech.</h2><p>
+            Teorie má pomáhat v provozu. Spojujeme ji s konkrétními situacemi za volantem.
+          </p>
+        </article><article class="card">
+          <span class="eyebrow">03 / Spolupráce</span><h2 class="value">Mluvíme spolu.</h2><p>
+            Otázky patří k výuce. Když něco není jasné, společně se k tomu vrátíme.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section><BranchCards /><FinalCta /></Base
+><style>
+  .value {
+    font-size: 1.65rem;
+  }
+</style>

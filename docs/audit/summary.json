@@ -1,0 +1,24 @@
+{
+  "prototypeHtmlRoutes": 53,
+  "liveSitemapUrls": 54,
+  "liveStatusCounts": {
+    "200": 54
+  },
+  "prototypeMissingCanonical": [
+    "/kampane/jesen"
+  ],
+  "prototypeInvalidJsonld": [],
+  "liveMissingH1": [
+    "https://www.autoskolabubu.cz/cenik-autoskolabubu",
+    "https://www.autoskolabubu.cz/service-page/řidičák-skupiny-b-12",
+    "https://www.autoskolabubu.cz/service-page/řidičák-skupiny-b-a-ba-automat"
+  ],
+  "liveUnresolvedUrlDecisions": [
+    "/book-online",
+    "/copy-of-ucitelak",
+    "/ridicak-podzim-praha",
+    "/service-page/řidičák-skupiny-b-12",
+    "/service-page/řidičák-skupiny-b-a-ba-automat",
+    "/ucitelak"
+  ]
+}

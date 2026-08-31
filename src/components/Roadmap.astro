@@ -1,0 +1,288 @@
+---
+const steps = [
+  {
+    title: 'Online objednávka',
+    summary: 'Kurz, pobočku i termín zápisu si vyberete online.',
+    detail:
+      'Kurz si vyberete na našem webu a přihlásíte se do něj online. V posledním kroku si zvolíte datum a čas, kdy se dostavíte k osobnímu zápisu do autoškoly.',
+    icon: 'pencil',
+  },
+  {
+    title: 'Osobní zápis',
+    summary: 'Dokumenty společně vyřídíme na vaší pobočce.',
+    detail:
+      'Osobní zápis probíhá na každé pobočce v otevírací době. Můžete se rovnou objednat na konkrétní den a čas, kdy nám přinesete všechny potřebné dokumenty, zejména žádost o přijetí k výuce a výcviku a zdravotní posudek.',
+    icon: 'calendar',
+  },
+  {
+    title: 'Teorie',
+    summary: 'Poznáte pravidla a připravíte se na provoz.',
+    detail:
+      'Při zápisu se dozvíte, kdy váš kurz začíná a kdy přijdete na první teorii. Po absolvování všech povinných bloků proběhne na pobočce interní teoretický test, při kterém si společně ověříme vaše znalosti.',
+    icon: 'classroom-solid',
+  },
+  {
+    title: 'Praktické jízdy',
+    summary: 'Za volant usednete se svým přiděleným instruktorem.',
+    detail:
+      'Po úspěšném absolvování našeho interního ověření znalostí pravidel silničního provozu usednete do auta a začnete praktické jízdy za volantem se svým přiděleným instruktorem.',
+    icon: 'car',
+  },
+  {
+    title: 'Zkouška nanečisto',
+    summary: 'Dobrovolně si vyzkoušíte průběh celé zkoušky.',
+    detail:
+      'Jako doplňkovou službu vám nabízíme možnost vyzkoušet si zkoušku nanečisto. Je čistě na vás, zda ji využijete. Čeká vás simulace teoretického testu i praktické jízdy v podobě, která odpovídá ostré zkoušce na úřadě.',
+    icon: 'target',
+  },
+  {
+    title: 'Závěrečná zkouška',
+    summary: 'Teoretická část a závěrečná praktická jízda.',
+    detail:
+      'Teoretická část závěrečné zkoušky zpravidla probíhá na příslušném úřadě podle vaší pobočky. Praktická jízda se koná v okolí pobočky autoškoly nebo příslušného úřadu.',
+    icon: 'graduation',
+  },
+];
+---
+
+<section class="section roadmap-section" aria-labelledby="roadmap-title" data-reveal>
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Od přihlášky k řidičáku</span><h2 id="roadmap-title">
+          Víte, co vás čeká.<br />Krok za krokem.
+        </h2>
+      </div><a class="text-link" href="/jak-probiha-vyuka">Jak probíhá výuka ↗</a>
+    </div>
+    <ol class="roadmap" style="--road-progress: 0%">
+      {
+        steps.map((step, i) => (
+          <li class:list={{ active: i === 0 }}>
+            <button
+              type="button"
+              aria-pressed={i === 0 ? 'true' : 'false'}
+              aria-expanded={i === 0 ? 'true' : 'false'}
+              aria-controls={`road-detail-${i}`}
+              data-road-step={i}
+            >
+              <span class="step-top">
+                <img
+                  src={`/icons/ui/blue-${step.icon}.webp`}
+                  alt=""
+                  width="192"
+                  height="192"
+                  loading="lazy"
+                />
+                <span class="step-number">0{i + 1}</span>
+              </span>
+              <>
+                <h3>{step.title}</h3>
+                <p>{step.summary}</p>
+              </>
+            </button>
+          </li>
+        ))
+      }
+    </ol>
+    <div class="roadmap-details" aria-live="polite">
+      {
+        steps.map((step, i) => (
+          <article id={`road-detail-${i}`} data-road-detail={i} hidden={i !== 0}>
+            <>
+              <span class="detail-number">0{i + 1}</span>
+              <div>
+                <>
+                  <h3>{step.title}</h3>
+                  <p>{step.detail}</p>
+                </>
+              </div>
+            </>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+<script>
+  document.querySelectorAll<HTMLOListElement>('.roadmap').forEach((roadmap) => {
+    const buttons = roadmap.querySelectorAll<HTMLButtonElement>('[data-road-step]');
+    const details = roadmap.parentElement?.querySelectorAll<HTMLElement>('[data-road-detail]');
+    buttons.forEach((button, index) => {
+      button.addEventListener('click', () => {
+        buttons.forEach((step, stepIndex) => {
+          const active = stepIndex === index;
+          step.setAttribute('aria-pressed', String(active));
+          step.setAttribute('aria-expanded', String(active));
+          step.closest('li')?.classList.toggle('active', active);
+        });
+        details?.forEach((detail, detailIndex) => (detail.hidden = detailIndex !== index));
+        roadmap.style.setProperty('--road-progress', `${(index / (buttons.length - 1)) * 100}%`);
+      });
+    });
+  });
+</script>
+<style>
+  .roadmap {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .roadmap::before,
+  .roadmap::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 3px;
+    border-radius: 3px;
+  }
+  .roadmap::before {
+    width: 100%;
+    background: var(--line);
+  }
+  .roadmap::after {
+    width: var(--road-progress);
+    background: linear-gradient(90deg, var(--brand), var(--blue));
+    transition: width 460ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .roadmap li {
+    position: relative;
+    padding-top: 18px;
+  }
+  .roadmap button {
+    width: 100%;
+    height: 100%;
+    padding: 16px;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    transition:
+      background 260ms ease,
+      border-color 260ms ease,
+      transform 260ms ease;
+  }
+  .roadmap button:hover {
+    transform: translateY(-3px);
+    background: var(--brand-soft);
+  }
+  .roadmap li.active button {
+    background: var(--brand-soft);
+    border-color: #a5d9d1;
+    box-shadow: inset 0 3px 0 var(--brand);
+  }
+  .step-number {
+    display: block;
+    color: var(--brand-dark);
+    font-size: 0.8rem;
+    font-weight: 750;
+  }
+  .step-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .step-top img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .roadmap li.active .step-top img,
+  .roadmap button:hover .step-top img {
+    transform: scale(1.08) rotate(-2deg);
+  }
+  .roadmap h3 {
+    font-size: 0.92rem;
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+  }
+  .roadmap p {
+    margin-top: 10px;
+    font-size: 0.76rem;
+  }
+  .roadmap-details {
+    min-height: 190px;
+    margin-top: 24px;
+  }
+  .roadmap-details article {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 22px;
+    padding: 30px;
+    border: 1px solid #a5d9d1;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, var(--brand-soft), #fff 74%);
+    animation: detail-enter 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .roadmap-details article[hidden] {
+    display: none;
+  }
+  .detail-number {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #21457f;
+    color: #fff;
+    font-weight: 800;
+  }
+  .roadmap-details h3 {
+    font-size: clamp(1.25rem, 2vw, 1.55rem);
+  }
+  .roadmap-details p {
+    max-width: 900px;
+    margin-top: 9px;
+    line-height: 1.7;
+  }
+  @keyframes detail-enter {
+    from {
+      transform: translateY(8px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  @media (max-width: 1050px) {
+    .roadmap {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .roadmap::before,
+    .roadmap::after {
+      display: none;
+    }
+  }
+  @media (max-width: 760px) {
+    .roadmap {
+      grid-template-columns: 1fr;
+    }
+    .roadmap li {
+      padding: 6px 0 0;
+    }
+    .roadmap button {
+      padding: 15px 18px;
+    }
+    .roadmap p {
+      margin-top: 5px;
+    }
+    .roadmap-details {
+      min-height: 260px;
+      margin-top: 18px;
+    }
+    .roadmap-details article {
+      grid-template-columns: 1fr;
+      gap: 14px;
+      padding: 23px;
+    }
+  }
+</style>

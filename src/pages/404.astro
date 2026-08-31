@@ -1,0 +1,21 @@
+---
+export const prerender = true;
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Stránka nenalezena"
+  description="Tuto stránku jsme nenašli. Pokračujte na úvod nebo na ceník Autoškoly BuBu."
+  noindex
+  ><section class="section">
+    <div class="container content">
+      <span class="eyebrow">404 / Tady cesta nevede</span><h1>Zkusíme jiný směr?</h1><p>
+        Stránku jsme nenašli. Na úvodu nebo v ceníku vás navedeme dál.
+      </p><div class="actions">
+        <a class="btn primary" href="/">Na úvod</a><a class="btn secondary" href="/cenik"
+          >Kurzy a ceník</a
+        >
+      </div>
+    </div>
+  </section></Base
+>

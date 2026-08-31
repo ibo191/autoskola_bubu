@@ -1,0 +1,288 @@
+---
+import '../styles/global.css';
+import OrderDialog from '../components/OrderDialog.astro';
+import { branches } from '../lib/catalog';
+interface Props {
+  title: string;
+  description: string;
+  noindex?: boolean;
+  schema?: Record<string, unknown>;
+}
+const { title, description, noindex = false, schema } = Astro.props;
+const path = Astro.url.pathname;
+const canonical = new URL(path, 'https://www.autoskolabubu.cz').href;
+const nav = [
+  ['/cenik', 'Kurzy a ceník'],
+  ['/jak-probiha-vyuka', 'Jak to probíhá'],
+  ['/o-nas', 'O nás'],
+  ['/blog', 'Blog'],
+  ['/kontakt', 'Kontakt'],
+];
+---
+
+<!doctype html>
+<html lang="cs">
+  <head
+    ><meta charset="UTF-8" /><meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    /><script is:inline>
+      document.documentElement.classList.add('js');
+    </script><title>{title} | Autoškola BuBu</title><meta
+      name="description"
+      content={description}
+    /><link rel="canonical" href={canonical} /><meta
+      name="robots"
+      content={noindex ? 'noindex, nofollow' : 'noindex, follow'}
+    /><meta property="og:title" content={`${title} | Autoškola BuBu`} /><meta
+      property="og:description"
+      content={description}
+    /><meta property="og:url" content={canonical} /><meta
+      property="og:type"
+      content="website"
+    /><meta property="og:locale" content="cs_CZ" /><meta
+      property="og:image"
+      content="https://www.autoskolabubu.cz/brand/bubak.png"
+    /><link rel="icon" href="/brand/bubak.png" /><meta name="theme-color" content="#4ab9ab" />{
+      schema && (
+        <script
+          is:inline
+          type="application/ld+json"
+          set:html={JSON.stringify(schema).replace(/</g, '\\u003c')}
+        />
+      )
+    }</head
+  ><body>
+    <a class="skip" href="#main">Přeskočit na obsah</a><div class="local-ribbon">
+      LOKÁLNÍ NÁHLED · objednávky nejsou aktivní · bez externí analytiky
+    </div>
+    <header>
+      <div class="container header-inner">
+        <a href="/" class="logo" aria-label="Autoškola BuBu – úvod"
+          ><img
+            src="/brand/logo.png"
+            alt="Autoškola BuBu"
+            width="588"
+            height="217"
+            fetchpriority="high"
+          /></a
+        ><button class="menu-toggle btn secondary" aria-expanded="false" aria-controls="navigation"
+          >Menu <span aria-hidden="true">☰</span></button
+        ><nav id="navigation" aria-label="Hlavní navigace">
+          {
+            nav.map(([href, label]) => (
+              <a href={href} aria-current={path === href ? 'page' : undefined}>
+                {label}
+              </a>
+            ))
+          }<button class="btn primary" data-order disabled>Přihlásit se ↗</button>
+        </nav>
+      </div>
+    </header>
+    <main id="main">
+      <noscript
+        ><div class="container notice">
+          Výběr kurzu vyžaduje JavaScript. Ceník můžete procházet i bez něj; s přihlášením vám
+          pomůže <a href="/kontakt">vaše pobočka</a>.
+        </div></noscript
+      ><slot />
+    </main>
+    <footer>
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <a class="logo" href="/"
+              ><img
+                src="/brand/logo.png"
+                alt="Autoškola BuBu"
+                width="588"
+                height="217"
+                loading="lazy"
+              /></a
+            ><p>Za řidičákem s lidským přístupem.<br />Praha 8 · Kladno · Statenice</p>
+          </div>{
+            branches.map((b) => (
+              <div>
+                <>
+                  <h2>
+                    <a href={`/${b.id}`}>{b.name}</a>
+                  </h2>
+                  <p>{b.address}</p>
+                  <a href={`tel:${b.phone}`}>
+                    {b.phone.replace(/(\+420)(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4')}
+                  </a>
+                  <a href={`mailto:${b.email}`}>{b.email}</a>
+                </>
+              </div>
+            ))
+          }
+        </div><div class="footer-bottom">
+          <span>© {new Date().getFullYear()} Autoškola BuBu</span><div>
+            <a href="/obchodni-podminky">Obchodní podmínky</a><a href="/ochrana-osobnich-udaju"
+              >Ochrana osobních údajů</a
+            ><a href="/sprava">Interní správa</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <OrderDialog />
+    <script>
+      const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
+      toggle?.addEventListener('click', () => {
+        const open = toggle.getAttribute('aria-expanded') !== 'true';
+        toggle.setAttribute('aria-expanded', String(open));
+        document.querySelector('#navigation')?.classList.toggle('open', open);
+      });
+
+      const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const revealElements = document.querySelectorAll<HTMLElement>('[data-reveal]');
+      if (reducedMotion || !('IntersectionObserver' in window)) {
+        revealElements.forEach((element) => element.classList.add('is-visible'));
+      } else {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            });
+          },
+          { rootMargin: '0px 0px -8% 0px', threshold: 0.12 },
+        );
+        revealElements.forEach((element) => observer.observe(element));
+      }
+    </script>
+  </body>
+</html>
+<style>
+  header {
+    border-bottom: 1px solid var(--line);
+    background: #fff;
+  }
+  .header-inner {
+    height: 94px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+  }
+  .logo {
+    display: block;
+    width: 178px;
+    flex-shrink: 0;
+  }
+  .logo img {
+    width: 100%;
+    height: auto;
+  }
+  .header-inner nav {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+  }
+  nav > a {
+    font-size: 0.8rem;
+    font-weight: 650;
+    text-decoration: none;
+    padding-block: 12px;
+  }
+  nav > a:hover,
+  nav > a[aria-current='page'] {
+    color: var(--brand-dark);
+  }
+  .menu-toggle {
+    display: none;
+  }
+  footer {
+    padding: 52px 0 24px;
+    border-top: 1px solid var(--line);
+    background: var(--canvas);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.25fr repeat(3, 1fr);
+    gap: 28px;
+  }
+  .footer-grid h2 {
+    font-size: 1rem;
+    margin-bottom: 18px;
+  }
+  .footer-grid h2 a {
+    text-decoration: none;
+  }
+  .footer-grid p {
+    font-size: 0.77rem;
+    margin: 20px 0 14px;
+  }
+  .footer-grid > div > a:not(.logo) {
+    display: block;
+    font-size: 0.72rem;
+    margin-top: 8px;
+  }
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    font-size: 0.68rem;
+    color: var(--muted);
+    margin-top: 44px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+  .footer-bottom > div {
+    display: flex;
+    gap: 20px;
+  }
+  @media (max-width: 950px) {
+    .header-inner nav {
+      gap: 15px;
+    }
+    .logo {
+      width: 148px;
+    }
+    .header-inner {
+      gap: 15px;
+    }
+    .footer-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 780px) {
+    .header-inner {
+      height: 80px;
+      position: relative;
+    }
+    .menu-toggle {
+      display: inline-flex;
+    }
+    .header-inner nav {
+      display: none;
+      position: absolute;
+      z-index: 20;
+      top: 80px;
+      left: 0;
+      right: 0;
+      background: white;
+      border-bottom: 1px solid var(--line);
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+    .header-inner nav.open {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .footer-bottom,
+    .footer-bottom > div {
+      flex-direction: column;
+    }
+    .footer-grid {
+      gap: 32px 18px;
+    }
+  }
+  @media (max-width: 400px) {
+    .footer-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

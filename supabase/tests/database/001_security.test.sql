@@ -1,0 +1,22 @@
+-- Run with `supabase test db` after `supabase db reset` on the local stack.
+begin;
+create extension if not exists pgtap with schema extensions;
+set search_path=public,extensions;
+select plan(15);
+select has_table('public','orders','Orders exist');
+select has_table('public','appointments','Appointments exist');
+select has_table('public','verification_tokens','Verification tokens exist');
+select ok((select relrowsecurity from pg_class where oid='public.orders'::regclass),'Orders have RLS');
+select ok((select relrowsecurity from pg_class where oid='public.appointments'::regclass),'Appointments have RLS');
+select ok(not has_table_privilege('anon','public.orders','SELECT'),'Anon cannot read orders');
+select ok(not has_table_privilege('anon','public.orders','INSERT'),'Anon cannot insert orders');
+select ok(not has_table_privilege('authenticated','public.orders','UPDATE'),'Staff cannot bypass audited writes');
+select ok(not has_table_privilege('authenticated','public.verification_tokens','SELECT'),'Authenticated cannot read token hashes');
+select ok(not has_function_privilege('anon','public.bubu_verify_email(text)','EXECUTE'),'Anon cannot call verification RPC');
+select ok(not has_function_privilege('authenticated','public.bubu_verify_email(text)','EXECUTE'),'Staff cannot bypass public verification controls');
+select ok(has_function_privilege('service_role','public.bubu_verify_email(text)','EXECUTE'),'Server can call verification RPC');
+select ok(not has_table_privilege('service_role','public.audit_log','DELETE'),'Audit cannot be deleted by service role');
+select ok(not has_table_privilege('service_role','public.consent_records','UPDATE'),'Consent evidence is append-only');
+select ok(not exists(select 1 from public.booking_settings where enabled),'Fixture booking disabled by default');
+select * from finish();
+rollback;

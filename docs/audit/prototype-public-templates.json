@@ -1,0 +1,2100 @@
+[
+  {
+    "name": "cookieConsentBanner",
+    "line": 1781,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [],
+    "sections": [],
+    "links": [
+      {
+        "tag": "button",
+        "text": "Pouze nutné"
+      },
+      {
+        "tag": "button",
+        "text": "Souhlasím"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "nav",
+    "line": 2301,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [],
+    "sections": [],
+    "links": [
+      {
+        "tag": "a",
+        "text": "",
+        "href": "/",
+        "data-go": "home"
+      },
+      {
+        "tag": "a",
+        "text": "Kurzy ⌄",
+        "href": "/cenik",
+        "data-go": "pricing"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"car_front_teal\", \"Skupina B\")} Řidičák skupiny B",
+        "href": "/kurzy/ridicak-skupina-b",
+        "data-go": "courses/b"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"l17_teal\", \"L17\")} L17 od 17 let",
+        "href": "/kurzy/l17",
+        "data-go": "courses/l17"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"motorcycle_a_teal\", \"Motorka A\")} Motorka A neomezený výkon",
+        "href": "/kurzy/ridicak-skupina-a",
+        "data-go": "courses/a"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"motorcycle_a2_teal\", \"Motorka A2\")} Motorka A2 do 35 kW",
+        "href": "/kurzy/ridicak-skupina-a2",
+        "data-go": "courses/a2"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"motorcycle_sport_teal\", \"Motorka A1\")} Motorka A1 do 125 ccm",
+        "href": "/kurzy/ridicak-skupina-a1",
+        "data-go": "courses/a1"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"scooter_teal\", \"Motorka AM\")} Motorka AM malé motocykly a skútry",
+        "href": "/kurzy/ridicak-skupina-am",
+        "data-go": "courses/am"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"car_trailer_teal\", \"B96\")} B96 souprava do 4250 kg",
+        "href": "/kurzy/b96",
+        "data-go": "courses/b96"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"car_trailer_teal\", \"B+E\")} B+E větší přívěsy",
+        "href": "/kurzy/be",
+        "data-go": "courses/be"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"steering_wheel_teal\", \"Kondiční jízdy\")} Kondiční jízdy",
+        "href": "/kurzy/kondicni-jizdy",
+        "data-go": "courses/doplnovaci"
+      },
+      {
+        "tag": "a",
+        "text": "Skupina B",
+        "href": "/kurzy/ridicak-skupina-b",
+        "data-go": "courses/b"
+      },
+      {
+        "tag": "button",
+        "text": "Přihlásit se na B",
+        "data-order": "b",
+        "data-event": "click_apply_course"
+      },
+      {
+        "tag": "a",
+        "text": "Zobrazit ceník",
+        "href": "/cenik",
+        "data-go": "pricing"
+      },
+      {
+        "tag": "a",
+        "text": "Jak probíhá kurz",
+        "href": "/jak-probiha-vyuka",
+        "data-go": "learn"
+      },
+      {
+        "tag": "a",
+        "text": "Ceník",
+        "href": "/cenik",
+        "data-go": "pricing"
+      },
+      {
+        "tag": "a",
+        "text": "Pobočky ⌄",
+        "href": "/strizkov",
+        "data-go": "locations/strizkov"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"location_pin_teal\", \"Střížkov\")} Praha 8 – Střížkov Prosek, Kobylisy, Letňany, Ládví",
+        "href": "/strizkov",
+        "data-go": "locations/strizkov"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"location_pin_teal\", \"Kladno\")} Kladno Kročehlavy, Rozdělov, Sítná",
+        "href": "/kladno",
+        "data-go": "locations/kladno"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"location_pin_teal\", \"Statenice\")} Statenice Horoměřice, Suchdol, Praha-západ",
+        "href": "/statenice",
+        "data-go": "locations/statenice"
+      },
+      {
+        "tag": "a",
+        "text": "Studentský portál",
+        "href": "/onboarding/index.html#student"
+      },
+      {
+        "tag": "a",
+        "text": "${googleLogoImg(\"google-logo-img header-google-logo\")} ★★★★★ 4,930+ recenzí",
+        "href": "/#recenze",
+        "data-event": "click_google_reviews"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"phone_teal\", \"Telefon\")} 737 123 456",
+        "href": "tel:+420725717755",
+        "data-event": "click_phone"
+      },
+      {
+        "tag": "button",
+        "text": "Přihlásit se do kurzu →",
+        "data-go": "pricing",
+        "data-event": "click_apply_course"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"phone_teal\", \"Zavolat\")}",
+        "href": "tel:+420725717755",
+        "data-event": "click_phone"
+      },
+      {
+        "tag": "button",
+        "text": ""
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"car_front_teal\", \"Kurzy\")} Kurzy",
+        "href": "/cenik",
+        "data-go": "pricing"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"calendar_teal\", \"Jak kurz probíhá\")} Jak probíhá kurz",
+        "href": "/jak-probiha-vyuka",
+        "data-go": "learn"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"payment_card_teal\", \"Ceník\")} Ceník",
+        "href": "/cenik",
+        "data-go": "pricing"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"car_trailer_teal\", \"B96\")} B96",
+        "href": "/kurzy/b96",
+        "data-go": "courses/b96"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"car_trailer_teal\", \"B+E\")} B+E",
+        "href": "/kurzy/be",
+        "data-go": "courses/be"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"location_pin_teal\", \"Střížkov\")} Praha 8 – Střížkov",
+        "href": "/strizkov",
+        "data-go": "locations/strizkov"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"location_pin_teal\", \"Kladno\")} Kladno",
+        "href": "/kladno",
+        "data-go": "locations/kladno"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"location_pin_teal\", \"Statenice\")} Statenice",
+        "href": "/statenice",
+        "data-go": "locations/statenice"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"grid_teal\", \"Studentský portál\")} Studentský portál",
+        "href": "/onboarding/index.html#student"
+      },
+      {
+        "tag": "button",
+        "text": "Přihlásit se do kurzu",
+        "data-go": "pricing",
+        "data-event": "click_apply_course"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "isActive",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "isActive",
+      "isActive",
+      "isActive",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "isActive",
+      "googleLogoImg",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "iconImg"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "siteStickyCta",
+    "line": 2391,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [],
+    "sections": [],
+    "links": [
+      {
+        "tag": "a",
+        "text": "Zavolat",
+        "href": "tel:+420725717755",
+        "data-event": "click_phone"
+      },
+      {
+        "tag": "button",
+        "text": "Přihlásit se do kurzu",
+        "data-go": "pricing",
+        "data-event": "click_apply_course"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "footer",
+    "line": 2400,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 3,
+        "text": "Kontakt"
+      },
+      {
+        "level": 3,
+        "text": "Rychlé odkazy"
+      },
+      {
+        "level": 3,
+        "text": "Dokumenty ke stažení"
+      }
+    ],
+    "sections": [],
+    "links": [
+      {
+        "tag": "button",
+        "text": "Napsat autoškole",
+        "data-go": "contact"
+      },
+      {
+        "tag": "a",
+        "text": "Ceník a kurzy",
+        "href": "/cenik",
+        "data-go": "pricing"
+      },
+      {
+        "tag": "a",
+        "text": "Jak probíhá kurz",
+        "href": "/jak-probiha-vyuka",
+        "data-go": "learn"
+      },
+      {
+        "tag": "a",
+        "text": "Kontakt",
+        "href": "/kontakt",
+        "data-go": "contact"
+      },
+      {
+        "tag": "a",
+        "text": "Blog",
+        "href": "/blog",
+        "data-go": "blog"
+      },
+      {
+        "tag": "a",
+        "text": "Admin portál",
+        "href": "/admin",
+        "data-go": "admin"
+      },
+      {
+        "tag": "a",
+        "text": "Všeobecné obchodní podmínky",
+        "href": "#"
+      },
+      {
+        "tag": "a",
+        "text": "Formulář pro odstoupení od smlouvy",
+        "href": "#"
+      },
+      {
+        "tag": "a",
+        "text": "Zásady ochrany osobních údajů",
+        "href": "#"
+      },
+      {
+        "tag": "a",
+        "text": "Přihláška do autoškoly",
+        "href": "#"
+      },
+      {
+        "tag": "a",
+        "text": "Zdravotní posudek",
+        "href": "#"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "homePage",
+    "line": 2705,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Řidičák bez stresu"
+      },
+      {
+        "level": 2,
+        "text": "Začněte kurzem, který vám sedne."
+      },
+      {
+        "level": 3,
+        "text": "Řidičák od 17 let"
+      },
+      {
+        "level": 3,
+        "text": "Řidičák skupiny B"
+      },
+      {
+        "level": 3,
+        "text": "Motorka bez omezení"
+      },
+      {
+        "level": 2,
+        "text": "Od přihlášky po zkoušku máte jasnou cestu."
+      },
+      {
+        "level": 2,
+        "text": "Důvěra vzniká zkušeností."
+      },
+      {
+        "level": 2,
+        "text": "Autoškola pro lidi, kteří chtějí řídit s jistotou."
+      },
+      {
+        "level": 2,
+        "text": "Vyberte si pobočku, která vám sedí."
+      },
+      {
+        "level": 3,
+        "text": "${escapeHtml(loc.name)}"
+      },
+      {
+        "level": 2,
+        "text": "Na co se lidé ptají nejčastěji?"
+      },
+      {
+        "level": 2,
+        "text": "Přihlaste se do kurzu a my vám pomůžeme s dalším krokem."
+      }
+    ],
+    "sections": [
+      {
+        "class": "home-hero"
+      },
+      {
+        "id": "kurzy",
+        "class": "section home-popular-lite-section"
+      },
+      {
+        "class": "section band home-process-section"
+      },
+      {
+        "id": "recenze",
+        "class": "section band google-reviews-section"
+      },
+      {
+        "class": "section home-why-redesign-section"
+      },
+      {
+        "class": "section home-locations-section home-modern-section"
+      },
+      {
+        "class": "section home-faq-modern-section"
+      },
+      {
+        "class": "section cta-section"
+      }
+    ],
+    "links": [
+      {
+        "tag": "button",
+        "text": "Přihlásit se do kurzu →",
+        "data-go": "pricing",
+        "data-event": "click_apply_course"
+      },
+      {
+        "tag": "button",
+        "text": "Jak probíhá výuka →",
+        "data-go": "learn",
+        "data-event": "click_contact"
+      },
+      {
+        "tag": "button",
+        "text": "Zobrazit pobočky",
+        "data-go": "locations/strizkov"
+      },
+      {
+        "tag": "button",
+        "text": "Vybrat kurz",
+        "data-order": "l17",
+        "data-package": "zaklad",
+        "data-event": "click_apply_course"
+      },
+      {
+        "tag": "button",
+        "text": "Vybrat kurz",
+        "data-order": "b",
+        "data-package": "zaklad",
+        "data-event": "click_apply_course"
+      },
+      {
+        "tag": "button",
+        "text": "Vybrat kurz",
+        "data-order": "a",
+        "data-package": "jistota",
+        "data-event": "click_apply_course"
+      },
+      {
+        "tag": "button",
+        "text": "Zobrazit celý ceník",
+        "data-go": "pricing"
+      },
+      {
+        "tag": "button",
+        "text": "Všechny kurzy",
+        "data-go": "courses"
+      },
+      {
+        "tag": "button",
+        "text": "Otevřít celý postup",
+        "data-go": "learn"
+      },
+      {
+        "tag": "button",
+        "text": "${index + 1}${phase.label}"
+      },
+      {
+        "tag": "button",
+        "text": "Detail pobočky",
+        "data-go": "locations/${loc.id}"
+      },
+      {
+        "tag": "button",
+        "text": "Přihlásit se do kurzu",
+        "data-go": "pricing",
+        "data-event": "click_apply_course"
+      },
+      {
+        "tag": "a",
+        "text": "Zavolat a zeptat se",
+        "href": "tel:+420725717755",
+        "data-event": "click_phone"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "openCourseTermsSection",
+      "roadmapDetail",
+      "roadmapDetail",
+      "googleReviewsWidget",
+      "iconImg",
+      "iconImg",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "String",
+      "escapeHtml",
+      "faqAnswerHtml"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "coursesPage",
+    "line": 3006,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [],
+    "sections": [
+      {
+        "class": "section band"
+      }
+    ],
+    "links": [
+      {
+        "tag": "button",
+        "text": "${label}"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "coursePage",
+    "line": 3015,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [],
+    "sections": [],
+    "links": [],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "CourseHero",
+      "CourseFitBox",
+      "CourseIncludes",
+      "CourseTimeline",
+      "CoursePricing",
+      "CourseBenefits",
+      "CourseFearBlock",
+      "CourseAvailability",
+      "CourseReviews",
+      "CourseFAQ",
+      "CourseFinalCTA",
+      "StickyMobileCTA"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "CourseHero",
+    "line": 3038,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "${escapeHtml(data.h1)}"
+      }
+    ],
+    "sections": [
+      {
+        "class": "course-template-hero"
+      }
+    ],
+    "links": [
+      {
+        "tag": "button",
+        "text": "${escapeHtml(data.primaryCta)}"
+      },
+      {
+        "tag": "button",
+        "text": "${escapeHtml(data.secondaryCta)}"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "courseCtaAttrs",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "CourseFitBox",
+    "line": 3061,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 2,
+        "text": "Tenhle kurz dává smysl, pokud..."
+      }
+    ],
+    "sections": [
+      {
+        "class": "section course-section"
+      }
+    ],
+    "links": [],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "escapeHtml"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "CourseIncludes",
+    "line": 3065,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 2,
+        "text": "Všechno důležité pro jistý start."
+      },
+      {
+        "level": 3,
+        "text": "${escapeHtml(item)}"
+      }
+    ],
+    "sections": [
+      {
+        "class": "section band course-section"
+      }
+    ],
+    "links": [],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "escapeHtml"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "CourseTimeline",
+    "line": 3069,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 2,
+        "text": "Od přihlášky po zkoušku máte jasnou cestu."
+      }
+    ],
+    "sections": [
+      {
+        "id": "prubeh-kurzu",
+        "class": "section course-section learn-roadmap-section"
+      }
+    ],
+    "links": [
+      {
+        "tag": "button",
+        "text": "${index + 1}${escapeHtml(phase.label)}"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "escapeHtml",
+      "roadmapDetail",
+      "escapeHtml",
+      "roadmapDetail"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "CourseAutoPackages",
+    "line": 3084,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [],
+    "sections": [],
+    "links": [
+      {
+        "tag": "button",
+        "text": "Rezervovat místo",
+        "data-order": "${course.id}",
+        "data-event": "click_apply_course"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "escapeHtml",
+      "money",
+      "escapeHtml",
+      "money",
+      "escapeHtml"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "CourseMotoPackages",
+    "line": 3107,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 3,
+        "text": "${escapeHtml(option.title)}"
+      }
+    ],
+    "sections": [],
+    "links": [
+      {
+        "tag": "button",
+        "text": "${recommended ? \"Chci Moto Jistotu\" : \"Vybrat Moto Základ\"}",
+        "data-order": "${course.id}",
+        "data-package": "${option.id}",
+        "data-event": "click_package_select"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "escapeHtml",
+      "money",
+      "escapeHtml"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "CoursePricing",
+    "line": 3145,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 2,
+        "text": "${title}"
+      }
+    ],
+    "sections": [
+      {
+        "id": "cena",
+        "class": "section band course-section course-pricing-section"
+      }
+    ],
+    "links": [
+      {
+        "tag": "button",
+        "text": "Rezervovat místo"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "escapeHtml",
+      "escapeHtml",
+      "courseCtaAttrs",
+      "escapeHtml",
+      "escapeHtml"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "CourseBenefits",
+    "line": 3154,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 2,
+        "text": "Výcvik, který má být lidský a srozumitelný."
+      },
+      {
+        "level": 3,
+        "text": "${escapeHtml(item)}"
+      }
+    ],
+    "sections": [
+      {
+        "class": "section course-section"
+      }
+    ],
+    "links": [],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "escapeHtml"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "CourseFearBlock",
+    "line": 3159,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 2,
+        "text": "Máte z autoškoly obavy? To je normální."
+      },
+      {
+        "level": 3,
+        "text": "${title}"
+      }
+    ],
+    "sections": [
+      {
+        "class": "section course-fear-section"
+      }
+    ],
+    "links": [],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "escapeHtml"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "CourseAvailability",
+    "line": 3168,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 2,
+        "text": "Chcete místo v kurzu? Pošlete rezervaci."
+      }
+    ],
+    "sections": [
+      {
+        "class": "section course-section"
+      }
+    ],
+    "links": [
+      {
+        "tag": "button",
+        "text": "Rezervovat místo"
+      },
+      {
+        "tag": "button",
+        "text": "Kontaktovat tuto autoškolu",
+        "data-go": "contact",
+        "data-event": "click_contact"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "escapeHtml",
+      "courseCtaAttrs"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "CourseReviews",
+    "line": 3172,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 2,
+        "text": "Studenti oceňují hlavně klid a trpělivost."
+      }
+    ],
+    "sections": [
+      {
+        "class": "section band course-section google-reviews-section"
+      }
+    ],
+    "links": [],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "googleReviewsWidget"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "CourseFAQ",
+    "line": 3176,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 2,
+        "text": "Časté otázky před přihlášením"
+      }
+    ],
+    "sections": [
+      {
+        "class": "section course-section"
+      }
+    ],
+    "links": [],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "CourseFinalCTA",
+    "line": 3180,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 2,
+        "text": "Chcete začít s řidičákem bez stresu?"
+      }
+    ],
+    "sections": [
+      {
+        "class": "section course-final-cta-section"
+      }
+    ],
+    "links": [
+      {
+        "tag": "button",
+        "text": "Rezervovat místo"
+      },
+      {
+        "tag": "button",
+        "text": "Nejdřív se chci zeptat",
+        "data-go": "contact",
+        "data-event": "click_contact"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "courseCtaAttrs"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "pricingAutoPackages",
+    "line": 3533,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 3,
+        "text": "Jedna jasná cena pro auto"
+      },
+      {
+        "level": 3,
+        "text": "Skupina B"
+      }
+    ],
+    "sections": [],
+    "links": [
+      {
+        "tag": "button",
+        "text": "Přihlásit se",
+        "data-order": "${courseId}",
+        "data-event": "click_apply_course"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "iconImg",
+      "escapeHtml",
+      "detailForCourse"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "pricingMotoPackages",
+    "line": 3553,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 3,
+        "text": "Vyberte si moto balíček"
+      }
+    ],
+    "sections": [],
+    "links": [],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "pricingPackageCard",
+      "pricingPackageCard"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "pricingPage",
+    "line": 3566,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 3,
+        "text": "${escapeHtml(item.title)}"
+      },
+      {
+        "level": 3,
+        "text": "${escapeHtml(item.title)}"
+      },
+      {
+        "level": 4,
+        "text": "${escapeHtml(pack.title)}"
+      },
+      {
+        "level": 3,
+        "text": "Na vybrané pobočce tento typ kurzu nenabízíme."
+      },
+      {
+        "level": 3,
+        "text": "Poplatky autoškole"
+      },
+      {
+        "level": 3,
+        "text": "Poplatky úřadům"
+      },
+      {
+        "level": 1,
+        "text": "Ceník služeb"
+      },
+      {
+        "level": 2,
+        "text": "${escapeHtml(current.title)}"
+      },
+      {
+        "level": 2,
+        "text": "Nevíte, který kurz je pro vás ten pravý?"
+      }
+    ],
+    "sections": [
+      {
+        "class": "new-pricing-page"
+      },
+      {
+        "class": "new-pricing-section"
+      },
+      {
+        "class": "pricing-help-strip new-pricing-help"
+      }
+    ],
+    "links": [
+      {
+        "tag": "button",
+        "text": "${label}",
+        "data-order": "${course.id}",
+        "data-package": "${packageId}",
+        "data-event": "click_apply_course"
+      },
+      {
+        "tag": "button",
+        "text": "${label}",
+        "data-go": "contact"
+      },
+      {
+        "tag": "button",
+        "text": "${iconImg(item.icon, \"\")}${item.label}"
+      },
+      {
+        "tag": "button",
+        "text": "${escapeHtml(label)}"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"phone_teal\", \"\")} Zavolejte nám",
+        "href": "tel:+420725717755"
+      },
+      {
+        "tag": "a",
+        "text": "${iconImg(\"whatsapp_teal\", \"\")} Napište na WhatsApp",
+        "href": "https://wa.me/420725717755"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "money",
+      "money",
+      "courseTermId",
+      "iconImg",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "iconImg",
+      "escapeHtml",
+      "orderButton",
+      "detailForCourse",
+      "iconImg",
+      "escapeHtml",
+      "escapeHtml",
+      "iconImg",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "orderButton",
+      "detailForCourse",
+      "iconImg",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "coursePanel",
+      "iconImg",
+      "iconImg",
+      "iconImg",
+      "shopProductsSection"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "locationsPage",
+    "line": 3744,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 3,
+        "text": "${loc.name}"
+      }
+    ],
+    "sections": [
+      {
+        "class": "section band"
+      }
+    ],
+    "links": [
+      {
+        "tag": "button",
+        "text": "Detail pobočky",
+        "data-go": "locations/${loc.id}"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "escapeHtml"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "learnPage",
+    "line": 3775,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Od přihlášky po první samostatnou jízdu. Bez zmatku a bez stresu."
+      },
+      {
+        "level": 2,
+        "text": "Jednoduchý přehled bez administrativního chaosu."
+      },
+      {
+        "level": 2,
+        "text": "Nejčastější obavy před kurzem"
+      }
+    ],
+    "sections": [
+      {
+        "class": "learn-hero"
+      },
+      {
+        "id": "cesta-k-ridicaku",
+        "class": "section learn-roadmap-section"
+      },
+      {
+        "class": "section band"
+      }
+    ],
+    "links": [
+      {
+        "tag": "button",
+        "text": "Přihlásit se do kurzu",
+        "data-go": "pricing",
+        "data-event": "click_apply_course"
+      },
+      {
+        "tag": "a",
+        "text": "Zavolat a zeptat se",
+        "href": "tel:+420725717755",
+        "data-event": "click_phone"
+      },
+      {
+        "tag": "button",
+        "text": "${index + 1}${phase.label}"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "roadmapDetail",
+      "roadmapDetail"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "faqPage",
+    "line": 3838,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [],
+    "sections": [
+      {
+        "class": "section band"
+      }
+    ],
+    "links": [],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "escapeHtml",
+      "faqAnswerHtml"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "contactPage",
+    "line": 3843,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 2,
+        "text": "Kontaktovat pobočku"
+      },
+      {
+        "level": 3,
+        "text": "${loc.name}"
+      }
+    ],
+    "sections": [
+      {
+        "class": "section band"
+      }
+    ],
+    "links": [
+      {
+        "tag": "button",
+        "text": "Kontaktovat pobočku",
+        "data-contact-branch": "${loc.id}"
+      },
+      {
+        "tag": "button",
+        "text": "Detail pobočky",
+        "data-go": "locations/${loc.id}"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "thankYouPage",
+    "line": 3856,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Objednávku máme v systému BuBu."
+      },
+      {
+        "level": 3,
+        "text": "Nastavte si heslo do portálu"
+      },
+      {
+        "level": 3,
+        "text": "Odkaz pro nastavení hesla"
+      },
+      {
+        "level": 3,
+        "text": "Co uděláte v portálu"
+      }
+    ],
+    "sections": [
+      {
+        "class": "section thank-you-section"
+      }
+    ],
+    "links": [
+      {
+        "tag": "a",
+        "text": "Nastavit heslo do portálu",
+        "href": "${escapeHtml(setupLink)}"
+      },
+      {
+        "tag": "a",
+        "text": "Nastavit heslo do portálu",
+        "href": "${escapeHtml(setupLink)}"
+      },
+      {
+        "tag": "a",
+        "text": "Přihlásit se do portálu",
+        "href": "${portalLoginUrl}"
+      },
+      {
+        "tag": "button",
+        "text": "Zpět na web",
+        "data-go": "home"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "locationPage",
+    "line": 4128,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "${localHeroTitle}"
+      },
+      {
+        "level": 2,
+        "text": "Od přihlášky po zkoušku víte, co se bude dít."
+      },
+      {
+        "level": 3,
+        "text": "${escapeHtml(steps[0][0])}"
+      },
+      {
+        "level": 3,
+        "text": "${escapeHtml(title)}"
+      },
+      {
+        "level": 2,
+        "text": "Střížkov konkrétně: jízdy, teorie a dostupnost."
+      },
+      {
+        "level": 3,
+        "text": "${escapeHtml(title)}"
+      },
+      {
+        "level": 3,
+        "text": "${escapeHtml(title)}"
+      },
+      {
+        "level": 2,
+        "text": "${escapeHtml(data.mapTitle)}"
+      },
+      {
+        "level": 2,
+        "text": "Proč Autoškola BuBu?"
+      },
+      {
+        "level": 3,
+        "text": "${escapeHtml(title)}"
+      },
+      {
+        "level": 2,
+        "text": "Studenti oceňují hlavně klid a trpělivost."
+      },
+      {
+        "level": 2,
+        "text": "Nejčastější otázky"
+      },
+      {
+        "level": 2,
+        "text": "${escapeHtml(data.finalHeadline)}"
+      }
+    ],
+    "sections": [
+      {
+        "class": "local-hero"
+      },
+      {
+        "class": "section local-process-section learn-roadmap-section"
+      },
+      {
+        "class": "section local-specific-section"
+      },
+      {
+        "class": "section local-why-band"
+      },
+      {
+        "class": "section"
+      },
+      {
+        "class": "section local-final-cta-section"
+      }
+    ],
+    "links": [
+      {
+        "tag": "button",
+        "text": "Přihlásit se do kurzu",
+        "data-order": "b",
+        "data-location": "${loc.id}",
+        "data-package": "zaklad",
+        "data-event": "click_apply_course"
+      },
+      {
+        "tag": "a",
+        "text": "Zavolat a zeptat se",
+        "href": "tel:${loc.phone.replace(/\\s/g, ",
+        "data-event": "click_phone"
+      },
+      {
+        "tag": "button",
+        "text": "Více o průběhu výuky",
+        "data-go": "learn"
+      },
+      {
+        "tag": "button",
+        "text": "${index + 1}${escapeHtml(title)}"
+      },
+      {
+        "tag": "a",
+        "text": "Detail níže",
+        "href": "#local-map-strizkov",
+        "data-event": "click_local_info"
+      },
+      {
+        "tag": "a",
+        "text": "Otevřít v Google Maps",
+        "href": "${googleMapsBranchUrl(loc.id)}"
+      },
+      {
+        "tag": "button",
+        "text": "Přihlásit se do kurzu",
+        "data-order": "b",
+        "data-location": "${loc.id}",
+        "data-package": "zaklad",
+        "data-event": "click_apply_course"
+      },
+      {
+        "tag": "a",
+        "text": "Zavolat a zeptat se",
+        "href": "tel:${loc.phone.replace(/\\s/g, ",
+        "data-event": "click_phone"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "openCourseTermsSection",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "encodeURIComponent",
+      "googleMapsBranchUrl",
+      "escapeHtml",
+      "escapeHtml",
+      "googleReviewsWidget",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "aboutPage",
+    "line": 4249,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "Autoškola, která chce dělat výuku jinak."
+      },
+      {
+        "level": 3,
+        "text": "${title}"
+      },
+      {
+        "level": 2,
+        "text": "Chceme vychovávat řidiče, ne jen rozdávat průkazy."
+      },
+      {
+        "level": 2,
+        "text": "Lidé, kteří znají cestu i pravidla."
+      }
+    ],
+    "sections": [
+      {
+        "class": "section band"
+      },
+      {
+        "class": "section"
+      },
+      {
+        "class": "section turquoise-band"
+      },
+      {
+        "class": "section band"
+      }
+    ],
+    "links": [
+      {
+        "tag": "button",
+        "text": "Vybrat kurz",
+        "data-go": "courses"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "blogPage",
+    "line": 4285,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [],
+    "sections": [
+      {
+        "class": "section band"
+      }
+    ],
+    "links": [],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "blogArticlePage",
+    "line": 4290,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 1,
+        "text": "${article.title}"
+      },
+      {
+        "level": 2,
+        "text": "${course.title}"
+      },
+      {
+        "level": 2,
+        "text": "Pokračujte ve čtení"
+      }
+    ],
+    "sections": [
+      {
+        "class": "section"
+      }
+    ],
+    "links": [
+      {
+        "tag": "button",
+        "text": "Zobrazit kurz",
+        "data-go": "courses/${course.id}"
+      },
+      {
+        "tag": "button",
+        "text": "← ${prev.title}",
+        "data-go": "blog/${prev.id}"
+      },
+      {
+        "tag": "button",
+        "text": "${next.title} →",
+        "data-go": "blog/${next.id}"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "escapeHtml",
+      "renderBlogContent"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "shopPage",
+    "line": 4353,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [],
+    "sections": [],
+    "links": [],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "modalHtml",
+    "line": 4980,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 3,
+        "text": "${modal.title}"
+      }
+    ],
+    "sections": [],
+    "links": [
+      {
+        "tag": "button",
+        "text": "×"
+      }
+    ],
+    "forms": [],
+    "fields": [],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "orderChoiceMarkup",
+    "line": 5074,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [],
+    "sections": [],
+    "links": [],
+    "forms": [],
+    "fields": [
+      {
+        "type": "hidden",
+        "name": "packageType"
+      }
+    ],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "escapeHtml",
+      "escapeHtml",
+      "money",
+      "orderPackageOptions"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "orderUpsellMarkup",
+    "line": 5085,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [],
+    "sections": [],
+    "links": [],
+    "forms": [],
+    "fields": [
+      {
+        "type": "checkbox",
+        "name": "upsellProducts"
+      }
+    ],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "money"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "orderModal",
+    "line": 5269,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [
+      {
+        "level": 2,
+        "text": "Objednat kurz ${escapeHtml(course.title)}"
+      },
+      {
+        "level": 3,
+        "text": "Osobní údaje, kurz a termín"
+      },
+      {
+        "level": 3,
+        "text": "Volby kurzu"
+      },
+      {
+        "level": 3,
+        "text": "Souhlasy a odeslání"
+      },
+      {
+        "level": 3,
+        "text": "Souhrn objednávky"
+      }
+    ],
+    "sections": [
+      {
+        "class": "order-main-column"
+      },
+      {
+        "class": "order-step-panel"
+      },
+      {
+        "class": "order-step-panel"
+      },
+      {
+        "class": "order-step-panel order-final-panel"
+      }
+    ],
+    "links": [
+      {
+        "tag": "button",
+        "text": "1Údaje a termín"
+      },
+      {
+        "tag": "button",
+        "text": "2Volby"
+      },
+      {
+        "tag": "button",
+        "text": "3Odeslání"
+      },
+      {
+        "tag": "button",
+        "text": "Pokračovat na volby kurzu"
+      },
+      {
+        "tag": "button",
+        "text": "Zpět"
+      },
+      {
+        "tag": "button",
+        "text": "Pokračovat na odeslání"
+      },
+      {
+        "tag": "a",
+        "text": "všeobecnými obchodními podmínkami",
+        "href": "/vseobecne-obchodni-podminky"
+      },
+      {
+        "tag": "a",
+        "text": "zásad ochrany osobních údajů",
+        "href": "/zasady-ochrany-osobnich-udaju"
+      },
+      {
+        "tag": "button",
+        "text": "Zpět"
+      },
+      {
+        "tag": "button",
+        "text": "Odeslat objednávku",
+        "data-event": "form_submit"
+      },
+      {
+        "tag": "a",
+        "text": "775 123 456",
+        "href": "tel:+420775123456"
+      }
+    ],
+    "forms": [
+      {
+        "class": "order-form order-form-redesign"
+      }
+    ],
+    "fields": [
+      {
+        "type": "hidden",
+        "name": "utmSource"
+      },
+      {
+        "type": "hidden",
+        "name": "utmMedium"
+      },
+      {
+        "type": "hidden",
+        "name": "utmCampaign"
+      },
+      {
+        "name": "firstName",
+        "required": null
+      },
+      {
+        "name": "lastName",
+        "required": null
+      },
+      {
+        "name": "phone",
+        "required": null
+      },
+      {
+        "name": "email",
+        "type": "email",
+        "required": null
+      },
+      {
+        "name": "selectedCourse",
+        "required": null
+      },
+      {
+        "name": "location",
+        "required": null
+      },
+      {
+        "name": "termId",
+        "required": null
+      },
+      {
+        "name": "message"
+      },
+      {
+        "type": "checkbox",
+        "name": "installments"
+      },
+      {
+        "type": "checkbox",
+        "name": "termsConsent",
+        "required": null
+      },
+      {
+        "type": "checkbox",
+        "name": "privacyConsent",
+        "required": null
+      }
+    ],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "escapeHtml",
+      "orderTermOptions",
+      "orderTermHelp",
+      "orderUpsellMarkup",
+      "recaptchaMarkup"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  },
+  {
+    "name": "contactBranchModal",
+    "line": 5382,
+    "title": "",
+    "meta": [],
+    "canonical": [],
+    "headings": [],
+    "sections": [],
+    "links": [
+      {
+        "tag": "button",
+        "text": "Odeslat zprávu",
+        "data-event": "form_submit"
+      }
+    ],
+    "forms": [
+      {}
+    ],
+    "fields": [
+      {
+        "name": "name",
+        "required": null
+      },
+      {
+        "name": "phone",
+        "required": null
+      },
+      {
+        "name": "email",
+        "type": "email",
+        "required": null
+      },
+      {
+        "name": "interest"
+      },
+      {
+        "name": "branch"
+      },
+      {
+        "name": "message"
+      }
+    ],
+    "scripts": [],
+    "jsonld": [],
+    "componentCalls": [
+      "recaptchaMarkup"
+    ],
+    "note": "Static template extraction. Dynamic expressions require source/DOM review; not an executed render."
+  }
+]
