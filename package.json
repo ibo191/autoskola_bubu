@@ -15,7 +15,8 @@
     "test:e2e": "playwright test",
     "format": "prettier --write src tests *.json *.mjs",
     "format:check": "prettier --check src tests *.json *.mjs",
-    "test:db": "node --env-file-if-exists=.env --import tsx --test tests/integration/*.test.ts"
+    "test:db": "node --env-file-if-exists=.env --import tsx --test tests/integration/*.test.ts",
+    "db:migrate": "node scripts/apply-db-migrations.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "7.2.4",
