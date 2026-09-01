@@ -76,8 +76,7 @@ import { branches, courses } from '../lib/catalog';
       </fieldset>
       <fieldset data-step="1" hidden>
         <legend class="sr-only">Kontaktní údaje</legend><div class="notice">
-          Lokální vývoj: zadávejte pouze fiktivní údaje. V této verzi se kontakt neodesílá ani
-          neukládá.
+          Kontaktní údaje použijeme jen pro zpracování objednávky a rezervaci osobního zápisu.
         </div><div class="form-grid">
           <label
             >Jméno<input
@@ -114,26 +113,27 @@ import { branches, courses } from '../lib/catalog';
       </fieldset>
       <fieldset data-step="2" hidden>
         <legend class="sr-only">Osobní zápis</legend><div class="notice">
-          <strong>Rezervace zatím není aktivní.</strong><p>
-            Pro místní testování čekáme na spuštění lokální databáze a konfiguraci zápisů.
-            Nenabízíme smyšlené termíny.
-          </p>
-        </div><div id="order-summary"></div><p class="small">
-          Po zapojení rezervací zde vyberete den a čas. Termín se potvrdí až po ověření vašeho
-          e-mailu.
-        </p><label class="checkbox"
-          ><input type="checkbox" name="terms" disabled /><span
-            >Souhlas s obchodními podmínkami – schválené znění bude dodáno.</span
+          Vyberte si termín zápisu na pobočce. Jeden termín je dlouhý 10 minut.
+        </div><div id="order-summary"></div><div class="form-grid">
+          <label
+            >Termín zápisu<select name="slotId" id="slot-field" required
+              ><option value="">Načítáme dostupné termíny…</option></select
+            ></label
+          >
+        </div><label class="checkbox"
+          ><input type="checkbox" name="terms" required /><span
+            >Souhlasím s <a href="/obchodni-podminky" target="_blank" rel="noreferrer"
+              >obchodními podmínkami</a
+            > a beru na vědomí
+            <a href="/ochrana-osobnich-udaju" target="_blank" rel="noreferrer"
+              >zpracování osobních údajů</a
+            >.</span
           ></label
-        ><p class="small">
-          <a href="/ochrana-osobnich-udaju">Informace o zpracování osobních údajů</a>
-        </p><label class="checkbox"
-          ><input type="checkbox" name="marketing" disabled /><span
-            >Dobrovolný marketingový souhlas – znění bude dodáno samostatně.</span
+        ><label class="checkbox"
+          ><input type="checkbox" name="marketing" /><span
+            >Chci dostávat novinky a praktické informace od Autoškoly BuBu.</span
           ></label
-        ><button type="button" class="btn primary" disabled
-          >Objednávky nejsou v tomto náhledu aktivní</button
-        >
+        ><button type="submit" id="order-submit" class="btn primary">Odeslat objednávku</button>
       </fieldset>
       <p id="order-error" class="error" role="alert"></p><div class="wizard-actions">
         <button type="button" id="order-back" class="btn secondary" hidden>Zpět</button><button

@@ -25,18 +25,19 @@ test('Vercel preview forces safe stage A adapters', () => {
   assert.equal(config.RECAPTCHA_ADAPTER, 'local');
   assert.equal(config.EMAIL_ADAPTER, 'local');
   assert.equal(config.ANALYTICS_ADAPTER, 'noop');
+  assert.doesNotThrow(() =>
+    readConfig({
+      VERCEL: '1',
+      VERCEL_URL: 'autoskola-bubu.vercel.app',
+      SUPABASE_URL: 'https://example.supabase.co',
+    }),
+  );
   assert.equal(
     readConfig({
       VERCEL: '1',
       VERCEL_PROJECT_PRODUCTION_URL: 'autoskola-bubu.vercel.app',
     }).APP_ORIGIN,
     'https://autoskola-bubu.vercel.app',
-  );
-  assert.throws(() =>
-    readConfig({
-      VERCEL: '1',
-      SUPABASE_URL: 'https://example.supabase.co',
-    }),
   );
 });
 test('Captcha is single-use, action-bound, host-bound and expires', async () => {

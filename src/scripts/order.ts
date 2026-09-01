@@ -13,7 +13,8 @@ let step = 0,
   dirty = false,
   validQuote: Extract<Quote, { ok: true }> | undefined,
   trigger: HTMLElement | undefined,
-  requestSequence = 0;
+  requestSequence = 0,
+  slotSequence = 0;
 const packageLabels: Record<Selection['package'], string> = {
   single: 'Jednotná cena',
   'moto-basic': 'Moto Základ · 13 hodin jízd',
@@ -32,9 +33,11 @@ function setStep(value: number) {
   back.hidden = step === 0;
   next.hidden = step === 2;
   error.textContent = '';
-  if (step === 2)
+  if (step === 2) {
     document.querySelector('#order-summary')!.textContent =
       `${(field('course') as HTMLSelectElement).selectedOptions[0]?.textContent} · ${(field('branch') as HTMLSelectElement).selectedOptions[0]?.textContent} · ${validQuote ? money(validQuote.amount) : ''}`;
+    void loadSlots();
+  }
   form
     .querySelector<HTMLElement>(
       `[data-step="${step}"] input,[data-step="${step}"] select,[data-step="${step}"] .notice`,
@@ -115,6 +118,10 @@ document.querySelector('#discard-order')!.addEventListener('click', () => {
   dialog.close();
 });
 form.addEventListener('submit', (e) => e.preventDefault());
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
+  void submitOrder();
+});
 form.addEventListener('input', () => {
   dirty = true;
 });
@@ -217,5 +224,139 @@ async function updateQuote(retry = false) {
     if (seq !== requestSequence) return;
     amount.textContent = 'Cenu se nepodařilo ověřit';
     note.textContent = 'Zkuste výběr znovu. Bez serverového ověření nelze pokračovat.';
+  }
+}
+
+function formatSlot(start: string, end: string) {
+  const from = new Date(start);
+  const to = new Date(end);
+  const day = new Intl.DateTimeFormat('cs-CZ', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'numeric',
+    timeZone: 'Europe/Prague',
+  }).format(from);
+  const time = new Intl.DateTimeFormat('cs-CZ', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Europe/Prague',
+  }).format(from);
+  const until = new Intl.DateTimeFormat('cs-CZ', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Europe/Prague',
+  }).format(to);
+  return `${day} · ${time}–${until}`;
+}
+
+async function loadSlots() {
+  const seq = ++slotSequence;
+  const slot = field('slotId') as HTMLSelectElement;
+  const branch = field('branch').value;
+  slot.replaceChildren(new Option('Načítáme dostupné termíny…', ''));
+  slot.disabled = true;
+  try {
+    const response = await fetch(`/api/slots?branch=${encodeURIComponent(branch)}`, {
+      headers: { Accept: 'application/json' },
+    });
+    const result = (await response.json()) as {
+      ok: boolean;
+      slots?: { id: string; startsAt: string; endsAt: string }[];
+      message?: string;
+    };
+    if (seq !== slotSequence) return;
+    if (!response.ok || !result.ok || !result.slots?.length) {
+      slot.replaceChildren(
+        new Option(result.message ?? 'Pro tuto pobočku nejsou vypsané termíny', ''),
+      );
+      return;
+    }
+    slot.replaceChildren(
+      new Option('Vyberte termín zápisu', ''),
+      ...result.slots.map(
+        (value) => new Option(formatSlot(value.startsAt, value.endsAt), value.id),
+      ),
+    );
+    slot.disabled = false;
+  } catch {
+    if (seq !== slotSequence) return;
+    slot.replaceChildren(new Option('Termíny se nepodařilo načíst', ''));
+  }
+}
+
+async function submitOrder() {
+  if (!validQuote) {
+    error.textContent = 'Nejdříve vyberte dostupný kurz.';
+    return;
+  }
+  const fields = form.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
+    `[data-step="${step}"] input,[data-step="${step}"] select`,
+  );
+  for (const el of fields) {
+    if (el.closest('[hidden]')) continue;
+    if (!el.checkValidity()) {
+      error.textContent = el.validationMessage;
+      el.reportValidity();
+      return;
+    }
+  }
+  const submit = document.querySelector<HTMLButtonElement>('#order-submit')!;
+  submit.disabled = true;
+  submit.textContent = 'Odesíláme…';
+  error.textContent = '';
+  const course = field('course').value;
+  const moto = ['am', 'a1', 'a2', 'a'].includes(course);
+  const heldLicence = field('heldLicence').value;
+  const heldLicences = moto && heldLicence ? [heldLicence] : [];
+  const direct =
+    (heldLicence === 'A1' && course === 'a2') || (heldLicence === 'A2' && course === 'a');
+  const body = {
+    slotId: field('slotId').value,
+    contact: {
+      firstName: field('firstName').value,
+      lastName: field('lastName').value,
+      email: field('email').value,
+      phone: field('phone').value,
+    },
+    selection: {
+      course,
+      branch: field('branch').value,
+      transmission:
+        course === 'b-automat'
+          ? 'automatic'
+          : course === 'l17'
+            ? field('transmission').value
+            : 'manual',
+      package: moto ? field('package').value : 'single',
+      heldLicences,
+      ...(moto && direct ? { holdingPeriod: field('holdingPeriod').value } : {}),
+    },
+    priceVersion: validQuote.priceVersion,
+    termsAccepted: (field('terms') as HTMLInputElement).checked,
+    marketingAccepted: (field('marketing') as HTMLInputElement).checked,
+  };
+  try {
+    const response = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const result = (await response.json()) as { ok: boolean; code?: string; expiresAt?: string };
+    if (!response.ok || !result.ok) {
+      error.textContent =
+        result.code === 'RATE_LIMITED'
+          ? 'Odeslali jste příliš mnoho pokusů. Zkuste to prosím později.'
+          : 'Objednávku se nepodařilo uložit. Zkontrolujte výběr a zkuste to znovu.';
+      submit.disabled = false;
+      submit.textContent = 'Odeslat objednávku';
+      return;
+    }
+    dirty = false;
+    form.innerHTML =
+      '<div class="notice"><strong>Objednávka je přijatá.</strong><p>Termín zápisu jsme vám podrželi. Brzy vás budeme kontaktovat s dalšími informacemi.</p></div>';
+  } catch {
+    error.textContent = 'Objednávku se nepodařilo odeslat. Zkuste to prosím znovu.';
+    submit.disabled = false;
+    submit.textContent = 'Odeslat objednávku';
   }
 }

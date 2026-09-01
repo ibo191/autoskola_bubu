@@ -39,12 +39,9 @@ export function generateSlots(input: unknown): Slot[] {
   const s = scheduleSchema.parse(input);
   const start = minuteOfDay(s.open),
     end = minuteOfDay(s.close);
-  const span = end - start - s.durationMinutes;
-  if (span < 9 * s.durationMinutes)
-    throw new Error('Opening window cannot fit ten non-overlapping appointments');
+  if (end - start < s.durationMinutes) throw new Error('Opening window cannot fit an appointment');
   const output: Slot[] = [];
-  for (let i = 0; i < 10; i++) {
-    const minute = start + Math.floor((span * i) / 9);
+  for (let minute = start; minute + s.durationMinutes <= end; minute += s.durationMinutes) {
     const time = `${Math.floor(minute / 60)
       .toString()
       .padStart(2, '0')}:${(minute % 60).toString().padStart(2, '0')}`;

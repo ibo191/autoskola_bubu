@@ -1,21 +1,39 @@
 ---
 export const prerender = true;
+import { readFileSync } from 'node:fs';
 import Base from '../layouts/Base.astro';
+
+const termsText = readFileSync('src/content/legal/vop.txt', 'utf8').trim();
 ---
 
 <Base
-  title="Obchodní podmínky – příprava"
-  description="Právní dokumenty lokálního projektu čekají na schválené znění provozovatele."
+  title="Obchodní podmínky"
+  description="Všeobecné obchodní podmínky Autoškoly BuBu s.r.o."
   noindex
-  ><section class="section">
-    <div class="container content">
-      <span class="eyebrow">Lokální vývoj</span><h1>Obchodní podmínky</h1><div class="notice">
-        Schválené obchodní podmínky budou dodány provozovatelem. Tento náhled není jejich náhradou.
-        Objednávky nejsou aktivní.
-      </div><p>Není zde vložený generovaný právní text ani neúplné podmínky ze starého webu.</p><a
-        class="text-link"
-        href="/cenik">Zpět na ceník</a
-      >
-    </div>
-  </section></Base
 >
+  <section class="section">
+    <div class="container content legal-document">
+      <span class="eyebrow">Autoškola BuBu s.r.o.</span>
+      <h1>Obchodní podmínky</h1>
+      <div class="notice">
+        Tento dokument upravuje podmínky výuky a výcviku, kurzovné, odstoupení od smlouvy, zkoušky
+        odborné způsobilosti a souhlas se zpracováním osobních údajů.
+      </div>
+      <pre>{termsText}</pre>
+      <a class="text-link" href="/cenik">Zpět na ceník</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .legal-document pre {
+    white-space: pre-wrap;
+    font: inherit;
+    line-height: 1.7;
+    color: var(--muted);
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin: 32px 0;
+  }
+</style>

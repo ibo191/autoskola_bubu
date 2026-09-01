@@ -8,10 +8,14 @@ if (!['local', 'preview'].includes(process.env.APP_ENV)) {
   throw new Error('Only local or preview builds are permitted before production launch.');
 }
 
-const result = spawnSync(process.execPath, ['./node_modules/astro/bin/astro.mjs', ...process.argv.slice(2)], {
-  stdio: 'inherit',
-  env: process.env,
-});
+const result = spawnSync(
+  process.execPath,
+  ['./node_modules/astro/bin/astro.mjs', ...process.argv.slice(2)],
+  {
+    stdio: 'inherit',
+    env: process.env,
+  },
+);
 
 if (result.error) throw result.error;
 process.exit(result.status ?? 1);

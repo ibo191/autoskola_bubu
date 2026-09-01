@@ -31,6 +31,9 @@ const baseBody = {
 class FakeRepository implements BookingRepository {
   calls: ProvisionalInput[] = [];
   shouldFail = false;
+  async listAvailableSlots() {
+    return [];
+  }
   async createProvisional(input: ProvisionalInput) {
     if (this.shouldFail) throw new Error('synthetic failure');
     this.calls.push(input);
@@ -42,6 +45,9 @@ class FakeRepository implements BookingRepository {
   }
   async verifyEmail() {
     return { ok: false };
+  }
+  async adminSummary() {
+    return { ordersTotal: 0, ordersConfirmed: 0, appointmentsTotal: 0, byCourse: [], byDay: [] };
   }
 }
 

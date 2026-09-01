@@ -8,16 +8,16 @@ const fixture = {
   durationMinutes: 15,
   capacity: 1,
 }; // Fictitious test parameters, not business defaults.
-test('Exactly ten distinct non-overlapping starts within opening hours', () => {
+test('Distinct non-overlapping starts cover the opening window', () => {
   const slots = generateSlots(fixture);
-  assert.equal(slots.length, 10);
-  assert.equal(new Set(slots.map((s) => s.start)).size, 10);
+  assert.equal(slots.length, 12);
+  assert.equal(new Set(slots.map((s) => s.start)).size, 12);
   assert.equal(slots[0]!.start, '2026-08-31T13:00:00.000Z');
-  assert.equal(slots[9]!.end, '2026-08-31T16:00:00.000Z');
-  for (let i = 1; i < 10; i++) assert.ok(slots[i - 1]!.end <= slots[i]!.start);
+  assert.equal(slots.at(-1)!.end, '2026-08-31T16:00:00.000Z');
+  for (let i = 1; i < slots.length; i++) assert.ok(slots[i - 1]!.end <= slots[i]!.start);
 });
 test('Impossible capacity/window is rejected, not silently shortened', () => {
-  assert.throws(() => generateSlots({ ...fixture, durationMinutes: 20 }));
+  assert.throws(() => generateSlots({ ...fixture, close: '15:10' }));
   assert.throws(() => generateSlots({ ...fixture, capacity: 0 }));
   assert.throws(() => generateSlots({ ...fixture, open: '26:00' }));
 });
@@ -26,7 +26,7 @@ test('Blocked intervals remove affected starts without inventing replacements', 
     ...fixture,
     blocked: [{ start: '2026-08-31T13:00:00Z', end: '2026-08-31T13:15:00Z' }],
   });
-  assert.equal(slots.length, 9);
+  assert.equal(slots.length, 11);
 });
 test('Prague summer and winter time and DST boundaries', () => {
   assert.equal(pragueToUtc('2026-01-15', '15:00').toISOString(), '2026-01-15T14:00:00.000Z');

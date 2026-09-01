@@ -2,18 +2,194 @@
 export const prerender = false;
 Astro.response.headers.set('Cache-Control', 'no-store');
 import Base from '../../layouts/Base.astro';
+import { courses } from '../../lib/catalog';
+import { requireLiveRepository } from '../../lib/server/live-order';
+
+const url = new URL(Astro.request.url);
+const expected = process.env.ADMIN_ACCESS_TOKEN ?? '';
+let authorized = expected.length >= 32 && Astro.cookies.get('bubu_admin')?.value === expected;
+let loginFailed = false;
+if (Astro.request.method === 'POST' && expected.length >= 32) {
+  const form = await Astro.request.formData();
+  const submitted = String(form.get('token') ?? '');
+  authorized = submitted === expected;
+  loginFailed = !authorized;
+  if (authorized)
+    Astro.cookies.set('bubu_admin', expected, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      path: '/sprava',
+      maxAge: 60 * 60 * 8,
+    });
+}
+const today = new Date().toISOString().slice(0, 10);
+const from = url.searchParams.get('from') ?? today;
+const to =
+  url.searchParams.get('to') ?? new Date(Date.now() + 31 * 86400000).toISOString().slice(0, 10);
+const course = url.searchParams.get('course') || '';
+const summary = authorized
+  ? await requireLiveRepository(process.env).adminSummary({
+      from: `${from}T00:00:00.000Z`,
+      to: `${to}T23:59:59.999Z`,
+      course: course || null,
+    })
+  : null;
 ---
 
 <Base title="Interní správa" description="Interní správa Autoškoly BuBu." noindex
   ><section class="section">
     <div class="container content">
-      <span class="eyebrow">Interní část</span><h1>Správa Autoškoly BuBu</h1><div class="notice">
-        Přihlášení čeká na lokální Supabase Auth. Přístup bude vyžadovat individuální účet a MFA.
-        Žádný vývojový přístup bez přihlášení není povolen.
-      </div><p>
-        Správa objednávek není v této verzi implementována. Nenahrazujeme autentizaci fiktivní
-        přihlášenou obrazovkou.
-      </p><a class="text-link" href="/">Zpět na web</a>
+      <span class="eyebrow">Interní část</span><h1>Správa Autoškoly BuBu</h1>{
+        !expected ? (
+          <div class="notice">
+            Pro zobrazení správy nastavte proměnnou <code>ADMIN_ACCESS_TOKEN</code> s minimálně 32
+            znaky.
+          </div>
+        ) : !authorized ? (
+          <form class="admin-login" method="post">
+            {loginFailed && <div class="error">Neplatný přístupový token.</div>}
+            <label>
+              Přístupový token
+              <input name="token" type="password" autocomplete="current-password" required />
+            </label>
+            <button class="btn primary" type="submit">
+              Zobrazit správu
+            </button>
+          </form>
+        ) : (
+          <>
+            <form class="admin-filters" method="get">
+              <label>
+                Od
+                <input type="date" name="from" value={from} />
+              </label>
+              <label>
+                Do
+                <input type="date" name="to" value={to} />
+              </label>
+              <label>
+                Skupina
+                <select name="course">
+                  <option value="">Všechny skupiny</option>
+                  {courses.map((item) => (
+                    <option value={item.id} selected={course === item.id}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button class="btn primary" type="submit">
+                Filtrovat
+              </button>
+            </form>
+            <div class="admin-grid">
+              <article>
+                <span>Objednávky celkem</span>
+                <strong>{summary?.ordersTotal ?? 0}</strong>
+              </article>
+              <article>
+                <span>Potvrzené objednávky</span>
+                <strong>{summary?.ordersConfirmed ?? 0}</strong>
+              </article>
+              <article>
+                <span>Zápisy v kalendáři</span>
+                <strong>{summary?.appointmentsTotal ?? 0}</strong>
+              </article>
+            </div>
+            <h2>Objednávky podle skupiny</h2>
+            <table>
+              <thead>
+                <tr>
+                  <>
+                    <th>Skupina</th>
+                    <th>Počet</th>
+                  </>
+                </tr>
+              </thead>
+              <tbody>
+                {(summary?.byCourse.length ? summary.byCourse : []).map((row) => (
+                  <tr>
+                    <td>{row.course}</td>
+                    <td>{row.count}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <h2>Příchody na zápis podle dne</h2>
+            <table>
+              <thead>
+                <tr>
+                  <>
+                    <th>Datum</th>
+                    <th>Počet lidí</th>
+                  </>
+                </tr>
+              </thead>
+              <tbody>
+                {(summary?.byDay.length ? summary.byDay : []).map((row) => (
+                  <tr>
+                    <td>{row.date}</td>
+                    <td>{row.count}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )
+      }<a class="text-link" href="/">Zpět na web</a>
     </div>
   </section></Base
 >
+
+<style>
+  .admin-login,
+  .admin-filters {
+    display: grid;
+    gap: 16px;
+    max-width: 720px;
+  }
+  .admin-filters {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: end;
+  }
+  .admin-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin: 28px 0;
+  }
+  .admin-grid article {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 20px;
+    background: #fff;
+  }
+  .admin-grid span {
+    display: block;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  .admin-grid strong {
+    display: block;
+    font-size: 2.2rem;
+    margin-top: 8px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 28px;
+  }
+  th,
+  td {
+    border-bottom: 1px solid var(--line);
+    padding: 12px;
+    text-align: left;
+  }
+  @media (max-width: 720px) {
+    .admin-filters,
+    .admin-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
