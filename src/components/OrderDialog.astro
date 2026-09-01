@@ -63,11 +63,22 @@ import { branches, courses } from '../lib/catalog';
               ></select
             ></label
           >
-          <label id="package-field" hidden
-            >Varianta výcviku<select name="package"
-              ><option value="single">Jednotná cena</option></select
-            ></label
-          >
+          <label id="package-field" hidden>
+            Varianta výcviku<select name="package">
+              <option value="single">Jednotná cena</option>
+            </select>
+          </label>
+        </div>
+        <div id="moto-package-cards" class="moto-package-cards" hidden aria-live="polite">
+          <div class="moto-package-intro">
+            <span class="eyebrow">Balíčky MOTO</span>
+            <h3>Vyberte si rozsah, který vám dá smysl.</h3>
+            <p>
+              Moto Jistotu doporučujeme hlavně začátečníkům. Dává víc času na ovládání motorky,
+              cvičiště i bezpečný pocit před zkouškou.
+            </p>
+          </div>
+          <div class="moto-package-grid" id="moto-package-options"></div>
         </div>
         <div class="upsell-panel" aria-labelledby="upsell-title">
           <div>
@@ -319,6 +330,99 @@ import { branches, courses } from '../lib/catalog';
     flex-shrink: 0;
     margin: 2px 8px 0 0;
   }
+  #package-field {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+  .moto-package-cards {
+    border: 1px solid #c4d8cb;
+    border-radius: 18px;
+    padding: 20px;
+    margin: 22px 0;
+    background: linear-gradient(135deg, #f7fbfa, #eaf7f4);
+  }
+  .moto-package-intro h3 {
+    font-size: 1.35rem;
+    margin: 4px 0 8px;
+  }
+  .moto-package-intro p {
+    font-size: 0.86rem;
+    max-width: 620px;
+  }
+  .moto-package-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 18px;
+  }
+  .moto-package-card {
+    border: 1px solid #cddfd9;
+    border-radius: 16px;
+    padding: 18px;
+    background: #fff;
+    text-align: left;
+    color: var(--ink);
+    display: grid;
+    gap: 12px;
+    min-height: 100%;
+    cursor: pointer;
+    transition:
+      transform var(--ease),
+      border-color var(--ease),
+      box-shadow var(--ease),
+      background var(--ease);
+  }
+  .moto-package-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--brand);
+    background: #f8fffd;
+  }
+  .moto-package-card[aria-pressed='true'] {
+    border-color: var(--brand-dark);
+    box-shadow: 0 14px 34px #126b6020;
+    background: #eefaf7;
+  }
+  .moto-package-card.recommended {
+    border-color: var(--brand);
+    position: relative;
+  }
+  .moto-package-card.recommended::before {
+    content: 'Doporučujeme';
+    justify-self: start;
+    border-radius: 999px;
+    background: var(--brand);
+    color: #102f48;
+    padding: 5px 10px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .moto-package-card h4 {
+    font-size: 1.18rem;
+    margin: 0;
+  }
+  .moto-package-card .package-price {
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+  .moto-package-card ul {
+    padding-left: 18px;
+    margin: 0;
+  }
+  .moto-package-card li {
+    margin: 6px 0;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+  .moto-package-grid.single {
+    grid-template-columns: 1fr;
+  }
   .upsell-panel {
     border: 1px solid var(--line);
     border-radius: 16px;
@@ -498,6 +602,9 @@ import { branches, courses } from '../lib/catalog';
     }
     .addon-card {
       align-items: flex-start;
+    }
+    .moto-package-grid {
+      grid-template-columns: 1fr;
     }
     .calendar-day {
       min-height: 36px;

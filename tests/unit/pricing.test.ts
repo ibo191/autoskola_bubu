@@ -24,7 +24,7 @@ for (const branch of branches)
       });
     }
 for (const course of ['am', 'a1', 'a2', 'a']) {
-  test(`${course}: no licence means only Jistota plus two theory hours`, () => {
+  test(`${course}: no licence means only Jistota`, () => {
     const selection = { course, branch: 'strizkov', heldLicences: [] };
     const rejected = quote({ ...selection, package: 'moto-basic' });
     assert.equal(rejected.ok, false);
@@ -33,7 +33,7 @@ for (const course of ['am', 'a1', 'a2', 'a']) {
     assert.equal(accepted.ok, true);
     if (accepted.ok) {
       assert.equal(accepted.amount, 31900);
-      assert.equal(accepted.extraTheoryHours, 2);
+      assert.equal(accepted.extraTheoryHours, course === 'a1' ? 2 : 0);
     }
   });
   for (const branch of ['kladno', 'statenice'])

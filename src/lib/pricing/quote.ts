@@ -159,7 +159,7 @@ export function quote(input: unknown): Quote {
     };
   if (s.heldLicences.length === 0) {
     if (s.package !== 'moto-confidence') return choose(['moto-confidence']);
-    return result(prices.motoConfidence, 'standard', 2);
+    return result(prices.motoConfidence, 'standard', s.course === 'a1' ? 2 : 0);
   }
   const ranks = { AM: 0, A1: 1, A2: 2, A: 3 } as const;
   const targetRanks = { am: 0, a1: 1, a2: 2, a: 3 } as const;

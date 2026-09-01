@@ -15,6 +15,8 @@ const slotField = document.querySelector<HTMLInputElement>('#slot-field')!;
 const calendarTitle = document.querySelector<HTMLElement>('#calendar-title')!;
 const calendarDays = document.querySelector<HTMLElement>('#calendar-days')!;
 const slotList = document.querySelector<HTMLElement>('#slot-list')!;
+const motoPackageCards = document.querySelector<HTMLElement>('#moto-package-cards')!;
+const motoPackageOptions = document.querySelector<HTMLElement>('#moto-package-options')!;
 let step = 0;
 let dirty = false;
 let validQuote: Extract<Quote, { ok: true }> | undefined;
@@ -31,6 +33,50 @@ const packageLabels: Record<Selection['package'], string> = {
   'moto-confidence': 'Moto Jistota · 20 hodin jízd',
   supplement: 'Doplňovací zkouška · 4 hodiny jízd',
 };
+const motoPackageCopy: Record<
+  Selection['package'],
+  { title: string; price: string; recommended?: boolean; benefits: string[] }
+> = {
+  single: { title: 'Jednotná cena', price: '', benefits: [] },
+  'moto-basic': {
+    title: 'MOTO ZÁKLAD',
+    price: '24 900 Kč',
+    benefits: [
+      'Zákonný rozsah výcviku 13 hodin jízd.',
+      'Vhodné pro ty, kteří už mají zkušenosti na motorce.',
+      'Vhodné na procvičení základů ovládání motorky a cvičiště ke zkoušce.',
+    ],
+  },
+  'moto-confidence': {
+    title: 'MOTO JISTOTA',
+    price: '31 900 Kč',
+    recommended: true,
+    benefits: [
+      'Rozsah nad rámec zákona 20 hodin jízd.',
+      'Vhodné pro úplné začátečníky na motorce.',
+      'Více času na ovládání motorky, bezpečnost a sebevědomí před zkouškou.',
+    ],
+  },
+  supplement: {
+    title: 'DOPLŇOVACÍ ZKOUŠKA',
+    price: '7 500 Kč',
+    benefits: [
+      'Pro zákonné rozšíření po dostatečné době držení nižší skupiny.',
+      'Obsahuje 4 hodiny jízd.',
+      'Pobočka ověří, že splňujete podmínky pro doplňovací zkoušku.',
+    ],
+  },
+};
+const firstLicenceCopy = {
+  title: 'MOTO JISTOTA prvořidičák',
+  price: '31 900 Kč',
+  recommended: true,
+  benefits: [
+    'Pro ty, kteří si dělají svůj první řidičák právě na skupinu A1.',
+    'Hodinový rozsah jízd nad rámec zákona: 20 hodin.',
+    'Rozšířený rozsah teoretické přípravy nad rámec zákona.',
+  ],
+};
 
 function localDateKey(date: Date) {
   const year = date.getFullYear();
@@ -39,6 +85,31 @@ function localDateKey(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
+function renderMotoPackageCards(allowed: Selection['package'][], selected: Selection['package']) {
+  motoPackageOptions.replaceChildren();
+  motoPackageOptions.classList.toggle('single', allowed.length === 1);
+  const course = field('course').value;
+  const heldLicence = field('heldLicence').value;
+  const isFirstLicenceA1 =
+    course === 'a1' && !heldLicence && allowed.length === 1 && allowed[0] === 'moto-confidence';
+  for (const value of allowed) {
+    const copy =
+      isFirstLicenceA1 && value === 'moto-confidence' ? firstLicenceCopy : motoPackageCopy[value];
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `moto-package-card${copy.recommended ? ' recommended' : ''}`;
+    button.dataset.package = value;
+    button.setAttribute('aria-pressed', String(value === selected));
+    const benefits = copy.benefits.map((benefit) => `<li>${benefit}</li>`).join('');
+    button.innerHTML = `<h4>${copy.title}</h4><strong class="package-price">${copy.price}</strong><ul>${benefits}</ul>`;
+    button.addEventListener('click', () => {
+      field('package').value = value;
+      renderMotoPackageCards(allowed, value);
+      void updateQuote();
+    });
+    motoPackageOptions.append(button);
+  }
+}
 function selectionWithAddons() {
   const course = field('course').value;
   const moto = ['am', 'a1', 'a2', 'a'].includes(course);
@@ -229,6 +300,7 @@ async function updateQuote(retry = false) {
     (field('heldLicence').value === 'A2' && course === 'a');
   document.querySelector<HTMLElement>('#period-field')!.hidden = !moto || !direct;
   document.querySelector<HTMLElement>('#package-field')!.hidden = !moto;
+  motoPackageCards.hidden = !moto;
   document.querySelector<HTMLElement>('#transmission-field')!.hidden = course !== 'l17';
   const amount = document.querySelector<HTMLElement>('#quote-amount')!;
   const note = document.querySelector<HTMLElement>('#quote-note')!;
@@ -250,9 +322,12 @@ async function updateQuote(retry = false) {
     if (!result.ok) {
       if (result.code === 'PACKAGE_REQUIRED' && result.allowedPackages && !retry) {
         const options = field('package') as HTMLSelectElement;
+        const fallback = result.allowedPackages[0] ?? 'moto-confidence';
         options.replaceChildren(
           ...result.allowedPackages.map((value) => new Option(packageLabels[value], value)),
         );
+        options.value = fallback;
+        renderMotoPackageCards(result.allowedPackages, fallback);
         await updateQuote(true);
         return;
       }
@@ -273,6 +348,7 @@ async function updateQuote(retry = false) {
       options.value = allowed.includes(selected as Selection['package'])
         ? selected
         : (allowed[0] ?? 'moto-confidence');
+      renderMotoPackageCards(allowed, options.value as Selection['package']);
     }
     validQuote = result;
     amount.textContent = money(result.amount);
