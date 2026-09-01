@@ -1,0 +1,201 @@
+---
+import Base from '../layouts/Base.astro';
+import { requireLiveRepository } from '../lib/server/live-order';
+import { branchLabel, courseLabel, formatDateTime } from '../lib/order-display';
+
+export const prerender = false;
+const code = Astro.url.searchParams.get('kod')?.trim() ?? '';
+let order = null;
+let message = '';
+if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  try {
+    order = await requireLiveRepository(process.env).getPublicOrder(code);
+  } catch {
+    message = 'Objednávku se nepodařilo načíst.';
+  }
+}
+---
+
+<Base
+  title="Správa termínu zápisu"
+  description="Změna nebo zrušení termínu zápisu v Autoškole BuBu."
+  noindex
+>
+  <section class="section hero-section compact">
+    <div class="container narrow">
+      <span class="eyebrow">Termín zápisu</span>
+      <h1>Změna nebo zrušení termínu.</h1>
+      <p>Zadejte číslo objednávky z potvrzovacího e-mailu.</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container narrow manage-grid">
+      <form class="summary-card" method="get">
+        <label>Číslo objednávky<input name="kod" value={code} required /></label>
+        <button class="btn primary" type="submit">Načíst objednávku</button>
+      </form>
+      {
+        order ? (
+          <div
+            class="summary-card"
+            data-manage-order={order.publicCode}
+            data-branch={order.selection.branch}
+          >
+            <h2>{courseLabel(order.selection.course)}</h2>
+            <p>
+              <strong>Pobočka:</strong> {branchLabel(order.selection.branch)}
+            </p>
+            <p>
+              <strong>Aktuální termín:</strong>{' '}
+              {order.appointment ? formatDateTime(order.appointment.startsAt) : 'bez termínu'}
+            </p>
+            <div class="notice strong">
+              Při zápisu se platí nevratná záloha za kurz 5 000 Kč na pobočce, ideálně v hotovosti,
+              případně okamžitým převodem na účet.
+            </div>
+            <div class="booking-calendar" aria-live="polite">
+              <div class="calendar-head">
+                <button type="button" class="btn secondary" id="manage-prev">
+                  ‹
+                </button>
+                <strong id="manage-title">Načítáme termíny…</strong>
+                <button type="button" class="btn secondary" id="manage-next">
+                  ›
+                </button>
+              </div>
+              <div class="calendar-weekdays" aria-hidden="true">
+                <>
+                  <span>Po</span>
+                  <span>Út</span>
+                  <span>St</span>
+                  <span>Čt</span>
+                  <span>Pá</span>
+                  <span>So</span>
+                  <span>Ne</span>
+                </>
+              </div>
+              <div id="manage-days" class="calendar-days" />
+              <div id="manage-slots" class="slot-list">
+                <p>Vyberte zvýrazněný den.</p>
+              </div>
+            </div>
+            <p id="manage-message" class="error" role="alert" />
+            <div class="actions">
+              <button type="button" id="cancel-appointment" class="btn secondary">
+                Zrušit termín zápisu
+              </button>
+            </div>
+          </div>
+        ) : code ? (
+          <div class="notice">{message || 'Objednávka s tímto číslem nebyla nalezena.'}</div>
+        ) : null
+      }
+    </div>
+  </section>
+  <script src="../scripts/manage-appointment.ts"></script>
+</Base>
+<style>
+  .narrow {
+    max-width: 880px;
+  }
+  .compact {
+    padding-bottom: 24px;
+  }
+  .manage-grid {
+    display: grid;
+    gap: 24px;
+  }
+  .summary-card {
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 28px;
+    background: #fff;
+    box-shadow: 0 20px 60px #0b2d2610;
+  }
+  label {
+    display: grid;
+    gap: 8px;
+    font-weight: 700;
+  }
+  input {
+    padding: 12px;
+    border: 1px solid #9aada5;
+    border-radius: 6px;
+    min-height: 49px;
+  }
+  .strong {
+    font-weight: 700;
+  }
+  .actions {
+    margin-top: 18px;
+  }
+  .booking-calendar {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+    background: #fff;
+    margin-top: 24px;
+  }
+  .calendar-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .calendar-weekdays,
+  .calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    text-align: center;
+  }
+  .calendar-weekdays {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #60716b;
+    margin-bottom: 6px;
+  }
+  .calendar-day {
+    min-height: 42px;
+    border: 1px solid #e2ece8;
+    border-radius: 10px;
+    background: #f7faf9;
+    color: #8a9a94;
+    font-weight: 700;
+  }
+  .calendar-day.available {
+    background: #e7f6f4;
+    color: var(--brand-dark);
+    border-color: #9bd5cf;
+    cursor: pointer;
+  }
+  .calendar-day.available:hover,
+  .calendar-day.selected {
+    background: var(--brand);
+    color: #fff;
+    border-color: var(--brand);
+  }
+  .calendar-day:disabled {
+    cursor: not-allowed;
+  }
+  .slot-list {
+    margin-top: 16px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .slot-option {
+    border: 1px solid #9bd5cf;
+    border-radius: 999px;
+    padding: 9px 13px;
+    background: #fff;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .slot-option:hover {
+    background: var(--brand-dark);
+    color: #fff;
+    border-color: var(--brand-dark);
+  }
+</style>

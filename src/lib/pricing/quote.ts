@@ -10,6 +10,20 @@ import {
   priceSource,
 } from '../catalog/index';
 
+const addonsSchema = z
+  .object({
+    book: z.boolean().default(false),
+    hoodieQty: z.number().int().min(0).max(10).default(0),
+    shirtQty: z.number().int().min(0).max(10).default(0),
+  })
+  .default({ book: false, hoodieQty: 0, shirtQty: 0 });
+
+export const addonCatalog = {
+  book: { id: 'book-autoskola-pohodlne', title: 'Knížka Autoškola Pohodlně', unitPrice: 300 },
+  hoodie: { id: 'hoodie-bubu', title: 'Mikina Autoškola BuBu', unitPrice: 500 },
+  shirt: { id: 'shirt-bubu', title: 'Tričko Autoškola BuBu', unitPrice: 500 },
+} as const;
+
 export const selectionSchema = z
   .object({
     course: courseId,
@@ -21,6 +35,7 @@ export const selectionSchema = z
       .max(6)
       .default([]),
     holdingPeriod: z.enum(['less-than-two', 'exactly-two', 'more-than-two', 'unknown']).optional(),
+    addons: addonsSchema,
   })
   .strict()
   .transform((value) => ({
@@ -32,6 +47,9 @@ export type Quote =
   | {
       ok: true;
       amount: number;
+      baseAmount: number;
+      addonsAmount: number;
+      addons: { id: string; title: string; quantity: number; unitPrice: number; total: number }[];
       currency: 'CZK';
       package: Selection['package'];
       training: 'standard' | 'extension' | 'supplement';
@@ -68,13 +86,52 @@ export function quote(input: unknown): Quote {
       code: 'UNAVAILABLE',
       message: 'Tato kombinace kurzu a pobočky není dostupná.',
     };
+  const selectedAddons = [
+    ...(s.addons.book
+      ? [
+          {
+            id: addonCatalog.book.id,
+            title: addonCatalog.book.title,
+            quantity: 1,
+            unitPrice: addonCatalog.book.unitPrice,
+            total: addonCatalog.book.unitPrice,
+          },
+        ]
+      : []),
+    ...(s.addons.hoodieQty > 0
+      ? [
+          {
+            id: addonCatalog.hoodie.id,
+            title: addonCatalog.hoodie.title,
+            quantity: s.addons.hoodieQty,
+            unitPrice: addonCatalog.hoodie.unitPrice,
+            total: s.addons.hoodieQty * addonCatalog.hoodie.unitPrice,
+          },
+        ]
+      : []),
+    ...(s.addons.shirtQty > 0
+      ? [
+          {
+            id: addonCatalog.shirt.id,
+            title: addonCatalog.shirt.title,
+            quantity: s.addons.shirtQty,
+            unitPrice: addonCatalog.shirt.unitPrice,
+            total: s.addons.shirtQty * addonCatalog.shirt.unitPrice,
+          },
+        ]
+      : []),
+  ];
+  const addonsAmount = selectedAddons.reduce((sum, item) => sum + item.total, 0);
   const result = (
-    amount: number,
+    baseAmount: number,
     training: 'standard' | 'extension' | 'supplement' = 'standard',
     extraTheoryHours = 0,
   ): Quote => ({
     ok: true,
-    amount,
+    amount: baseAmount + addonsAmount,
+    baseAmount,
+    addonsAmount,
+    addons: selectedAddons,
     currency: 'CZK',
     package: s.package,
     training,

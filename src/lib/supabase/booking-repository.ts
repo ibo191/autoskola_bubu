@@ -5,12 +5,17 @@ import type {
   AvailableSlot,
   BookingRepository,
   ProvisionalInput,
+  PublicOrderOverview,
 } from '../booking/repository';
 import type { RateLimiter } from '../security/rate-limit';
+
 const createdSchema = z.object({
   orderId: z.uuid(),
+  publicCode: z.string().min(6),
   appointmentId: z.uuid(),
   expiresAt: z.iso.datetime({ offset: true }),
+  startsAt: z.iso.datetime({ offset: true }),
+  endsAt: z.iso.datetime({ offset: true }),
 });
 const slotSchema = z.object({
   id: z.uuid(),
@@ -19,6 +24,40 @@ const slotSchema = z.object({
   ends_at: z.iso.datetime({ offset: true }),
   remaining: z.number().int().positive(),
 });
+const publicOrderSchema = z
+  .object({
+    orderId: z.uuid(),
+    publicCode: z.string(),
+    status: z.string(),
+    contact: z.object({
+      firstName: z.string(),
+      lastName: z.string(),
+      email: z.string(),
+      phone: z.string(),
+    }),
+    selection: z.unknown(),
+    price: z.unknown(),
+    addons: z.array(
+      z.object({
+        id: z.string(),
+        title: z.string(),
+        quantity: z.number().int(),
+        unitPrice: z.number().int(),
+        total: z.number().int(),
+      }),
+    ),
+    appointment: z
+      .object({
+        id: z.uuid(),
+        branch: z.string(),
+        status: z.string(),
+        startsAt: z.iso.datetime({ offset: true }),
+        endsAt: z.iso.datetime({ offset: true }),
+      })
+      .nullable(),
+    createdAt: z.iso.datetime({ offset: true }),
+  })
+  .nullable();
 const adminSummarySchema = z.object({
   ordersTotal: z.number().int().nonnegative(),
   ordersConfirmed: z.number().int().nonnegative(),
@@ -26,6 +65,7 @@ const adminSummarySchema = z.object({
   byCourse: z.array(z.object({ course: z.string(), count: z.number().int().nonnegative() })),
   byDay: z.array(z.object({ date: z.string(), count: z.number().int().nonnegative() })),
 });
+
 /** Server-only REST adapter. Browser code must never import this module. */
 export class SupabaseBookingRepository implements BookingRepository {
   private base: string;
@@ -42,7 +82,10 @@ export class SupabaseBookingRepository implements BookingRepository {
       | 'bubu_available_slots'
       | 'bubu_create_provisional'
       | 'bubu_verify_email'
-      | 'bubu_admin_summary',
+      | 'bubu_admin_summary'
+      | 'bubu_public_order'
+      | 'bubu_reschedule_appointment'
+      | 'bubu_cancel_appointment',
     body: unknown,
   ) {
     const response = await fetch(this.base + name, {
@@ -83,7 +126,15 @@ export class SupabaseBookingRepository implements BookingRepository {
         p_selection: input.selection,
         p_price: input.price,
         p_terms: input.terms,
+        p_privacy: input.privacy,
         p_marketing: input.marketing,
+        p_items: input.addons.map((item) => ({
+          product_id: item.id,
+          variant_id: item.id,
+          title: item.title,
+          quantity: item.quantity,
+          unit_price_czk: item.unitPrice,
+        })),
         p_token_hash: input.verificationHash,
       }),
     );
@@ -95,6 +146,35 @@ export class SupabaseBookingRepository implements BookingRepository {
     return z
       .object({ ok: z.boolean(), orderId: z.uuid().optional() })
       .parse(await this.rpc('bubu_verify_email', { p_hash: hash }));
+  }
+  async getPublicOrder(publicCode: string) {
+    const parsed = publicOrderSchema.parse(
+      await this.rpc('bubu_public_order', { p_public_code: publicCode }),
+    );
+    return parsed as PublicOrderOverview | null;
+  }
+  async rescheduleAppointment(input: { publicCode: string; slotId: string }) {
+    return z
+      .union([
+        z.object({
+          ok: z.literal(true),
+          appointmentId: z.uuid(),
+          startsAt: z.iso.datetime({ offset: true }),
+          endsAt: z.iso.datetime({ offset: true }),
+        }),
+        z.object({ ok: z.literal(false) }),
+      ])
+      .parse(
+        await this.rpc('bubu_reschedule_appointment', {
+          p_public_code: input.publicCode,
+          p_slot: input.slotId,
+        }),
+      );
+  }
+  async cancelAppointment(publicCode: string) {
+    return z
+      .object({ ok: z.boolean() })
+      .parse(await this.rpc('bubu_cancel_appointment', { p_public_code: publicCode }));
   }
   async adminSummary(input: { from: string; to: string; course?: string | null }) {
     return adminSummarySchema.parse(

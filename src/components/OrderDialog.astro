@@ -19,7 +19,7 @@ import { branches, courses } from '../lib/catalog';
     </ol>
     <form id="order-form" novalidate>
       <fieldset data-step="0">
-        <legend class="sr-only">Výběr kurzu a pobočky</legend><div class="form-grid">
+        <legend class="sr-only">Výběr kurzu, pobočky a doplňků</legend><div class="form-grid">
           <label
             >Pobočka<select name="branch" required
               ><option value="">Vyberte pobočku</option>{
@@ -68,8 +68,50 @@ import { branches, courses } from '../lib/catalog';
               ><option value="single">Jednotná cena</option></select
             ></label
           >
-        </div><div class="quote-box" aria-live="polite">
-          <span id="quote-label">Cena vašeho kurzu</span><strong id="quote-amount"
+        </div>
+        <div class="upsell-panel" aria-labelledby="upsell-title">
+          <div>
+            <span class="eyebrow">Doporučujeme ke kurzu</span>
+            <h3 id="upsell-title">Doplňky k objednávce</h3>
+            <p>Volitelné položky přičteme k celkové ceně kurzu.</p>
+          </div>
+          <label class="addon-card">
+            <input type="checkbox" name="addonBook" />
+            <span
+              ><strong>Knížka Autoškola Pohodlně</strong><small
+                >Praktická příprava ke zkoušce · 300 Kč</small
+              ></span
+            >
+          </label>
+          <div class="addon-card addon-quantity">
+            <span><strong>Mikina Autoškola BuBu</strong><small>500 Kč/ks s DPH</small></span>
+            <label
+              >Množství<input
+                type="number"
+                name="addonHoodieQty"
+                min="0"
+                max="10"
+                value="0"
+                inputmode="numeric"
+              /></label
+            >
+          </div>
+          <div class="addon-card addon-quantity">
+            <span><strong>Tričko Autoškola BuBu</strong><small>500 Kč/ks s DPH</small></span>
+            <label
+              >Množství<input
+                type="number"
+                name="addonShirtQty"
+                min="0"
+                max="10"
+                value="0"
+                inputmode="numeric"
+              /></label
+            >
+          </div>
+        </div>
+        <div class="quote-box" aria-live="polite">
+          <span id="quote-label">Cena vaší objednávky</span><strong id="quote-amount"
             >Vyberte kurz a pobočku</strong
           ><p id="quote-note"></p>
         </div>
@@ -114,13 +156,23 @@ import { branches, courses } from '../lib/catalog';
       <fieldset data-step="2" hidden>
         <legend class="sr-only">Osobní zápis</legend><div class="notice">
           Vyberte si termín zápisu na pobočce. Jeden termín je dlouhý 10 minut.
-        </div><div id="order-summary"></div><div class="form-grid">
-          <label
-            >Termín zápisu<select name="slotId" id="slot-field" required
-              ><option value="">Načítáme dostupné termíny…</option></select
-            ></label
-          >
-        </div><label class="checkbox"
+        </div><div id="order-summary"></div>
+        <input type="hidden" name="slotId" id="slot-field" required />
+        <div class="booking-calendar" aria-live="polite">
+          <div class="calendar-head">
+            <button type="button" class="btn secondary" id="calendar-prev">‹</button>
+            <strong id="calendar-title">Načítáme termíny…</strong>
+            <button type="button" class="btn secondary" id="calendar-next">›</button>
+          </div>
+          <div class="calendar-weekdays" aria-hidden="true">
+            <span>Po</span><span>Út</span><span>St</span><span>Čt</span><span>Pá</span><span
+              >So</span
+            ><span>Ne</span>
+          </div>
+          <div id="calendar-days" class="calendar-days"></div>
+          <div id="slot-list" class="slot-list"><p>Vyberte zvýrazněný den v kalendáři.</p></div>
+        </div>
+        <label class="checkbox"
           ><input type="checkbox" name="terms" required /><span
             >Souhlasím s <a href="/obchodni-podminky" target="_blank" rel="noreferrer"
               >obchodními podmínkami</a
@@ -162,7 +214,7 @@ import { branches, courses } from '../lib/catalog';
     border: 0;
     border-radius: 20px;
     padding: 0;
-    max-width: 720px;
+    max-width: 760px;
     width: calc(100% - 32px);
     max-height: 92dvh;
     color: var(--ink);
@@ -267,6 +319,46 @@ import { branches, courses } from '../lib/catalog';
     flex-shrink: 0;
     margin: 2px 8px 0 0;
   }
+  .upsell-panel {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px;
+    display: grid;
+    gap: 12px;
+    background: #f8fbfa;
+  }
+  .upsell-panel h3 {
+    margin: 4px 0;
+    font-size: 1.25rem;
+  }
+  .upsell-panel p,
+  .addon-card small {
+    font-size: 0.78rem;
+    color: #51625c;
+  }
+  .addon-card {
+    border: 1px solid #d7e4df;
+    border-radius: 12px;
+    padding: 14px;
+    background: #fff;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+  .addon-card input[type='checkbox'] {
+    width: 22px;
+    min-height: 22px;
+    flex: 0 0 auto;
+  }
+  .addon-card span {
+    display: grid;
+    gap: 4px;
+  }
+  .addon-quantity label {
+    max-width: 110px;
+    margin-left: auto;
+  }
   .quote-box {
     background: var(--brand-soft);
     border-radius: 10px;
@@ -285,6 +377,78 @@ import { branches, courses } from '../lib/catalog';
   .quote-box p {
     font-size: 0.75rem;
     margin-top: 8px;
+  }
+  .booking-calendar {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+    background: #fff;
+  }
+  .calendar-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .calendar-weekdays,
+  .calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    text-align: center;
+  }
+  .calendar-weekdays {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #60716b;
+    margin-bottom: 6px;
+  }
+  .calendar-day {
+    min-height: 42px;
+    border: 1px solid #e2ece8;
+    border-radius: 10px;
+    background: #f7faf9;
+    color: #8a9a94;
+    font-weight: 700;
+  }
+  .calendar-day.available {
+    background: #e7f6f4;
+    color: var(--brand-dark);
+    border-color: #9bd5cf;
+    cursor: pointer;
+  }
+  .calendar-day.available:hover,
+  .calendar-day.selected {
+    background: var(--brand);
+    color: #fff;
+    border-color: var(--brand);
+  }
+  .calendar-day:disabled {
+    cursor: not-allowed;
+  }
+  .slot-list {
+    margin-top: 16px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .slot-list p {
+    font-size: 0.8rem;
+  }
+  .slot-option {
+    border: 1px solid #9bd5cf;
+    border-radius: 999px;
+    padding: 9px 13px;
+    background: #fff;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .slot-option:hover,
+  .slot-option[aria-pressed='true'] {
+    background: var(--brand-dark);
+    color: #fff;
+    border-color: var(--brand-dark);
   }
   .wizard-actions {
     display: flex;
@@ -331,6 +495,12 @@ import { branches, courses } from '../lib/catalog';
     .wizard-steps {
       gap: 8px;
       font-size: 0.65rem;
+    }
+    .addon-card {
+      align-items: flex-start;
+    }
+    .calendar-day {
+      min-height: 36px;
     }
   }
 </style>

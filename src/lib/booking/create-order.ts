@@ -29,8 +29,13 @@ export type CreateOrderResult =
   | {
       ok: true;
       orderId: string;
+      publicCode: string;
       appointmentId: string;
       expiresAt: string;
+      startsAt: string;
+      endsAt: string;
+      thankYouUrl: string;
+      manageUrl: string;
     }
   | {
       ok: false;
@@ -104,21 +109,30 @@ export class CreateOrderService {
           ...this.dependencies.legal.marketing,
           accepted: parsed.data.marketingAccepted,
         },
+        privacy: {
+          version: 'GDPR-2026-09-01',
+          wording:
+            'Beru na vědomí zpracování osobních údajů potřebné pro objednávku a rezervaci zápisu.',
+          accepted: true,
+        },
+        addons: serverQuote.addons,
         verificationHash: verification.hash,
       });
     } catch {
       return { ok: false, code: 'STORAGE_FAILED' };
     }
 
-    const verificationUrl = new URL('/overit-email', this.dependencies.origin);
-    verificationUrl.searchParams.set('token', verification.token);
+    const thankYouUrl = new URL('/dekujeme', this.dependencies.origin);
+    thankYouUrl.searchParams.set('kod', saved.publicCode);
+    const manageUrl = new URL('/spravovat-termin', this.dependencies.origin);
+    manageUrl.searchParams.set('kod', saved.publicCode);
     await this.dependencies.email.send({
       idempotencyKey: `${saved.orderId}:verify-email`,
       to: parsed.data.contact.email,
-      subject: 'Ověřte svůj e-mail – Autoškola BUBU',
-      text: `Pro dokončení rezervace otevřete tento odkaz: ${verificationUrl.href}`,
+      subject: 'Potvrzení objednávky – Autoškola BuBu',
+      text: `Děkujeme za objednávku v Autoškole BuBu.\n\nČíslo objednávky: ${saved.publicCode}\nPřehled objednávky a termínu zápisu: ${thankYouUrl.href}\nZměna nebo zrušení termínu zápisu: ${manageUrl.href}\n\nPři zápisu se platí nevratná záloha za kurz 5 000 Kč na pobočce, ideálně v hotovosti, případně okamžitým převodem na účet.`,
     });
 
-    return { ok: true, ...saved };
+    return { ok: true, ...saved, thankYouUrl: thankYouUrl.href, manageUrl: manageUrl.href };
   }
 }

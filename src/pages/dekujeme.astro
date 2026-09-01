@@ -1,0 +1,179 @@
+---
+import Base from '../layouts/Base.astro';
+import { requireLiveRepository } from '../lib/server/live-order';
+import { branchLabel, courseLabel, formatDateTime, orderTotal } from '../lib/order-display';
+
+export const prerender = false;
+const code = Astro.url.searchParams.get('kod')?.trim() ?? '';
+let order = null;
+let errorMessage = '';
+if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  try {
+    order = await requireLiveRepository(process.env).getPublicOrder(code);
+  } catch {
+    errorMessage = 'Přehled objednávky se teď nepodařilo načíst.';
+  }
+} else if (!code) {
+  errorMessage = 'Chybí číslo objednávky.';
+} else {
+  errorMessage = 'Objednávková databáze ještě není nastavena.';
+}
+---
+
+<Base
+  title="Děkujeme za objednávku"
+  description="Souhrn objednávky a rezervace zápisu v Autoškole BuBu."
+  noindex
+>
+  <section class="section hero-section compact">
+    <div class="container narrow">
+      <span class="eyebrow">Objednávka přijata</span>
+      <h1>Děkujeme, máme vaši objednávku.</h1>
+      <p>Na této stránce najdete souhrn objednávky a termín osobního zápisu.</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container narrow">
+      {
+        order ? (
+          <div class="summary-card conversion-summary" data-conversion="order-thank-you">
+            <h2>Souhrn objednávky</h2>
+            <dl>
+              <div>
+                <>
+                  <dt>Číslo objednávky</dt>
+                  <dd>{order.publicCode}</dd>
+                </>
+              </div>
+              <div>
+                <>
+                  <dt>Jméno</dt>
+                  <dd>
+                    {order.contact.firstName} {order.contact.lastName}
+                  </dd>
+                </>
+              </div>
+              <div>
+                <>
+                  <dt>Kurz</dt>
+                  <dd>{courseLabel(order.selection.course)}</dd>
+                </>
+              </div>
+              <div>
+                <>
+                  <dt>Pobočka</dt>
+                  <dd>{branchLabel(order.selection.branch)}</dd>
+                </>
+              </div>
+              <div>
+                <>
+                  <dt>Celková cena</dt>
+                  <dd>{orderTotal(order)}</dd>
+                </>
+              </div>
+              <div>
+                <>
+                  <dt>Termín zápisu</dt>
+                  <dd>
+                    {order.appointment
+                      ? formatDateTime(order.appointment.startsAt)
+                      : 'Termín není vybraný'}
+                  </dd>
+                </>
+              </div>
+            </dl>
+            {order.addons.length ? (
+              <div class="addons-list">
+                <h3>Doplňky</h3>
+                <ul>
+                  {order.addons.map((item) => (
+                    <li>
+                      {item.title} × {item.quantity}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            <div class="notice strong">
+              Při zápisu se platí nevratná záloha za kurz 5 000 Kč na pobočce, ideálně v hotovosti,
+              případně okamžitým převodem na účet.
+            </div>
+            <div class="actions">
+              {order.appointment ? (
+                <a class="btn primary" href={`/api/orders/${order.publicCode}/calendar`}>
+                  Přidat do kalendáře
+                </a>
+              ) : null}
+              <a
+                class="btn secondary"
+                href={`/spravovat-termin?kod=${encodeURIComponent(order.publicCode)}`}
+              >
+                Změnit nebo zrušit termín
+              </a>
+            </div>
+          </div>
+        ) : (
+          <div class="notice">
+            <>
+              <strong>{errorMessage}</strong>
+              <p>Pokud máte číslo objednávky v e-mailu, otevřete prosím odkaz z potvrzení.</p>
+            </>
+          </div>
+        )
+      }
+    </div>
+  </section>
+</Base>
+<style>
+  .narrow {
+    max-width: 880px;
+  }
+  .compact {
+    padding-bottom: 24px;
+  }
+  .summary-card {
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 28px;
+    background: #fff;
+    box-shadow: 0 20px 60px #0b2d2610;
+  }
+  dl {
+    display: grid;
+    gap: 12px;
+    margin: 24px 0;
+  }
+  dl div {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 18px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 12px;
+  }
+  dt {
+    font-weight: 750;
+    color: #53645e;
+  }
+  dd {
+    margin: 0;
+    font-weight: 650;
+  }
+  .addons-list {
+    margin: 24px 0;
+  }
+  .strong {
+    font-weight: 700;
+  }
+  .actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+  @media (max-width: 640px) {
+    dl div {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+  }
+</style>

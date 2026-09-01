@@ -1,6 +1,8 @@
 import { money } from '../lib/format';
 import type { Quote, Selection } from '../lib/pricing/quote';
 
+type Slot = { id: string; branch: string; startsAt: string; endsAt: string; remaining: number };
+
 const dialog = document.querySelector<HTMLDialogElement>('#order-dialog')!;
 const form = document.querySelector<HTMLFormElement>('#order-form')!;
 const field = (name: string) =>
@@ -9,18 +11,60 @@ const error = document.querySelector<HTMLElement>('#order-error')!;
 const next = document.querySelector<HTMLButtonElement>('#order-next')!;
 const back = document.querySelector<HTMLButtonElement>('#order-back')!;
 const question = document.querySelector<HTMLElement>('#discard-question')!;
-let step = 0,
-  dirty = false,
-  validQuote: Extract<Quote, { ok: true }> | undefined,
-  trigger: HTMLElement | undefined,
-  requestSequence = 0,
-  slotSequence = 0;
+const slotField = document.querySelector<HTMLInputElement>('#slot-field')!;
+const calendarTitle = document.querySelector<HTMLElement>('#calendar-title')!;
+const calendarDays = document.querySelector<HTMLElement>('#calendar-days')!;
+const slotList = document.querySelector<HTMLElement>('#slot-list')!;
+let step = 0;
+let dirty = false;
+let validQuote: Extract<Quote, { ok: true }> | undefined;
+let trigger: HTMLElement | undefined;
+let requestSequence = 0;
+let slotSequence = 0;
+let monthCursor = new Date();
+let loadedSlots: Slot[] = [];
+let selectedDate = '';
+
 const packageLabels: Record<Selection['package'], string> = {
   single: 'Jednotná cena',
   'moto-basic': 'Moto Základ · 13 hodin jízd',
   'moto-confidence': 'Moto Jistota · 20 hodin jízd',
   supplement: 'Doplňovací zkouška · 4 hodiny jízd',
 };
+
+function localDateKey(date: Date) {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, '0');
+  const day = `${date.getDate()}`.padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function selectionWithAddons() {
+  const course = field('course').value;
+  const moto = ['am', 'a1', 'a2', 'a'].includes(course);
+  const heldLicence = field('heldLicence').value;
+  const direct =
+    (heldLicence === 'A1' && course === 'a2') || (heldLicence === 'A2' && course === 'a');
+  return {
+    course,
+    branch: field('branch').value,
+    transmission:
+      course === 'b-automat'
+        ? 'automatic'
+        : course === 'l17'
+          ? field('transmission').value
+          : 'manual',
+    package: moto ? field('package').value : 'single',
+    heldLicences: moto && heldLicence ? [heldLicence] : [],
+    ...(moto && direct ? { holdingPeriod: field('holdingPeriod').value } : {}),
+    addons: {
+      book: (field('addonBook') as HTMLInputElement).checked,
+      hoodieQty: Number(field('addonHoodieQty').value || 0),
+      shirtQty: Number(field('addonShirtQty').value || 0),
+    },
+  };
+}
+
 function setStep(value: number) {
   step = value;
   document
@@ -34,8 +78,17 @@ function setStep(value: number) {
   next.hidden = step === 2;
   error.textContent = '';
   if (step === 2) {
+    const course = (field('course') as HTMLSelectElement).selectedOptions[0]?.textContent;
+    const branch = (field('branch') as HTMLSelectElement).selectedOptions[0]?.textContent;
+    const addons = validQuote?.addons.length
+      ? ` · Doplňky: ${validQuote.addons.map((item) => `${item.title} × ${item.quantity}`).join(', ')}`
+      : '';
     document.querySelector('#order-summary')!.textContent =
-      `${(field('course') as HTMLSelectElement).selectedOptions[0]?.textContent} · ${(field('branch') as HTMLSelectElement).selectedOptions[0]?.textContent} · ${validQuote ? money(validQuote.amount) : ''}`;
+      `${course} · ${branch} · ${validQuote ? money(validQuote.amount) : ''}${addons}`;
+    slotField.value = '';
+    selectedDate = '';
+    monthCursor = new Date();
+    monthCursor.setDate(1);
     void loadSlots();
   }
   form
@@ -44,19 +97,25 @@ function setStep(value: number) {
     )
     ?.focus();
 }
+
 function reset() {
   form.reset();
   dirty = false;
   validQuote = undefined;
   question.hidden = true;
+  loadedSlots = [];
+  selectedDate = '';
+  slotField.value = '';
   setStep(0);
 }
+
 function requestClose() {
   if (dirty) {
     question.hidden = false;
     document.querySelector<HTMLButtonElement>('#keep-order')!.focus();
   } else dialog.close();
 }
+
 document.querySelectorAll<HTMLElement>('[data-order]').forEach((button) => {
   button.addEventListener('click', () => {
     trigger = button;
@@ -69,6 +128,7 @@ document.querySelectorAll<HTMLElement>('[data-order]').forEach((button) => {
   });
   button.removeAttribute('disabled');
 });
+
 dialog.addEventListener('cancel', (e) => {
   e.preventDefault();
   requestClose();
@@ -84,8 +144,8 @@ dialog.addEventListener('keydown', (event) => {
       !el.closest('[hidden]') &&
       el.getClientRects().length > 0,
   );
-  const first = focusable[0],
-    last = focusable.at(-1);
+  const first = focusable[0];
+  const last = focusable.at(-1);
   if (!first || !last) {
     event.preventDefault();
     return;
@@ -117,7 +177,6 @@ document.querySelector('#discard-order')!.addEventListener('click', () => {
   reset();
   dialog.close();
 });
-form.addEventListener('submit', (e) => e.preventDefault());
 form.addEventListener('submit', (event) => {
   event.preventDefault();
   void submitOrder();
@@ -125,8 +184,8 @@ form.addEventListener('submit', (event) => {
 form.addEventListener('input', () => {
   dirty = true;
 });
-form.addEventListener('change', (event) => {
-  if ((event.target as HTMLElement).tagName === 'SELECT') void updateQuote();
+form.addEventListener('change', () => {
+  void updateQuote();
 });
 back.addEventListener('click', () => setStep(step - 1));
 next.addEventListener('click', () => {
@@ -147,14 +206,23 @@ next.addEventListener('click', () => {
   }
   setStep(step + 1);
 });
+document.querySelector('#calendar-prev')!.addEventListener('click', () => {
+  monthCursor.setMonth(monthCursor.getMonth() - 1);
+  void loadSlots();
+});
+document.querySelector('#calendar-next')!.addEventListener('click', () => {
+  monthCursor.setMonth(monthCursor.getMonth() + 1);
+  void loadSlots();
+});
+
 async function updateQuote(retry = false) {
   const seq = ++requestSequence;
   validQuote = undefined;
   next.disabled = true;
   error.textContent = '';
-  const course = field('course').value,
-    branch = field('branch').value,
-    moto = ['am', 'a1', 'a2', 'a'].includes(course);
+  const course = field('course').value;
+  const branch = field('branch').value;
+  const moto = ['am', 'a1', 'a2', 'a'].includes(course);
   document.querySelector<HTMLElement>('#licence-field')!.hidden = !moto;
   const direct =
     (field('heldLicence').value === 'A1' && course === 'a2') ||
@@ -162,27 +230,15 @@ async function updateQuote(retry = false) {
   document.querySelector<HTMLElement>('#period-field')!.hidden = !moto || !direct;
   document.querySelector<HTMLElement>('#package-field')!.hidden = !moto;
   document.querySelector<HTMLElement>('#transmission-field')!.hidden = course !== 'l17';
-  const amount = document.querySelector<HTMLElement>('#quote-amount')!,
-    note = document.querySelector<HTMLElement>('#quote-note')!;
+  const amount = document.querySelector<HTMLElement>('#quote-amount')!;
+  const note = document.querySelector<HTMLElement>('#quote-note')!;
   if (!course || !branch) {
     amount.textContent = 'Vyberte kurz a pobočku';
     note.textContent = '';
     return;
   }
   amount.textContent = 'Ověřujeme cenu…';
-  const selection = {
-    course,
-    branch,
-    transmission:
-      course === 'b-automat'
-        ? 'automatic'
-        : course === 'l17'
-          ? field('transmission').value
-          : 'manual',
-    package: moto ? field('package').value : 'single',
-    heldLicences: moto && field('heldLicence').value ? [field('heldLicence').value] : [],
-    ...(moto && direct ? { holdingPeriod: field('holdingPeriod').value } : {}),
-  };
+  const selection = selectionWithAddons();
   try {
     const response = await fetch('/api/quote', {
       method: 'POST',
@@ -214,11 +270,14 @@ async function updateQuote(retry = false) {
             : ['moto-basic', 'moto-confidence'];
       const selected = options.value;
       options.replaceChildren(...allowed.map((value) => new Option(packageLabels[value], value)));
-      options.value = selected;
+      options.value = allowed.includes(selected as Selection['package'])
+        ? selected
+        : (allowed[0] ?? 'moto-confidence');
     }
     validQuote = result;
     amount.textContent = money(result.amount);
-    note.textContent = `Samostatně: organizace zkoušky ${money(result.schoolFee)}, úřední poplatek za první zkoušku ${money(result.authorityFee)}.${result.extraTheoryHours ? ' Součástí jsou také 2 hodiny teorie navíc.' : ''}`;
+    const addonsNote = result.addonsAmount ? ` Doplňky: ${money(result.addonsAmount)}.` : '';
+    note.textContent = `Kurz: ${money(result.baseAmount)}.${addonsNote} Samostatně: organizace zkoušky ${money(result.schoolFee)}, úřední poplatek za první zkoušku ${money(result.authorityFee)}.${result.extraTheoryHours ? ' Součástí jsou také 2 hodiny teorie navíc.' : ''}`;
     next.disabled = false;
   } catch {
     if (seq !== requestSequence) return;
@@ -227,66 +286,113 @@ async function updateQuote(retry = false) {
   }
 }
 
-function formatSlot(start: string, end: string) {
+function formatSlotTime(start: string, end: string) {
   const from = new Date(start);
   const to = new Date(end);
-  const day = new Intl.DateTimeFormat('cs-CZ', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'numeric',
-    timeZone: 'Europe/Prague',
-  }).format(from);
-  const time = new Intl.DateTimeFormat('cs-CZ', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Europe/Prague',
-  }).format(from);
-  const until = new Intl.DateTimeFormat('cs-CZ', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Europe/Prague',
-  }).format(to);
-  return `${day} · ${time}–${until}`;
+  return `${new Intl.DateTimeFormat('cs-CZ', { hour: '2-digit', minute: '2-digit' }).format(from)}–${new Intl.DateTimeFormat('cs-CZ', { hour: '2-digit', minute: '2-digit' }).format(to)}`;
+}
+
+function renderSlotsForDate(date: string) {
+  const slots = loadedSlots.filter((slot) => localDateKey(new Date(slot.startsAt)) === date);
+  slotList.replaceChildren();
+  slotField.value = '';
+  if (!slots.length) {
+    slotList.innerHTML = '<p>Pro tento den už nejsou volné časy.</p>';
+    return;
+  }
+  for (const slot of slots) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'slot-option';
+    button.textContent = formatSlotTime(slot.startsAt, slot.endsAt);
+    button.setAttribute('aria-pressed', 'false');
+    button.addEventListener('click', () => {
+      slotField.value = slot.id;
+      slotList
+        .querySelectorAll('.slot-option')
+        .forEach((item) => item.setAttribute('aria-pressed', 'false'));
+      button.setAttribute('aria-pressed', 'true');
+      error.textContent = '';
+    });
+    slotList.append(button);
+  }
+}
+
+function renderCalendar() {
+  const availableDates = new Set(loadedSlots.map((slot) => localDateKey(new Date(slot.startsAt))));
+  calendarDays.replaceChildren();
+  calendarTitle.textContent = new Intl.DateTimeFormat('cs-CZ', {
+    month: 'long',
+    year: 'numeric',
+  }).format(monthCursor);
+  const first = new Date(monthCursor.getFullYear(), monthCursor.getMonth(), 1);
+  const offset = (first.getDay() + 6) % 7;
+  const daysInMonth = new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 0).getDate();
+  for (let i = 0; i < offset; i += 1) calendarDays.append(document.createElement('span'));
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const date = new Date(monthCursor.getFullYear(), monthCursor.getMonth(), day);
+    const key = localDateKey(date);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'calendar-day';
+    button.textContent = String(day);
+    button.disabled = !availableDates.has(key);
+    if (availableDates.has(key)) button.classList.add('available');
+    if (selectedDate === key) button.classList.add('selected');
+    button.addEventListener('click', () => {
+      selectedDate = key;
+      renderCalendar();
+      renderSlotsForDate(key);
+    });
+    calendarDays.append(button);
+  }
+  if (!selectedDate) slotList.innerHTML = '<p>Vyberte zvýrazněný den v kalendáři.</p>';
 }
 
 async function loadSlots() {
-  const seq = ++slotSequence;
-  const slot = field('slotId') as HTMLSelectElement;
   const branch = field('branch').value;
-  slot.replaceChildren(new Option('Načítáme dostupné termíny…', ''));
-  slot.disabled = true;
+  const seq = ++slotSequence;
+  loadedSlots = [];
+  slotField.value = '';
+  selectedDate = '';
+  calendarTitle.textContent = 'Načítáme termíny…';
+  calendarDays.replaceChildren();
+  slotList.innerHTML = '<p>Načítáme volné termíny…</p>';
+  if (!branch) return;
+  const from = new Date(monthCursor.getFullYear(), monthCursor.getMonth(), 1);
+  const to = new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 0);
   try {
-    const response = await fetch(`/api/slots?branch=${encodeURIComponent(branch)}`, {
-      headers: { Accept: 'application/json' },
-    });
-    const result = (await response.json()) as {
-      ok: boolean;
-      slots?: { id: string; startsAt: string; endsAt: string }[];
-      message?: string;
-    };
+    const response = await fetch(
+      `/api/slots?branch=${encodeURIComponent(branch)}&from=${localDateKey(from)}&to=${localDateKey(to)}`,
+    );
+    const result = (await response.json()) as { ok: boolean; slots?: Slot[]; message?: string };
     if (seq !== slotSequence) return;
     if (!response.ok || !result.ok || !result.slots?.length) {
-      slot.replaceChildren(
-        new Option(result.message ?? 'Pro tuto pobočku nejsou vypsané termíny', ''),
-      );
+      calendarTitle.textContent = new Intl.DateTimeFormat('cs-CZ', {
+        month: 'long',
+        year: 'numeric',
+      }).format(monthCursor);
+      slotList.innerHTML = `<p>${result.message ?? 'Pro tuto pobočku nejsou vypsané termíny.'}</p>`;
+      renderCalendar();
       return;
     }
-    slot.replaceChildren(
-      new Option('Vyberte termín zápisu', ''),
-      ...result.slots.map(
-        (value) => new Option(formatSlot(value.startsAt, value.endsAt), value.id),
-      ),
-    );
-    slot.disabled = false;
+    loadedSlots = result.slots;
+    renderCalendar();
   } catch {
     if (seq !== slotSequence) return;
-    slot.replaceChildren(new Option('Termíny se nepodařilo načíst', ''));
+    calendarTitle.textContent = 'Termíny se nepodařilo načíst';
+    slotList.innerHTML = '<p>Zkuste to prosím znovu.</p>';
   }
 }
 
 async function submitOrder() {
   if (!validQuote) {
     error.textContent = 'Nejdříve vyberte dostupný kurz.';
+    return;
+  }
+  if (!slotField.value) {
+    error.textContent = 'Vyberte prosím termín zápisu v kalendáři.';
+    slotField.reportValidity();
     return;
   }
   const fields = form.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
@@ -304,33 +410,15 @@ async function submitOrder() {
   submit.disabled = true;
   submit.textContent = 'Odesíláme…';
   error.textContent = '';
-  const course = field('course').value;
-  const moto = ['am', 'a1', 'a2', 'a'].includes(course);
-  const heldLicence = field('heldLicence').value;
-  const heldLicences = moto && heldLicence ? [heldLicence] : [];
-  const direct =
-    (heldLicence === 'A1' && course === 'a2') || (heldLicence === 'A2' && course === 'a');
   const body = {
-    slotId: field('slotId').value,
+    slotId: slotField.value,
     contact: {
       firstName: field('firstName').value,
       lastName: field('lastName').value,
       email: field('email').value,
       phone: field('phone').value,
     },
-    selection: {
-      course,
-      branch: field('branch').value,
-      transmission:
-        course === 'b-automat'
-          ? 'automatic'
-          : course === 'l17'
-            ? field('transmission').value
-            : 'manual',
-      package: moto ? field('package').value : 'single',
-      heldLicences,
-      ...(moto && direct ? { holdingPeriod: field('holdingPeriod').value } : {}),
-    },
+    selection: selectionWithAddons(),
     priceVersion: validQuote.priceVersion,
     termsAccepted: (field('terms') as HTMLInputElement).checked,
     privacyAccepted: (field('privacy') as HTMLInputElement).checked,
@@ -342,7 +430,12 @@ async function submitOrder() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
-    const result = (await response.json()) as { ok: boolean; code?: string; expiresAt?: string };
+    const result = (await response.json()) as {
+      ok: boolean;
+      code?: string;
+      thankYouUrl?: string;
+      publicCode?: string;
+    };
     if (!response.ok || !result.ok) {
       error.textContent =
         result.code === 'RATE_LIMITED'
@@ -355,8 +448,8 @@ async function submitOrder() {
       return;
     }
     dirty = false;
-    form.innerHTML =
-      '<div class="notice"><strong>Objednávka je přijatá.</strong><p>Termín zápisu jsme vám podrželi. Brzy vás budeme kontaktovat s dalšími informacemi.</p></div>';
+    window.location.href =
+      result.thankYouUrl ?? `/dekujeme?kod=${encodeURIComponent(result.publicCode ?? '')}`;
   } catch {
     error.textContent = 'Objednávku se nepodařilo odeslat. Zkuste to prosím znovu.';
     submit.disabled = false;

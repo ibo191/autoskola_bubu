@@ -40,11 +40,23 @@ class FakeRepository implements BookingRepository {
     this.calls.push(input);
     return {
       orderId: '22222222-2222-4222-8222-222222222222',
+      publicCode: 'BUBU-TEST1234',
       appointmentId: '33333333-3333-4333-8333-333333333333',
       expiresAt: '2026-08-31T10:15:00.000Z',
+      startsAt: '2026-08-31T10:00:00.000Z',
+      endsAt: '2026-08-31T10:10:00.000Z',
     };
   }
   async verifyEmail() {
+    return { ok: false };
+  }
+  async getPublicOrder() {
+    return null;
+  }
+  async rescheduleAppointment() {
+    return { ok: false as const };
+  }
+  async cancelAppointment() {
     return { ok: false };
   }
   async adminSummary() {
@@ -89,7 +101,9 @@ test('order workflow recalculates price, stores a hash, then sends one verificat
   assert.equal(f.email.messages.size, 1);
   const message = [...f.email.messages.values()][0];
   assert.equal(message?.to, 'fixture@example.invalid');
-  assert.match(message?.text ?? '', /\/overit-email\?token=/);
+  assert.match(message?.text ?? '', /BUBU-TEST1234/);
+  assert.match(message?.text ?? '', /\/dekujeme\?kod=BUBU-TEST1234/);
+  assert.match(message?.text ?? '', /\/spravovat-termin\?kod=BUBU-TEST1234/);
   assert.doesNotMatch(
     message?.text ?? '',
     new RegExp(f.repository.calls[0]?.verificationHash ?? 'x'),
