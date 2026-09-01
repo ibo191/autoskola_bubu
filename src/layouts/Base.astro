@@ -12,7 +12,8 @@ const { title, description, noindex = false, schema } = Astro.props;
 const path = Astro.url.pathname;
 const canonical = new URL(path, 'https://www.autoskolabubu.cz').href;
 const nav = [
-  ['/cenik', 'Kurzy a ceník'],
+  ['/kurzy', 'Kurzy'],
+  ['/cenik', 'Ceník'],
   ['/jak-probiha-vyuka', 'Jak to probíhá'],
   ['/o-nas', 'O nás'],
   ['/blog', 'Blog'],
@@ -69,7 +70,14 @@ const nav = [
         ><nav id="navigation" aria-label="Hlavní navigace">
           {
             nav.map(([href, label]) => (
-              <a href={href} aria-current={path === href ? 'page' : undefined}>
+              <a
+                href={href}
+                aria-current={
+                  path === href || (href !== '/' && path.startsWith(`${href}/`))
+                    ? 'page'
+                    : undefined
+                }
+              >
                 {label}
               </a>
             ))

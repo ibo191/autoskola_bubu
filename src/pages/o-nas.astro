@@ -3,43 +3,107 @@ export const prerender = true;
 import Base from '../layouts/Base.astro';
 import BranchCards from '../components/BranchCards.astro';
 import FinalCta from '../components/FinalCta.astro';
+
+const partners = [
+  { name: 'Kvalty', text: 'Portál pro výběr a hodnocení autoškol.' },
+  { name: 'Motovšem', text: 'Partner pro motorkářskou komunitu a vybavení.' },
+  {
+    name: 'Optiscont optika',
+    text: 'Optika pro studenty, kteří řeší zrak před kurzem nebo zdravotním posudkem.',
+  },
+];
 ---
 
 <Base
   title="O nás"
-  description="Poznejte Autoškolu BuBu. Učíme řídit v Praze 8, Kladně a Statenicích. Srozumitelně, postupně a s respektem k tomu, že se teprve učíte."
-  ><section class="page-hero">
+  description="Autoškola BuBu vznikla s myšlenkou vychovávat bezpečné a zodpovědné řidiče. Za školou stojí lidé se zkušeností z provozu i policie."
+>
+  <section class="page-hero">
     <div class="container">
       <nav class="breadcrumbs" aria-label="Drobečková navigace">
         <a href="/">Domů</a><span>/</span><span>O nás</span>
-      </nav><span class="eyebrow">Těší nás. Jsme BuBu.</span><h1>
-        Učíme řídit.<br />A věřit si za volantem.
-      </h1><p class="lead">
-        První jízda je začátek, ne zkouška. Vytváříme prostor, ve kterém se můžete ptát, zkoušet a
-        postupně zlepšovat.
+      </nav>
+      <span class="eyebrow">Autoškola BuBu</span><h1>Nechceme jen odučit kurz.</h1><p class="lead">
+        Chceme vychovávat řidiče, které se nebudeme bát pustit do provozu.
       </p>
     </div>
-  </section><section class="section">
+  </section>
+  <section class="section">
+    <div class="container split story-split">
+      <div>
+        <span class="eyebrow">Proč jsme vznikli</span><h2>Více bezpečnosti na cestách.</h2>
+      </div><div class="content story-copy">
+        <p>
+          Naše autoškola byla založená s myšlenkou přinést na cesty více bezpečnosti a přejít od
+          přístupu „odučit kurz“ k tomu, abychom vychovávali skutečné řidiče, kteří se na cestě cítí
+          bezpečně a zodpovědně.
+        </p>
+        <p>
+          Autoškolu založila skupina bývalých a současných příslušníků policie, aby předávala své
+          zkušenosti další generaci řidičů. Nechceme z vás udělat člověka, který jen projde
+          zkouškou. Chceme, abyste rozuměli provozu a zvládli v něm fungovat s klidem.
+        </p>
+      </div>
+    </div>
+  </section>
+  <section class="section tinted">
     <div class="container">
+      <div class="section-heading">
+        <div><span class="eyebrow">Naše hodnoty</span><h2>Bez křiku. S odpovědností.</h2></div>
+      </div>
       <div class="grid">
         <article class="card">
-          <span class="eyebrow">01 / Přístup</span><h2 class="value">Respekt k začátkům.</h2><p>
-            Každý někdy řídil poprvé. Počítáme s tím, že potřebujete čas i vysvětlení.
+          <span class="eyebrow">01 / Bezpečnost</span><h3>Nejdřív člověk, potom zkouška.</h3><p>
+            Učíme tak, aby student rozuměl rizikům, ne aby jen mechanicky splnil úlohu.
           </p>
-        </article><article class="card">
-          <span class="eyebrow">02 / Výuka</span><h2 class="value">Pravidla v souvislostech.</h2><p>
-            Teorie má pomáhat v provozu. Spojujeme ji s konkrétními situacemi za volantem.
+        </article>
+        <article class="card">
+          <span class="eyebrow">02 / Praxe</span><h3>Zkušenosti z reálného provozu.</h3><p>
+            Do výuky vnášíme pohled lidí, kteří provoz znali profesně a viděli následky špatných
+            návyků.
           </p>
-        </article><article class="card">
-          <span class="eyebrow">03 / Spolupráce</span><h2 class="value">Mluvíme spolu.</h2><p>
-            Otázky patří k výuce. Když něco není jasné, společně se k tomu vrátíme.
+        </article>
+        <article class="card">
+          <span class="eyebrow">03 / Klid</span><h3>Respekt k tomu, že se učíte.</h3><p>
+            Chyby patří k výcviku. Důležité je pochopit je, opravit a získat jistotu.
           </p>
         </article>
       </div>
     </div>
-  </section><BranchCards /><FinalCta /></Base
-><style>
-  .value {
-    font-size: 1.65rem;
+  </section>
+  <section class="section partners-section">
+    <div class="container">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">Naši partneři</span><h2>
+            Spolupracujeme s lidmi, kteří dávají smysl.
+          </h2>
+        </div>
+      </div>
+      <div class="grid partner-grid">
+        {
+          partners.map((partner) => (
+            <article class="card partner-card">
+              <>
+                <h3>{partner.name}</h3>
+                <p>{partner.text}</p>
+              </>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+  <BranchCards /><FinalCta />
+</Base>
+<style>
+  .story-split {
+    align-items: start;
+  }
+  .story-copy p {
+    font-size: 1rem;
+  }
+  .partner-card h3 {
+    font-size: 1.7rem;
   }
 </style>

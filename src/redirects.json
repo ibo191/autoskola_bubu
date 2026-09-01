@@ -3,7 +3,6 @@
   "/strizkovcenik": "/cenik",
   "/kladnocenik": "/cenik?branch=kladno",
   "/statenicecenik": "/cenik?branch=statenice",
-  "/kurzy": "/cenik",
   "/kurz-b": "/kurzy/ridicak-skupina-b",
   "/ba-ridicak-na-automat": "/kurzy/ridicak-skupina-b-automat",
   "/kurz-bl17": "/kurzy/l17",
