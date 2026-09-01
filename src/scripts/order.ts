@@ -15,6 +15,7 @@ const slotField = document.querySelector<HTMLInputElement>('#slot-field')!;
 const calendarTitle = document.querySelector<HTMLElement>('#calendar-title')!;
 const calendarDays = document.querySelector<HTMLElement>('#calendar-days')!;
 const slotList = document.querySelector<HTMLElement>('#slot-list')!;
+const selectedSlotLabel = document.querySelector<HTMLElement>('#selected-slot-label')!;
 const motoPackageCards = document.querySelector<HTMLElement>('#moto-package-cards')!;
 const motoPackageOptions = document.querySelector<HTMLElement>('#moto-package-options')!;
 let step = 0;
@@ -26,6 +27,7 @@ let slotSequence = 0;
 let monthCursor = new Date();
 let loadedSlots: Slot[] = [];
 let selectedDate = '';
+let selectedSlotId = '';
 
 const packageLabels: Record<Selection['package'], string> = {
   single: 'Jednotná cena',
@@ -157,7 +159,9 @@ function setStep(value: number) {
     document.querySelector('#order-summary')!.textContent =
       `${course} · ${branch} · ${validQuote ? money(validQuote.amount) : ''}${addons}`;
     slotField.value = '';
+    selectedSlotId = '';
     selectedDate = '';
+    selectedSlotLabel.textContent = 'Termín zatím není vybraný.';
     monthCursor = new Date();
     monthCursor.setDate(1);
     void loadSlots();
@@ -176,7 +180,9 @@ function reset() {
   question.hidden = true;
   loadedSlots = [];
   selectedDate = '';
+  selectedSlotId = '';
   slotField.value = '';
+  selectedSlotLabel.textContent = 'Termín zatím není vybraný.';
   setStep(0);
 }
 
@@ -371,7 +377,9 @@ function formatSlotTime(start: string, end: string) {
 function renderSlotsForDate(date: string) {
   const slots = loadedSlots.filter((slot) => localDateKey(new Date(slot.startsAt)) === date);
   slotList.replaceChildren();
+  selectedSlotId = '';
   slotField.value = '';
+  selectedSlotLabel.textContent = 'Vyberte časový slot pro zvolený den.';
   if (!slots.length) {
     slotList.innerHTML = '<p>Pro tento den už nejsou volné časy.</p>';
     return;
@@ -381,9 +389,11 @@ function renderSlotsForDate(date: string) {
     button.type = 'button';
     button.className = 'slot-option';
     button.textContent = formatSlotTime(slot.startsAt, slot.endsAt);
-    button.setAttribute('aria-pressed', 'false');
+    button.setAttribute('aria-pressed', String(slot.id === selectedSlotId));
     button.addEventListener('click', () => {
+      selectedSlotId = slot.id;
       slotField.value = slot.id;
+      selectedSlotLabel.textContent = `Vybraný termín: ${formatSlotTime(slot.startsAt, slot.endsAt)}.`;
       slotList
         .querySelectorAll('.slot-option')
         .forEach((item) => item.setAttribute('aria-pressed', 'false'));
@@ -468,7 +478,7 @@ async function submitOrder() {
   }
   if (!slotField.value) {
     error.textContent = 'Vyberte prosím termín zápisu v kalendáři.';
-    slotField.reportValidity();
+    slotList.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     return;
   }
   const fields = form.querySelectorAll<HTMLInputElement | HTMLSelectElement>(

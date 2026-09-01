@@ -1,13 +1,13 @@
 -- Live preview booking setup. Public clients never receive direct table access.
 update public.booking_settings
-set duration_minutes = 10, capacity = 1, hold_minutes = 30, fixture_only = false, enabled = true
+set duration_minutes = 20, capacity = 1, hold_minutes = 30, fixture_only = false, enabled = true
 where branch in ('strizkov', 'statenice');
 
 insert into public.booking_settings(branch, duration_minutes, capacity, hold_minutes, fixture_only, enabled)
 values
-  ('strizkov', 10, 1, 30, false, true),
-  ('kladno', 10, 1, 30, false, false),
-  ('statenice', 10, 1, 30, false, true)
+  ('strizkov', 20, 1, 30, false, true),
+  ('kladno', 20, 1, 30, false, false),
+  ('statenice', 20, 1, 30, false, true)
 on conflict (branch) do update set
   duration_minutes = excluded.duration_minutes,
   capacity = excluded.capacity,

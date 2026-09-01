@@ -11,6 +11,7 @@ if (root) {
   cursor.setDate(1);
   let loaded: Slot[] = [];
   let selected = '';
+  let selectedSlot = '';
 
   const key = (date: Date) =>
     `${date.getFullYear()}-${`${date.getMonth() + 1}`.padStart(2, '0')}-${`${date.getDate()}`.padStart(2, '0')}`;
@@ -29,7 +30,13 @@ if (root) {
       button.type = 'button';
       button.className = 'slot-option';
       button.textContent = time(slot.startsAt, slot.endsAt);
+      button.setAttribute('aria-pressed', String(slot.id === selectedSlot));
       button.addEventListener('click', async () => {
+        selectedSlot = slot.id;
+        slotsEl
+          .querySelectorAll('.slot-option')
+          .forEach((item) => item.setAttribute('aria-pressed', 'false'));
+        button.setAttribute('aria-pressed', 'true');
         button.disabled = true;
         message.textContent = 'Ukládáme nový termín…';
         const response = await fetch(`/api/orders/${encodeURIComponent(code)}/reschedule`, {
@@ -81,6 +88,7 @@ if (root) {
 
   async function load() {
     selected = '';
+    selectedSlot = '';
     loaded = [];
     title.textContent = 'Načítáme termíny…';
     days.replaceChildren();

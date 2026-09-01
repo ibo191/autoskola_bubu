@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { branchId, branches } from '../../lib/catalog';
@@ -16,6 +17,11 @@ function isoDateAfter(days: number) {
   const value = new Date();
   value.setUTCDate(value.getUTCDate() + days);
   return value.toISOString().slice(0, 10);
+}
+
+function stableSlotId(branch: string, start: string) {
+  const hash = createHash('sha256').update(`${branch}:${start}`).digest('hex');
+  return `${hash.slice(0, 8)}-${hash.slice(8, 12)}-4${hash.slice(13, 16)}-8${hash.slice(17, 20)}-${hash.slice(20, 32)}`;
 }
 
 function previewSlots(branch: string, from: string, to: string) {
@@ -44,11 +50,11 @@ function previewSlots(branch: string, from: string, to: string) {
         date,
         open: window.open,
         close: window.close,
-        durationMinutes: 10,
+        durationMinutes: 20,
         capacity: 1,
-      }).slice(0, 18)) {
+      }).slice(0, 9)) {
         output.push({
-          id: crypto.randomUUID(),
+          id: stableSlotId(branch, slot.start),
           branch,
           startsAt: slot.start,
           endsAt: slot.end,

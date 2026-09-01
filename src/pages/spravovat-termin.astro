@@ -146,9 +146,10 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
   .calendar-weekdays,
   .calendar-days {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 8px;
     text-align: center;
+    align-items: stretch;
   }
   .calendar-weekdays {
     font-size: 0.7rem;
@@ -157,12 +158,22 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
     margin-bottom: 6px;
   }
   .calendar-day {
-    min-height: 42px;
+    min-height: 46px;
+    width: 100%;
     border: 1px solid #e2ece8;
-    border-radius: 10px;
+    border-radius: 12px;
     background: #f7faf9;
     color: #8a9a94;
-    font-weight: 700;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background var(--ease),
+      border-color var(--ease),
+      color var(--ease),
+      transform var(--ease),
+      box-shadow var(--ease);
   }
   .calendar-day.available {
     background: #e7f6f4;
@@ -170,32 +181,54 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
     border-color: #9bd5cf;
     cursor: pointer;
   }
-  .calendar-day.available:hover,
-  .calendar-day.selected {
-    background: var(--brand);
-    color: #fff;
+  .calendar-day.available:hover {
+    background: #d8f2ee;
     border-color: var(--brand);
+    color: var(--brand-dark);
+    transform: translateY(-1px);
+  }
+  .calendar-day.selected {
+    background: var(--brand-dark);
+    color: #fff;
+    border-color: var(--brand-dark);
+    box-shadow: 0 10px 24px #126b6026;
   }
   .calendar-day:disabled {
     cursor: not-allowed;
   }
   .slot-list {
     margin-top: 16px;
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+    gap: 10px;
+    align-items: stretch;
   }
   .slot-option {
     border: 1px solid #9bd5cf;
-    border-radius: 999px;
-    padding: 9px 13px;
+    border-radius: 12px;
+    padding: 12px 13px;
+    min-height: 48px;
     background: #fff;
+    color: var(--brand-dark);
     cursor: pointer;
-    font-weight: 700;
+    font-weight: 800;
+    text-align: center;
+    transition:
+      background var(--ease),
+      border-color var(--ease),
+      color var(--ease),
+      transform var(--ease),
+      box-shadow var(--ease);
   }
   .slot-option:hover {
+    background: var(--brand-soft);
+    border-color: var(--brand);
+    transform: translateY(-1px);
+  }
+  .slot-option[aria-pressed='true'] {
     background: var(--brand-dark);
     color: #fff;
     border-color: var(--brand-dark);
+    box-shadow: 0 10px 24px #126b6026;
   }
 </style>
