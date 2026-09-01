@@ -14,6 +14,58 @@ interface Props {
   branch: Branch;
 }
 const { branch } = Astro.props;
+const isStrizkov = branch.id === 'strizkov';
+const phoneFormatted = branch.phone.replace(/(\+420)(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4');
+const mapQuery = encodeURIComponent('Autoškola BuBu U Kapliček 34 Praha 8 Střížkov');
+const localBoxes = [
+  {
+    title: 'Kde se jezdí?',
+    text: 'Z pobočky na Střížkově jezdíme na Praze 8 a 9: Střížkov, Prosek, Kobylisy, Letňany, Ládví, Ďáblice a okolité lokality.',
+  },
+  {
+    title: 'Kde probíhá teorie?',
+    text: 'Teorie probíhá na naší pobočce na Praze 8: U Kapliček 34, Střížkov. Teorie probíhají srozumitelně, prakticky a bez zahlcení.',
+  },
+  {
+    title: 'Jak se k nám dostanete?',
+    text: 'Metro C Střížkov je přibližně 10 minut od pobočky. Navazují také autobusy a MHD z Proseku, Kobylis, Letňan, Ládví, Ďáblic a Vysočan.',
+  },
+  {
+    title: 'Pro koho je pobočka vhodná?',
+    text: 'Začátečníci, lidé, kteří nikdy neřídili, kondiční jízdy, studenti i zájemci o motorku, kteří chtějí lidský přístup.',
+  },
+];
+const strizkovFaq = [
+  {
+    q: 'Kde se jezdí na Střížkově?',
+    a: 'Jízdy plánujeme primárně na Praze 8 a 9: Střížkov, Prosek, Kobylisy, Letňany, Ládví, Ďáblice a navazující pražský provoz. První jízda probíhá na našem cvičišti v Čakovicích, kde si studenti procvičí ovládání auta a rozjezdy před výjezdem do provozu. Následně jezdíme i v mírnějším provozu v okolí Prahy. Během výcviku si vyzkoušíte centrum Prahy, dálnici, tankování, myčku, garáže i McDrive.',
+  },
+  {
+    q: 'Kde a jak probíhají teorie?',
+    a: 'Teorie probíhají prezenčně na pobočce U Kapliček 34, Praha 8 Střížkov. V kurzu skupiny B absolvujete 4 bloky teorií, které probíhají pravidelně během pracovního týdne.',
+  },
+  {
+    q: 'Jak se dostanete na pobočku na Střížkově?',
+    a: 'Nejjednodušší je metro C, stanice Střížkov, která je přibližně 10 minut chůze od pobočky. Využít můžete také autobusové spojení z Proseku, Kobylis, Letňan, Ládví, Ďáblic a Vysočan.',
+  },
+  {
+    q: 'Kolik stojí řidičák skupiny B na Střížkově?',
+    a: 'Cena kurzu skupiny B je 24 900 Kč za výuku a výcvik v autoškole. Před zkouškou se zvlášť hradí poplatek autoškole za organizaci zkoušky 1 000 Kč a úřední poplatek za zkoušku podle aktuálního ceníku příslušného úřadu.',
+  },
+  {
+    q: 'Pro koho je pobočka Střížkov vhodná?',
+    a: 'Pobočka je vhodná pro studenty z okolních středních škol, pracující dospělé, lidi bez řidičáku i zájemce o kondiční jízdy. Na Střížkově učíme také všechny skupiny motorek, takže se hodí i pro motorkáře. Je vhodná pro nervózní studenty, kteří chtějí klidný přístup bez křiku a stresu.',
+  },
+  {
+    q: 'Jak se můžu přihlásit do autoškoly?',
+    a: 'Online vyplníte objednávku na našem webu a v posledním kroku si zvolíte termín zápisu. Na zápis přijdete se zdravotním posudkem od praktického lékaře, oboustranně vytištěnou a vyplněnou žádostí o přijetí k výcviku a výuce a občanským průkazem. Pokud žádáte o řidičák v režimu L17, přijďte i se zákonným zástupcem. Na pobočce proběhne zápis a zařadíme vás do kurzu podle vaší časové preference.',
+  },
+];
+const reviewHighlights = [
+  'Studenti oceňují klidný přístup, trpělivost instruktorů a přípravu bez zbytečného stresu.',
+  'V recenzích se často opakuje pochvala za lidskou komunikaci a praktické vysvětlení situací v provozu.',
+  'Na veřejném profilu pobočky je uvedené Google hodnocení 5,0 z 28 recenzí.',
+];
 const schema = {
   '@context': 'https://schema.org',
   '@type': 'LocalBusiness',
@@ -31,8 +83,10 @@ const schema = {
 ---
 
 <Base
-  title={`Autoškola ${branch.name}${branch.id === 'strizkov' ? ' – Praha 8' : ''}`}
-  description={`Autoškola BuBu ${branch.name}. ${branch.address}. Kurz B za ${money(branch.bPrice)}. Osobní zápis a výcvik s lidským přístupem.`}
+  title={isStrizkov ? 'Autoškola Praha 8 Střížkov bez stresu' : `Autoškola ${branch.name}`}
+  description={isStrizkov
+    ? 'Autoškola Praha 8 Střížkov. Řidičák skupiny B s jasným plánem výcviku, přípravou na pražský provoz a lidským přístupem bez křiku.'
+    : `Autoškola BuBu ${branch.name}. ${branch.address}. Kurz B za ${money(branch.bPrice)}. Osobní zápis a výcvik s lidským přístupem.`}
   schema={schema}
 >
   <section class="page-hero">
@@ -41,21 +95,43 @@ const schema = {
         <a href="/">Domů</a><span>/</span><span>{branch.name}</span>
       </nav><div class="split">
         <div>
-          <span class="eyebrow">Vaše autoškola · {branch.locality}</span><h1>
-            Za řidičákem<br />do {
-              branch.id === 'strizkov'
-                ? 'Střížkova'
-                : branch.id === 'kladno'
-                  ? 'Kladna'
-                  : 'Statenic'
-            }.
+          <span class="eyebrow"
+            >{isStrizkov ? 'Praha 8 · Střížkov' : `Vaše autoškola · ${branch.locality}`}</span
+          ><h1>
+            {
+              isStrizkov
+                ? 'Autoškola Praha 8 Střížkov bez stresu'
+                : `Za řidičákem do ${branch.id === 'kladno' ? 'Kladna' : 'Statenic'}.`
+            }
           </h1><p class="lead">
-            Začínáte od nuly? To je v pořádku. V BuBu vás provedeme od prvního rozjezdu až k
-            závěrečné zkoušce.
-          </p><div class="actions">
-            <button class="btn primary" data-order disabled data-branch={branch.id} data-course="b"
-              >Chci řidičák ↗</button
-            ><a class="btn secondary" href="#pobocka">Kde nás najdete</a>
+            {
+              isStrizkov
+                ? 'Řidičák sk. B s jasným plánem výcviku a přípravou na reálný pražský provoz. Bez křiku, bez chaosu a lidsky.'
+                : 'Začínáte od nuly? To je v pořádku. V BuBu vás provedeme od prvního rozjezdu až k závěrečné zkoušce.'
+            }
+          </p>{
+            isStrizkov && (
+              <p class="hero-copy">
+                Střížkov je hlavní pobočka Autoškoly BuBu pro Prahu 8 a okolí. Hodí se pro studenty
+                ze Střížkova, Proseku, Kobylis, Letňan, Ládví, Ďáblic i Prahy 9, kteří chtějí výcvik
+                bez křiku a s přípravou na reálnou zkoušku.
+              </p>
+            )
+          }<div class="actions">
+            <button class="btn primary" data-order disabled data-branch={branch.id} data-course="b">
+              {isStrizkov ? 'Přihlásit se do kurzu ↗' : 'Chci řidičák ↗'}
+            </button>
+            {
+              isStrizkov ? (
+                <a class="btn secondary" href={`tel:${branch.phone}`}>
+                  Zavolat a zeptat se
+                </a>
+              ) : (
+                <a class="btn secondary" href="#pobocka">
+                  Kde nás najdete
+                </a>
+              )
+            }
           </div><p class="branch-price">
             Skupina B <strong>{money(branch.bPrice)}</strong> · jedna cena, bez balíčků
           </p>
@@ -74,62 +150,275 @@ const schema = {
   <div class="local-trust">
     <div class="container">
       <span>✓ Manuál{branch.id === 'strizkov' ? ' i automat' : ''}</span><span>✓ Kurz L17</span
-      ><span>✓ Osobní zápis na pobočce</span>
+      ><span>✓ Osobní zápis na pobočce</span>{isStrizkov && <span>✓ Motorky pouze Praha</span>}
     </div>
   </div>
+
   <Roadmap />
-  <section class="section tinted" id="pobocka">
-    <div class="container split">
-      <div>
-        <span class="eyebrow">Pobočka {branch.name}</span><h2>
-          Stavte se.<br />Všechno probereme.
-        </h2><p class="lead">{branch.address}</p><dl>
-          <dt>Kdy nás zastihnete</dt><dd>
-            {branch.hours ?? 'Otevírací dobu si prosím ověřte telefonicky.'}
-          </dd><dt>Telefon</dt><dd>
-            <a href={`tel:${branch.phone}`}
-              >{branch.phone.replace(/(\+420)(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4')}</a
-            >
-          </dd><dt>E-mail</dt><dd><a href={`mailto:${branch.email}`}>{branch.email}</a></dd>
-        </dl>{
-          branch.id === 'kladno' && (
-            <p class="small">Přesné místo osobního zápisu vám potvrdí pobočka.</p>
-          )
-        }
-      </div><div class="location-panel">
-        <span aria-hidden="true">↗</span><span class="eyebrow">{branch.locality}</span><h3>
-          {branch.name}
-        </h3><p>{branch.address}</p><a
-          class="btn secondary"
-          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('Autoškola BuBu ' + branch.address)}`}
-          rel="noreferrer">Otevřít v mapách ↗</a
-        ><p class="small">Mapa se načte až po otevření odkazu.</p>
-      </div>
-    </div>
-  </section>
-  <section class="section">
-    <div class="container">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">V BuBu na to nejste sami</span><h2>
-            Místo pro otázky.<br />Prostor získat jistotu.
-          </h2>
-        </div>
-      </div><div class="grid">
-        <article class="card">
-          <h3>Začínáme základy</h3><p>Nečekáme, že už umíte řídit. Od toho je tu výcvik.</p>
-        </article><article class="card">
-          <h3>Propojujeme teorii s jízdou</h3><p>
-            Pravidla dostanou smysl ve skutečných situacích na silnici.
-          </p>
-        </article><article class="card">
-          <h3>Průběh znáte předem</h3><p>Online výběr, osobní zápis, teorie, jízdy a zkouška.</p>
-        </article>
-      </div>
-    </div>
-  </section><Faq /><FinalCta branch={branch.id} />
+
+  {
+    isStrizkov ? (
+      <>
+        <section class="section" id="lokalni-informace">
+          <div class="container">
+            <>
+              <div class="section-heading">
+                <div>
+                  <>
+                    <span class="eyebrow">Lokální informace</span>
+                    <h2>Výcvik z Prahy 8 do reálného provozu.</h2>
+                    <p>
+                      Střížkov používáme jako praktický výchozí bod pro Prahu 8, Prahu 9 i klidnější
+                      začátky mimo hustý provoz.
+                    </p>
+                  </>
+                </div>
+              </div>
+              <div class="grid local-info-grid">
+                {localBoxes.map((item) => (
+                  <article class="card">
+                    <h3>{item.title}</h3>
+                    <p>{item.text}</p>
+                  </article>
+                ))}
+              </div>
+            </>
+          </div>
+        </section>
+        <section class="section tinted" id="pobocka">
+          <div class="container split">
+            <>
+              <div>
+                <>
+                  <span class="eyebrow">Pobočka Praha 8 Střížkov</span>
+                  <h2>
+                    U Kapliček 34.
+                    <br />
+                    Sem přijdete na zápis i teorii.
+                  </h2>
+                  <p class="lead">{branch.address}</p>
+                  <dl>
+                    <>
+                      <dt>Kdy nás zastihnete</dt>
+                      <dd>{branch.hours}</dd>
+                      <dt>Telefon</dt>
+                      <dd>
+                        <a href={`tel:${branch.phone}`}>{phoneFormatted}</a>
+                      </dd>
+                      <dt>E-mail</dt>
+                      <dd>
+                        <a href={`mailto:${branch.email}`}>{branch.email}</a>
+                      </dd>
+                    </>
+                  </dl>
+                </>
+              </div>
+              <div class="map-panel">
+                <iframe
+                  title="Mapa pobočky Autoškola BuBu Praha 8 Střížkov"
+                  src={`https://www.google.com/maps?q=${mapQuery}&output=embed`}
+                  loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"
+                />
+              </div>
+            </>
+          </div>
+        </section>
+        <section class="section">
+          <div class="container">
+            <>
+              <div class="section-heading">
+                <>
+                  <div>
+                    <>
+                      <span class="eyebrow">Google recenze</span>
+                      <h2>Studenti oceňují klid a lidský přístup.</h2>
+                      <p>
+                        Aktuální veřejný profil pobočky uvádí Google hodnocení 5,0 z 28 recenzí.
+                      </p>
+                    </>
+                  </div>
+                  <a
+                    class="text-link"
+                    href="https://kvalty.cz/autoskola/bubu-strizkov"
+                    rel="noreferrer"
+                  >
+                    Zobrazit zdroj recenzí ↗
+                  </a>
+                </>
+              </div>
+              <div class="grid review-grid">
+                {reviewHighlights.map((text) => (
+                  <article class="card review-card">
+                    <span aria-hidden="true">★★★★★</span>
+                    <p>{text}</p>
+                  </article>
+                ))}
+              </div>
+            </>
+          </div>
+        </section>
+        <section class="section tinted" id="faq">
+          <div class="container faq-layout">
+            <>
+              <div>
+                <>
+                  <span class="eyebrow">FAQ Praha 8</span>
+                  <h2>Nejčastější otázky ke Střížkovu.</h2>
+                  <p>Praktické odpovědi před zápisem do kurzu.</p>
+                </>
+              </div>
+              <div>
+                {strizkovFaq.map((item) => (
+                  <details>
+                    <summary>
+                      {item.q}
+                      <span aria-hidden="true">+</span>
+                    </summary>
+                    <p>{item.a}</p>
+                  </details>
+                ))}
+              </div>
+            </>
+          </div>
+        </section>
+        <section class="section" id="dotaz">
+          <div class="container split contact-split">
+            <>
+              <div>
+                <>
+                  <span class="eyebrow">Dotaz na pobočku</span>
+                  <h2>Napište nám přímo na Střížkov.</h2>
+                  <p class="lead">
+                    Nejste si jistí kurzem, termínem zápisu nebo tím, jestli je pro vás lepší
+                    manuál, automat, L17 nebo motorka? Pošlete dotaz přímo pobočce Praha 8.
+                  </p>
+                </>
+              </div>
+              <form class="contact-card" data-branch-contact data-branch={branch.id}>
+                <label>
+                  Jméno a příjmení
+                  <input name="name" autocomplete="name" required maxlength="120" />
+                </label>
+                <label>
+                  E-mail
+                  <input type="email" name="email" autocomplete="email" required maxlength="254" />
+                </label>
+                <label>
+                  Telefon
+                  <input type="tel" name="phone" autocomplete="tel" maxlength="20" />
+                </label>
+                <label>
+                  Dotaz
+                  <textarea name="message" required maxlength="2000" rows="6" />
+                </label>
+                <input class="sr-only" name="website" tabindex="-1" autocomplete="off" />
+                <button class="btn primary" type="submit">
+                  Odeslat dotaz
+                </button>
+                <p class="small" data-contact-status role="status" />
+              </form>
+            </>
+          </div>
+        </section>
+        <script src="../scripts/branch-contact.ts" />
+      </>
+    ) : (
+      <>
+        <section class="section tinted" id="pobocka">
+          <div class="container split">
+            <>
+              <div>
+                <dl>
+                  <>
+                    <dt>Kdy nás zastihnete</dt>
+                    <dd>{branch.hours ?? 'Otevírací dobu si prosím ověřte telefonicky.'}</dd>
+                    <dt>Telefon</dt>
+                    <dd>
+                      <a href={`tel:${branch.phone}`}>{phoneFormatted}</a>
+                    </dd>
+                    <dt>E-mail</dt>
+                    <dd>
+                      <a href={`mailto:${branch.email}`}>{branch.email}</a>
+                    </dd>
+                  </>
+                </dl>
+                {branch.id === 'kladno' && (
+                  <p class="small">Přesné místo osobního zápisu vám potvrdí pobočka.</p>
+                )}
+              </div>
+              <div class="location-panel">
+                <>
+                  <span aria-hidden="true">↗</span>
+                  <span class="eyebrow">{branch.locality}</span>
+                  <h3>{branch.name}</h3>
+                  <p>{branch.address}</p>
+                  <a
+                    class="btn secondary"
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('Autoškola BuBu ' + branch.address)}`}
+                    rel="noreferrer"
+                  >
+                    Otevřít v mapách ↗
+                  </a>
+                  <p class="small">Mapa se načte až po otevření odkazu.</p>
+                </>
+              </div>
+            </>
+          </div>
+        </section>
+        <>
+          <section class="section">
+            <div class="container">
+              <>
+                <div class="section-heading">
+                  <div>
+                    <>
+                      <span class="eyebrow">V BuBu na to nejste sami</span>
+                      <h2>
+                        Místo pro otázky.
+                        <br />
+                        Prostor získat jistotu.
+                      </h2>
+                    </>
+                  </div>
+                </div>
+                <div class="grid">
+                  <>
+                    <article class="card">
+                      <>
+                        <h3>Začínáme základy</h3>
+                        <p>Nečekáme, že už umíte řídit. Od toho je tu výcvik.</p>
+                      </>
+                    </article>
+                    <article class="card">
+                      <>
+                        <h3>Propojujeme teorii s jízdou</h3>
+                        <p>Pravidla dostanou smysl ve skutečných situacích na silnici.</p>
+                      </>
+                    </article>
+                    <article class="card">
+                      <>
+                        <h3>Průběh znáte předem</h3>
+                        <p>Online výběr, osobní zápis, teorie, jízdy a zkouška.</p>
+                      </>
+                    </article>
+                  </>
+                </div>
+              </>
+            </div>
+          </section>
+          <Faq />
+        </>
+      </>
+    )
+  }
+  <FinalCta branch={branch.id} />
 </Base>
 <style>
+  .hero-copy {
+    margin-top: 18px;
+    max-width: 650px;
+  }
   .branch-price {
     font-size: 0.75rem;
     margin-top: 24px;
@@ -147,6 +436,9 @@ const schema = {
     gap: 36px;
     padding-block: 23px;
     flex-wrap: wrap;
+  }
+  .local-info-grid .card {
+    min-height: 210px;
   }
   dl {
     margin: 26px 0;
@@ -184,10 +476,105 @@ const schema = {
   .location-panel .btn {
     margin-top: 26px;
   }
+  .map-panel {
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    border: 1px solid #c4d8cb;
+    box-shadow: var(--shadow);
+    min-height: 430px;
+    background: #e2eee8;
+  }
+  .map-panel iframe {
+    width: 100%;
+    height: 100%;
+    min-height: 430px;
+    border: 0;
+    display: block;
+  }
+  .review-card span {
+    color: #e3a82d;
+    letter-spacing: 0.08em;
+    font-weight: 800;
+  }
+  .faq-layout {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: 70px;
+  }
+  .faq-layout > div > p {
+    margin: 24px 0 18px;
+  }
+  details {
+    border-bottom: 1px solid var(--line);
+  }
+  summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    cursor: pointer;
+    font-weight: 650;
+    font-size: 0.94rem;
+    padding: 23px 0;
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary span {
+    font-size: 1.35rem;
+    color: var(--brand-dark);
+  }
+  details[open] summary span {
+    transform: rotate(45deg);
+  }
+  details p {
+    padding-bottom: 24px;
+    font-size: 0.91rem;
+  }
+  .contact-split {
+    align-items: start;
+  }
+  .contact-card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 30px;
+    background: #fff;
+    box-shadow: var(--shadow);
+    display: grid;
+    gap: 16px;
+  }
+  .contact-card label {
+    display: grid;
+    gap: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+  .contact-card input,
+  .contact-card textarea {
+    width: 100%;
+    border: 1px solid #9aada5;
+    border-radius: 8px;
+    padding: 12px;
+    color: var(--ink);
+    background: #fff;
+  }
+  .contact-card textarea {
+    resize: vertical;
+  }
+  @media (max-width: 760px) {
+    .faq-layout {
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+  }
   @media (max-width: 640px) {
     .local-trust .container {
       gap: 12px 20px;
       font-size: 0.65rem;
+    }
+    .map-panel,
+    .map-panel iframe {
+      min-height: 320px;
     }
   }
 </style>
