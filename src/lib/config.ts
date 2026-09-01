@@ -7,9 +7,24 @@ const schema = z.object({
   ANALYTICS_ADAPTER: z.literal('noop').default('noop'),
 });
 export function readConfig(env: Record<string, string | undefined>) {
-  const value = schema.parse(env);
+  const isVercelPreview = env.VERCEL === '1';
+  const value = schema.parse(
+    isVercelPreview
+      ? {
+          ...env,
+          APP_ENV: 'local',
+          APP_ORIGIN:
+            env.APP_ORIGIN ??
+            (env.VERCEL_URL ? `https://${env.VERCEL_URL}` : 'https://autoskolabubu.cz'),
+          RECAPTCHA_ADAPTER: 'local',
+          EMAIL_ADAPTER: 'local',
+          ANALYTICS_ADAPTER: 'noop',
+        }
+      : env,
+  );
   const host = new URL(value.APP_ORIGIN).hostname;
-  if (!['127.0.0.1', 'localhost', '[::1]'].includes(host)) throw new Error('Local origin required');
+  if (!isVercelPreview && !['127.0.0.1', 'localhost', '[::1]'].includes(host))
+    throw new Error('Local origin required');
   if (
     env.SUPABASE_URL &&
     !['127.0.0.1', 'localhost', '[::1]'].includes(new URL(env.SUPABASE_URL).hostname)

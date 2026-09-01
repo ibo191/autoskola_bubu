@@ -11,6 +11,27 @@ test('Stage A rejects production, cloud DB and non-local origin', () => {
   for (const Adapter of [LocalCaptcha, LocalEmail, NoopAnalytics])
     assert.throws(() => new Adapter({ APP_ENV: 'production' }));
 });
+test('Vercel preview forces safe stage A adapters', () => {
+  const config = readConfig({
+    VERCEL: '1',
+    VERCEL_URL: 'autoskola-bubu.vercel.app',
+    APP_ENV: 'production',
+    RECAPTCHA_ADAPTER: 'recaptcha',
+    EMAIL_ADAPTER: 'smtp',
+    ANALYTICS_ADAPTER: 'gtm',
+  });
+  assert.equal(config.APP_ENV, 'local');
+  assert.equal(config.APP_ORIGIN, 'https://autoskola-bubu.vercel.app');
+  assert.equal(config.RECAPTCHA_ADAPTER, 'local');
+  assert.equal(config.EMAIL_ADAPTER, 'local');
+  assert.equal(config.ANALYTICS_ADAPTER, 'noop');
+  assert.throws(() =>
+    readConfig({
+      VERCEL: '1',
+      SUPABASE_URL: 'https://example.supabase.co',
+    }),
+  );
+});
 test('Captcha is single-use, action-bound, host-bound and expires', async () => {
   const captcha = new LocalCaptcha({ APP_ENV: 'local' });
   const now = new Date('2026-08-31T10:00:00Z');
