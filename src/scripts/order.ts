@@ -333,6 +333,7 @@ async function submitOrder() {
     },
     priceVersion: validQuote.priceVersion,
     termsAccepted: (field('terms') as HTMLInputElement).checked,
+    privacyAccepted: (field('privacy') as HTMLInputElement).checked,
     marketingAccepted: (field('marketing') as HTMLInputElement).checked,
   };
   try {
@@ -346,7 +347,9 @@ async function submitOrder() {
       error.textContent =
         result.code === 'RATE_LIMITED'
           ? 'Odeslali jste příliš mnoho pokusů. Zkuste to prosím později.'
-          : 'Objednávku se nepodařilo uložit. Zkontrolujte výběr a zkuste to znovu.';
+          : result.code === 'BOOKING_NOT_CONFIGURED'
+            ? 'Objednávky jsou v rozhraní spuštěné, ale server ještě nemá nastavenou databázi Supabase.'
+            : 'Objednávku se nepodařilo uložit. Zkontrolujte výběr a zkuste to znovu.';
       submit.disabled = false;
       submit.textContent = 'Odeslat objednávku';
       return;

@@ -30,6 +30,16 @@ async function readJson(request: Request) {
 export const POST: APIRoute = async ({ request }) => {
   try {
     assertSameOrigin(request);
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return Response.json(
+        {
+          ok: false,
+          code: 'BOOKING_NOT_CONFIGURED',
+          message: 'Supabase database is not configured.',
+        },
+        { status: 503, headers: { 'Cache-Control': 'no-store' } },
+      );
+    }
     const body = await readJson(request);
     const url = new URL(request.url);
     const result = await createLiveOrderService(process.env).execute({

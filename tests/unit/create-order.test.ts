@@ -25,6 +25,7 @@ const baseBody = {
   captchaToken: 'replaced-in-test-000000',
   priceVersion: priceSource.version,
   termsAccepted: true,
+  privacyAccepted: true,
   marketingAccepted: false,
 } as const;
 

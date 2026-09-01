@@ -14,6 +14,7 @@ const requestSchema = z
     captchaToken: z.string().min(16).max(512),
     priceVersion: z.string().min(1).max(80),
     termsAccepted: z.literal(true),
+    privacyAccepted: z.literal(true),
     marketingAccepted: z.boolean().default(false),
   })
   .strict();
