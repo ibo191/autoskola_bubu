@@ -17,7 +17,16 @@ const branch = url.searchParams.get('branch') || '';
 const status = url.searchParams.get('status') || '';
 const query = url.searchParams.get('q') || '';
 const appointmentDate = url.searchParams.get('appointmentDate') || today;
+const rawAppointmentMonth = url.searchParams.get('appointmentMonth') || appointmentDate.slice(0, 7);
+const appointmentMonth = /^\d{4}-\d{2}$/.test(rawAppointmentMonth)
+  ? rawAppointmentMonth
+  : today.slice(0, 7);
 const appointmentBranch = url.searchParams.get('appointmentBranch') || branch || '';
+const calendarParts = appointmentMonth.split('-').map(Number);
+const calendarYear = calendarParts[0] ?? Number(today.slice(0, 4));
+const calendarMonth = calendarParts[1] ?? Number(today.slice(5, 7));
+const daysInMonth = new Date(calendarYear, calendarMonth, 0).getDate();
+const firstDayOffset = (new Date(calendarYear, calendarMonth - 1, 1).getDay() + 6) % 7;
 const adminCookie = Astro.cookies.get('bubu_admin_session')?.value ?? '';
 let loginFailed = false;
 let currentUser: { email: string; name: string } | null = null;
@@ -90,6 +99,28 @@ const nextAppointmentDay =
   repository && currentUser
     ? await repository.adminNextAppointmentDay({ from: today, branch: appointmentBranch || null })
     : null;
+const calendarDates = Array.from({ length: daysInMonth }, (_, index) => {
+  const day = index + 1;
+  const date = `${appointmentMonth}-${String(day).padStart(2, '0')}`;
+  return { day, date };
+});
+const appointmentDays =
+  repository && currentUser
+    ? (
+        await Promise.all(
+          calendarDates.map(async (item) => ({
+            ...item,
+            count: (
+              await repository.adminAppointments({
+                date: item.date,
+                branch: appointmentBranch || null,
+              })
+            ).length,
+          })),
+        )
+      ).filter((item) => item.count > 0)
+    : [];
+const appointmentDayMap = new Map(appointmentDays.map((item) => [item.date, item.count]));
 
 const courseLabel = (id: string) => courses.find((item) => item.id === id)?.label ?? id;
 const branchLabel = (id: string) => branches.find((item) => item.id === id)?.name ?? id;
@@ -133,6 +164,29 @@ const statuses = [
   'expired',
   'provisional',
 ];
+const buildAdminUrl = (updates: Record<string, string>) => {
+  const params = new URLSearchParams();
+  const current = {
+    from,
+    to,
+    branch,
+    course,
+    status,
+    q: query,
+    appointmentDate,
+    appointmentMonth,
+    appointmentBranch,
+    ...updates,
+  };
+  Object.entries(current).forEach(([key, value]) => {
+    if (value) params.set(key, value);
+  });
+  return `/sprava?${params.toString()}`;
+};
+const calendarDays = calendarDates.map((item) => ({
+  ...item,
+  count: appointmentDayMap.get(item.date) ?? 0,
+}));
 ---
 
 <Base title="Interní správa" description="Interní správa Autoškoly BuBu." noindex>
@@ -261,13 +315,24 @@ const statuses = [
                       ? `${nextAppointmentDay.count} lidí čeká na zápis.`
                       : 'Zatím není rezervovaný žádný budoucí zápis.'}
                   </p>
+                  {nextAppointmentDay && (
+                    <a
+                      class="mini-link"
+                      href={buildAdminUrl({
+                        appointmentDate: nextAppointmentDay.date,
+                        appointmentMonth: nextAppointmentDay.date.slice(0, 7),
+                      })}
+                    >
+                      Otevřít den
+                    </a>
+                  )}
                 </article>
               </div>
             </section>
 
             <section class="admin-panel">
               <h2>Objednávky</h2>
-              <div class="table-wrap">
+              <div class="table-wrap orders-desktop">
                 <table>
                   <thead>
                     <tr>
@@ -331,6 +396,65 @@ const statuses = [
                   </tbody>
                 </table>
               </div>
+              <div class="order-card-list">
+                {orders.length ? (
+                  orders.map((order) => (
+                    <article class="order-card">
+                      <div class="order-card-head">
+                        <strong>{order.publicCode}</strong>
+                        <span class={`status-chip status-${order.status}`}>
+                          {statusLabel(order.status)}
+                        </span>
+                      </div>
+                      <h3>
+                        {order.contact.firstName} {order.contact.lastName}
+                      </h3>
+                      <p>
+                        {courseLabel(order.course)} · {branchLabel(order.branch)} ·{' '}
+                        {packageLabel(order.package)}
+                      </p>
+                      <dl>
+                        <div>
+                          <dt>Vytvořeno</dt>
+                          <dd>{formatDateTime(order.createdAt)}</dd>
+                        </div>
+                        <div>
+                          <dt>Cena</dt>
+                          <dd>{money(order.totalCzk)}</dd>
+                        </div>
+                        <div>
+                          <dt>Kontakt</dt>
+                          <dd>
+                            <a href={`tel:${order.contact.phone}`}>{order.contact.phone}</a>
+                            <br />
+                            <a href={`mailto:${order.contact.email}`}>{order.contact.email}</a>
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Doplňky</dt>
+                          <dd>
+                            {order.addons.length
+                              ? order.addons
+                                  .map((item) => `${item.title} × ${item.quantity}`)
+                                  .join(', ')
+                              : '—'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Termín zápisu</dt>
+                          <dd>
+                            {order.appointment
+                              ? `${formatDateTime(order.appointment.startsAt)}–${formatTime(order.appointment.endsAt)}`
+                              : '—'}
+                          </dd>
+                        </div>
+                      </dl>
+                    </article>
+                  ))
+                ) : (
+                  <div class="notice">Zvoleným filtrům neodpovídá žádná objednávka.</div>
+                )}
+              </div>
             </section>
 
             <section class="admin-panel">
@@ -342,6 +466,10 @@ const statuses = [
                 <input type="hidden" name="course" value={course} />
                 <input type="hidden" name="status" value={status} />
                 <input type="hidden" name="q" value={query} />
+                <label>
+                  Měsíc
+                  <input type="month" name="appointmentMonth" value={appointmentMonth} />
+                </label>
                 <label>
                   Den zápisu
                   <input type="date" name="appointmentDate" value={appointmentDate} />
@@ -361,6 +489,60 @@ const statuses = [
                   Zobrazit den
                 </button>
               </form>
+              <div class="appointment-calendar-shell">
+                <div class="appointment-calendar-header">
+                  <div>
+                    <strong>Zápisové dny v měsíci</strong>
+                    <span>Číslo v políčku ukazuje počet rezervovaných zápisů.</span>
+                  </div>
+                  {appointmentDays.length > 0 && (
+                    <div class="appointment-day-chips" aria-label="Rychlé otevření zápisových dnů">
+                      {appointmentDays.map((item) => (
+                        <a
+                          href={buildAdminUrl({
+                            appointmentDate: item.date,
+                            appointmentMonth: item.date.slice(0, 7),
+                          })}
+                        >
+                          {new Intl.DateTimeFormat('cs-CZ', {
+                            day: 'numeric',
+                            month: 'short',
+                          }).format(new Date(`${item.date}T12:00:00`))}
+                          <strong>{item.count}</strong>
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div class="calendar-weekdays" aria-hidden="true">
+                  <span>Po</span>
+                  <span>Út</span>
+                  <span>St</span>
+                  <span>Čt</span>
+                  <span>Pá</span>
+                  <span>So</span>
+                  <span>Ne</span>
+                </div>
+                <div class="appointment-calendar-grid">
+                  {Array.from({ length: firstDayOffset }, () => (
+                    <span class="calendar-empty" />
+                  ))}
+                  {calendarDays.map((item) => (
+                    <a
+                      class:list={[
+                        'calendar-day',
+                        item.count > 0 && 'has-appointments',
+                        item.date === appointmentDate && 'selected',
+                      ]}
+                      href={buildAdminUrl({ appointmentDate: item.date, appointmentMonth })}
+                      aria-label={`Otevřít ${item.date}, zápisů: ${item.count}`}
+                    >
+                      <span>{item.day}</span>
+                      {item.count > 0 && <strong>{item.count}</strong>}
+                    </a>
+                  ))}
+                </div>
+              </div>
               <p class="lead small-lead">
                 Na zvolený den čeká <strong>{appointments.length}</strong> zápisů.
               </p>
@@ -403,12 +585,20 @@ const statuses = [
   .admin-section {
     background: var(--canvas);
   }
+  .admin-section .container {
+    max-width: 1720px;
+  }
   .admin-topline {
     display: flex;
     justify-content: space-between;
     gap: 20px;
     align-items: start;
     margin-bottom: 28px;
+  }
+  .admin-topline h1 {
+    max-width: 820px;
+    font-size: clamp(2.75rem, 5.6vw, 5.5rem);
+    line-height: 0.95;
   }
   .admin-topline form {
     display: flex;
@@ -422,7 +612,6 @@ const statuses = [
   .admin-filters {
     display: grid;
     gap: 16px;
-    max-width: 980px;
   }
   .admin-login {
     max-width: 460px;
@@ -433,7 +622,7 @@ const statuses = [
     box-shadow: var(--shadow);
   }
   .admin-filters {
-    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     align-items: end;
   }
   .admin-login label,
@@ -456,7 +645,7 @@ const statuses = [
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
     background: #fff;
-    padding: 28px;
+    padding: clamp(22px, 2.4vw, 42px);
     margin-bottom: 28px;
     box-shadow: var(--shadow);
   }
@@ -469,8 +658,9 @@ const statuses = [
   .admin-grid article {
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    padding: 20px;
+    padding: clamp(18px, 1.6vw, 28px);
     background: var(--canvas);
+    min-height: 150px;
   }
   .admin-grid span {
     display: block;
@@ -486,11 +676,21 @@ const statuses = [
     margin-top: 8px;
     font-size: 0.9rem;
   }
+  .mini-link {
+    display: inline-flex;
+    margin-top: 12px;
+    color: var(--brand-dark);
+    font-weight: 800;
+    text-decoration: none;
+  }
   .table-wrap {
     overflow: auto;
   }
+  .order-card-list {
+    display: none;
+  }
   table {
-    min-width: 1180px;
+    min-width: 1280px;
     width: 100%;
     border-collapse: collapse;
     margin-top: 16px;
@@ -525,7 +725,119 @@ const statuses = [
     color: var(--danger);
   }
   .calendar-filter {
-    grid-template-columns: minmax(180px, 240px) minmax(180px, 240px) auto;
+    grid-template-columns: minmax(160px, 220px) minmax(160px, 220px) minmax(180px, 260px) auto;
+    max-width: 920px;
+  }
+  .appointment-calendar-shell {
+    display: grid;
+    gap: 14px;
+    margin-top: 24px;
+    max-width: 980px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: clamp(16px, 2vw, 24px);
+    background: var(--canvas);
+  }
+  .appointment-calendar-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    align-items: flex-start;
+  }
+  .appointment-calendar-header strong,
+  .appointment-calendar-header span {
+    display: block;
+  }
+  .appointment-calendar-header span {
+    color: var(--muted);
+    font-size: 0.92rem;
+    margin-top: 4px;
+  }
+  .appointment-day-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  .appointment-day-chips a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(74, 178, 184, 0.5);
+    border-radius: 999px;
+    padding: 8px 10px;
+    background: #fff;
+    color: var(--brand-dark);
+    font-size: 0.86rem;
+    font-weight: 800;
+    text-decoration: none;
+  }
+  .appointment-day-chips strong,
+  .calendar-day strong {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    border-radius: 999px;
+    background: var(--brand);
+    color: #fff;
+    font-size: 0.78rem;
+  }
+  .calendar-weekdays,
+  .appointment-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .calendar-weekdays span {
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .calendar-day,
+  .calendar-empty {
+    min-height: 62px;
+  }
+  .calendar-day {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 6px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 10px;
+    background: #fff;
+    color: var(--ink);
+    font-weight: 850;
+    text-decoration: none;
+    transition:
+      background 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s ease;
+  }
+  .calendar-day:hover,
+  .calendar-day:focus-visible {
+    background: rgba(74, 178, 184, 0.12);
+    border-color: rgba(74, 178, 184, 0.55);
+    transform: translateY(-1px);
+  }
+  .calendar-day.has-appointments {
+    border-color: rgba(74, 178, 184, 0.7);
+    background: rgba(74, 178, 184, 0.16);
+    box-shadow: inset 0 0 0 1px rgba(74, 178, 184, 0.08);
+  }
+  .calendar-day.selected {
+    background: var(--brand-dark);
+    border-color: var(--brand-dark);
+    color: #fff;
+  }
+  .calendar-day.selected strong {
+    background: #fff;
+    color: var(--brand-dark);
   }
   .small-lead {
     margin: 18px 0;
@@ -547,6 +859,45 @@ const statuses = [
     font-weight: 800;
     color: var(--brand-dark);
   }
+  .order-card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px;
+    background: var(--canvas);
+  }
+  .order-card-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+  }
+  .order-card h3 {
+    margin: 14px 0 4px;
+    font-size: 1.25rem;
+  }
+  .order-card p {
+    margin: 0 0 14px;
+    color: var(--muted);
+  }
+  .order-card dl {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+  }
+  .order-card dl div {
+    display: grid;
+    gap: 3px;
+  }
+  .order-card dt {
+    color: var(--muted);
+    font-size: 0.74rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .order-card dd {
+    margin: 0;
+  }
   @media (max-width: 980px) {
     .admin-topline,
     .admin-topline form {
@@ -557,6 +908,74 @@ const statuses = [
     .admin-grid,
     .appointment-list article {
       grid-template-columns: 1fr;
+    }
+    .admin-section .container {
+      padding-inline: 18px;
+    }
+    .admin-topline h1 {
+      font-size: clamp(2.35rem, 14vw, 4rem);
+    }
+    .admin-grid article {
+      min-height: auto;
+    }
+    .appointment-calendar-header {
+      display: grid;
+    }
+    .appointment-day-chips {
+      justify-content: flex-start;
+    }
+    .calendar-day,
+    .calendar-empty {
+      min-height: 52px;
+    }
+    .calendar-day {
+      border-radius: 13px;
+      padding: 8px;
+    }
+  }
+  @media (max-width: 760px) {
+    .admin-panel {
+      border-radius: 24px;
+      padding: 18px;
+    }
+    .orders-desktop {
+      display: none;
+    }
+    .order-card-list {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .appointment-calendar-shell {
+      padding: 14px;
+      border-radius: 20px;
+    }
+    .calendar-weekdays,
+    .appointment-calendar-grid {
+      gap: 5px;
+    }
+    .calendar-day {
+      min-height: 46px;
+      font-size: 0.86rem;
+    }
+    .appointment-day-chips a {
+      flex: 1 1 calc(50% - 8px);
+      justify-content: space-between;
+    }
+  }
+  @media (max-width: 460px) {
+    .admin-section .container {
+      padding-inline: 12px;
+    }
+    .admin-panel {
+      padding: 14px;
+    }
+    .calendar-day {
+      min-height: 40px;
+      padding: 6px;
+    }
+    .appointment-day-chips a {
+      flex-basis: 100%;
     }
   }
 </style>
