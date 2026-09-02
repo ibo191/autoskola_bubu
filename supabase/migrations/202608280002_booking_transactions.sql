@@ -1,6 +1,6 @@
 -- Reservation procedures are server-only. They are not wired to the public wizard yet.
 -- A per-branch advisory lock gives one lock order for hold, expiry and verification.
-create function bubu_private.expire_branch(p_branch text) returns void
+create or replace function bubu_private.expire_branch(p_branch text) returns void
 language plpgsql security definer set search_path='' as $$
 begin
   perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(p_branch,0));
@@ -15,7 +15,7 @@ end $$;
 revoke all on function bubu_private.expire_branch(text) from public,anon,authenticated;
 grant execute on function bubu_private.expire_branch(text) to service_role;
 
-create function bubu_private.check_slot_write() returns trigger
+create or replace function bubu_private.check_slot_write() returns trigger
 language plpgsql security definer set search_path='' as $$
 begin
   perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(new.branch,0));
@@ -31,11 +31,12 @@ begin
   end if;
   return new;
 end $$;
+drop trigger if exists validate_slot_write on public.appointment_slots;
 create trigger validate_slot_write before insert or update on public.appointment_slots
 for each row execute function bubu_private.check_slot_write();
 revoke all on function bubu_private.check_slot_write() from public,anon,authenticated;
 
-create function bubu_private.check_seat() returns trigger
+create or replace function bubu_private.check_seat() returns trigger
 language plpgsql security definer set search_path='' as $$
 declare cap integer;
 begin
@@ -44,11 +45,12 @@ begin
   if cap is null or new.seat>cap then raise exception 'INVALID_SEAT'; end if;
   return new;
 end $$;
+drop trigger if exists validate_seat on public.appointments;
 create trigger validate_seat before insert or update on public.appointments
 for each row execute function bubu_private.check_seat();
 revoke all on function bubu_private.check_seat() from public,anon,authenticated;
 
-create function public.bubu_create_provisional(
+create or replace function public.bubu_create_provisional(
   p_slot uuid,p_contact jsonb,p_selection jsonb,p_price jsonb,p_terms jsonb,p_marketing jsonb,p_token_hash text
 ) returns jsonb language plpgsql security definer set search_path='' as $$
 declare s public.appointment_slots; cfg public.booking_settings; chosen integer; oid uuid; aid uuid; expiry timestamptz;
@@ -81,7 +83,7 @@ end $$;
 revoke all on function public.bubu_create_provisional(uuid,jsonb,jsonb,jsonb,jsonb,jsonb,text) from public,anon,authenticated;
 grant execute on function public.bubu_create_provisional(uuid,jsonb,jsonb,jsonb,jsonb,jsonb,text) to service_role;
 
-create function public.bubu_verify_email(p_hash text) returns jsonb
+create or replace function public.bubu_verify_email(p_hash text) returns jsonb
 language plpgsql security definer set search_path='' as $$
 declare tok public.verification_tokens; app public.appointments; slot public.appointment_slots; branch_id text; moment timestamptz;
 begin
