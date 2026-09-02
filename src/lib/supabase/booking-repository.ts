@@ -65,6 +65,80 @@ const adminSummarySchema = z.object({
   byCourse: z.array(z.object({ course: z.string(), count: z.number().int().nonnegative() })),
   byDay: z.array(z.object({ date: z.string(), count: z.number().int().nonnegative() })),
 });
+const adminUserSchema = z.object({ email: z.string(), name: z.string() });
+const adminLoginSchema = z.union([
+  z.object({
+    ok: z.literal(true),
+    token: z.string().min(32),
+    expiresAt: z.iso.datetime({ offset: true }),
+    user: adminUserSchema,
+  }),
+  z.object({ ok: z.literal(false) }),
+]);
+const adminSessionSchema = z.union([
+  z.object({ ok: z.literal(true), user: adminUserSchema }),
+  z.object({ ok: z.literal(false) }),
+]);
+const adminOrderSchema = z.object({
+  orderId: z.uuid(),
+  publicCode: z.string(),
+  createdAt: z.iso.datetime({ offset: true }),
+  status: z.string(),
+  branch: z.string(),
+  course: z.string(),
+  package: z.string(),
+  totalCzk: z.number().int(),
+  contact: z.object({
+    firstName: z.string(),
+    lastName: z.string(),
+    email: z.string(),
+    phone: z.string(),
+  }),
+  selection: z.unknown(),
+  price: z.unknown(),
+  addons: z.array(
+    z.object({
+      id: z.string(),
+      title: z.string(),
+      quantity: z.number().int(),
+      unitPrice: z.number().int(),
+      total: z.number().int(),
+    }),
+  ),
+  appointment: z
+    .object({
+      id: z.uuid(),
+      branch: z.string(),
+      status: z.string(),
+      startsAt: z.iso.datetime({ offset: true }),
+      endsAt: z.iso.datetime({ offset: true }),
+    })
+    .nullable(),
+});
+const adminAppointmentSchema = z.object({
+  appointmentId: z.uuid(),
+  status: z.string(),
+  branch: z.string(),
+  startsAt: z.iso.datetime({ offset: true }),
+  endsAt: z.iso.datetime({ offset: true }),
+  publicCode: z.string(),
+  course: z.string(),
+  package: z.string(),
+  totalCzk: z.number().int(),
+  contact: z.object({
+    firstName: z.string(),
+    lastName: z.string(),
+    email: z.string(),
+    phone: z.string(),
+  }),
+});
+const nextAppointmentDaySchema = z
+  .object({ date: z.string(), count: z.number().int().nonnegative() })
+  .nullable();
+export type AdminUser = z.infer<typeof adminUserSchema>;
+export type AdminOrder = z.infer<typeof adminOrderSchema>;
+export type AdminAppointment = z.infer<typeof adminAppointmentSchema>;
+export type NextAppointmentDay = z.infer<typeof nextAppointmentDaySchema>;
 
 /** Server-only REST adapter. Browser code must never import this module. */
 export class SupabaseBookingRepository implements BookingRepository {
@@ -85,7 +159,13 @@ export class SupabaseBookingRepository implements BookingRepository {
       | 'bubu_admin_summary'
       | 'bubu_public_order'
       | 'bubu_reschedule_appointment'
-      | 'bubu_cancel_appointment',
+      | 'bubu_cancel_appointment'
+      | 'bubu_admin_login'
+      | 'bubu_admin_session'
+      | 'bubu_admin_logout'
+      | 'bubu_admin_orders'
+      | 'bubu_admin_appointments'
+      | 'bubu_admin_next_appointment_day',
     body: unknown,
   ) {
     const response = await fetch(this.base + name, {
@@ -184,6 +264,56 @@ export class SupabaseBookingRepository implements BookingRepository {
         p_course: input.course || null,
       }),
     ) as AdminSummary;
+  }
+  async adminLogin(input: { email: string; password: string }) {
+    return adminLoginSchema.parse(
+      await this.rpc('bubu_admin_login', { p_email: input.email, p_password: input.password }),
+    );
+  }
+  async adminSession(token: string) {
+    return adminSessionSchema.parse(await this.rpc('bubu_admin_session', { p_token: token }));
+  }
+  async adminLogout(token: string) {
+    return z
+      .object({ ok: z.boolean() })
+      .parse(await this.rpc('bubu_admin_logout', { p_token: token }));
+  }
+  async adminOrders(input: {
+    from: string;
+    to: string;
+    course?: string | null;
+    branch?: string | null;
+    status?: string | null;
+    query?: string | null;
+    limit?: number;
+  }) {
+    return z.array(adminOrderSchema).parse(
+      await this.rpc('bubu_admin_orders', {
+        p_from: input.from,
+        p_to: input.to,
+        p_course: input.course || null,
+        p_branch: input.branch || null,
+        p_status: input.status || null,
+        p_query: input.query || null,
+        p_limit: input.limit ?? 200,
+      }),
+    );
+  }
+  async adminAppointments(input: { date: string; branch?: string | null }) {
+    return z.array(adminAppointmentSchema).parse(
+      await this.rpc('bubu_admin_appointments', {
+        p_local_date: input.date,
+        p_branch: input.branch || null,
+      }),
+    );
+  }
+  async adminNextAppointmentDay(input: { from: string; branch?: string | null }) {
+    return nextAppointmentDaySchema.parse(
+      await this.rpc('bubu_admin_next_appointment_day', {
+        p_from: input.from,
+        p_branch: input.branch || null,
+      }),
+    );
   }
 }
 

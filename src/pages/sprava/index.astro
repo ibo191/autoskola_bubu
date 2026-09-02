@@ -2,168 +2,475 @@
 export const prerender = false;
 Astro.response.headers.set('Cache-Control', 'no-store');
 import Base from '../../layouts/Base.astro';
-import { courses } from '../../lib/catalog';
+import { branches, courses, money } from '../../lib/catalog';
 import { requireLiveRepository } from '../../lib/server/live-order';
 
+const repositoryReady = Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+const repository = repositoryReady ? requireLiveRepository(process.env) : null;
 const url = new URL(Astro.request.url);
-const expected = process.env.ADMIN_ACCESS_TOKEN ?? '';
-let authorized = expected.length >= 32 && Astro.cookies.get('bubu_admin')?.value === expected;
-let loginFailed = false;
-if (Astro.request.method === 'POST' && expected.length >= 32) {
-  const form = await Astro.request.formData();
-  const submitted = String(form.get('token') ?? '');
-  authorized = submitted === expected;
-  loginFailed = !authorized;
-  if (authorized)
-    Astro.cookies.set('bubu_admin', expected, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-      path: '/sprava',
-      maxAge: 60 * 60 * 8,
-    });
-}
 const today = new Date().toISOString().slice(0, 10);
 const from = url.searchParams.get('from') ?? today;
 const to =
   url.searchParams.get('to') ?? new Date(Date.now() + 31 * 86400000).toISOString().slice(0, 10);
 const course = url.searchParams.get('course') || '';
-const summary = authorized
-  ? await requireLiveRepository(process.env).adminSummary({
-      from: `${from}T00:00:00.000Z`,
-      to: `${to}T23:59:59.999Z`,
-      course: course || null,
-    })
-  : null;
+const branch = url.searchParams.get('branch') || '';
+const status = url.searchParams.get('status') || '';
+const query = url.searchParams.get('q') || '';
+const appointmentDate = url.searchParams.get('appointmentDate') || today;
+const appointmentBranch = url.searchParams.get('appointmentBranch') || branch || '';
+const adminCookie = Astro.cookies.get('bubu_admin_session')?.value ?? '';
+let loginFailed = false;
+let currentUser: { email: string; name: string } | null = null;
+let configError = !repositoryReady;
+
+function cookieOptions() {
+  return {
+    httpOnly: true,
+    secure: Astro.url.protocol === 'https:',
+    sameSite: 'strict' as const,
+    path: '/sprava',
+    maxAge: 60 * 60 * 8,
+  };
+}
+
+if (repository && adminCookie) {
+  const session = await repository.adminSession(adminCookie).catch(() => ({ ok: false as const }));
+  if (session.ok) currentUser = session.user;
+}
+
+if (repository && Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const intent = String(form.get('intent') ?? 'login');
+  if (intent === 'logout') {
+    if (adminCookie) await repository.adminLogout(adminCookie).catch(() => null);
+    Astro.cookies.delete('bubu_admin_session', { path: '/sprava' });
+    return Astro.redirect('/sprava', 303);
+  }
+  const email = String(form.get('email') ?? '');
+  const password = String(form.get('password') ?? '');
+  const login = await repository
+    .adminLogin({ email, password })
+    .catch(() => ({ ok: false as const }));
+  if (login.ok) {
+    currentUser = login.user;
+    Astro.cookies.set('bubu_admin_session', login.token, cookieOptions());
+    return Astro.redirect('/sprava', 303);
+  }
+  loginFailed = true;
+}
+
+const summary =
+  repository && currentUser
+    ? await repository.adminSummary({
+        from: `${from}T00:00:00.000Z`,
+        to: `${to}T23:59:59.999Z`,
+        course: course || null,
+      })
+    : null;
+const orders =
+  repository && currentUser
+    ? await repository.adminOrders({
+        from: `${from}T00:00:00.000Z`,
+        to: `${to}T23:59:59.999Z`,
+        course: course || null,
+        branch: branch || null,
+        status: status || null,
+        query: query || null,
+        limit: 250,
+      })
+    : [];
+const appointments =
+  repository && currentUser
+    ? await repository.adminAppointments({
+        date: appointmentDate,
+        branch: appointmentBranch || null,
+      })
+    : [];
+const nextAppointmentDay =
+  repository && currentUser
+    ? await repository.adminNextAppointmentDay({ from: today, branch: appointmentBranch || null })
+    : null;
+
+const courseLabel = (id: string) => courses.find((item) => item.id === id)?.label ?? id;
+const branchLabel = (id: string) => branches.find((item) => item.id === id)?.name ?? id;
+const packageLabel = (id: string) =>
+  ({
+    single: 'Samostatný kurz',
+    'moto-basic': 'Moto základ',
+    'moto-confidence': 'Moto Jistota',
+    supplement: 'Doplňovací zkouška',
+  })[id] ?? id;
+const statusLabel = (value: string) =>
+  ({
+    provisional: 'Rozpracované',
+    confirmed: 'Potvrzené',
+    rescheduled: 'Přeplánované',
+    cancelled: 'Zrušené',
+    attended: 'Dorazil/a',
+    no_show: 'Nedorazil/a',
+    enrolled: 'Zařazen/a do kurzu',
+    expired: 'Expirované',
+  })[value] ?? value;
+const formatDateTime = (value: string) =>
+  new Intl.DateTimeFormat('cs-CZ', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: 'Europe/Prague',
+  }).format(new Date(value));
+const formatTime = (value: string) =>
+  new Intl.DateTimeFormat('cs-CZ', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Europe/Prague',
+  }).format(new Date(value));
+const statuses = [
+  'confirmed',
+  'rescheduled',
+  'cancelled',
+  'enrolled',
+  'attended',
+  'no_show',
+  'expired',
+  'provisional',
+];
 ---
 
-<Base title="Interní správa" description="Interní správa Autoškoly BuBu." noindex
-  ><section class="section">
+<Base title="Interní správa" description="Interní správa Autoškoly BuBu." noindex>
+  <section class="section admin-section">
     <div class="container content">
-      <span class="eyebrow">Interní část</span><h1>Správa Autoškoly BuBu</h1>{
-        !expected ? (
-          <div class="notice">
-            Pro zobrazení správy nastavte proměnnou <code>ADMIN_ACCESS_TOKEN</code> s minimálně 32
-            znaky.
-          </div>
-        ) : !authorized ? (
+      <div class="admin-topline">
+        <div>
+          <span class="eyebrow">Interní část</span><h1>Správa Autoškoly BuBu</h1>
+        </div>
+        {
+          currentUser && (
+            <form method="post">
+              <input type="hidden" name="intent" value="logout" />
+              <span class="admin-user">{currentUser.name}</span>
+              <button class="btn secondary" type="submit">
+                Odhlásit
+              </button>
+            </form>
+          )
+        }
+      </div>
+
+      {
+        configError ? (
+          <div class="notice">Pro zobrazení správy nastavte Supabase proměnné na Vercelu.</div>
+        ) : !currentUser ? (
           <form class="admin-login" method="post">
-            {loginFailed && <div class="error">Neplatný přístupový token.</div>}
+            <input type="hidden" name="intent" value="login" />
+            {loginFailed && <div class="error">Neplatný e-mail nebo heslo.</div>}
             <label>
-              Přístupový token
-              <input name="token" type="password" autocomplete="current-password" required />
+              E-mail
+              <input name="email" type="email" autocomplete="username" required />
+            </label>
+            <label>
+              Heslo
+              <input name="password" type="password" autocomplete="current-password" required />
             </label>
             <button class="btn primary" type="submit">
-              Zobrazit správu
+              Přihlásit se
             </button>
           </form>
         ) : (
           <>
-            <form class="admin-filters" method="get">
-              <label>
-                Od
-                <input type="date" name="from" value={from} />
-              </label>
-              <label>
-                Do
-                <input type="date" name="to" value={to} />
-              </label>
-              <label>
-                Skupina
-                <select name="course">
-                  <option value="">Všechny skupiny</option>
-                  {courses.map((item) => (
-                    <option value={item.id} selected={course === item.id}>
-                      {item.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button class="btn primary" type="submit">
-                Filtrovat
-              </button>
-            </form>
-            <div class="admin-grid">
-              <article>
-                <span>Objednávky celkem</span>
-                <strong>{summary?.ordersTotal ?? 0}</strong>
-              </article>
-              <article>
-                <span>Potvrzené objednávky</span>
-                <strong>{summary?.ordersConfirmed ?? 0}</strong>
-              </article>
-              <article>
-                <span>Zápisy v kalendáři</span>
-                <strong>{summary?.appointmentsTotal ?? 0}</strong>
-              </article>
-            </div>
-            <h2>Objednávky podle skupiny</h2>
-            <table>
-              <thead>
-                <tr>
+            <section class="admin-panel">
+              <h2>Přehled</h2>
+              <form class="admin-filters" method="get">
+                <label>
+                  Od
+                  <input type="date" name="from" value={from} />
+                </label>
+                <label>
+                  Do
+                  <input type="date" name="to" value={to} />
+                </label>
+                <label>
+                  Pobočka
+                  <select name="branch">
+                    <option value="">Všechny pobočky</option>
+                    {branches.map((item) => (
+                      <option value={item.id} selected={branch === item.id}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Skupina
+                  <select name="course">
+                    <option value="">Všechny skupiny</option>
+                    {courses.map((item) => (
+                      <option value={item.id} selected={course === item.id}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Stav
+                  <select name="status">
+                    <option value="">Všechny stavy</option>
+                    {statuses.map((item) => (
+                      <option value={item} selected={status === item}>
+                        {statusLabel(item)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Hledat
+                  <input name="q" value={query} placeholder="jméno, e-mail, telefon, kód" />
+                </label>
+                <button class="btn primary" type="submit">
+                  Filtrovat
+                </button>
+              </form>
+              <div class="admin-grid">
+                <article>
                   <>
-                    <th>Skupina</th>
-                    <th>Počet</th>
+                    <span>Objednávky celkem</span>
+                    <strong>{summary?.ordersTotal ?? 0}</strong>
                   </>
-                </tr>
-              </thead>
-              <tbody>
-                {(summary?.byCourse.length ? summary.byCourse : []).map((row) => (
-                  <tr>
-                    <td>{row.course}</td>
-                    <td>{row.count}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <h2>Příchody na zápis podle dne</h2>
-            <table>
-              <thead>
-                <tr>
+                </article>
+                <article>
                   <>
-                    <th>Datum</th>
-                    <th>Počet lidí</th>
+                    <span>Potvrzené objednávky</span>
+                    <strong>{summary?.ordersConfirmed ?? 0}</strong>
                   </>
-                </tr>
-              </thead>
-              <tbody>
-                {(summary?.byDay.length ? summary.byDay : []).map((row) => (
-                  <tr>
-                    <td>{row.date}</td>
-                    <td>{row.count}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                </article>
+                <article>
+                  <>
+                    <span>Zápisy v kalendáři</span>
+                    <strong>{summary?.appointmentsTotal ?? 0}</strong>
+                  </>
+                </article>
+                <article class="next-day">
+                  <span>Nejbližší den zápisu</span>
+                  <strong>
+                    {nextAppointmentDay
+                      ? new Intl.DateTimeFormat('cs-CZ', { dateStyle: 'medium' }).format(
+                          new Date(`${nextAppointmentDay.date}T12:00:00`),
+                        )
+                      : 'Žádný'}
+                  </strong>
+                  <p>
+                    {nextAppointmentDay
+                      ? `${nextAppointmentDay.count} lidí čeká na zápis.`
+                      : 'Zatím není rezervovaný žádný budoucí zápis.'}
+                  </p>
+                </article>
+              </div>
+            </section>
+
+            <section class="admin-panel">
+              <h2>Objednávky</h2>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <>
+                        <th>Kód</th>
+                        <th>Datum</th>
+                        <th>Kontakt</th>
+                        <th>Kurz</th>
+                        <th>Pobočka</th>
+                        <th>Balíček</th>
+                        <th>Doplňky</th>
+                        <th>Termín zápisu</th>
+                        <th>Stav</th>
+                        <th>Cena</th>
+                      </>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orders.length ? (
+                      orders.map((order) => (
+                        <tr>
+                          <td>
+                            <strong>{order.publicCode}</strong>
+                          </td>
+                          <td>{formatDateTime(order.createdAt)}</td>
+                          <td>
+                            {order.contact.firstName} {order.contact.lastName}
+                            <br />
+                            <a href={`mailto:${order.contact.email}`}>{order.contact.email}</a>
+                            <br />
+                            <a href={`tel:${order.contact.phone}`}>{order.contact.phone}</a>
+                          </td>
+                          <td>{courseLabel(order.course)}</td>
+                          <td>{branchLabel(order.branch)}</td>
+                          <td>{packageLabel(order.package)}</td>
+                          <td>
+                            {order.addons.length
+                              ? order.addons
+                                  .map((item) => `${item.title} × ${item.quantity}`)
+                                  .join(', ')
+                              : '—'}
+                          </td>
+                          <td>
+                            {order.appointment
+                              ? `${formatDateTime(order.appointment.startsAt)}–${formatTime(order.appointment.endsAt)}`
+                              : '—'}
+                          </td>
+                          <td>
+                            <span class={`status-chip status-${order.status}`}>
+                              {statusLabel(order.status)}
+                            </span>
+                          </td>
+                          <td>{money(order.totalCzk)}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colspan="10">Zvoleným filtrům neodpovídá žádná objednávka.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="admin-panel">
+              <h2>Zápisy podle kalendáře</h2>
+              <form class="admin-filters calendar-filter" method="get">
+                <input type="hidden" name="from" value={from} />
+                <input type="hidden" name="to" value={to} />
+                <input type="hidden" name="branch" value={branch} />
+                <input type="hidden" name="course" value={course} />
+                <input type="hidden" name="status" value={status} />
+                <input type="hidden" name="q" value={query} />
+                <label>
+                  Den zápisu
+                  <input type="date" name="appointmentDate" value={appointmentDate} />
+                </label>
+                <label>
+                  Pobočka zápisu
+                  <select name="appointmentBranch">
+                    <option value="">Všechny pobočky</option>
+                    {branches.map((item) => (
+                      <option value={item.id} selected={appointmentBranch === item.id}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button class="btn primary" type="submit">
+                  Zobrazit den
+                </button>
+              </form>
+              <p class="lead small-lead">
+                Na zvolený den čeká <strong>{appointments.length}</strong> zápisů.
+              </p>
+              <div class="appointment-list">
+                {appointments.length ? (
+                  appointments.map((item) => (
+                    <article>
+                      <time>
+                        {formatTime(item.startsAt)}–{formatTime(item.endsAt)}
+                      </time>
+                      <div>
+                        <strong>
+                          {item.contact.firstName} {item.contact.lastName}
+                        </strong>
+                        <br />
+                        {courseLabel(item.course)} · {branchLabel(item.branch)} · {item.publicCode}
+                        <br />
+                        <a href={`tel:${item.contact.phone}`}>{item.contact.phone}</a> ·{' '}
+                        <a href={`mailto:${item.contact.email}`}>{item.contact.email}</a>
+                      </div>
+                      <span class={`status-chip status-${item.status}`}>
+                        {statusLabel(item.status)}
+                      </span>
+                    </article>
+                  ))
+                ) : (
+                  <div class="notice">Na tento den není rezervovaný žádný zápis.</div>
+                )}
+              </div>
+            </section>
           </>
         )
-      }<a class="text-link" href="/">Zpět na web</a>
+      }
+      <a class="text-link" href="/">Zpět na web</a>
     </div>
-  </section></Base
->
+  </section>
+</Base>
 
 <style>
+  .admin-section {
+    background: var(--canvas);
+  }
+  .admin-topline {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: start;
+    margin-bottom: 28px;
+  }
+  .admin-topline form {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .admin-user {
+    font-weight: 750;
+  }
   .admin-login,
   .admin-filters {
     display: grid;
     gap: 16px;
-    max-width: 720px;
+    max-width: 980px;
+  }
+  .admin-login {
+    max-width: 460px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    background: #fff;
+    box-shadow: var(--shadow);
   }
   .admin-filters {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(7, minmax(0, 1fr));
     align-items: end;
+  }
+  .admin-login label,
+  .admin-filters label {
+    display: grid;
+    gap: 6px;
+    font-weight: 700;
+  }
+  .admin-login input,
+  .admin-filters input,
+  .admin-filters select {
+    width: 100%;
+    border: 1px solid #cbd9d9;
+    border-radius: 0.75rem;
+    padding: 11px 12px;
+    background: #fff;
+    color: var(--ink);
+  }
+  .admin-panel {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: #fff;
+    padding: 28px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
   }
   .admin-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px;
-    margin: 28px 0;
+    margin: 24px 0 0;
   }
   .admin-grid article {
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: var(--radius);
     padding: 20px;
-    background: #fff;
+    background: var(--canvas);
   }
   .admin-grid span {
     display: block;
@@ -172,23 +479,83 @@ const summary = authorized
   }
   .admin-grid strong {
     display: block;
-    font-size: 2.2rem;
+    font-size: 2rem;
     margin-top: 8px;
   }
+  .next-day p {
+    margin-top: 8px;
+    font-size: 0.9rem;
+  }
+  .table-wrap {
+    overflow: auto;
+  }
   table {
+    min-width: 1180px;
     width: 100%;
     border-collapse: collapse;
-    margin: 16px 0 28px;
+    margin-top: 16px;
   }
   th,
   td {
     border-bottom: 1px solid var(--line);
     padding: 12px;
     text-align: left;
+    vertical-align: top;
+    font-size: 0.9rem;
   }
-  @media (max-width: 720px) {
+  th {
+    color: var(--muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .status-chip {
+    display: inline-flex;
+    border-radius: 999px;
+    padding: 5px 10px;
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+    font-size: 0.76rem;
+    font-weight: 750;
+    white-space: nowrap;
+  }
+  .status-cancelled,
+  .status-expired {
+    background: #f8e6e4;
+    color: var(--danger);
+  }
+  .calendar-filter {
+    grid-template-columns: minmax(180px, 240px) minmax(180px, 240px) auto;
+  }
+  .small-lead {
+    margin: 18px 0;
+  }
+  .appointment-list {
+    display: grid;
+    gap: 12px;
+  }
+  .appointment-list article {
+    display: grid;
+    grid-template-columns: 130px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .appointment-list time {
+    font-weight: 800;
+    color: var(--brand-dark);
+  }
+  @media (max-width: 980px) {
+    .admin-topline,
+    .admin-topline form {
+      display: grid;
+    }
     .admin-filters,
-    .admin-grid {
+    .calendar-filter,
+    .admin-grid,
+    .appointment-list article {
       grid-template-columns: 1fr;
     }
   }
