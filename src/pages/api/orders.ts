@@ -7,6 +7,10 @@ import {
 
 export const prerender = false;
 
+function missingSupabaseEnv(env: Record<string, string | undefined>) {
+  return ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'].filter((key) => !env[key]);
+}
+
 async function readJson(request: Request) {
   if (!request.headers.get('content-type')?.startsWith('application/json'))
     throw new Response(null, { status: 415 });
@@ -30,12 +34,14 @@ async function readJson(request: Request) {
 export const POST: APIRoute = async ({ request }) => {
   try {
     assertSameOrigin(request);
-    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    const missingEnv = missingSupabaseEnv(process.env);
+    if (missingEnv.length) {
       return Response.json(
         {
           ok: false,
           code: 'BOOKING_NOT_CONFIGURED',
           message: 'Supabase database is not configured.',
+          missingEnv,
         },
         { status: 503, headers: { 'Cache-Control': 'no-store' } },
       );

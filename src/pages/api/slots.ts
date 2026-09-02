@@ -86,11 +86,21 @@ export const GET: APIRoute = async ({ request }) => {
       );
     }
 
-    const slots =
-      process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
-        ? await requireLiveRepository(process.env).listAvailableSlots(parsed.data)
-        : previewSlots(parsed.data.branch, parsed.data.from, parsed.data.to);
-    return Response.json({ ok: true, slots }, { headers: { 'Cache-Control': 'no-store' } });
+    const configured = Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+    const slots = configured
+      ? await requireLiveRepository(process.env).listAvailableSlots(parsed.data)
+      : previewSlots(parsed.data.branch, parsed.data.from, parsed.data.to);
+    return Response.json(
+      {
+        ok: true,
+        source: configured ? 'database' : 'preview',
+        missingEnv: configured
+          ? []
+          : ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'].filter((key) => !process.env[key]),
+        slots,
+      },
+      { headers: { 'Cache-Control': 'no-store' } },
+    );
   } catch {
     return Response.json(
       { ok: false, message: 'Termíny zápisu se teď nepodařilo načíst.' },
