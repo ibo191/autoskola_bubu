@@ -78,6 +78,13 @@ export const fallbackGoogleReviews: GoogleReviewsPayload = {
       text: 'Po napojení Google Places API se zde budou automaticky zobrazovat aktuální recenze z profilu Autoškola BuBu Střížkov.',
       relativeTime: 'čeká na API klíč',
     },
+    {
+      id: 'fallback-confidence',
+      authorName: 'Autoškola BuBu',
+      rating: 5,
+      text: 'Naším cílem je vést žáky klidně, lidsky a tak, aby od zkoušky neodcházeli jen s papírem, ale hlavně s jistotou v provozu.',
+      relativeTime: 'pobočka Střížkov',
+    },
   ],
 };
 

@@ -1,48 +1,58 @@
 ---
 import { fallbackGoogleReviews } from '../lib/google/reviews';
 const fallback = fallbackGoogleReviews;
-const fallbackReviews = fallback.reviews.slice(0, 3);
+const fallbackReviews = fallback.reviews.slice(0, 5);
 const stars = '★★★★★';
 ---
 
 <section class="section google-reviews" data-reveal data-google-reviews>
   <div class="container reviews-shell">
     <div class="reviews-copy">
-      <span class="eyebrow">Google recenze</span>
-      <h2>Klid, respekt a&nbsp;příprava na reálný provoz.</h2>
+      <span class="eyebrow">Proč právě BuBu</span>
+      <h2>Autoškola, kde vás připravíme na skutečný provoz.</h2>
       <p>
-        Recenze načítáme z veřejného Google profilu pobočky Autoškola BuBu Střížkov. Google vrací
-        omezený výběr recenzí, všechny si můžete otevřít přímo na profilu.
+        Učíme klidně, lidsky a s jasným plánem. Nechceme jen odjezdit povinné hodiny — chceme,
+        abyste se za volantem nebo na motorce cítili bezpečně, samostatně a připraveně na reálnou
+        zkoušku.
       </p>
       <div class="rating-card">
         <span class="google-label">Google</span>
         <strong data-rating>{fallback.rating.toFixed(1).replace('.', ',')}</strong>
         <span class="stars" aria-label={`${fallback.rating} z 5 hvězdiček`}>{stars}</span>
         <a data-google-link href={fallback.googleMapsUri} target="_blank" rel="noopener noreferrer">
-          {fallback.userRatingCount} recenzí na Google ↗
+          Zobrazit všechny recenze na Google ↗
         </a>
       </div>
     </div>
-    <div class="reviews-list" data-reviews-list>
-      {
-        fallbackReviews.map((review) => (
-          <article class="review-card">
-            <div class="review-head">
-              <div class="avatar" aria-hidden="true">
-                {review.authorName.charAt(0)}
+    <div class="reviews-carousel">
+      <div class="carousel-top">
+        <span>Co o nás říkají žáci</span>
+        <div class="carousel-actions" aria-label="Posun recenzí">
+          <button type="button" data-reviews-prev aria-label="Předchozí recenze">←</button>
+          <button type="button" data-reviews-next aria-label="Další recenze">→</button>
+        </div>
+      </div>
+      <div class="reviews-list" data-reviews-list>
+        {
+          fallbackReviews.map((review) => (
+            <article class="review-card">
+              <div class="review-head">
+                <div class="avatar" aria-hidden="true">
+                  {review.authorName.charAt(0)}
+                </div>
+                <div>
+                  <strong>{review.authorName}</strong>
+                  <span>{review.relativeTime}</span>
+                </div>
               </div>
-              <div>
-                <strong>{review.authorName}</strong>
-                <span>{review.relativeTime}</span>
-              </div>
-            </div>
-            <span class="stars" aria-label={`${review.rating} z 5 hvězdiček`}>
-              {stars.slice(0, Math.round(review.rating))}
-            </span>
-            <p>{review.text}</p>
-          </article>
-        ))
-      }
+              <span class="stars" aria-label={`${review.rating} z 5 hvězdiček`}>
+                {stars.slice(0, Math.round(review.rating))}
+              </span>
+              <p>{review.text}</p>
+            </article>
+          ))
+        }
+      </div>
     </div>
   </div>
 </section>
@@ -72,6 +82,8 @@ const stars = '★★★★★';
   const list = section?.querySelector<HTMLElement>('[data-reviews-list]');
   const rating = section?.querySelector<HTMLElement>('[data-rating]');
   const link = section?.querySelector<HTMLAnchorElement>('[data-google-link]');
+  const prev = section?.querySelector<HTMLButtonElement>('[data-reviews-prev]');
+  const next = section?.querySelector<HTMLButtonElement>('[data-reviews-next]');
 
   const entityMap: Record<string, string> = {
     '&': '&amp;',
@@ -116,12 +128,20 @@ const stars = '★★★★★';
       const data = (await response.json()) as ReviewsPayload;
       rating.textContent = data.rating.toFixed(1).replace('.', ',');
       link.href = data.googleMapsUri;
-      link.textContent = `${data.userRatingCount} recenzí na Google ↗`;
+      link.textContent = `Zobrazit všech ${data.userRatingCount} recenzí na Google ↗`;
       if (data.reviews.length) list.innerHTML = data.reviews.slice(0, 5).map(renderReview).join('');
     } catch {
       /* The static fallback stays visible when Google reviews are unavailable. */
     }
   };
+
+  prev?.addEventListener('click', () => {
+    list?.scrollBy({ left: -360, behavior: 'smooth' });
+  });
+
+  next?.addEventListener('click', () => {
+    list?.scrollBy({ left: 360, behavior: 'smooth' });
+  });
 
   loadReviews();
 </script>
@@ -177,13 +197,61 @@ const stars = '★★★★★';
     font-weight: 800;
     text-decoration: none;
   }
-  .reviews-list {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .reviews-carousel {
+    min-width: 0;
+  }
+  .carousel-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     gap: 16px;
+    margin-bottom: 16px;
+  }
+  .carousel-top span {
+    color: var(--ink);
+    font-size: 0.86rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .carousel-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .carousel-actions button {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border: 1px solid rgba(74, 185, 171, 0.42);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--brand-dark);
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: 900;
+    transition:
+      transform 0.2s ease,
+      background 0.2s ease,
+      color 0.2s ease;
+  }
+  .carousel-actions button:hover {
+    transform: translateY(-1px);
+    background: var(--brand);
+    color: #fff;
+  }
+  .reviews-list {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding: 4px 4px 18px;
+    scroll-padding-inline: 4px;
+    scroll-snap-type: x mandatory;
+    scrollbar-color: rgba(74, 185, 171, 0.7) transparent;
   }
   .review-card {
     display: flex;
+    min-width: min(31vw, 330px);
     min-height: 270px;
     flex-direction: column;
     gap: 14px;
@@ -192,6 +260,7 @@ const stars = '★★★★★';
     background: #fff;
     padding: 22px;
     box-shadow: 0 12px 32px rgba(23, 51, 95, 0.07);
+    scroll-snap-align: start;
   }
   .review-head {
     display: flex;
@@ -241,21 +310,21 @@ const stars = '★★★★★';
     .reviews-shell {
       grid-template-columns: 1fr;
     }
-    .reviews-list {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+    .review-card {
+      min-width: min(46vw, 340px);
     }
   }
   @media (max-width: 640px) {
-    .reviews-list {
-      display: flex;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      padding-bottom: 8px;
+    .carousel-top {
+      align-items: flex-start;
+    }
+    .carousel-actions button {
+      width: 38px;
+      height: 38px;
     }
     .review-card {
       min-width: min(86vw, 340px);
       min-height: 250px;
-      scroll-snap-align: start;
     }
     .rating-card {
       max-width: none;
