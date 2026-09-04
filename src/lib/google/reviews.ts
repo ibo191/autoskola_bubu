@@ -131,9 +131,7 @@ export async function loadGoogleReviews(env: Record<string, string | undefined>)
     );
 
     if (!response.ok) {
-      console.warn(
-        `Google reviews fallback: place details failed with ${response.status} ${await response.text()}`,
-      );
+      console.warn(`Google reviews fallback: place details failed with status ${response.status}.`);
       return fallbackGoogleReviews;
     }
 
@@ -191,9 +189,7 @@ async function resolveStrizkovPlaceId(apiKey: string, configuredQuery?: string) 
   });
 
   if (!response.ok) {
-    console.warn(
-      `Google reviews fallback: text search failed with ${response.status} ${await response.text()}`,
-    );
+    console.warn(`Google reviews fallback: text search failed with status ${response.status}.`);
     return undefined;
   }
 
