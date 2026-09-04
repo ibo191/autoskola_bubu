@@ -1,10 +1,11 @@
 import { z } from 'zod';
 import type { BookingRepository, ConsentSnapshot } from './repository';
-import type { CaptchaAdapter, EmailAdapter } from '../integrations/contracts';
+import type { CaptchaAdapter, EmailAdapter, EmailMessage } from '../integrations/contracts';
 import { contactSchema } from '../validation/contact';
 import { quote, selectionSchema } from '../pricing/quote';
 import { createToken } from '../security/tokens';
 import type { RateLimiter } from '../security/rate-limit';
+import { internalNewOrderEmail, orderConfirmationEmail } from '../server/email/templates';
 
 const requestSchema = z
   .object({
@@ -57,6 +58,7 @@ type Dependencies = {
   rateLimiter: RateLimiter;
   legal: OrderLegalSettings;
   origin: string;
+  notificationEmail?: string;
 };
 
 export class CreateOrderService {
@@ -126,12 +128,37 @@ export class CreateOrderService {
     thankYouUrl.searchParams.set('kod', saved.publicCode);
     const manageUrl = new URL('/spravovat-termin', this.dependencies.origin);
     manageUrl.searchParams.set('kod', saved.publicCode);
-    await this.dependencies.email.send({
-      idempotencyKey: `${saved.orderId}:verify-email`,
-      to: parsed.data.contact.email,
-      subject: 'Potvrzení objednávky – Autoškola BuBu',
-      text: `Děkujeme za objednávku v Autoškole BuBu.\n\nČíslo objednávky: ${saved.publicCode}\nPřehled objednávky a termínu zápisu: ${thankYouUrl.href}\nZměna nebo zrušení termínu zápisu: ${manageUrl.href}\n\nPři zápisu se platí nevratná záloha za kurz 5 000 Kč na pobočce, ideálně v hotovosti, případně okamžitým převodem na účet.`,
-    });
+    const emailInput = {
+      orderId: saved.orderId,
+      publicCode: saved.publicCode,
+      contact: parsed.data.contact,
+      selection: parsed.data.selection,
+      price: serverQuote,
+      addons: serverQuote.addons,
+      appointment: {
+        id: saved.appointmentId,
+        startsAt: saved.startsAt,
+        endsAt: saved.endsAt,
+      },
+      createdAt: context.now,
+      thankYouUrl: thankYouUrl.href,
+      manageUrl: manageUrl.href,
+      notificationEmail: this.dependencies.notificationEmail,
+    };
+    const messages = [orderConfirmationEmail(emailInput), internalNewOrderEmail(emailInput)].filter(
+      (message): message is EmailMessage => Boolean(message),
+    );
+    const deliveries = await Promise.allSettled(
+      messages.map((message) => this.dependencies.email.send(message)),
+    );
+    for (const delivery of deliveries) {
+      if (delivery.status === 'rejected')
+        console.warn('email_delivery_failed', {
+          workflow: 'new_order',
+          orderId: saved.orderId,
+          error: delivery.reason instanceof Error ? delivery.reason.message : 'unknown',
+        });
+    }
 
     return { ok: true, ...saved, thankYouUrl: thankYouUrl.href, manageUrl: manageUrl.href };
   }

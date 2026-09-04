@@ -2,7 +2,8 @@ import { readConfig } from '../config';
 import { CreateOrderService, type OrderLegalSettings } from '../booking/create-order';
 import { SupabaseBookingRepository, SupabaseRateLimiter } from '../supabase/booking-repository';
 import { requestFingerprint } from '../security/rate-limit';
-import type { CaptchaAdapter, EmailAdapter } from '../integrations/contracts';
+import type { CaptchaAdapter } from '../integrations/contracts';
+import { createTransactionalEmailAdapter, orderNotificationEmail } from './email';
 
 const termsWording =
   'Souhlasím se všeobecnými obchodními podmínkami Autoškoly BuBu s.r.o. zveřejněnými na webu.';
@@ -12,12 +13,6 @@ const marketingWording =
 class PreviewCaptcha implements CaptchaAdapter {
   async verify(input: { token: string; action: string }) {
     return input.token === 'preview-order-submission';
-  }
-}
-
-class PreviewEmail implements EmailAdapter {
-  async send() {
-    /* E-mail provider is intentionally not enabled for the live preview. */
   }
 }
 
@@ -37,10 +32,11 @@ export function createLiveOrderService(env: Record<string, string | undefined>) 
   return new CreateOrderService({
     repository: new SupabaseBookingRepository(env),
     captcha: new PreviewCaptcha(),
-    email: new PreviewEmail(),
+    email: createTransactionalEmailAdapter(env),
     rateLimiter: new SupabaseRateLimiter(env),
     legal: legalSettings,
     origin: config.APP_ORIGIN,
+    notificationEmail: orderNotificationEmail(env),
   });
 }
 

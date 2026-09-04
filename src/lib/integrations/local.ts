@@ -37,6 +37,7 @@ export class LocalEmail implements EmailAdapter {
   async send(message: EmailMessage) {
     if (!this.messages.has(message.idempotencyKey))
       this.messages.set(message.idempotencyKey, { ...message });
+    return { status: 'local' };
   }
 }
 export class NoopAnalytics implements AnalyticsAdapter {

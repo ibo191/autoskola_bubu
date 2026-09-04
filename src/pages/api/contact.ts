@@ -1,6 +1,11 @@
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { assertSameOrigin } from '../../lib/server/live-order';
+import {
+  createTransactionalEmailAdapter,
+  isTransactionalEmailConfigured,
+} from '../../lib/server/email';
+import { contactFormEmail } from '../../lib/server/email/templates';
 
 export const prerender = false;
 
@@ -34,36 +39,33 @@ export const POST: APIRoute = async ({ request }) => {
     if (!parsed.success) {
       return Response.json({ ok: false, code: 'INVALID_REQUEST' }, { status: 422 });
     }
-
-    const webhook = process.env.CONTACT_WEBHOOK_URL;
-    if (!webhook) {
+    if (!isTransactionalEmailConfigured(process.env)) {
       return Response.json(
         { ok: false, code: 'CONTACT_NOT_CONFIGURED' },
         { status: 503, headers: { 'Cache-Control': 'no-store' } },
       );
     }
 
-    const to =
-      process.env.GENERAL_CONTACT_EMAIL ?? process.env.CONTACT_TO_EMAIL ?? 'info@autoskolabubu.cz';
-    const response = await fetch(webhook, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        to,
-        subject: `Obecný dotaz z webu – ${parsed.data.subject}`,
+    await createTransactionalEmailAdapter(process.env).send(
+      contactFormEmail({
+        to:
+          process.env.GENERAL_CONTACT_EMAIL ??
+          process.env.CONTACT_TO_EMAIL ??
+          'info@autoskolabubu.cz',
+        source: 'contact-page',
         name: parsed.data.name,
         email: parsed.data.email,
         phone: parsed.data.phone,
+        subject: parsed.data.subject,
         message: parsed.data.message,
-        source: 'contact-page',
       }),
-      signal: AbortSignal.timeout(10000),
-      redirect: 'error',
-    });
-    if (!response.ok) throw new Error('Contact webhook failed');
+    );
     return Response.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     if (error instanceof Response) return error;
+    console.warn('contact_email_failed', {
+      error: error instanceof Error ? error.message : 'unknown',
+    });
     return Response.json(
       { ok: false, code: 'CONTACT_FAILED' },
       { status: 503, headers: { 'Cache-Control': 'no-store' } },

@@ -76,6 +76,7 @@ function fixture(overrides: Partial<{ legal: OrderLegalSettings }> = {}) {
     rateLimiter,
     legal: overrides.legal ?? legal,
     origin: 'http://127.0.0.1:4321',
+    notificationEmail: 'orders@example.invalid',
   });
   const execute = (body: unknown = baseBody, at = now) =>
     service.execute({ body, hostname: '127.0.0.1', clientFingerprint: 'hashed-client', now: at });
@@ -88,7 +89,7 @@ test('order workflow fails closed while legal texts are not approved', async () 
   assert.equal(f.repository.calls.length, 0);
 });
 
-test('order workflow recalculates price, stores a hash, then sends one verification message', async () => {
+test('order workflow recalculates price, stores a hash, then sends customer and internal order messages', async () => {
   const f = fixture();
   const captchaToken = f.captcha.issue('create_order', now);
   const result = await f.execute({ ...baseBody, captchaToken });
@@ -98,9 +99,17 @@ test('order workflow recalculates price, stores a hash, then sends one verificat
   assert.match(f.repository.calls[0]?.verificationHash ?? '', /^[a-f0-9]{64}$/);
   assert.equal(f.repository.calls[0]?.terms.accepted, true);
   assert.equal(f.repository.calls[0]?.marketing.accepted, false);
-  assert.equal(f.email.messages.size, 1);
-  const message = [...f.email.messages.values()][0];
-  assert.equal(message?.to, 'fixture@example.invalid');
+  assert.equal(f.email.messages.size, 2);
+  const customer = [...f.email.messages.values()].find(
+    (item) => item.to === 'fixture@example.invalid',
+  );
+  const internal = [...f.email.messages.values()].find(
+    (item) => item.to === 'orders@example.invalid',
+  );
+  assert.ok(customer);
+  assert.ok(internal);
+  assert.equal(internal.replyTo, 'fixture@example.invalid');
+  const message = customer;
   assert.match(message?.text ?? '', /BUBU-TEST1234/);
   assert.match(message?.text ?? '', /\/dekujeme\?kod=BUBU-TEST1234/);
   assert.match(message?.text ?? '', /\/spravovat-termin\?kod=BUBU-TEST1234/);

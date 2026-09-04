@@ -2,6 +2,11 @@ import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { branches, branchId } from '../../lib/catalog';
 import { assertSameOrigin } from '../../lib/server/live-order';
+import {
+  createTransactionalEmailAdapter,
+  isTransactionalEmailConfigured,
+} from '../../lib/server/email';
+import { contactFormEmail } from '../../lib/server/email/templates';
 
 export const prerender = false;
 
@@ -33,33 +38,31 @@ export const POST: APIRoute = async ({ request }) => {
     const parsed = bodySchema.safeParse(await readJson(request));
     if (!parsed.success)
       return Response.json({ ok: false, code: 'INVALID_REQUEST' }, { status: 422 });
-    const branch = branches.find((item) => item.id === parsed.data.branch)!;
-    const webhook = process.env.CONTACT_WEBHOOK_URL;
-    if (!webhook) {
+    if (!isTransactionalEmailConfigured(process.env)) {
       return Response.json(
         { ok: false, code: 'CONTACT_NOT_CONFIGURED' },
         { status: 503, headers: { 'Cache-Control': 'no-store' } },
       );
     }
-    const response = await fetch(webhook, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    const branch = branches.find((item) => item.id === parsed.data.branch)!;
+    await createTransactionalEmailAdapter(process.env).send(
+      contactFormEmail({
         to: branch.email,
-        subject: `Dotaz z webu – ${branch.name}`,
+        source: `branch-contact:${branch.id}`,
+        branch: branch.id,
         name: parsed.data.name,
         email: parsed.data.email,
         phone: parsed.data.phone,
+        subject: branch.name,
         message: parsed.data.message,
-        branch: branch.id,
       }),
-      signal: AbortSignal.timeout(10000),
-      redirect: 'error',
-    });
-    if (!response.ok) throw new Error('Contact webhook failed');
+    );
     return Response.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     if (error instanceof Response) return error;
+    console.warn('branch_contact_email_failed', {
+      error: error instanceof Error ? error.message : 'unknown',
+    });
     return Response.json(
       { ok: false, code: 'CONTACT_FAILED' },
       { status: 503, headers: { 'Cache-Control': 'no-store' } },

@@ -24,6 +24,22 @@ export function branchLabel(id: string) {
   return branches.find((item) => item.id === id)?.name ?? id;
 }
 
+export function packageLabel(id?: string) {
+  switch (id) {
+    case 'moto-basic':
+      return 'Moto základ';
+    case 'moto-confidence':
+      return 'Moto Jistota';
+    case 'supplement':
+      return 'Doplňovací zkouška';
+    case 'single':
+    case undefined:
+      return 'Samostatný kurz';
+    default:
+      return id;
+  }
+}
+
 export function orderTotal(order: PublicOrderOverview) {
   return money(order.price.amount);
 }

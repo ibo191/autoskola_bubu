@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/email-reminders",
+      "schedule": "0 5-8 * * *"
+    },
+    {
+      "path": "/api/cron/daily-report",
+      "schedule": "0 5-8 * * *"
+    },
+    {
+      "path": "/api/cron/monthly-report",
+      "schedule": "15 5-8 * * *"
+    }
+  ]
+}
