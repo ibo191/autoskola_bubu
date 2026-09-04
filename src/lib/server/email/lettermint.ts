@@ -31,6 +31,12 @@ export class LettermintEmailAdapter implements EmailAdapter {
         text: message.text,
         tag: message.tag,
         metadata: message.metadata,
+        attachments: message.attachments?.map((attachment) => ({
+          filename: stripHeader(attachment.filename),
+          content: attachment.content,
+          content_type: attachment.contentType ?? 'application/octet-stream',
+          content_id: attachment.contentId,
+        })),
       }),
       signal: AbortSignal.timeout(12000),
       redirect: 'error',

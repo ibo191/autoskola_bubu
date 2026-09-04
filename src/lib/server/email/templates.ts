@@ -28,6 +28,7 @@ export type CreatedOrderEmailInput = {
   createdAt: Date;
   thankYouUrl: string;
   manageUrl: string;
+  applicationFormUrl: string;
   notificationEmail?: string;
 };
 
@@ -57,7 +58,7 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
   const appointmentText = input.appointment
     ? formatEmailDateTime(input.appointment.startsAt)
     : 'Termín zápisu zatím není vybraný';
-  const body = `<p style="font-size:17px;line-height:1.65;margin:0 0 16px;">Dobrý den, ${escapeHtml(input.contact.firstName)}, děkujeme za objednávku. Níže najdete přehled a další krok.</p>${rows(
+  const body = `<p style="font-size:17px;line-height:1.65;margin:0 0 16px;">Dobrý den, ${escapeHtml(input.contact.firstName)}, děkujeme za objednávku. Níže najdete přehled a co je potřeba připravit před zápisem.</p>${rows(
     [
       ['Číslo objednávky', input.publicCode],
       ['Kurz', courseLabel(input.selection.course)],
@@ -68,7 +69,7 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
       ['Termín zápisu', appointmentText],
       ['Adresa zápisu', branchAddress(input.selection.branch)],
     ],
-  )}<p style="font-size:16px;line-height:1.65;margin:18px 0;"><strong>Při zápisu se platí nevratná záloha za kurz 5&nbsp;000 Kč</strong> na pobočce, ideálně v hotovosti, případně okamžitým převodem na účet.</p><p style="margin:24px 0;"><a href="${escapeHtml(input.thankYouUrl)}" style="display:inline-block;background:#4daeb6;color:#ffffff;text-decoration:none;padding:13px 18px;border-radius:999px;font-weight:700;">Zobrazit objednávku</a> <a href="${escapeHtml(input.manageUrl)}" style="display:inline-block;color:#17345d;text-decoration:underline;margin-left:12px;font-weight:700;">Změnit termín zápisu</a></p><p style="font-size:15px;line-height:1.6;color:#667998;margin:0;">Na zápis si prosím vezměte občanský průkaz, vyplněnou žádost a zdravotní posudek od praktického lékaře.</p>`;
+  )}<section style="background:#f4faf9;border:1px solid #dcebea;border-radius:18px;padding:18px;margin:22px 0;"><h2 style="font-size:19px;margin:0 0 12px;color:#17345d;">Co připravit před zápisem</h2><ol style="padding-left:22px;margin:0;color:#17345d;font-size:15px;line-height:1.7;"><li><strong>Vyplňte přihlášku.</strong> Odkaz ke stažení najdete zde: <a href="${escapeHtml(input.applicationFormUrl)}" style="color:#17345d;font-weight:700;">přihláška k výcviku</a>. Přihlášku přikládáme také jako PDF přílohu. Vyplňte prosím první část dokumentu označenou „Vyplňuje žadatel“. Vyplněnou první stranu nám pošlete odpovědí na tento e-mail. Originál si uschovejte a přineste jej osobně při zahájení výuky.</li><li style="margin-top:12px;"><strong>Vyřiďte zdravotní posudek.</strong> Pro zahájení kurzu potřebujeme posudek zdravotní způsobilosti. Od 1. 1. 2026 ho vydává pouze váš registrující ošetřující lékař, tedy praktický lékař pro děti a dorost, všeobecný praktický lékař, případně lékař pracovnělékařských služeb.</li><li style="margin-top:12px;"><strong>Doložte zdravotní způsobilost.</strong> Posudek by měl být nově vydáván elektronicky a zapsán do aplikace EZKarta v rámci databáze NZIP. Autoškola do tohoto systému nemá přístup, proto nám posudek doložte jedním z těchto způsobů: požádejte lékaře o písemné potvrzení jako doposud, stáhněte PDF v aplikaci EZKarta a pošlete nám ho e-mailem, nebo PDF vytiskněte a přineste spolu s přihláškou. Informace k EZKartě: <a href="https://www.nzip.cz/ezkarta" style="color:#17345d;font-weight:700;">nzip.cz/ezkarta</a>.</li></ol><p style="font-size:15px;line-height:1.6;color:#17345d;margin:14px 0 0;"><strong>Pozor:</strong> zdravotní posudek nesmí být starší než 3 měsíce.</p></section><p style="font-size:16px;line-height:1.65;margin:18px 0;"><strong>Při zápisu se platí nevratná záloha za kurz 5&nbsp;000 Kč</strong> na pobočce, ideálně v hotovosti, případně okamžitým převodem na účet.</p><p style="margin:24px 0;"><a href="${escapeHtml(input.thankYouUrl)}" style="display:inline-block;background:#4daeb6;color:#ffffff;text-decoration:none;padding:13px 18px;border-radius:999px;font-weight:700;">Zobrazit objednávku</a> <a href="${escapeHtml(input.manageUrl)}" style="display:inline-block;color:#17345d;text-decoration:underline;margin-left:12px;font-weight:700;">Změnit termín zápisu</a></p><p style="font-size:15px;line-height:1.6;color:#667998;margin:0;">Na zápis si prosím vezměte občanský průkaz, originál přihlášky a zdravotní posudek.</p>`;
   const text = [
     `Dobrý den, ${input.contact.firstName}, děkujeme za objednávku v Autoškole BuBu.`,
     '',
@@ -80,6 +81,12 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
     `Celková hodnota objednávky: ${money(input.price.amount)}`,
     `Termín zápisu: ${appointmentText}`,
     `Adresa zápisu: ${branchAddress(input.selection.branch)}`,
+    '',
+    'Co připravit před zápisem:',
+    `1. Vyplňte první část přihlášky označenou „Vyplňuje žadatel“. Přihlášku stáhnete zde: ${input.applicationFormUrl}. PDF přikládáme také jako přílohu. Vyplněnou první stranu nám pošlete odpovědí na tento e-mail. Originál si uschovejte a přineste osobně při zahájení výuky.`,
+    '2. Vyřiďte zdravotní posudek. Od 1. 1. 2026 ho vydává váš registrující ošetřující lékař, tedy praktický lékař pro děti a dorost, všeobecný praktický lékař, případně lékař pracovnělékařských služeb.',
+    '3. Autoškola nemá přístup do EZKarty ani databáze NZIP. Zdravotní způsobilost doložte písemným potvrzením od lékaře, PDF souborem z EZKarty zaslaným e-mailem, nebo vytištěným PDF z EZKarty přineseným spolu s přihláškou. Informace: https://www.nzip.cz/ezkarta',
+    'Pozor: zdravotní posudek nesmí být starší než 3 měsíce.',
     '',
     `Přehled objednávky: ${input.thankYouUrl}`,
     `Změna nebo zrušení termínu zápisu: ${input.manageUrl}`,
@@ -105,7 +112,6 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
     },
   };
 }
-
 export function internalNewOrderEmail(input: CreatedOrderEmailInput): EmailMessage | null {
   if (!input.notificationEmail) return null;
   const appointmentText = input.appointment

@@ -43,6 +43,7 @@ export interface EmailMessage {
   scheduledFor?: string;
   reportDate?: string;
   reportMonth?: string;
+  attachments?: { filename: string; content: string; contentType?: string; contentId?: string }[];
 }
 export type EmailSendResult = { providerMessageId?: string | null; status?: string | null };
 export interface EmailAdapter {

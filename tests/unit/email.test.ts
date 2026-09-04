@@ -52,6 +52,7 @@ const orderInput = {
   createdAt: new Date('2026-09-01T10:00:00.000Z'),
   thankYouUrl: 'https://example.invalid/dekujeme?kod=BUBU-TEST1234',
   manageUrl: 'https://example.invalid/spravovat-termin?kod=BUBU-TEST1234',
+  applicationFormUrl: 'https://example.invalid/dokumenty/prihlaska-k-vycviku.pdf',
   notificationEmail: 'orders@example.invalid',
 };
 

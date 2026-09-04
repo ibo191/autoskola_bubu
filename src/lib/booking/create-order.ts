@@ -5,6 +5,7 @@ import { contactSchema } from '../validation/contact';
 import { quote, selectionSchema } from '../pricing/quote';
 import { createToken } from '../security/tokens';
 import type { RateLimiter } from '../security/rate-limit';
+import { applicationFormAttachment, APPLICATION_FORM_URL_PATH } from '../server/email/attachments';
 import { internalNewOrderEmail, orderConfirmationEmail } from '../server/email/templates';
 
 const requestSchema = z
@@ -143,9 +144,20 @@ export class CreateOrderService {
       createdAt: context.now,
       thankYouUrl: thankYouUrl.href,
       manageUrl: manageUrl.href,
+      applicationFormUrl: new URL(APPLICATION_FORM_URL_PATH, this.dependencies.origin).href,
       notificationEmail: this.dependencies.notificationEmail,
     };
-    const messages = [orderConfirmationEmail(emailInput), internalNewOrderEmail(emailInput)].filter(
+    const customerMessage = orderConfirmationEmail(emailInput);
+    try {
+      customerMessage.attachments = [await applicationFormAttachment()];
+    } catch (error) {
+      console.warn('email_attachment_missing', {
+        workflow: 'new_order',
+        orderId: saved.orderId,
+        error: error instanceof Error ? error.message : 'unknown',
+      });
+    }
+    const messages = [customerMessage, internalNewOrderEmail(emailInput)].filter(
       (message): message is EmailMessage => Boolean(message),
     );
     const deliveries = await Promise.allSettled(
