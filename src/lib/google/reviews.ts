@@ -33,6 +33,18 @@ const placeDetailsSchema = z.object({
     .optional(),
 });
 
+const placeSearchSchema = z.object({
+  places: z
+    .array(
+      z.object({
+        id: z.string().optional(),
+      }),
+    )
+    .optional(),
+});
+
+const defaultStrizkovPlaceQuery = 'Autoškola BuBu Střížkov U Kapliček 34 Praha 8';
+
 export type GoogleReview = {
   id: string;
   authorName: string;
@@ -90,10 +102,16 @@ export const fallbackGoogleReviews: GoogleReviewsPayload = {
 
 export async function loadGoogleReviews(env: Record<string, string | undefined>) {
   const apiKey = env.GOOGLE_PLACES_API_KEY;
-  const placeId = env.GOOGLE_PLACE_ID_STRIZKOV || env.GOOGLE_REVIEWS_PLACE_ID;
-  if (!apiKey || !placeId) return fallbackGoogleReviews;
+  if (!apiKey) return fallbackGoogleReviews;
 
   try {
+    const placeId =
+      env.GOOGLE_PLACE_ID_STRIZKOV ||
+      env.GOOGLE_REVIEWS_PLACE_ID ||
+      (await resolveStrizkovPlaceId(apiKey, env.GOOGLE_PLACE_QUERY_STRIZKOV));
+
+    if (!placeId) return fallbackGoogleReviews;
+
     const response = await fetch(
       `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}?languageCode=cs&regionCode=CZ`,
       {
@@ -139,4 +157,27 @@ export async function loadGoogleReviews(env: Record<string, string | undefined>)
   } catch {
     return fallbackGoogleReviews;
   }
+}
+
+async function resolveStrizkovPlaceId(apiKey: string, configuredQuery?: string) {
+  const response = await fetch('https://places.googleapis.com/v1/places:searchText', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Goog-Api-Key': apiKey,
+      'X-Goog-FieldMask': 'places.id',
+    },
+    body: JSON.stringify({
+      textQuery: configuredQuery || defaultStrizkovPlaceQuery,
+      languageCode: 'cs',
+      regionCode: 'CZ',
+      pageSize: 1,
+    }),
+    signal: AbortSignal.timeout(8000),
+  });
+
+  if (!response.ok) return undefined;
+
+  const searchResult = placeSearchSchema.parse(await response.json());
+  return searchResult.places?.find((place) => place.id)?.id;
 }
