@@ -102,7 +102,10 @@ export const fallbackGoogleReviews: GoogleReviewsPayload = {
 
 export async function loadGoogleReviews(env: Record<string, string | undefined>) {
   const apiKey = env.GOOGLE_PLACES_API_KEY;
-  if (!apiKey) return fallbackGoogleReviews;
+  if (!apiKey) {
+    console.warn('Google reviews fallback: GOOGLE_PLACES_API_KEY is missing.');
+    return fallbackGoogleReviews;
+  }
 
   try {
     const placeId =
@@ -110,7 +113,10 @@ export async function loadGoogleReviews(env: Record<string, string | undefined>)
       env.GOOGLE_REVIEWS_PLACE_ID ||
       (await resolveStrizkovPlaceId(apiKey, env.GOOGLE_PLACE_QUERY_STRIZKOV));
 
-    if (!placeId) return fallbackGoogleReviews;
+    if (!placeId) {
+      console.warn('Google reviews fallback: place id could not be resolved.');
+      return fallbackGoogleReviews;
+    }
 
     const response = await fetch(
       `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}?languageCode=cs&regionCode=CZ`,
@@ -124,7 +130,12 @@ export async function loadGoogleReviews(env: Record<string, string | undefined>)
       },
     );
 
-    if (!response.ok) return fallbackGoogleReviews;
+    if (!response.ok) {
+      console.warn(
+        `Google reviews fallback: place details failed with ${response.status} ${await response.text()}`,
+      );
+      return fallbackGoogleReviews;
+    }
 
     const place = placeDetailsSchema.parse(await response.json());
     const reviews = (place.reviews ?? [])
@@ -154,7 +165,10 @@ export async function loadGoogleReviews(env: Record<string, string | undefined>)
       googleMapsUri: place.googleMapsUri ?? fallbackGoogleReviews.googleMapsUri,
       reviews: reviews.length ? reviews : fallbackGoogleReviews.reviews,
     } satisfies GoogleReviewsPayload;
-  } catch {
+  } catch (error) {
+    console.warn(
+      `Google reviews fallback: ${error instanceof Error ? error.message : 'unknown error'}`,
+    );
     return fallbackGoogleReviews;
   }
 }
@@ -176,7 +190,12 @@ async function resolveStrizkovPlaceId(apiKey: string, configuredQuery?: string) 
     signal: AbortSignal.timeout(8000),
   });
 
-  if (!response.ok) return undefined;
+  if (!response.ok) {
+    console.warn(
+      `Google reviews fallback: text search failed with ${response.status} ${await response.text()}`,
+    );
+    return undefined;
+  }
 
   const searchResult = placeSearchSchema.parse(await response.json());
   return searchResult.places?.find((place) => place.id)?.id;
