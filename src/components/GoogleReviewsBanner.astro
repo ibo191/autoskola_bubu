@@ -6,52 +6,61 @@ const stars = '★★★★★';
 ---
 
 <section class="section google-reviews" data-reveal data-google-reviews>
-  <div class="container reviews-shell">
-    <div class="reviews-copy">
-      <span class="eyebrow">Google recenze</span>
-      <h2>Žáci oceňují klid, respekt a&nbsp;jasný plán.</h2>
-      <p>
-        Hned po tom, co ukazujeme náš přístup, dáváme prostor zkušenostem žáků. Recenze načítáme z
-        veřejného Google profilu pobočky Autoškola BuBu Střížkov a všechny si můžete otevřít přímo
-        na Google.
-      </p>
-      <div class="rating-card">
-        <span class="google-label">Google</span>
-        <strong data-rating>{fallback.rating.toFixed(1).replace('.', ',')}</strong>
-        <span class="stars" aria-label={`${fallback.rating} z 5 hvězdiček`}>{stars}</span>
-        <a data-google-link href={fallback.googleMapsUri} target="_blank" rel="noopener noreferrer">
-          Zobrazit všechny recenze na Google ↗
+  <div class="container">
+    <div class="google-board">
+      <div class="google-summary">
+        <span class="eyebrow">Google recenze</span>
+        <div class="google-logo" aria-label="Google">
+          <span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span>
+        </div>
+        <h2>Žáci oceňují klid, respekt a&nbsp;jasný plán.</h2>
+        <div class="rating-row">
+          <strong data-rating>{fallback.rating.toFixed(1).replace('.', ',')}</strong>
+          <span class="stars" aria-label={`${fallback.rating} z 5 hvězdiček`}>{stars}</span>
+          <span class="review-count" data-review-count>{fallback.userRatingCount} recenzí</span>
+        </div>
+        <p>Reálné recenze načítáme z veřejného Google profilu pobočky Autoškola BuBu Střížkov.</p>
+        <a
+          class="all-reviews"
+          data-google-link
+          href={fallback.googleMapsUri}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Zobrazit všechny recenze na Google
+          <span aria-hidden="true">↗</span>
         </a>
       </div>
-    </div>
-    <div class="reviews-carousel">
-      <div class="carousel-top">
-        <span>Co o nás říkají žáci</span>
-        <div class="carousel-actions" aria-label="Posun recenzí">
-          <button type="button" data-reviews-prev aria-label="Předchozí recenze">←</button>
-          <button type="button" data-reviews-next aria-label="Další recenze">→</button>
+
+      <div class="reviews-panel">
+        <div class="carousel-top">
+          <span>Nejnovější zkušenosti žáků</span>
+          <div class="carousel-actions" aria-label="Posun recenzí">
+            <button type="button" data-reviews-prev aria-label="Předchozí recenze">←</button>
+            <button type="button" data-reviews-next aria-label="Další recenze">→</button>
+          </div>
         </div>
-      </div>
-      <div class="reviews-list" data-reviews-list>
-        {
-          fallbackReviews.map((review) => (
-            <article class="review-card">
-              <div class="review-head">
-                <div class="avatar" aria-hidden="true">
-                  {review.authorName.charAt(0)}
+        <div class="reviews-list" data-reviews-list>
+          {
+            fallbackReviews.map((review) => (
+              <article class="review-card">
+                <div class="review-head">
+                  <div class="avatar" aria-hidden="true">
+                    {review.authorName.charAt(0)}
+                  </div>
+                  <div>
+                    <strong>{review.authorName}</strong>
+                    <span>{review.relativeTime}</span>
+                  </div>
                 </div>
-                <div>
-                  <strong>{review.authorName}</strong>
-                  <span>{review.relativeTime}</span>
-                </div>
-              </div>
-              <span class="stars" aria-label={`${review.rating} z 5 hvězdiček`}>
-                {stars.slice(0, Math.round(review.rating))}
-              </span>
-              <p>{review.text}</p>
-            </article>
-          ))
-        }
+                <span class="stars" aria-label={`${review.rating} z 5 hvězdiček`}>
+                  {stars.slice(0, Math.round(review.rating))}
+                </span>
+                <p>{review.text}</p>
+              </article>
+            ))
+          }
+        </div>
       </div>
     </div>
   </div>
@@ -81,6 +90,7 @@ const stars = '★★★★★';
   const section = document.querySelector<HTMLElement>('[data-google-reviews]');
   const list = section?.querySelector<HTMLElement>('[data-reviews-list]');
   const rating = section?.querySelector<HTMLElement>('[data-rating]');
+  const count = section?.querySelector<HTMLElement>('[data-review-count]');
   const link = section?.querySelector<HTMLAnchorElement>('[data-google-link]');
   const prev = section?.querySelector<HTMLButtonElement>('[data-reviews-prev]');
   const next = section?.querySelector<HTMLButtonElement>('[data-reviews-next]');
@@ -118,8 +128,15 @@ const stars = '★★★★★';
     </article>`;
   };
 
+  const cardStep = () => {
+    const firstCard = list?.querySelector<HTMLElement>('.review-card');
+    if (!firstCard || !list) return 380;
+    const gap = Number.parseFloat(getComputedStyle(list).columnGap || '18') || 18;
+    return firstCard.getBoundingClientRect().width + gap;
+  };
+
   const loadReviews = async () => {
-    if (!section || !list || !rating || !link) return;
+    if (!section || !list || !rating || !count || !link) return;
     try {
       const response = await fetch('/api/google-reviews', {
         headers: { Accept: 'application/json' },
@@ -127,8 +144,9 @@ const stars = '★★★★★';
       if (!response.ok) return;
       const data = (await response.json()) as ReviewsPayload;
       rating.textContent = data.rating.toFixed(1).replace('.', ',');
+      count.textContent = `${data.userRatingCount} recenzí`;
       link.href = data.googleMapsUri;
-      link.textContent = `Zobrazit všech ${data.userRatingCount} recenzí na Google ↗`;
+      link.innerHTML = `Zobrazit všech ${data.userRatingCount} recenzí na Google <span aria-hidden="true">↗</span>`;
       if (data.reviews.length) list.innerHTML = data.reviews.slice(0, 5).map(renderReview).join('');
     } catch {
       /* The static fallback stays visible when Google reviews are unavailable. */
@@ -136,11 +154,11 @@ const stars = '★★★★★';
   };
 
   prev?.addEventListener('click', () => {
-    list?.scrollBy({ left: -360, behavior: 'smooth' });
+    list?.scrollBy({ left: -cardStep(), behavior: 'smooth' });
   });
 
   next?.addEventListener('click', () => {
-    list?.scrollBy({ left: 360, behavior: 'smooth' });
+    list?.scrollBy({ left: cardStep(), behavior: 'smooth' });
   });
 
   loadReviews();
@@ -148,56 +166,112 @@ const stars = '★★★★★';
 
 <style>
   .google-reviews {
-    background: linear-gradient(135deg, #ffffff 0%, #f3f8f7 58%, #e0f4f0 100%);
+    background: #f8fafc;
     border-block: 1px solid var(--line);
   }
-  .reviews-shell {
+  .google-board {
     display: grid;
-    grid-template-columns: 0.82fr 1.18fr;
-    gap: clamp(28px, 5vw, 64px);
-    align-items: center;
-  }
-  .reviews-copy p {
-    max-width: 520px;
-    margin-top: 18px;
-  }
-  .rating-card {
-    display: grid;
-    gap: 8px;
-    max-width: 320px;
-    margin-top: 28px;
-    border: 1px solid rgba(74, 185, 171, 0.35);
-    border-radius: var(--radius);
+    grid-template-columns: minmax(280px, 0.42fr) minmax(0, 0.58fr);
+    gap: clamp(22px, 4vw, 44px);
+    align-items: stretch;
+    border: 1px solid #dadce0;
+    border-radius: 28px;
     background: #fff;
-    padding: 24px;
-    box-shadow: var(--shadow);
+    padding: clamp(20px, 4vw, 34px);
+    box-shadow: 0 18px 48px rgba(60, 64, 67, 0.12);
   }
-  .google-label {
-    color: var(--muted);
-    font-size: 0.74rem;
-    font-weight: 850;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+  .google-summary {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
   }
-  .rating-card strong {
+  .google-logo {
+    display: flex;
+    align-items: center;
+    margin-top: 12px;
+    font-family: Arial, sans-serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    letter-spacing: -0.06em;
+    line-height: 1;
+  }
+  .google-logo span:nth-child(1),
+  .google-logo span:nth-child(4) {
+    color: #4285f4;
+  }
+  .google-logo span:nth-child(2),
+  .google-logo span:nth-child(6) {
+    color: #ea4335;
+  }
+  .google-logo span:nth-child(3) {
+    color: #fbbc05;
+  }
+  .google-logo span:nth-child(5) {
+    color: #34a853;
+  }
+  .google-summary h2 {
+    max-width: 430px;
+    margin-top: 14px;
     color: var(--ink);
-    font-size: 3.7rem;
-    line-height: 0.95;
+    font-size: clamp(1.65rem, 3vw, 2.6rem);
+  }
+  .google-summary p {
+    max-width: 430px;
+    margin-top: 16px;
+    color: #5f6368;
+    font-size: 0.94rem;
+  }
+  .rating-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .rating-row strong {
+    color: #202124;
+    font-size: 2.2rem;
+    line-height: 1;
   }
   .stars {
-    color: #f5ad2d;
+    color: #fbbc04;
     font-size: 1rem;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.04em;
     white-space: nowrap;
   }
-  .rating-card a,
+  .review-count {
+    color: #5f6368;
+    font-size: 0.92rem;
+    font-weight: 650;
+  }
+  .all-reviews,
   .review-link {
-    color: var(--brand-dark);
-    font-size: 0.86rem;
-    font-weight: 800;
+    color: #1a73e8;
+    font-size: 0.9rem;
+    font-weight: 750;
     text-decoration: none;
   }
-  .reviews-carousel {
+  .all-reviews {
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    gap: 8px;
+    margin-top: 22px;
+    border: 1px solid #dadce0;
+    border-radius: 999px;
+    padding: 11px 16px;
+    transition:
+      background 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  .all-reviews:hover {
+    border-color: #c6dafc;
+    background: #f1f6ff;
+    box-shadow: 0 6px 18px rgba(26, 115, 232, 0.12);
+  }
+  .reviews-panel {
     min-width: 0;
   }
   .carousel-top {
@@ -205,13 +279,13 @@ const stars = '★★★★★';
     justify-content: space-between;
     align-items: center;
     gap: 16px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
   .carousel-top span {
-    color: var(--ink);
-    font-size: 0.86rem;
-    font-weight: 850;
-    letter-spacing: 0.08em;
+    color: #5f6368;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.09em;
     text-transform: uppercase;
   }
   .carousel-actions {
@@ -220,46 +294,48 @@ const stars = '★★★★★';
   }
   .carousel-actions button {
     display: grid;
-    width: 42px;
-    height: 42px;
+    width: 38px;
+    height: 38px;
     place-items: center;
-    border: 1px solid rgba(74, 185, 171, 0.42);
+    border: 1px solid #dadce0;
     border-radius: 999px;
     background: #fff;
-    color: var(--brand-dark);
+    color: #3c4043;
     cursor: pointer;
-    font-size: 1.2rem;
-    font-weight: 900;
+    font-size: 1.05rem;
+    font-weight: 850;
     transition:
       transform 0.2s ease,
       background 0.2s ease,
+      border-color 0.2s ease,
       color 0.2s ease;
   }
   .carousel-actions button:hover {
     transform: translateY(-1px);
-    background: var(--brand);
-    color: #fff;
+    border-color: #c6dafc;
+    background: #f1f6ff;
+    color: #1a73e8;
   }
   .reviews-list {
     display: flex;
-    gap: 16px;
+    gap: 18px;
     overflow-x: auto;
-    padding: 4px 4px 18px;
-    scroll-padding-inline: 4px;
+    padding: 4px 2px 18px;
+    scroll-padding-inline: 2px;
     scroll-snap-type: x mandatory;
-    scrollbar-color: rgba(74, 185, 171, 0.7) transparent;
+    scrollbar-color: #dadce0 transparent;
   }
   .review-card {
     display: flex;
-    min-width: min(31vw, 330px);
-    min-height: 270px;
+    flex: 0 0 calc((100% - 18px) / 2);
+    min-height: 300px;
     flex-direction: column;
     gap: 14px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: 1px solid #e0e3e7;
+    border-radius: 18px;
     background: #fff;
-    padding: 22px;
-    box-shadow: 0 12px 32px rgba(23, 51, 95, 0.07);
+    padding: 20px;
+    box-shadow: 0 4px 14px rgba(60, 64, 67, 0.08);
     scroll-snap-align: start;
   }
   .review-head {
@@ -272,11 +348,13 @@ const stars = '★★★★★';
     display: block;
   }
   .review-head strong {
-    font-size: 0.92rem;
+    color: #202124;
+    font-size: 0.94rem;
+    font-weight: 750;
   }
   .review-head span {
-    color: var(--muted);
-    font-size: 0.76rem;
+    color: #70757a;
+    font-size: 0.78rem;
   }
   .avatar {
     display: grid;
@@ -286,9 +364,10 @@ const stars = '★★★★★';
     place-items: center;
     overflow: hidden;
     border-radius: 999px;
-    background: var(--brand-soft);
-    color: var(--brand-dark);
-    font-weight: 900;
+    background: #e8f0fe;
+    color: #1a73e8;
+    font-family: Arial, sans-serif;
+    font-weight: 800;
   }
   .avatar img {
     width: 100%;
@@ -300,34 +379,43 @@ const stars = '★★★★★';
     overflow: hidden;
     margin-top: 0;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 6;
-    font-size: 0.9rem;
+    -webkit-line-clamp: 7;
+    color: #3c4043;
+    font-size: 0.92rem;
+    line-height: 1.65;
   }
   .review-link {
     margin-top: auto;
   }
   @media (max-width: 980px) {
-    .reviews-shell {
+    .google-board {
       grid-template-columns: 1fr;
     }
-    .review-card {
-      min-width: min(46vw, 340px);
+    .google-summary h2,
+    .google-summary p {
+      max-width: 640px;
     }
   }
   @media (max-width: 640px) {
+    .google-board {
+      border-radius: 22px;
+      padding: 20px;
+    }
     .carousel-top {
       align-items: flex-start;
     }
     .carousel-actions button {
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
     }
     .review-card {
-      min-width: min(86vw, 340px);
-      min-height: 250px;
+      flex-basis: min(86vw, 340px);
+      min-height: 270px;
     }
-    .rating-card {
-      max-width: none;
+    .all-reviews {
+      width: 100%;
+      justify-content: center;
+      text-align: center;
     }
   }
 </style>
