@@ -2,7 +2,7 @@
 export const prerender = true;
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import car from '../assets/car.jpg';
+import manualCar from '../assets/courses/b-manual.webp';
 import CourseCard from '../components/CourseCard.astro';
 import Roadmap from '../components/Roadmap.astro';
 import BranchCards from '../components/BranchCards.astro';
@@ -32,7 +32,7 @@ import { getCourse } from '../lib/catalog';
         </div>
       </div><div class="hero-visual">
         <div class="photo-label">VAŠE CESTA ZAČÍNÁ TADY <span>↗</span></div><Image
-          src={car}
+          src={manualCar}
           alt="Bílá Škoda Fabia Autoškoly BuBu připravená na výcvik"
           widths={[480, 768, 1080]}
           sizes="(max-width:640px) 90vw, 48vw"

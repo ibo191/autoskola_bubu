@@ -10,10 +10,7 @@ export type TrackingEvent = {
 };
 
 export type CampaignTrackingName =
-  | 'campaign_view'
-  | 'campaign_cta_click'
-  | 'campaign_form_start'
-  | 'campaign_form_submit';
+  'campaign_view' | 'campaign_cta_click' | 'campaign_form_start' | 'campaign_form_submit';
 
 function safeEvent(input: TrackingEvent) {
   return {

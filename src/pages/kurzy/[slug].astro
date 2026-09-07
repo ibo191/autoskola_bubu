@@ -12,7 +12,8 @@ import {
   money,
   type Course,
 } from '../../lib/catalog';
-import car from '../../assets/car.jpg';
+import manualCar from '../../assets/courses/b-manual.webp';
+import automaticCar from '../../assets/courses/b-automatic.webp';
 import moto from '../../assets/moto.jpeg';
 import trailer from '../../assets/trailer.jpeg';
 export const prerender = true;
@@ -23,7 +24,14 @@ interface Props {
   course: Course;
 }
 const { course } = Astro.props;
-const photo = course.category === 'auto' ? car : course.category === 'moto' ? moto : trailer;
+const photo =
+  course.id === 'b-automat'
+    ? automaticCar
+    : course.category === 'auto'
+      ? manualCar
+      : course.category === 'moto'
+        ? moto
+        : trailer;
 const availableBranches = branches.filter((b) => availableAt(course, b.id));
 const minPrice = Math.min(...availableBranches.map((b) => displayPrice(course, b.id)));
 const categoryLabel =
@@ -145,11 +153,13 @@ const schema = {
           </p>
         </div><Image
           src={photo}
-          alt={course.category === 'moto'
-            ? 'Výcvikové motocykly Autoškoly BuBu'
-            : course.category === 'prives'
-              ? 'Výcviková souprava s přívěsem'
-              : 'Auto Autoškoly BuBu pro praktický výcvik'}
+          alt={course.id === 'b-automat'
+            ? 'Černé auto Autoškoly BuBu pro výcvik na automat'
+            : course.category === 'auto'
+              ? 'Bílé auto Autoškoly BuBu pro manuální výcvik skupiny B'
+              : course.category === 'moto'
+                ? 'Výcvikové motocykly Autoškoly BuBu'
+                : 'Výcviková souprava s přívěsem'}
           widths={[480, 800]}
           sizes="(max-width:640px) 90vw,45vw"
           format="webp"

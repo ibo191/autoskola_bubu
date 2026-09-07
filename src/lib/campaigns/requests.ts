@@ -62,7 +62,10 @@ export class CampaignRequestRepository {
     };
   }
 
-  async create(input: CampaignRequestInput, meta: { amountDueCzk?: number | null; sourceUrl: string }) {
+  async create(
+    input: CampaignRequestInput,
+    meta: { amountDueCzk?: number | null; sourceUrl: string },
+  ) {
     const response = await fetch(`${this.restBase}campaign_requests`, {
       method: 'POST',
       headers: this.headers({ Prefer: 'return=representation' }),

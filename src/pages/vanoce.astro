@@ -6,138 +6,308 @@ import { branches, money } from '../lib/catalog';
 import { campaignConsent } from '../lib/campaigns/requests';
 
 const courses = campaignCourseOptions();
+const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze zálohu ${money(christmasCampaign.depositCzk)} a my vám připravíme fyzický poukaz jako dárek.`;
 ---
 
 <Base
   title="Vánoční poukaz Autoškola BuBu – darujte řidičák bez stresu"
-  description="Vánoční poukaz Autoškoly BuBu. Rezervujte dárek s budoucí zálohou 5 000 Kč, balením a doručením za 200 Kč a bonusem až 1 800 Kč."
+  description="Vánoční poukaz Autoškoly BuBu. Rezervujte dárek se zálohou 5 000 Kč, dárkovým balením a bonusem až 1 800 Kč."
 >
-  <main class="campaign-page christmas-page" data-campaign="vanoce">
-    <section class="campaign-hero christmas-hero">
-      <div class="container hero-grid">
-        <div class="hero-copy">
-          <span class="campaign-kicker">Vánoce v BuBu</span>
-          <h1>{christmasCampaign.headline}</h1>
-          <p class="lead">
-            Dárkový poukaz je pro člověka, kterému chcete pomoct udělat velký krok v klidu. Bez
-            tlačení, bez chaosu, s jasným plánem a lidským přístupem.
-          </p>
-          <div class="campaign-badges festive" aria-label="Vánoční nabídka">
-            <span>{christmasCampaign.badge}</span>
-            <span>Záloha {money(christmasCampaign.depositCzk)}</span>
-            <span>Balení a doručení {money(christmasCampaign.packagingAndDeliveryCzk)}</span>
+  <main class="christmas-page" data-campaign="vanoce">
+    <section class="xmas-hero">
+      <div class="snow snow-a">❄</div><div class="snow snow-b">❄</div><div class="snow snow-c">
+        ✦
+      </div>
+      <div class="container xmas-hero-grid">
+        <div class="xmas-copy">
+          <span class="xmas-kicker">Vánoce v BUBU</span>
+          <h1>Darujte letos <span>řidičák bez stresu.</span></h1>
+          <p class="xmas-lead">{heroPerex}</p>
+          <div class="deposit-box">
+            <span class="coin-icon">▣</span>
+            <div>
+              <strong
+                >{money(christmasCampaign.depositCzk)} záloha na kurz + {
+                  money(christmasCampaign.packagingAndDeliveryCzk)
+                } dárkové balení a doručení</strong
+              ><small>Zálohu následně v plné výši odečteme z ceny kurzu.</small>
+            </div>
           </div>
-          <div class="actions">
-            <a class="btn primary" href="#poukaz-form">{christmasCampaign.cta} ↗</a>
-            <a class="btn secondary" href="#bonusy">Vybrat bonus</a>
+          <div class="xmas-actions">
+            <a class="btn primary gift-btn" href="#poukaz-form">Chci darovat řidičák →</a>
+            <a class="bonus-pill" href="#bonusy"
+              ><span>🎁</span> + Vánoční bonus <strong>až {money(1800)}</strong></a
+            >
           </div>
-          <p class="fineprint">
-            Online platba bude dopojená později. Formulář teď slouží jako rezervace poukazu a
-            kontakt pro domluvu.
-          </p>
+          <div class="mini-proof" aria-label="Výhody poukazu">
+            <span>Fyzický poukaz jako dárek</span><span>Platí na všechny pobočky</span><span
+              >Snadné objednání</span
+            >
+          </div>
         </div>
-        <div class="voucher-card" aria-label="Vánoční poukaz Autoškola BuBu">
-          <div class="voucher-ribbon">Dárkový poukaz</div>
-          <img src="/brand/bubak.png" alt="Autoškola BuBu" />
-          <strong>{money(christmasCampaign.onlineTotalCzk)}</strong>
-          <span>plánovaná online platba</span>
-          <p>Záloha se celá odečte z ceny kurzu. Obdarovaný si později vybere vánoční bonus.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="campaign-strip" aria-label="Co poukaz obsahuje">
-      <div class="container strip-grid christmas-strip">
-        <span><strong>Řidičák bez stresu</strong>lidský přístup</span>
-        <span><strong>3 pobočky</strong>Praha 8, Kladno, Statenice</span>
-        <span><strong>Bonus až {money(1800)}</strong>výběr po domluvě</span>
-        <span><strong>Dárek pod stromeček</strong>poukaz s doručením</span>
-      </div>
-    </section>
-
-    <section class="section compact-section">
-      <div class="container">
-        <div class="section-heading center">
-          <span class="eyebrow">Proč darovat BuBu</span>
-          <h2>Dáváte dárek, který se neztratí v šuplíku.</h2>
-        </div>
-        <div class="benefit-grid festive-grid">
-          <article><img src="/icons/ui/mint-safety-heart.webp" alt="" /><h3>Bez stresu</h3><p>Výuka je klidná, přátelská a přizpůsobená tomu, kdo za volantem začíná.</p></article>
-          <article><img src="/icons/ui/mint-calendar.webp" alt="" /><h3>Čas na domluvu</h3><p>Obdarovaný si s námi později vybere pobočku, termín i konkrétní průběh.</p></article>
-          <article><img src="/icons/ui/mint-target.webp" alt="" /><h3>Jasná hodnota</h3><p>{money(christmasCampaign.depositCzk)} je záloha odečtená z kurzu, {money(christmasCampaign.packagingAndDeliveryCzk)} je balení a doručení.</p></article>
-          <article><img src="/icons/ui/mint-smile.webp" alt="" /><h3>Hezký start</h3><p>Poukaz otevře cestu k řidičáku bez pocitu, že už je všechno nalinkované pod tlakem.</p></article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section tinted" id="bonusy">
-      <div class="container narrow">
-        <div class="section-heading center">
-          <span class="eyebrow">Vánoční bonus</span>
-          <h2>Obdarovaný si vybere, co mu pomůže víc.</h2>
-        </div>
-        <div class="bonus-grid">
-          {christmasCampaign.bonusVariants.map((bonus) => (
-            <article>
-              <span>Bonus</span>
-              <h3>{bonus.title}</h3>
-              <strong>Hodnota {money(bonus.valueCzk)}</strong>
-              <p>{bonus.description}</p>
+        <div class="hero-visual" aria-label="Dárkový poukaz Autoškola BuBu">
+          <div class="winter-window"></div>
+          <div class="voucher-scene">
+            <div class="envelope"></div>
+            <article class="voucher-paper">
+              <img src="/brand/logo.png" alt="Autoškola BuBu" />
+              <span>DÁRKOVÝ POUKAZ</span>
+              <strong>na kurz autoškoly</strong>
+              <p>Splňte si své cíle</p>
+              <small>♡</small>
             </article>
-          ))}
+            <div class="car-key"><span>▣</span><span>⌁</span><span>▣</span></div>
+            <img
+              class="bubak-gift"
+              src="/brand/bubak.png"
+              alt="Maskot Autoškoly BuBu s vánočním poukazem"
+            />
+            <div class="gift-box"></div>
+            <p class="hero-note">VÍCE NEŽ JEN ŘIDIČÁK.<br />SVOBODA NA DOSAH.</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="section">
+    <section class="xmas-section soft-blue">
+      <div class="container">
+        <h2 class="center-title">Proč je to dobrý dárek</h2>
+        <div class="reason-grid">
+          <article>
+            <span>🎁</span><h3>Praktický dárek s dlouhodobou hodnotou</h3><p>
+              Nejen radost, ale i investice do budoucnosti.
+            </p>
+          </article>
+          <article>
+            <span>🗓</span><h3>Nemusíte znát přesný termín zahájení</h3><p>
+              Obdarovaný si vybere, kdy začne.
+            </p>
+          </article>
+          <article>
+            <span>☝</span><h3>Jednoduché objednání</h3><p>Vše vyřídíte online za pár minut.</p>
+          </article>
+          <article>
+            <span>☆</span><h3>Bonus navíc před zkouškou</h3><p>
+              Ještě větší jistota na závěrečné zkoušce.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="xmas-section">
+      <div class="container">
+        <h2 class="center-title">Co dostanete</h2>
+        <div class="what-grid">
+          <article>
+            <div class="mini-asset voucher-mini"><span>DÁRKOVÝ POUKAZ</span></div><h3>
+              Fyzický vánoční poukaz
+            </h3><p>Kvalitní tištěný poukaz s vánočním designem.</p>
+          </article>
+          <article>
+            <div class="mini-asset envelope-mini"></div><h3>Dárkové balení</h3><p>
+              Elegantní obálka s vánočním motivem.
+            </p>
+          </article>
+          <article>
+            <div class="mini-asset note-mini">
+              Protože velké cesty začínají malými rozhodnutími. ♡
+            </div><h3>Možnost osobního věnování</h3><p>
+              Přidejte vlastní přání, my ho krásně vytiskneme.
+            </p>
+          </article>
+          <article>
+            <div class="mini-asset bubak-mini"><img src="/brand/bubak.png" alt="" /></div><h3>
+              Speciální bonus před zkouškou
+            </h3><p>Vybere si jeden ze dvou užitečných bonusů.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="xmas-section bonus-section" id="bonusy">
       <div class="container narrow">
-        <div class="section-heading center">
-          <span class="eyebrow">Jak to funguje</span>
-          <h2>Jednoduše, bez platby v této fázi.</h2>
+        <h2 class="center-title">Vyberte si bonus</h2>
+        <div class="bonus-choice-grid">
+          {
+            christmasCampaign.bonusVariants.map((bonus, index) => (
+              <label class:list={['bonus-choice', index === 1 && 'selected']}>
+                <input type="radio" name="visualBonus" checked={index === 1} />
+                <span class="bonus-icon">{index === 0 ? '🚙' : '☑'}</span>
+                <span class="bonus-copy">
+                  <>
+                    <strong>
+                      {index === 0 ? 'Více času za volantem' : 'Zkouška bez překvapení'}
+                    </strong>
+                    <small>{bonus.title}</small>
+                    <em>Hodnota {money(bonus.valueCzk)}</em>
+                  </>
+                </span>
+              </label>
+            ))
+          }
         </div>
-        <div class="steps-list">
-          <article><span>1</span><p>Vyplníte krátkou rezervaci poukazu.</p></article>
-          <article><span>2</span><p>Ozveme se vám a potvrdíme detaily dárku.</p></article>
-          <article><span>3</span><p>Později bude možné uhradit {money(christmasCampaign.onlineTotalCzk)} online.</p></article>
-          <article><span>4</span><p>Poukaz připravíme a odešleme na uvedenou adresu.</p></article>
-          <article><span>5</span><p>Obdarovaný se nám ozve, až bude chtít kurz řešit.</p></article>
-          <article><span>6</span><p>Vybere si pobočku, kurz a vánoční bonus.</p></article>
-          <article><span>7</span><p>Záloha {money(christmasCampaign.depositCzk)} se odečte z ceny kurzu.</p></article>
+        <p class="bonus-note">ⓘ Obdarovaný si bonus vybere později.</p>
+      </div>
+    </section>
+
+    <section class="xmas-section">
+      <div class="container">
+        <h2 class="center-title">Jak to funguje</h2>
+        <div class="how-grid">
+          <article>
+            <span>⌕</span><h3>1. Vyberete kurz a pobočku</h3><p>Zvolte typ kurzu a naši pobočku.</p>
+          </article>
+          <article>
+            <span>✎</span><h3>2. Vyplníte údaje k poukazu</h3><p>
+              Zadáte kontakt a případné věnování.
+            </p>
+          </article>
+          <article>
+            <span>🛒</span><h3>3. Odešlete objednávku</h3><p>
+              Zatím bez online platby; ozveme se s potvrzením.
+            </p>
+          </article>
+          <article>
+            <span>🎁</span><h3>4. Obdarovaný dokončí přihlášení</h3><p>
+              A vyrazí za svým řidičákem s naší podporou.
+            </p>
+          </article>
         </div>
       </div>
     </section>
 
-    <section class="section voucher-form-section" id="poukaz-form">
+    <section class="xmas-section faq-lite">
+      <div class="container narrow">
+        <h2 class="center-title">Časté dotazy</h2>
+        <div class="faq-grid">
+          <details>
+            <summary>Jak funguje záloha 5 000 Kč?</summary><p>
+              Záloha se následně v plné výši odečte z ceny vybraného kurzu.
+            </p>
+          </details>
+          <details>
+            <summary>Musím znát termín zahájení kurzu?</summary><p>
+              Nemusíte. Obdarovaný si termín a další detaily domluví později.
+            </p>
+          </details>
+          <details>
+            <summary>Co je zahrnuto v částce 200 Kč?</summary><p>
+              Dárkové balení a doručení fyzického poukazu.
+            </p>
+          </details>
+          <details>
+            <summary>Kdy si obdarovaný vybírá svůj bonus?</summary><p>
+              Bonus si vybere později při domluvě kurzu s autoškolou.
+            </p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="xmas-bottom-cta">
+      <div class="container bottom-card">
+        <img src="/brand/bubak.png" alt="Autoškola BuBu" />
+        <div>
+          <h2>Připravte letos dárek, který má skutečnou hodnotu.</h2><p>
+            Vánoční poukaz na kurz Autoškoly BUBU – více než jen řidičák.
+          </p>
+        </div>
+        <a class="btn secondary cta-white" href="#poukaz-form">Objednat vánoční poukaz →</a>
+      </div>
+    </section>
+
+    <section class="xmas-section voucher-form-section" id="poukaz-form">
       <div class="container form-wrap">
         <div class="form-copy">
-          <span class="campaign-kicker">Rezervace poukazu</span>
-          <h2>Získejte vánoční poukaz</h2>
+          <span class="xmas-kicker">Rezervace poukazu</span>
+          <h2>Objednat vánoční poukaz</h2>
           <p>
-            Vyplňte údaje a my se ozveme s potvrzením. Platbu zatím nespouštíme, aby bylo možné
-            doladit obchodní a právní kroky čistě.
+            Vyplňte údaje a my se ozveme s potvrzením. Online platbu dopojíme až po finálním
+            schválení platebního procesu.
           </p>
-          <div class="price-chip"><strong>{money(christmasCampaign.onlineTotalCzk)}</strong><span>{money(christmasCampaign.depositCzk)} záloha + {money(christmasCampaign.packagingAndDeliveryCzk)} balení a doručení</span></div>
+          <div class="price-chip">
+            <strong>{money(christmasCampaign.onlineTotalCzk)}</strong><span
+              >{money(christmasCampaign.depositCzk)} záloha + {
+                money(christmasCampaign.packagingAndDeliveryCzk)
+              } balení a doručení</span>
+          </div>
         </div>
         <form class="voucher-form" id="voucher-form" novalidate>
           <div class="form-grid">
-            <label>Jméno kupujícího<input name="firstName" autocomplete="given-name" required /></label>
-            <label>Příjmení kupujícího<input name="lastName" autocomplete="family-name" required /></label>
+            <label
+              >Jméno kupujícího<input name="firstName" autocomplete="given-name" required /></label
+            >
+            <label
+              >Příjmení kupujícího<input
+                name="lastName"
+                autocomplete="family-name"
+                required
+              /></label
+            >
             <label>E-mail<input name="email" type="email" autocomplete="email" required /></label>
             <label>Telefon<input name="phone" autocomplete="tel" required /></label>
             <label>Jméno obdarovaného<input name="recipientFirstName" required /></label>
             <label>Příjmení obdarovaného<input name="recipientLastName" /></label>
-            <label>Kurz<select name="course"><option value="">Domluvíme později</option>{courses.map((course) => <option value={course.id}>{course.label} – {course.name}</option>)}</select></label>
-            <label>Pobočka<select name="branch"><option value="">Domluvíme později</option>{branches.map((branch) => <option value={branch.id}>{branch.name}</option>)}</select></label>
-            <label class="wide">Vybraný bonus<select name="bonusVariant" required>{christmasCampaign.bonusVariants.map((bonus) => <option value={bonus.id}>{bonus.title}</option>)}</select></label>
-            <label class="wide">Osobní vzkaz na poukaz<textarea name="message" rows="3" maxlength="300" placeholder="Volitelné"></textarea></label>
+            <label
+              >Kurz<select name="course"
+                ><option value="">Domluvíme později</option>{
+                  courses.map((course) => (
+                    <option value={course.id}>
+                      {course.label} – {course.name}
+                    </option>
+                  ))
+                }</select
+              ></label
+            >
+            <label
+              >Pobočka<select name="branch"
+                ><option value="">Domluvíme později</option>{
+                  branches.map((branch) => <option value={branch.id}>{branch.name}</option>)
+                }</select
+              ></label
+            >
+            <label class="wide"
+              >Vybraný bonus<select name="bonusVariant" required
+                >{
+                  christmasCampaign.bonusVariants.map((bonus) => (
+                    <option value={bonus.id}>{bonus.title}</option>
+                  ))
+                }</select
+              ></label
+            >
+            <label class="wide"
+              >Osobní vzkaz na poukaz<textarea
+                name="message"
+                rows="3"
+                maxlength="300"
+                placeholder="Volitelné"></textarea></label
+            >
             <label>Doručovací ulice<input name="street" required /></label>
             <label>Město<input name="city" required /></label>
             <label>PSČ<input name="zip" required /></label>
           </div>
-          <label class="check-row"><input type="checkbox" name="terms" required /><span>Seznámil/a jsem se s <a href="/obchodni-podminky" target="_blank" rel="noreferrer">Všeobecnými obchodními podmínkami</a> a souhlasím s nimi.</span></label>
-          <p class="privacy-note">Odesláním formuláře potvrzujete, že jste se seznámil/a s <a href="/ochrana-osobnich-udaju" target="_blank" rel="noreferrer">Informacemi o zpracování osobních údajů</a>. Vaše údaje zpracováváme za účelem vyřízení poptávky, rezervace kampaně a navazující komunikace.</p>
-          <label class="check-row"><input type="checkbox" name="marketing" /><span>{campaignConsent.marketing.wording}</span></label>
-          <button class="btn primary" type="submit">Odeslat rezervaci poukazu ↗</button>
+          <label class="check-row"
+            ><input type="checkbox" name="terms" required /><span
+              >Seznámil/a jsem se s <a href="/obchodni-podminky" target="_blank" rel="noreferrer"
+                >Všeobecnými obchodními podmínkami</a
+              > a souhlasím s nimi.</span
+            ></label
+          >
+          <p class="privacy-note">
+            Odesláním formuláře potvrzujete, že jste se seznámil/a s <a
+              href="/ochrana-osobnich-udaju"
+              target="_blank"
+              rel="noreferrer">Informacemi o zpracování osobních údajů</a
+            >. Vaše údaje zpracováváme za účelem vyřízení poptávky, rezervace kampaně a navazující
+            komunikace.
+          </p>
+          <label class="check-row"
+            ><input type="checkbox" name="marketing" /><span
+              >{campaignConsent.marketing.wording}</span
+            ></label
+          >
+          <button class="btn primary" type="submit">Odeslat rezervaci poukazu →</button>
           <p class="form-status" id="voucher-status" role="status"></p>
         </form>
       </div>
@@ -149,15 +319,23 @@ const courses = campaignCourseOptions();
   const voucherForm = document.querySelector<HTMLFormElement>('#voucher-form');
   const voucherStatus = document.querySelector<HTMLElement>('#voucher-status');
   const campaignName = 'vanoce';
-  window.dispatchEvent(new CustomEvent('bubu:tracking', { detail: { name: 'campaign_view', campaign: campaignName } }));
+  window.dispatchEvent(
+    new CustomEvent('bubu:tracking', { detail: { name: 'campaign_view', campaign: campaignName } }),
+  );
   document.querySelectorAll('a[href="#poukaz-form"], a[href="#bonusy"]').forEach((element) => {
     element.addEventListener('click', () => {
-      window.dispatchEvent(new CustomEvent('bubu:tracking', { detail: { name: 'campaign_cta_click', campaign: campaignName } }));
+      window.dispatchEvent(
+        new CustomEvent('bubu:tracking', {
+          detail: { name: 'campaign_cta_click', campaign: campaignName },
+        }),
+      );
     });
   });
   function collect(form: HTMLFormElement, name: string) {
     const control = form.elements.namedItem(name);
-    return control instanceof HTMLInputElement || control instanceof HTMLSelectElement || control instanceof HTMLTextAreaElement
+    return control instanceof HTMLInputElement ||
+      control instanceof HTMLSelectElement ||
+      control instanceof HTMLTextAreaElement
       ? control.value.trim()
       : '';
   }
@@ -168,7 +346,11 @@ const courses = campaignCourseOptions();
   voucherForm?.addEventListener('input', () => {
     if (!voucherForm || voucherForm.dataset.started) return;
     voucherForm.dataset.started = 'true';
-    window.dispatchEvent(new CustomEvent('bubu:tracking', { detail: { name: 'campaign_form_start', campaign: campaignName } }));
+    window.dispatchEvent(
+      new CustomEvent('bubu:tracking', {
+        detail: { name: 'campaign_form_start', campaign: campaignName },
+      }),
+    );
   });
   voucherForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -215,12 +397,23 @@ const courses = campaignCourseOptions();
         body: JSON.stringify(body),
       });
       const result = await response.json();
-      if (!response.ok || !result.ok) throw new Error(result.message || 'Formulář se nepodařilo odeslat.');
-      window.dispatchEvent(new CustomEvent('bubu:tracking', { detail: { name: 'campaign_form_submit', campaign: campaignName, course: body.selection.course, branch: body.selection.branch } }));
+      if (!response.ok || !result.ok)
+        throw new Error(result.message || 'Formulář se nepodařilo odeslat.');
+      window.dispatchEvent(
+        new CustomEvent('bubu:tracking', {
+          detail: {
+            name: 'campaign_form_submit',
+            campaign: campaignName,
+            course: body.selection.course,
+            branch: body.selection.branch,
+          },
+        }),
+      );
       form.reset();
       voucherStatus.textContent = 'Děkujeme. Rezervaci poukazu máme a ozveme se s potvrzením.';
     } catch (error) {
-      voucherStatus.textContent = error instanceof Error ? error.message : 'Formulář se nepodařilo odeslat.';
+      voucherStatus.textContent =
+        error instanceof Error ? error.message : 'Formulář se nepodařilo odeslat.';
     } finally {
       submit.disabled = false;
     }
@@ -228,55 +421,670 @@ const courses = campaignCourseOptions();
 </script>
 
 <style>
-  .campaign-page { background: radial-gradient(circle at top right, #fff5d9 0, transparent 30rem), radial-gradient(circle at top left, #e8fbf7 0, transparent 34rem), #fff; overflow:hidden; }
-  .campaign-hero { padding: 92px 0 54px; }
-  .hero-grid { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(300px,.8fr); gap:clamp(28px,5vw,72px); align-items:center; }
-  .campaign-kicker { display:inline-flex; align-items:center; gap:8px; color:var(--brand-dark); font-weight:800; text-transform:uppercase; letter-spacing:.12em; font-size:.78rem; }
-  .campaign-kicker::before { content:"✦"; color:#c7972d; font-size:1rem; }
-  .campaign-hero h1 { margin-top:16px; color:#0a0f17; }
-  .campaign-badges { display:flex; flex-wrap:wrap; gap:10px; margin-top:24px; }
-  .campaign-badges span { padding:10px 14px; border-radius:999px; background:#fff; border:1px solid #ead9aa; color:#17335f; font-weight:800; box-shadow:var(--shadow); }
-  .fineprint { margin-top:18px; max-width:680px; font-size:.86rem; color:#61728a; }
-  .voucher-card { position:relative; min-height:430px; border-radius:34px; padding:34px; background:linear-gradient(145deg,#064b43,#0d7469); color:#fff; box-shadow:0 26px 70px #17335f2a; display:flex; flex-direction:column; justify-content:end; overflow:hidden; }
-  .voucher-card::before { content:""; position:absolute; inset:18px; border:1px dashed #ffefbd88; border-radius:26px; }
-  .voucher-ribbon { position:absolute; top:24px; left:-42px; transform:rotate(-12deg); background:#b11f24; color:#fff; padding:10px 58px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; }
-  .voucher-card img { width:190px; margin:0 auto 28px; filter:drop-shadow(0 18px 25px #0005); transform:rotate(4deg); }
-  .voucher-card strong { font-size:clamp(3rem,7vw,5rem); line-height:1; letter-spacing:-.06em; color:#ffefbd; }
-  .voucher-card span { font-weight:850; font-size:1.2rem; }
-  .voucher-card p { color:#e8fbf7; margin-top:14px; }
-  .campaign-strip { padding:0 0 42px; }
-  .strip-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; border:1px solid var(--line); border-radius:18px; overflow:hidden; box-shadow:var(--shadow); background:var(--line); }
-  .strip-grid span { background:#fff; padding:18px; color:#607087; font-size:.9rem; } .strip-grid strong { display:block; color:var(--ink); }
-  .compact-section { padding-top:34px; } .center { text-align:center; justify-content:center; } .center p { margin-inline:auto; }
-  .benefit-grid, .bonus-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:22px; margin-top:34px; }
-  .benefit-grid article, .bonus-grid article { background:#fff; border:1px solid var(--line); border-radius:22px; padding:24px; box-shadow:var(--shadow); }
-  .benefit-grid img { width:48px; height:48px; margin-bottom:18px; opacity:.9; }
-  .bonus-grid { grid-template-columns:repeat(2,1fr); }
-  .bonus-grid span { display:inline-flex; width:max-content; padding:6px 10px; border-radius:999px; background:#fff4d4; color:#7a5712; font-weight:900; font-size:.74rem; text-transform:uppercase; letter-spacing:.12em; }
-  .bonus-grid h3 { margin-top:16px; } .bonus-grid strong { display:block; margin-top:10px; color:var(--brand-dark); font-size:1.2rem; }
-  .narrow { max-width:980px; }
-  .steps-list { display:grid; grid-template-columns:repeat(7,1fr); gap:12px; margin-top:32px; }
-  .steps-list article { background:#fff; border:1px solid var(--line); border-radius:18px; padding:18px; box-shadow:var(--shadow); }
-  .steps-list span { display:grid; place-items:center; width:34px; height:34px; border-radius:50%; background:var(--brand); color:#0b2d2a; font-weight:900; margin-bottom:12px; }
-  .steps-list p { font-size:.88rem; }
-  .voucher-form-section { background:linear-gradient(135deg,#063f3a,#118a7d); color:#fff; }
-  .form-wrap { display:grid; grid-template-columns:.8fr 1.2fr; gap:34px; align-items:start; }
-  .form-copy h2 { margin-top:14px; color:#fff; } .form-copy p { color:#dff4f0; }
-  .price-chip { display:flex; flex-direction:column; gap:4px; margin-top:22px; padding:18px; border-radius:18px; background:#ffffff14; border:1px solid #ffffff2b; }
-  .price-chip strong { font-size:2.1rem; color:#ffefbd; line-height:1; }
-  .voucher-form { background:#fff; color:var(--ink); border-radius:26px; padding:26px; box-shadow:0 22px 60px #001b1838; }
-  .form-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
-  .form-grid label, .check-row { font-weight:750; font-size:.86rem; color:var(--ink); }
-  .form-grid input, .form-grid select, .form-grid textarea { width:100%; margin-top:6px; border:1px solid var(--line); border-radius:12px; padding:12px 13px; color:var(--ink); background:#fff; }
-  .wide { grid-column:1 / -1; }
-  .check-row { display:flex; gap:12px; align-items:flex-start; margin-top:18px; } .check-row input { width:20px; height:20px; flex:0 0 auto; }
-  .privacy-note { margin-top:16px; padding:14px; background:#f4faf9; border:1px solid var(--line); border-radius:16px; font-size:.9rem; }
-  .voucher-form .btn { margin-top:20px; width:100%; }
-  .form-status { margin-top:14px; font-weight:750; color:var(--brand-dark); }
-  @media (max-width: 1080px) { .steps-list { grid-template-columns:repeat(3,1fr); } }
-  @media (max-width: 920px) { .hero-grid, .form-wrap { grid-template-columns:1fr; } .benefit-grid { grid-template-columns:repeat(2,1fr); } .strip-grid { grid-template-columns:repeat(2,1fr); } }
-  @media (max-width: 640px) { .campaign-hero { padding-top:54px; } .benefit-grid, .bonus-grid, .steps-list, .strip-grid, .form-grid { grid-template-columns:1fr; } .voucher-card { min-height:360px; } }
+  :global(.christmas-page) {
+    --xblue: #078bc2;
+    --xblue-dark: #086994;
+    --xice: #eff9ff;
+    --xgold: #e5b34a;
+    --xnavy: #101b35;
+    background: #fff;
+    color: var(--xnavy);
+    overflow: hidden;
+  }
+  :global(.christmas-page .btn.primary) {
+    background: linear-gradient(135deg, #0797c9, #03a9d6);
+    color: #fff;
+    border: 0;
+    box-shadow: 0 14px 30px #0690c02a;
+  }
+  :global(.christmas-page .btn.primary:hover) {
+    background: linear-gradient(135deg, #067cad, #0499c4);
+  }
+  .xmas-hero {
+    position: relative;
+    padding: 72px 0 34px;
+    background:
+      radial-gradient(circle at 83% 8%, #dff2ff 0, transparent 28rem),
+      linear-gradient(90deg, #fff 0%, #fff 42%, #eff8ff 100%);
+  }
+  .xmas-hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
+    gap: 42px;
+    align-items: center;
+  }
+  .xmas-kicker {
+    display: block;
+    color: #087eaa;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.82rem;
+    margin-bottom: 14px;
+  }
+  .xmas-copy h1 {
+    font-size: clamp(3rem, 6vw, 5.9rem);
+    color: #080c16;
+    max-width: 760px;
+  }
+  .xmas-copy h1 span {
+    display: block;
+    color: #0688b8;
+  }
+  .xmas-lead {
+    max-width: 690px;
+    color: #0d1627;
+    font-size: clamp(1.08rem, 1.6vw, 1.42rem);
+    line-height: 1.55;
+  }
+  .deposit-box {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 15px;
+    max-width: 720px;
+    margin-top: 24px;
+    padding: 16px 20px;
+    border-radius: 18px;
+    background: #dff4ff;
+    color: #10213c;
+    box-shadow: 0 14px 34px #087eaa17;
+  }
+  .coin-icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: #fff;
+    color: #078bc2;
+    font-weight: 900;
+  }
+  .deposit-box strong,
+  .deposit-box small {
+    display: block;
+  }
+  .deposit-box small {
+    color: #4d6378;
+    margin-top: 3px;
+  }
+  .xmas-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 26px;
+    align-items: center;
+  }
+  .gift-btn {
+    min-height: 64px;
+    border-radius: 14px;
+    padding-inline: 34px;
+    font-size: 1.02rem;
+  }
+  .bonus-pill {
+    min-height: 64px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 14px;
+    padding: 12px 20px;
+    background: #e8f7ff;
+    color: #0b6993;
+    text-decoration: none;
+    font-weight: 800;
+  }
+  .bonus-pill span {
+    font-size: 1.45rem;
+  }
+  .bonus-pill strong {
+    color: #0b1427;
+  }
+  .mini-proof {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 24px;
+    color: #52647b;
+    font-size: 0.9rem;
+  }
+  .mini-proof span::before {
+    content: '✓';
+    color: #078bc2;
+    font-weight: 900;
+    margin-right: 8px;
+  }
+  .hero-visual {
+    position: relative;
+    min-height: 540px;
+    border-radius: 0 0 0 56px;
+    overflow: hidden;
+  }
+  .winter-window {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 78% 18%, #fff 0 0.2rem, transparent 0.25rem),
+      radial-gradient(circle at 55% 16%, #fff 0 0.18rem, transparent 0.24rem),
+      linear-gradient(135deg, #f5fbff 0%, #dfeff8 52%, #ffffff 100%);
+  }
+  .winter-window::after {
+    content: '';
+    position: absolute;
+    right: 30px;
+    top: 58px;
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    background: linear-gradient(#8a5c2b, #b78947);
+    opacity: 0.22;
+    box-shadow: 0 0 0 18px #fff8;
+  }
+  .voucher-scene {
+    position: absolute;
+    inset: 42px 26px 18px;
+  }
+  .envelope {
+    position: absolute;
+    right: 110px;
+    top: 74px;
+    width: 430px;
+    height: 280px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #083b78, #115ca0);
+    transform: rotate(-5deg);
+    box-shadow: 0 24px 50px #0c2b4f30;
+  }
+  .envelope::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(145deg, transparent 48%, #ffffff22 49% 51%, transparent 52%);
+  }
+  .voucher-paper {
+    position: absolute;
+    right: 62px;
+    top: 105px;
+    width: min(490px, 72vw);
+    min-height: 285px;
+    padding: 36px 42px;
+    border-radius: 10px;
+    background: #fff;
+    transform: rotate(4deg);
+    box-shadow: 0 24px 55px #10213c38;
+    text-align: center;
+  }
+  .voucher-paper::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 18px;
+    width: 85px;
+    height: 190px;
+    border-radius: 999px;
+    background: linear-gradient(#047ebb, #08a6d2);
+    transform: rotate(44deg);
+    box-shadow: 0 0 0 15px #ffffffbb;
+  }
+  .voucher-paper img {
+    width: 118px;
+    margin: 0 auto 20px;
+  }
+  .voucher-paper span {
+    display: block;
+    color: #1264a3;
+    font-size: 1.58rem;
+    font-weight: 950;
+    letter-spacing: 0.06em;
+  }
+  .voucher-paper strong {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.72rem;
+    color: #1d2f49;
+    margin-top: 2px;
+  }
+  .voucher-paper p {
+    margin-top: 25px;
+    font-family: cursive;
+    color: #2d405d;
+    font-size: 1.28rem;
+  }
+  .voucher-paper small {
+    font-size: 2rem;
+    color: #233a5d;
+  }
+  .car-key {
+    position: absolute;
+    right: 22px;
+    top: 235px;
+    width: 92px;
+    height: 170px;
+    border-radius: 26px;
+    background: linear-gradient(145deg, #151d2a, #3c4657);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    padding: 16px 0;
+    box-shadow: 0 20px 35px #0004;
+    transform: rotate(-10deg);
+  }
+  .bubak-gift {
+    position: absolute;
+    left: 88px;
+    bottom: 55px;
+    width: 176px;
+    filter: drop-shadow(0 22px 28px #0003);
+  }
+  .gift-box {
+    position: absolute;
+    left: 230px;
+    bottom: 64px;
+    width: 68px;
+    height: 68px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #bfefff 0 42%, #0b84bc 43% 57%, #e6f8ff 58%);
+    box-shadow: 0 16px 30px #0a395633;
+  }
+  .gift-box::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    right: -8px;
+    top: 24px;
+    height: 12px;
+    background: #0b84bc;
+  }
+  .hero-note {
+    position: absolute;
+    right: 40px;
+    bottom: 12px;
+    text-align: center;
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    font-weight: 900;
+    color: #41546d;
+  }
+  .snow {
+    position: absolute;
+    color: #97d8f4;
+    font-size: 2.2rem;
+    opacity: 0.75;
+  }
+  .snow-a {
+    left: 7%;
+    bottom: 7%;
+  }
+  .snow-b {
+    right: 8%;
+    bottom: 22%;
+  }
+  .snow-c {
+    right: 33%;
+    top: 11%;
+    color: #e4b446;
+  }
+  .xmas-section {
+    padding: 42px 0;
+    position: relative;
+  }
+  .soft-blue {
+    background: linear-gradient(#f4fbff, #fff);
+  }
+  .center-title {
+    text-align: center;
+    font-size: clamp(1.9rem, 3vw, 2.8rem);
+    color: #091122;
+    margin-bottom: 26px;
+  }
+  .reason-grid,
+  .what-grid,
+  .how-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+  }
+  .reason-grid article,
+  .what-grid article,
+  .how-grid article,
+  .faq-grid details {
+    background: #fff;
+    border: 1px solid #deedf5;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 14px 38px #12365a0d;
+    text-align: center;
+  }
+  .reason-grid span,
+  .how-grid span {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: #e0f5ff;
+    color: #078bc2;
+    margin: 0 auto 14px;
+    font-size: 1.7rem;
+  }
+  .reason-grid h3,
+  .what-grid h3,
+  .how-grid h3 {
+    font-size: 1.05rem;
+    line-height: 1.22;
+    color: #101b35;
+  }
+  .reason-grid p,
+  .what-grid p,
+  .how-grid p {
+    margin-top: 10px;
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+  .mini-asset {
+    height: 150px;
+    border-radius: 14px;
+    background: #eef8ff;
+    margin-bottom: 18px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .voucher-mini {
+    background: linear-gradient(135deg, #fff, #e7f6ff);
+    color: #1369a6;
+    font-weight: 950;
+    border: 1px solid #d3eaf6;
+  }
+  .envelope-mini {
+    background: linear-gradient(145deg, #082c63, #135a9a);
+    position: relative;
+  }
+  .envelope-mini::after {
+    content: 'AUTOŠKOLA BUBU';
+    color: #fff;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+  }
+  .note-mini {
+    padding: 20px;
+    font-family: cursive;
+    color: #253a5a;
+    background: #fff;
+    border: 1px solid #e4edf2;
+  }
+  .bubak-mini img {
+    width: 86px;
+  }
+  .narrow {
+    max-width: 1080px;
+  }
+  .bonus-choice-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+  }
+  .bonus-choice {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 18px;
+    padding: 22px;
+    border: 2px solid #d7eaf4;
+    border-radius: 18px;
+    background: #fff;
+    cursor: pointer;
+    box-shadow: 0 14px 34px #12365a0c;
+  }
+  .bonus-choice.selected {
+    border-color: #08a8dc;
+    background: linear-gradient(135deg, #fff, #effaff);
+  }
+  .bonus-choice input {
+    width: 22px;
+    height: 22px;
+    order: 3;
+  }
+  .bonus-icon {
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #dff5ff;
+    font-size: 2rem;
+  }
+  .bonus-copy strong,
+  .bonus-copy small,
+  .bonus-copy em {
+    display: block;
+  }
+  .bonus-copy strong {
+    font-size: 1.2rem;
+  }
+  .bonus-copy small {
+    color: #60738b;
+    margin-top: 3px;
+  }
+  .bonus-copy em {
+    width: max-content;
+    margin-top: 10px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: #bfefff;
+    color: #086994;
+    font-style: normal;
+    font-weight: 900;
+  }
+  .bonus-note {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 0.92rem;
+  }
+  .how-grid article {
+    text-align: left;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 14px;
+  }
+  .how-grid span {
+    margin: 0;
+    grid-row: 1 / span 2;
+  }
+  .faq-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .faq-grid details {
+    text-align: left;
+    padding: 0;
+    overflow: hidden;
+  }
+  .faq-grid summary {
+    cursor: pointer;
+    padding: 18px 22px;
+    font-weight: 800;
+  }
+  .faq-grid p {
+    padding: 0 22px 18px;
+  }
+  .xmas-bottom-cta {
+    padding: 18px 0 54px;
+  }
+  .bottom-card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 28px;
+    border-radius: 22px;
+    padding: 24px 32px;
+    color: #fff;
+    background: linear-gradient(135deg, #07a7c8, #0179b5);
+    box-shadow: 0 22px 50px #067ca42a;
+  }
+  .bottom-card img {
+    width: 120px;
+    filter: drop-shadow(0 14px 18px #004b6733);
+  }
+  .bottom-card h2 {
+    color: #fff;
+    font-size: clamp(1.5rem, 2.5vw, 2.35rem);
+  }
+  .bottom-card p {
+    color: #e8fbff;
+  }
+  .cta-white {
+    background: #fff;
+    color: #086994;
+    border: 0;
+  }
+  .voucher-form-section {
+    background: #f2fbff;
+    padding-top: 52px;
+  }
+  .form-wrap {
+    display: grid;
+    grid-template-columns: 0.75fr 1.25fr;
+    gap: 30px;
+    align-items: start;
+  }
+  .form-copy h2 {
+    margin-top: 12px;
+  }
+  .price-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 22px;
+    padding: 18px;
+    border-radius: 18px;
+    background: #fff;
+    border: 1px solid #d7eaf4;
+    box-shadow: 0 12px 34px #12365a0d;
+  }
+  .price-chip strong {
+    font-size: 2rem;
+    color: #078bc2;
+  }
+  .voucher-form {
+    background: #fff;
+    color: var(--ink);
+    border-radius: 24px;
+    padding: 26px;
+    border: 1px solid #d7eaf4;
+    box-shadow: 0 20px 54px #12365a14;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .form-grid label,
+  .check-row {
+    font-weight: 750;
+    font-size: 0.86rem;
+    color: var(--ink);
+  }
+  .form-grid input,
+  .form-grid select,
+  .form-grid textarea {
+    width: 100%;
+    margin-top: 6px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 13px;
+    color: var(--ink);
+    background: #fff;
+  }
+  .wide {
+    grid-column: 1 / -1;
+  }
+  .check-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-top: 18px;
+  }
+  .check-row input {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+  }
+  .privacy-note {
+    margin-top: 16px;
+    padding: 14px;
+    background: #f4faf9;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    font-size: 0.9rem;
+  }
+  .voucher-form .btn {
+    margin-top: 20px;
+    width: 100%;
+  }
+  .form-status {
+    margin-top: 14px;
+    font-weight: 750;
+    color: #086994;
+  }
+  @media (max-width: 1080px) {
+    .xmas-hero-grid,
+    .form-wrap {
+      grid-template-columns: 1fr;
+    }
+    .hero-visual {
+      min-height: 500px;
+    }
+    .reason-grid,
+    .what-grid,
+    .how-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .bottom-card {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+    .bottom-card img {
+      margin: auto;
+    }
+  }
+  @media (max-width: 700px) {
+    .xmas-hero {
+      padding-top: 44px;
+    }
+    .reason-grid,
+    .what-grid,
+    .how-grid,
+    .bonus-choice-grid,
+    .faq-grid,
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+    .hero-visual {
+      min-height: 430px;
+    }
+    .voucher-paper {
+      right: 5px;
+      width: 86vw;
+      padding: 28px;
+    }
+    .envelope {
+      right: 70px;
+      width: 330px;
+    }
+    .bubak-gift {
+      left: 10px;
+      width: 132px;
+    }
+    .hero-note {
+      display: none;
+    }
+    .mini-proof {
+      display: grid;
+      gap: 8px;
+    }
+    .xmas-copy h1 {
+      font-size: clamp(2.6rem, 12vw, 4.2rem);
+    }
+  }
 </style>
-
-
-

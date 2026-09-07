@@ -5,7 +5,7 @@ import Roadmap from '../components/Roadmap.astro';
 import Faq from '../components/Faq.astro';
 import FinalCta from '../components/FinalCta.astro';
 import { branches, money, type Branch } from '../lib/catalog';
-import car from '../assets/car.jpg';
+import manualCar from '../assets/courses/b-manual.webp';
 export const prerender = true;
 export function getStaticPaths() {
   return branches.map((branch) => ({ params: { branch: branch.id }, props: { branch } }));
@@ -136,7 +136,7 @@ const schema = {
             Skupina B <strong>{money(branch.bPrice)}</strong> · jedna cena, bez balíčků
           </p>
         </div><Image
-          src={car}
+          src={manualCar}
           alt="Výcviková Škoda Fabia Autoškoly BuBu"
           widths={[480, 800]}
           sizes="(max-width:640px) 90vw, 45vw"

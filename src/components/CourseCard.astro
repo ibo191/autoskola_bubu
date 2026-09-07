@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
-import car from '../assets/car.jpg';
+import manualCar from '../assets/courses/b-manual.webp';
+import automaticCar from '../assets/courses/b-automatic.webp';
 import moto from '../assets/moto.jpeg';
 import trailer from '../assets/trailer.jpeg';
 import { displayPrice, money, type Course, type BranchId } from '../lib/catalog';
@@ -10,7 +11,14 @@ interface Props {
   photo?: boolean;
 }
 const { course, branch = 'strizkov', photo = false } = Astro.props;
-const asset = course.category === 'auto' ? car : course.category === 'moto' ? moto : trailer;
+const asset =
+  course.id === 'b-automat'
+    ? automaticCar
+    : course.category === 'auto'
+      ? manualCar
+      : course.category === 'moto'
+        ? moto
+        : trailer;
 ---
 
 <article class:list={['course-card', { photographic: photo }]} data-category={course.category}>
@@ -19,11 +27,13 @@ const asset = course.category === 'auto' ? car : course.category === 'moto' ? mo
       <Image
         src={asset}
         alt={
-          course.category === 'auto'
-            ? 'Výcvikové auto Autoškoly BuBu'
-            : course.category === 'moto'
-              ? 'Motocykly Autoškoly BuBu'
-              : 'Auto s přívěsem Autoškoly BuBu'
+          course.id === 'b-automat'
+            ? 'Černé výcvikové auto Autoškoly BuBu pro automat'
+            : course.category === 'auto'
+              ? 'Bílé výcvikové auto Autoškoly BuBu pro manuál'
+              : course.category === 'moto'
+                ? 'Motocykly Autoškoly BuBu'
+                : 'Auto s přívěsem Autoškoly BuBu'
         }
         widths={[360, 600]}
         sizes="(max-width:640px) 90vw, 360px"

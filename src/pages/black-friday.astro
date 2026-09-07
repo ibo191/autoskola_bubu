@@ -1,10 +1,16 @@
 ---
 export const prerender = true;
 import Base from '../layouts/Base.astro';
-import { blackFridayCampaign, campaignBranchOptions, campaignCourseOptions } from '../lib/campaigns/config';
+import {
+  blackFridayCampaign,
+  campaignBranchOptions,
+  campaignCourseOptions,
+} from '../lib/campaigns/config';
 import { branches, money, type CourseId } from '../lib/catalog';
 
-const primaryBranches = branches.filter((branch) => ['strizkov', 'kladno', 'statenice'].includes(branch.id));
+const primaryBranches = branches.filter((branch) =>
+  ['strizkov', 'kladno', 'statenice'].includes(branch.id),
+);
 const courses = campaignCourseOptions();
 const defaultCampaignBranchByCourse = Object.fromEntries(
   courses.map((course) => [
@@ -25,8 +31,8 @@ const defaultCampaignBranchByCourse = Object.fromEntries(
           <span class="campaign-kicker">Black Friday v BuBu</span>
           <h1>{blackFridayCampaign.headline}</h1>
           <p class="lead">
-            Nesnižujeme hodnotu výcviku. Přidáváme to, co studentům před zkouškou pomáhá nejvíc:
-            dvě extra vyučovací hodiny jízdy zdarma.
+            Nesnižujeme hodnotu výcviku. Přidáváme to, co studentům před zkouškou pomáhá nejvíc: dvě
+            extra vyučovací hodiny jízdy zdarma.
           </p>
           <div class="campaign-badges" aria-label="Hlavní výhody">
             <span>{blackFridayCampaign.badge}</span>
@@ -34,7 +40,13 @@ const defaultCampaignBranchByCourse = Object.fromEntries(
             <span>Limit {blackFridayCampaign.orderLimit} kurzů</span>
           </div>
           <div class="actions">
-            <button class="btn primary" data-order data-course="b" data-branch="strizkov" data-campaign="black-friday">
+            <button
+              class="btn primary"
+              data-order
+              data-course="b"
+              data-branch="strizkov"
+              data-campaign="black-friday"
+            >
               {blackFridayCampaign.cta} ↗
             </button>
             <a class="btn secondary" href="#jak-to-funguje">Jak to funguje</a>
@@ -55,7 +67,14 @@ const defaultCampaignBranchByCourse = Object.fromEntries(
 
     <section class="campaign-strip" aria-label="Pobočky a styl výuky">
       <div class="container strip-grid">
-        {primaryBranches.map((branch) => <span><strong>{branch.name}</strong>{branch.locality}</span>)}
+        {
+          primaryBranches.map((branch) => (
+            <span>
+              <strong>{branch.name}</strong>
+              {branch.locality}
+            </span>
+          ))
+        }
         <span><strong>Bez křiku</strong>klidná příprava</span>
         <span><strong>Skupina B i další kurzy</strong>podle dostupnosti pobočky</span>
       </div>
@@ -68,10 +87,27 @@ const defaultCampaignBranchByCourse = Object.fromEntries(
           <h2>Víc času za volantem má před zkouškou větší cenu.</h2>
         </div>
         <div class="benefit-grid">
-          <article><img src="/icons/ui/mint-hands-wheel.webp" alt="" /><h3>Klid před zkouškou</h3><p>Extra jízdy si necháte na období, kdy už víte, co potřebujete nejvíc procvičit.</p></article>
-          <article><img src="/icons/ui/mint-target.webp" alt="" /><h3>Konkrétní slabá místa</h3><p>Instruktor se s vámi zaměří na situace, které vás brzdí: parkování, křižovatky, provoz.</p></article>
-          <article><img src="/icons/ui/mint-safety-heart.webp" alt="" /><h3>Férová hodnota</h3><p>Bonus má hodnotu {money(blackFridayCampaign.bonusValueCzk)} a dává smysl přímo pro výcvik.</p></article>
-          <article><img src="/icons/ui/mint-smile.webp" alt="" /><h3>Bez tlaku</h3><p>Nabídka je jednoduchá: vyberete si kurz, rezervujete zápis a bonus vám připíšeme.</p></article>
+          <article>
+            <img src="/icons/ui/mint-hands-wheel.webp" alt="" /><h3>Klid před zkouškou</h3><p>
+              Extra jízdy si necháte na období, kdy už víte, co potřebujete nejvíc procvičit.
+            </p>
+          </article>
+          <article>
+            <img src="/icons/ui/mint-target.webp" alt="" /><h3>Konkrétní slabá místa</h3><p>
+              Instruktor se s vámi zaměří na situace, které vás brzdí: parkování, křižovatky,
+              provoz.
+            </p>
+          </article>
+          <article>
+            <img src="/icons/ui/mint-safety-heart.webp" alt="" /><h3>Férová hodnota</h3><p>
+              Bonus má hodnotu {money(blackFridayCampaign.bonusValueCzk)} a dává smysl přímo pro výcvik.
+            </p>
+          </article>
+          <article>
+            <img src="/icons/ui/mint-smile.webp" alt="" /><h3>Bez tlaku</h3><p>
+              Nabídka je jednoduchá: vyberete si kurz, rezervujete zápis a bonus vám připíšeme.
+            </p>
+          </article>
         </div>
       </div>
     </section>
@@ -83,9 +119,21 @@ const defaultCampaignBranchByCourse = Object.fromEntries(
           <h2>Tři kroky a máte místo rezervované.</h2>
         </div>
         <div class="steps-row">
-          <article><span>1</span><h3>Vyplníte objednávku</h3><p>Vyberete kurz, pobočku a termín zápisu v běžném objednávkovém formuláři.</p></article>
-          <article><span>2</span><h3>Potvrdíme místo</h3><p>Po odeslání objednávky vám přijde potvrzení e-mailem se shrnutím a dokumenty.</p></article>
-          <article><span>3</span><h3>Bonus necháte na závěr</h3><p>Dvě extra jízdy využijete před závěrečnou zkouškou, když mají největší efekt.</p></article>
+          <article>
+            <span>1</span><h3>Vyplníte objednávku</h3><p>
+              Vyberete kurz, pobočku a termín zápisu v běžném objednávkovém formuláři.
+            </p>
+          </article>
+          <article>
+            <span>2</span><h3>Potvrdíme místo</h3><p>
+              Po odeslání objednávky vám přijde potvrzení e-mailem se shrnutím a dokumenty.
+            </p>
+          </article>
+          <article>
+            <span>3</span><h3>Bonus necháte na závěr</h3><p>
+              Dvě extra jízdy využijete před závěrečnou zkouškou, když mají největší efekt.
+            </p>
+          </article>
         </div>
       </div>
     </section>
@@ -95,10 +143,20 @@ const defaultCampaignBranchByCourse = Object.fromEntries(
         <div class="dark-offer">
           <div>
             <span class="campaign-kicker">Transparentní limit</span>
-            <h2>Black Friday bonus platí pro prvních {blackFridayCampaign.orderLimit} objednávek.</h2>
-            <p>Žádné umělé stopky. Jakmile bude limit naplněný, stránka má připravený sold-out stav.</p>
+            <h2>
+              Black Friday bonus platí pro prvních {blackFridayCampaign.orderLimit} objednávek.
+            </h2>
+            <p>
+              Žádné umělé stopky. Jakmile bude limit naplněný, stránka má připravený sold-out stav.
+            </p>
           </div>
-          <button class="btn primary" data-order data-course="b" data-branch="strizkov" data-campaign="black-friday">Rezervovat místo ↗</button>
+          <button
+            class="btn primary"
+            data-order
+            data-course="b"
+            data-branch="strizkov"
+            data-campaign="black-friday">Rezervovat místo ↗</button
+          >
         </div>
 
         <div class="section-heading center offer-heading">
@@ -106,14 +164,33 @@ const defaultCampaignBranchByCourse = Object.fromEntries(
           <h2>Začněte kurzem, který vám sedí.</h2>
         </div>
         <div class="course-offer-grid">
-          {courses.map((course) => (
-            <article>
-              <img src={course.id.includes('a') && course.id !== 'b-automat' ? '/icons/ui/mint-motorcycle.webp' : course.id === 'l17' ? '/icons/ui/mint-graduation.webp' : '/icons/ui/mint-car.webp'} alt="" />
-              <h3>{course.label}</h3>
-              <p>{course.name}</p>
-              <button class="btn secondary" data-order data-course={course.id} data-branch={defaultCampaignBranchByCourse[course.id as CourseId]} data-campaign="black-friday">Vybrat kurz</button>
-            </article>
-          ))}
+          {
+            courses.map((course) => (
+              <article>
+                <img
+                  src={
+                    course.id.includes('a') && course.id !== 'b-automat'
+                      ? '/icons/ui/mint-motorcycle.webp'
+                      : course.id === 'l17'
+                        ? '/icons/ui/mint-graduation.webp'
+                        : '/icons/ui/mint-car.webp'
+                  }
+                  alt=""
+                />
+                <h3>{course.label}</h3>
+                <p>{course.name}</p>
+                <button
+                  class="btn secondary"
+                  data-order
+                  data-course={course.id}
+                  data-branch={defaultCampaignBranchByCourse[course.id as CourseId]}
+                  data-campaign="black-friday"
+                >
+                  Vybrat kurz
+                </button>
+              </article>
+            ))
+          }
         </div>
       </div>
     </section>
@@ -124,10 +201,31 @@ const defaultCampaignBranchByCourse = Object.fromEntries(
           <span class="eyebrow">Často se ptáte</span>
           <h2>Black Friday bez drobných háčků.</h2>
         </div>
-        <details open><summary>Co přesně získám?</summary><p>Ke kurzu získáte 2 × 45 minut extra jízdy před závěrečnou zkouškou zdarma. Hodnota bonusu je {money(blackFridayCampaign.bonusValueCzk)}.</p></details>
-        <details><summary>Je to sleva z kurzu?</summary><p>Ne. Cena kurzu zůstává podle ceníku. Black Friday výhoda je praktický bonus navíc, který pomůže s přípravou na zkoušku.</p></details>
-        <details><summary>Pro kolik lidí nabídka platí?</summary><p>Nabídka je připravena pro prvních {blackFridayCampaign.orderLimit} kvalifikovaných objednávek. Aktuální zůstatek nezobrazujeme bez backendového počítání.</p></details>
-        <details><summary>Na jaké pobočce můžu kurz dělat?</summary><p>Podle dostupnosti konkrétního kurzu: {branches.map((branch) => `${branch.name} (${branch.locality})`).join(', ')}. Motorky a přívěsy se poskytují jen na Střížkově.</p></details>
+        <details open>
+          <summary>Co přesně získám?</summary><p>
+            Ke kurzu získáte 2 × 45 minut extra jízdy před závěrečnou zkouškou zdarma. Hodnota
+            bonusu je {money(blackFridayCampaign.bonusValueCzk)}.
+          </p>
+        </details>
+        <details>
+          <summary>Je to sleva z kurzu?</summary><p>
+            Ne. Cena kurzu zůstává podle ceníku. Black Friday výhoda je praktický bonus navíc, který
+            pomůže s přípravou na zkoušku.
+          </p>
+        </details>
+        <details>
+          <summary>Pro kolik lidí nabídka platí?</summary><p>
+            Nabídka je připravena pro prvních {blackFridayCampaign.orderLimit} kvalifikovaných objednávek.
+            Aktuální zůstatek nezobrazujeme bez backendového počítání.
+          </p>
+        </details>
+        <details>
+          <summary>Na jaké pobočce můžu kurz dělat?</summary><p>
+            Podle dostupnosti konkrétního kurzu: {
+              branches.map((branch) => `${branch.name} (${branch.locality})`).join(', ')
+            }. Motorky a přívěsy se poskytují jen na Střížkově.
+          </p>
+        </details>
       </div>
     </section>
   </main>
@@ -135,7 +233,9 @@ const defaultCampaignBranchByCourse = Object.fromEntries(
 
 <script>
   const campaignName = 'black-friday';
-  window.dispatchEvent(new CustomEvent('bubu:tracking', { detail: { name: 'campaign_view', campaign: campaignName } }));
+  window.dispatchEvent(
+    new CustomEvent('bubu:tracking', { detail: { name: 'campaign_view', campaign: campaignName } }),
+  );
   document.querySelectorAll('[data-campaign="black-friday"]').forEach((element) => {
     element.addEventListener('click', () => {
       const target = element instanceof HTMLElement ? element : null;
@@ -154,43 +254,279 @@ const defaultCampaignBranchByCourse = Object.fromEntries(
 </script>
 
 <style>
-  .campaign-page { background: radial-gradient(circle at top right, #e8fbf7 0, transparent 34rem), #fff; overflow: hidden; }
-  .campaign-hero { padding: 92px 0 54px; position: relative; }
-  .hero-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(300px, .75fr); gap: clamp(28px, 5vw, 72px); align-items: center; }
-  .campaign-kicker { display: inline-flex; align-items:center; gap:8px; color: var(--brand-dark); font-weight: 800; text-transform: uppercase; letter-spacing: .12em; font-size:.78rem; }
-  .campaign-kicker::before { content:""; width:10px; height:10px; border-radius:3px; background:var(--brand); transform:rotate(45deg); }
-  .campaign-hero h1 { margin-top: 16px; max-width: 830px; color: #0a0f17; }
-  .campaign-badges { display:flex; flex-wrap:wrap; gap:10px; margin-top:24px; }
-  .campaign-badges span { padding:10px 14px; border-radius:999px; background:#0b0d12; color:white; font-weight:800; font-size:.88rem; box-shadow: var(--shadow); }
-  .fineprint { margin-top:18px; max-width:680px; font-size:.86rem; color:#61728a; }
-  .hero-card { border-radius: 34px; padding: 34px; background: linear-gradient(145deg, #101820, #06100f); color:#fff; box-shadow: 0 26px 70px #17335f2a; position:relative; isolation:isolate; min-height:440px; display:flex; flex-direction:column; justify-content:end; overflow:hidden; }
-  .hero-card::before, .hero-card::after { content:""; position:absolute; width:180px; height:180px; border-radius:50%; background:#4ab9ab55; filter: blur(18px); z-index:-1; }
-  .hero-card::before { top:30px; right:40px; } .hero-card::after { bottom:-40px; left:-40px; background:#2f5aa666; }
-  .bubak-wrap { width: 210px; margin: 0 auto 30px; transform: rotate(-6deg); filter: drop-shadow(0 18px 25px #0006); }
-  .hero-card strong { font-size: clamp(3rem, 7vw, 5.3rem); line-height:1; letter-spacing:-.06em; color: var(--brand); }
-  .hero-card span { font-size:1.5rem; font-weight:800; color:#fff; }
-  .hero-card p { color:#dcebea; margin-top:14px; }
-  .campaign-strip { padding: 0 0 42px; }
-  .strip-grid { display:grid; grid-template-columns: repeat(5, 1fr); gap:1px; border:1px solid var(--line); border-radius:18px; overflow:hidden; box-shadow:var(--shadow); background:var(--line); }
-  .strip-grid span { background:#fff; padding:18px; color:#607087; font-size:.9rem; } .strip-grid strong { display:block; color:var(--ink); }
-  .compact-section { padding-top:34px; }
-  .center { text-align:center; justify-content:center; } .center p { margin-inline:auto; }
-  .benefit-grid, .course-offer-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:22px; margin-top:34px; }
-  .benefit-grid article, .course-offer-grid article { background:#fff; border:1px solid var(--line); border-radius:22px; padding:24px; box-shadow:var(--shadow); }
-  .benefit-grid img, .course-offer-grid img { width:48px; height:48px; margin-bottom:18px; opacity:.9; }
-  .benefit-grid p, .course-offer-grid p { margin-top:10px; font-size:.94rem; }
-  .narrow { max-width:980px; }
-  .steps-row { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:32px; }
-  .steps-row article { background:#fff; border:1px solid var(--line); border-radius:24px; padding:26px; }
-  .steps-row span { display:grid; place-items:center; width:42px; height:42px; border-radius:50%; background:var(--brand); color:#0b2d2a; font-weight:900; margin-bottom:16px; }
-  .dark-offer { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:30px; border-radius:28px; background:linear-gradient(135deg,#071010,#112c2b); color:#fff; box-shadow:0 18px 48px #17335f26; }
-  .dark-offer h2 { color:#fff; font-size:clamp(1.7rem,3vw,2.5rem); margin-top:8px; } .dark-offer p { color:#d5e3e3; }
-  .offer-heading { margin-top:48px; }
-  .course-offer-grid article { display:flex; flex-direction:column; } .course-offer-grid .btn { margin-top:auto; }
-  .faq-section details { background:#fff; border:1px solid var(--line); border-radius:16px; padding:18px 20px; margin-top:12px; }
-  .faq-section summary { cursor:pointer; font-weight:800; color:var(--ink); }
-  .faq-section details p { margin-top:12px; }
-  @media (max-width: 980px) { .hero-grid, .steps-row { grid-template-columns:1fr; } .strip-grid, .benefit-grid, .course-offer-grid { grid-template-columns:repeat(2,1fr); } .hero-card { min-height:360px; } }
-  @media (max-width: 640px) { .campaign-hero { padding-top:54px; } .strip-grid, .benefit-grid, .course-offer-grid { grid-template-columns:1fr; } .dark-offer { align-items:stretch; flex-direction:column; } .campaign-badges span { width:100%; text-align:center; } }
+  .campaign-page {
+    background: radial-gradient(circle at top right, #e8fbf7 0, transparent 34rem), #fff;
+    overflow: hidden;
+  }
+  .campaign-hero {
+    padding: 92px 0 54px;
+    position: relative;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.75fr);
+    gap: clamp(28px, 5vw, 72px);
+    align-items: center;
+  }
+  .campaign-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--brand-dark);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.78rem;
+  }
+  .campaign-kicker::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    background: var(--brand);
+    transform: rotate(45deg);
+  }
+  .campaign-hero h1 {
+    margin-top: 16px;
+    max-width: 830px;
+    color: #0a0f17;
+  }
+  .campaign-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  .campaign-badges span {
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: #0b0d12;
+    color: white;
+    font-weight: 800;
+    font-size: 0.88rem;
+    box-shadow: var(--shadow);
+  }
+  .fineprint {
+    margin-top: 18px;
+    max-width: 680px;
+    font-size: 0.86rem;
+    color: #61728a;
+  }
+  .hero-card {
+    border-radius: 34px;
+    padding: 34px;
+    background: linear-gradient(145deg, #101820, #06100f);
+    color: #fff;
+    box-shadow: 0 26px 70px #17335f2a;
+    position: relative;
+    isolation: isolate;
+    min-height: 440px;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    overflow: hidden;
+  }
+  .hero-card::before,
+  .hero-card::after {
+    content: '';
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: #4ab9ab55;
+    filter: blur(18px);
+    z-index: -1;
+  }
+  .hero-card::before {
+    top: 30px;
+    right: 40px;
+  }
+  .hero-card::after {
+    bottom: -40px;
+    left: -40px;
+    background: #2f5aa666;
+  }
+  .bubak-wrap {
+    width: 210px;
+    margin: 0 auto 30px;
+    transform: rotate(-6deg);
+    filter: drop-shadow(0 18px 25px #0006);
+  }
+  .hero-card strong {
+    font-size: clamp(3rem, 7vw, 5.3rem);
+    line-height: 1;
+    letter-spacing: -0.06em;
+    color: var(--brand);
+  }
+  .hero-card span {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #fff;
+  }
+  .hero-card p {
+    color: #dcebea;
+    margin-top: 14px;
+  }
+  .campaign-strip {
+    padding: 0 0 42px;
+  }
+  .strip-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    background: var(--line);
+  }
+  .strip-grid span {
+    background: #fff;
+    padding: 18px;
+    color: #607087;
+    font-size: 0.9rem;
+  }
+  .strip-grid strong {
+    display: block;
+    color: var(--ink);
+  }
+  .compact-section {
+    padding-top: 34px;
+  }
+  .center {
+    text-align: center;
+    justify-content: center;
+  }
+  .center p {
+    margin-inline: auto;
+  }
+  .benefit-grid,
+  .course-offer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+    margin-top: 34px;
+  }
+  .benefit-grid article,
+  .course-offer-grid article {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+  .benefit-grid img,
+  .course-offer-grid img {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 18px;
+    opacity: 0.9;
+  }
+  .benefit-grid p,
+  .course-offer-grid p {
+    margin-top: 10px;
+    font-size: 0.94rem;
+  }
+  .narrow {
+    max-width: 980px;
+  }
+  .steps-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 32px;
+  }
+  .steps-row article {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 26px;
+  }
+  .steps-row span {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: #0b2d2a;
+    font-weight: 900;
+    margin-bottom: 16px;
+  }
+  .dark-offer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 30px;
+    border-radius: 28px;
+    background: linear-gradient(135deg, #071010, #112c2b);
+    color: #fff;
+    box-shadow: 0 18px 48px #17335f26;
+  }
+  .dark-offer h2 {
+    color: #fff;
+    font-size: clamp(1.7rem, 3vw, 2.5rem);
+    margin-top: 8px;
+  }
+  .dark-offer p {
+    color: #d5e3e3;
+  }
+  .offer-heading {
+    margin-top: 48px;
+  }
+  .course-offer-grid article {
+    display: flex;
+    flex-direction: column;
+  }
+  .course-offer-grid .btn {
+    margin-top: auto;
+  }
+  .faq-section details {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-top: 12px;
+  }
+  .faq-section summary {
+    cursor: pointer;
+    font-weight: 800;
+    color: var(--ink);
+  }
+  .faq-section details p {
+    margin-top: 12px;
+  }
+  @media (max-width: 980px) {
+    .hero-grid,
+    .steps-row {
+      grid-template-columns: 1fr;
+    }
+    .strip-grid,
+    .benefit-grid,
+    .course-offer-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .hero-card {
+      min-height: 360px;
+    }
+  }
+  @media (max-width: 640px) {
+    .campaign-hero {
+      padding-top: 54px;
+    }
+    .strip-grid,
+    .benefit-grid,
+    .course-offer-grid {
+      grid-template-columns: 1fr;
+    }
+    .dark-offer {
+      align-items: stretch;
+      flex-direction: column;
+    }
+    .campaign-badges span {
+      width: 100%;
+      text-align: center;
+    }
+  }
 </style>
-

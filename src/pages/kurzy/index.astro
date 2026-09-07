@@ -10,6 +10,12 @@ const categoryLabels = {
   prives: 'Přívěs',
 } as const;
 
+const coursePhotos = {
+  b: '/images/courses/b-manual.webp',
+  'b-automat': '/images/courses/b-automatic.webp',
+  l17: '/images/courses/b-manual.webp',
+} as const;
+
 const courseIcons = {
   b: '/icons/ui/mint-car.webp',
   'b-automat': '/icons/ui/mint-car-automatic.webp',
@@ -81,6 +87,20 @@ const courseIcons = {
                 class="course-tile"
                 data-branches={availableBranches.map((branch) => branch.id).join(' ')}
               >
+                {course.id in coursePhotos && (
+                  <img
+                    class="course-photo"
+                    src={coursePhotos[course.id as keyof typeof coursePhotos]}
+                    alt={
+                      course.id === 'b-automat'
+                        ? 'Černé auto Autoškoly BuBu pro automat'
+                        : 'Bílé auto Autoškoly BuBu pro manuální kurz'
+                    }
+                    loading="lazy"
+                    width="560"
+                    height="420"
+                  />
+                )}
                 <div class="course-tile-top">
                   <span class="eyebrow">{categoryLabels[course.category]}</span>
                   <span class="course-icon" aria-hidden="true">
@@ -200,6 +220,15 @@ const courseIcons = {
     transform: translateY(-4px);
     border-color: #a8d8d1;
     box-shadow: var(--shadow);
+  }
+  .course-photo {
+    width: calc(100% + 56px);
+    max-width: none;
+    height: 164px;
+    margin: -28px -28px 8px;
+    object-fit: cover;
+    border-radius: var(--radius) var(--radius) 22px 22px;
+    filter: saturate(0.96) contrast(1.02);
   }
   .course-tile-top {
     display: flex;

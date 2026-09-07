@@ -59,5 +59,3 @@ export function getArticles() {
 export function getArticle(slug: string) {
   return getArticles().find((article) => article.id === slug) ?? null;
 }
-
-
