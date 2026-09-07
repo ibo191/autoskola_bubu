@@ -45,9 +45,6 @@ const stars = '★★★★★';
             fallbackReviews.map((review) => (
               <article class="review-card">
                 <div class="review-head">
-                  <div class="avatar" aria-hidden="true">
-                    {review.authorName.charAt(0)}
-                  </div>
                   <div>
                     <strong>{review.authorName}</strong>
                     <span>{review.relativeTime}</span>
@@ -111,15 +108,11 @@ const stars = '★★★★★';
     const text = escapeText(review.text || '');
     const time = escapeText(review.relativeTime || 'Google recenze');
     const stars = renderStars(review.rating || 5);
-    const photo = review.authorPhotoUri
-      ? `<img src="${escapeText(review.authorPhotoUri)}" alt="" loading="lazy" referrerpolicy="no-referrer" />`
-      : escapeText(author.charAt(0));
     const reviewLink = review.reviewUri
       ? `<a class="review-link" href="${escapeText(review.reviewUri)}" target="_blank" rel="noopener noreferrer">Zobrazit na Google ↗</a>`
       : '';
     return `<article class="review-card">
       <div class="review-head">
-        <div class="avatar" aria-hidden="true">${photo}</div>
         <div><strong>${author}</strong><span>${time}</span></div>
       </div>
       <span class="stars" aria-label="${escapeText(String(review.rating || 5))} z 5 hvězdiček">${stars}</span>
@@ -365,24 +358,6 @@ const stars = '★★★★★';
   [data-google-reviews] .review-head span {
     color: #70757a;
     font-size: 0.76rem;
-  }
-  [data-google-reviews] .avatar {
-    display: grid;
-    width: 38px;
-    height: 38px;
-    flex: 0 0 auto;
-    place-items: center;
-    overflow: hidden;
-    border-radius: 999px;
-    background: #e8f0fe;
-    color: #1a73e8;
-    font-family: Arial, sans-serif;
-    font-weight: 800;
-  }
-  [data-google-reviews] .avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
   }
   [data-google-reviews] .review-card p {
     display: -webkit-box;
