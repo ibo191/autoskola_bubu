@@ -81,18 +81,24 @@ import { branches, courses } from '../lib/catalog';
           <div class="moto-package-grid" id="moto-package-options"></div>
         </div>
         <div class="upsell-panel" aria-labelledby="upsell-title">
-          <div>
-            <span class="eyebrow">Doporučujeme ke kurzu</span>
-            <h3 id="upsell-title">Doplňky k objednávce</h3>
-            <p>Volitelné položky přičteme k celkové ceně kurzu.</p>
+          <div class="upsell-heading">
+            <h3 id="upsell-title">Doplňky ke kurzu</h3>
+            <p>Volitelné položky se přičtou k ceně.</p>
           </div>
-          <label class="addon-card">
-            <input type="checkbox" name="addonBook" />
+          <label class="addon-card book-addon">
+            <img
+              src="/images/products/autoskola-pohodlne.jpg"
+              alt="Knížka Autoškola Pohodlně"
+              loading="lazy"
+              width="72"
+              height="92"
+            />
             <span
               ><strong>Knížka Autoškola Pohodlně</strong><small
                 >Praktická příprava ke zkoušce · 300 Kč</small
               ></span
             >
+            <input type="checkbox" name="addonBook" />
           </label>
           <div class="addon-card addon-quantity">
             <span><strong>Mikina Autoškola BuBu</strong><small>500 Kč/ks s DPH</small></span>
@@ -436,40 +442,66 @@ import { branches, courses } from '../lib/catalog';
     grid-template-columns: 1fr;
   }
   .upsell-panel {
-    border: 1px solid var(--line);
+    border: 1px solid #dbe8e4;
     border-radius: 16px;
-    padding: 20px;
+    padding: 16px;
     display: grid;
+    gap: 10px;
+    background: #fff;
+  }
+  .upsell-heading {
+    display: flex;
+    justify-content: space-between;
     gap: 12px;
-    background: #f8fbfa;
+    align-items: baseline;
   }
   .upsell-panel h3 {
-    margin: 4px 0;
-    font-size: 1.25rem;
+    margin: 0;
+    font-size: 1.02rem;
   }
   .upsell-panel p,
   .addon-card small {
-    font-size: 0.78rem;
-    color: #51625c;
+    font-size: 0.76rem;
+    color: #60716b;
   }
   .addon-card {
-    border: 1px solid #d7e4df;
-    border-radius: 12px;
-    padding: 14px;
-    background: #fff;
+    border: 1px solid #e1ece8;
+    border-radius: 14px;
+    padding: 12px;
+    background: #fbfdfc;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 14px;
+    gap: 12px;
+    transition:
+      border-color var(--ease),
+      background var(--ease),
+      box-shadow var(--ease);
+  }
+  .addon-card:hover {
+    border-color: #b8dcd6;
+    background: #f7fcfa;
   }
   .addon-card input[type='checkbox'] {
-    width: 22px;
-    min-height: 22px;
+    width: 20px;
+    min-height: 20px;
     flex: 0 0 auto;
   }
   .addon-card span {
     display: grid;
-    gap: 4px;
+    gap: 3px;
+  }
+  .book-addon {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+  }
+  .book-addon img {
+    width: 56px;
+    height: 72px;
+    border-radius: 8px;
+    object-fit: cover;
+    object-position: center;
+    box-shadow: 0 8px 18px #17335f18;
   }
   .addon-quantity label {
     max-width: 110px;
@@ -652,6 +684,14 @@ import { branches, courses } from '../lib/catalog';
     }
     .addon-card {
       align-items: flex-start;
+    }
+    .upsell-heading {
+      display: grid;
+      gap: 2px;
+    }
+    .book-addon {
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
     }
     .moto-package-grid {
       grid-template-columns: 1fr;
