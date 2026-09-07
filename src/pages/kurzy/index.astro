@@ -9,6 +9,18 @@ const categoryLabels = {
   moto: 'Motorka',
   prives: 'Přívěs',
 } as const;
+
+const courseIcons = {
+  b: '/icons/ui/mint-car.webp',
+  'b-automat': '/icons/ui/mint-car-automatic.webp',
+  l17: '/icons/ui/mint-graduation.webp',
+  am: '/icons/ui/mint-scooter.webp',
+  a1: '/icons/ui/mint-motorcycle.webp',
+  a2: '/icons/ui/mint-motorcycle.webp',
+  a: '/icons/ui/mint-motorcycle.webp',
+  b96: '/icons/ui/mint-car.webp',
+  be: '/icons/ui/mint-car.webp',
+} as const;
 ---
 
 <Base
@@ -69,7 +81,18 @@ const categoryLabels = {
                 class="course-tile"
                 data-branches={availableBranches.map((branch) => branch.id).join(' ')}
               >
-                <span class="eyebrow">{categoryLabels[course.category]}</span>
+                <div class="course-tile-top">
+                  <span class="eyebrow">{categoryLabels[course.category]}</span>
+                  <span class="course-icon" aria-hidden="true">
+                    <img
+                      src={courseIcons[course.id]}
+                      alt=""
+                      loading="lazy"
+                      width="54"
+                      height="54"
+                    />
+                  </span>
+                </div>
                 <h3>
                   <a href={`/kurzy/${course.slug}`}>{course.label}</a>
                 </h3>
@@ -150,19 +173,68 @@ const categoryLabels = {
     border: 1px solid var(--line);
     border-radius: var(--radius);
     padding: 28px;
-    background: #fff;
+    background: linear-gradient(145deg, #fff 0%, #fff 62%, #f6fbfa 100%);
     display: grid;
     gap: 14px;
     min-height: 100%;
+    position: relative;
+    overflow: hidden;
     transition:
       transform var(--ease),
       border-color var(--ease),
       box-shadow var(--ease);
   }
+  .course-tile::after {
+    content: '';
+    position: absolute;
+    right: -42px;
+    top: -42px;
+    width: 128px;
+    height: 128px;
+    border-radius: 50%;
+    background: #eaf7f4;
+    opacity: 0.72;
+    pointer-events: none;
+  }
   .course-tile:hover {
     transform: translateY(-4px);
     border-color: #a8d8d1;
     box-shadow: var(--shadow);
+  }
+  .course-tile-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    position: relative;
+    z-index: 1;
+  }
+  .course-tile-top .eyebrow {
+    margin-bottom: 0;
+  }
+  .course-icon {
+    width: 62px;
+    height: 62px;
+    border-radius: 18px;
+    background: #f1faf7;
+    border: 1px solid #d9ebe7;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    opacity: 0.9;
+  }
+  .course-icon img {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+  }
+  .course-tile h3,
+  .course-tile p,
+  .course-tile .tile-meta,
+  .course-tile .tile-actions {
+    position: relative;
+    z-index: 1;
   }
   .course-tile h3 {
     font-size: 2rem;
@@ -211,6 +283,15 @@ const categoryLabels = {
   @media (max-width: 640px) {
     .course-tile-grid {
       grid-template-columns: 1fr;
+    }
+    .course-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+    }
+    .course-icon img {
+      width: 38px;
+      height: 38px;
     }
   }
 </style>
