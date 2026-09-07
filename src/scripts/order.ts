@@ -167,9 +167,7 @@ function setStep(value: number) {
     void loadSlots();
   }
   form
-    .querySelector<HTMLElement>(
-      `[data-step="${step}"] input,[data-step="${step}"] select,[data-step="${step}"] .notice`,
-    )
+    .querySelector<HTMLElement>(`[data-step="${step}"] input,[data-step="${step}"] select`)
     ?.focus();
 }
 
