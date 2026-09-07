@@ -1,19 +1,19 @@
 ---
-import { getCollection, render, type CollectionEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import FinalCta from '../../components/FinalCta.astro';
+import { getArticles, type ArticleEntry } from '../../lib/articles';
 export const prerender = true;
 export async function getStaticPaths() {
-  return (await getCollection('articles')).map((article) => ({
+  return getArticles().map((article) => ({
     params: { slug: article.id },
     props: { article },
   }));
 }
 interface Props {
-  article: CollectionEntry<'articles'>;
+  article: ArticleEntry;
 }
 const { article } = Astro.props;
-const { Content } = await render(article);
+const Content = article.Content;
 const a = article.data;
 const schema = {
   '@context': 'https://schema.org',
@@ -48,7 +48,7 @@ const schema = {
       </div>
     </header><div class="section">
       <div class="container content">
-        <Content /><p class="source small">
+        {Content && <Content />}<p class="source small">
           Článek převzat z <a href={a.sourceUrl}>dosavadního webu Autoškoly BuBu</a>. Datum výše je
           původní redakční aktualizace.
         </p><a class="btn primary" href="/kurzy/ridicak-skupina-b">Prohlédnout kurz skupiny B ↗</a>

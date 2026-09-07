@@ -1,11 +1,9 @@
 ---
 export const prerender = true;
-import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import FinalCta from '../../components/FinalCta.astro';
-const articles = (await getCollection('articles')).sort(
-  (a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime(),
-);
+import { getArticles } from '../../lib/articles';
+const articles = getArticles();
 ---
 
 <Base

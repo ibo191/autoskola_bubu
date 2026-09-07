@@ -6,7 +6,14 @@ export type TrackingEvent = {
   valueCzk?: number;
   course?: string;
   branch?: string;
+  campaign?: string;
 };
+
+export type CampaignTrackingName =
+  | 'campaign_view'
+  | 'campaign_cta_click'
+  | 'campaign_form_start'
+  | 'campaign_form_submit';
 
 function safeEvent(input: TrackingEvent) {
   return {
@@ -16,6 +23,7 @@ function safeEvent(input: TrackingEvent) {
       typeof input.valueCzk === 'number' ? Math.max(0, Math.round(input.valueCzk)) : undefined,
     course: input.course?.slice(0, 80),
     branch: input.branch?.slice(0, 80),
+    campaign: input.campaign?.slice(0, 80),
   };
 }
 
@@ -25,6 +33,13 @@ export function trackAnalyticsEvent(input: Omit<TrackingEvent, 'category'>) {
 
 export function trackMarketingEvent(input: Omit<TrackingEvent, 'category'>) {
   void safeEvent({ ...input, category: 'marketing' });
+}
+
+export function trackCampaignEvent(
+  name: CampaignTrackingName,
+  input: Omit<TrackingEvent, 'name' | 'category'> = {},
+) {
+  trackMarketingEvent({ ...input, name });
 }
 
 export function trackLead(input: Omit<TrackingEvent, 'name' | 'category'> = {}) {
