@@ -12,8 +12,31 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
 <Base
   title="Vánoční poukaz Autoškola BuBu – darujte řidičák bez stresu"
   description="Vánoční poukaz Autoškoly BuBu. Rezervujte dárek se zálohou 5 000 Kč, dárkovým balením a bonusem až 1 800 Kč."
+  hideHeader
+  hideFooter
 >
   <main class="christmas-page" data-campaign="vanoce">
+    <div class="xmas-topbar">
+      <div class="container topbar-inner">
+        <span>🎁 VÁNOČNÍ NABÍDKA</span><strong>Řidičák bez stresu i pod stromeček</strong><span
+          >⏱ Platí jen omezenou dobu</span
+        >
+      </div>
+    </div>
+    <nav class="xmas-nav" aria-label="Vánoční landing navigace">
+      <div class="container nav-inner">
+        <a class="xmas-logo" href="/">
+          <img src="/brand/logo.png" alt="Autoškola BuBu" />
+        </a>
+        <div class="nav-links">
+          <a href="#darkovy-balicek">Co dostanete</a>
+          <a href="#bonusy">Bonus</a>
+          <a href="#jak-to-funguje">Jak to funguje</a>
+          <a href="#poukaz-form">Objednat</a>
+        </div>
+        <a class="btn primary nav-cta" href="#poukaz-form">Darovat řidičák</a>
+      </div>
+    </nav>
     <section class="xmas-hero">
       <div class="snow snow-a">❄</div><div class="snow snow-b">❄</div><div class="snow snow-c">
         ✦
@@ -48,6 +71,7 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
         <div class="hero-visual" aria-label="Dárkový poukaz Autoškola BuBu">
           <div class="winter-window"></div>
           <div class="voucher-scene">
+            <div class="xmas-badge">DÁREK POD STROMEČEK</div>
             <div class="envelope"></div>
             <article class="voucher-paper">
               <img src="/brand/logo.png" alt="Autoškola BuBu" />
@@ -66,6 +90,23 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
             <p class="hero-note">VÍCE NEŽ JEN ŘIDIČÁK.<br />SVOBODA NA DOSAH.</p>
           </div>
         </div>
+      </div>
+    </section>
+
+    <section class="hero-strip" aria-label="Výhody vánočního poukazu">
+      <div class="container hero-strip-grid">
+        <article>
+          <span>✓</span><strong>Fyzický poukaz</strong><small>hezky zabalený dárek</small>
+        </article>
+        <article>
+          <span>⌁</span><strong>Všechny pobočky</strong><small>Praha 8, Kladno, Statenice</small>
+        </article>
+        <article>
+          <span>🚗</span><strong>Skupina B</strong><small>manuál, automat i L17</small>
+        </article>
+        <article>
+          <span>🎄</span><strong>Vánoční bonus</strong><small>až {money(1800)} navíc</small>
+        </article>
       </div>
     </section>
 
@@ -95,7 +136,7 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
       </div>
     </section>
 
-    <section class="xmas-section">
+    <section class="xmas-section" id="darkovy-balicek">
       <div class="container">
         <h2 class="center-title">Co dostanete</h2>
         <div class="what-grid">
@@ -151,7 +192,7 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
       </div>
     </section>
 
-    <section class="xmas-section">
+    <section class="xmas-section" id="jak-to-funguje">
       <div class="container">
         <h2 class="center-title">Jak to funguje</h2>
         <div class="how-grid">
@@ -230,7 +271,8 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
             <strong>{money(christmasCampaign.onlineTotalCzk)}</strong><span
               >{money(christmasCampaign.depositCzk)} záloha + {
                 money(christmasCampaign.packagingAndDeliveryCzk)
-              } balení a doručení</span>
+              } balení a doručení</span
+            >
           </div>
         </div>
         <form class="voucher-form" id="voucher-form" novalidate>
@@ -312,6 +354,17 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
         </form>
       </div>
     </section>
+    <footer class="xmas-footer">
+      <div class="container footer-inner">
+        <a class="xmas-logo" href="/"><img src="/brand/logo.png" alt="Autoškola BuBu" /></a>
+        <div class="footer-links">
+          <a href="/kurzy">Kurzy</a><a href="/#pobocky">Pobočky</a><a href="/o-nas">O nás</a><a
+            href="/kontakt">Kontakt</a
+          >
+        </div>
+        <p>VÍCE NEŽ JEN ŘIDIČÁK. <span>♡</span></p>
+      </div>
+    </footer>
   </main>
 </Base>
 
@@ -440,6 +493,119 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
   :global(.christmas-page .btn.primary:hover) {
     background: linear-gradient(135deg, #067cad, #0499c4);
   }
+  .xmas-topbar {
+    background: #06080d;
+    color: #fff;
+    font-size: 0.86rem;
+    font-weight: 800;
+  }
+  .topbar-inner {
+    min-height: 38px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    text-align: center;
+  }
+  .topbar-inner span:first-child {
+    color: #f2c65d;
+  }
+  .topbar-inner span:last-child {
+    color: #eaf7ff;
+  }
+  .xmas-nav {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: rgba(255, 255, 255, 0.92);
+    border-bottom: 1px solid #deedf5;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 10px 26px #12365a0b;
+  }
+  .nav-inner {
+    min-height: 82px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .xmas-logo {
+    display: inline-flex;
+    align-items: center;
+    width: 168px;
+    text-decoration: none;
+  }
+  .xmas-logo img {
+    width: 100%;
+    height: auto;
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(18px, 3vw, 44px);
+    font-size: 0.9rem;
+    font-weight: 800;
+  }
+  .nav-links a {
+    color: #101b35;
+    text-decoration: none;
+  }
+  .nav-links a:hover {
+    color: #078bc2;
+  }
+  .nav-cta {
+    min-height: 50px;
+    border-radius: 12px;
+    padding-inline: 22px;
+  }
+  .hero-strip {
+    position: relative;
+    z-index: 2;
+    margin-top: -16px;
+    padding-bottom: 24px;
+  }
+  .hero-strip-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    overflow: hidden;
+    border: 1px solid #deedf5;
+    border-radius: 16px;
+    background: #deedf5;
+    box-shadow: 0 20px 48px #12365a14;
+  }
+  .hero-strip article {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    column-gap: 12px;
+    background: rgba(255, 255, 255, 0.94);
+    padding: 18px 22px;
+  }
+  .hero-strip span {
+    grid-row: 1 / span 2;
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #e0f5ff;
+    color: #078bc2;
+    font-weight: 950;
+  }
+  .hero-strip strong,
+  .hero-strip small {
+    display: block;
+  }
+  .hero-strip strong {
+    color: #101b35;
+    font-size: 0.96rem;
+  }
+  .hero-strip small {
+    color: #64768b;
+    font-size: 0.78rem;
+  }
   .xmas-hero {
     position: relative;
     padding: 72px 0 34px;
@@ -449,7 +615,7 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
   }
   .xmas-hero-grid {
     display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
+    grid-template-columns: minmax(0, 0.95fr) minmax(520px, 1.05fr);
     gap: 42px;
     align-items: center;
   }
@@ -463,7 +629,7 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
     margin-bottom: 14px;
   }
   .xmas-copy h1 {
-    font-size: clamp(3rem, 6vw, 5.9rem);
+    font-size: clamp(3rem, 4.65vw, 4.85rem);
     color: #080c16;
     max-width: 760px;
   }
@@ -475,7 +641,7 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
     max-width: 690px;
     color: #0d1627;
     font-size: clamp(1.08rem, 1.6vw, 1.42rem);
-    line-height: 1.55;
+    line-height: 1.5;
   }
   .deposit-box {
     display: grid;
@@ -554,7 +720,7 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
   }
   .hero-visual {
     position: relative;
-    min-height: 540px;
+    min-height: 520px;
     border-radius: 0 0 0 56px;
     overflow: hidden;
   }
@@ -582,6 +748,28 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
     position: absolute;
     inset: 42px 26px 18px;
   }
+
+  .xmas-badge {
+    position: absolute;
+    left: 18px;
+    top: 34px;
+    z-index: 5;
+    width: max-content;
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: #fff;
+    color: #0b77a5;
+    border: 1px solid #d7eaf4;
+    box-shadow: 0 12px 28px #12365a16;
+    font-size: 0.72rem;
+    font-weight: 950;
+    letter-spacing: 0.12em;
+  }
+  .xmas-badge::before {
+    content: '🎄';
+    margin-right: 8px;
+  }
+
   .envelope {
     position: absolute;
     right: 110px;
@@ -778,7 +966,7 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
   .how-grid p {
     margin-top: 10px;
     font-size: 0.92rem;
-    line-height: 1.55;
+    line-height: 1.5;
   }
   .mini-asset {
     height: 150px;
@@ -942,6 +1130,44 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
     background: #f2fbff;
     padding-top: 52px;
   }
+  .xmas-footer {
+    border-top: 1px solid #deedf5;
+    background: #fff;
+    padding: 24px 0;
+  }
+  .footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+    font-size: 0.84rem;
+    font-weight: 800;
+  }
+  .footer-links a {
+    color: #101b35;
+    text-decoration: none;
+  }
+  .footer-links a:hover {
+    color: #078bc2;
+  }
+  .xmas-footer p {
+    margin: 0;
+    color: #41546d;
+    font-size: 0.82rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-align: right;
+  }
+  .xmas-footer p span {
+    color: #0b7fae;
+    font-size: 1.3rem;
+  }
+
   .form-wrap {
     display: grid;
     grid-template-columns: 0.75fr 1.25fr;
@@ -1049,8 +1275,54 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
     }
   }
   @media (max-width: 700px) {
+    .topbar-inner {
+      min-height: auto;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+      padding: 7px 0;
+      font-size: 0.74rem;
+      line-height: 1.25;
+    }
+    .topbar-inner strong {
+      width: 100%;
+      order: 3;
+      font-size: 0.78rem;
+    }
+    .nav-inner {
+      min-height: 68px;
+    }
+    .nav-links {
+      display: none;
+    }
+    .xmas-logo {
+      width: 134px;
+    }
+    .nav-cta {
+      min-height: 42px;
+      padding-inline: 14px;
+      font-size: 0.78rem;
+    }
     .xmas-hero {
-      padding-top: 44px;
+      padding: 30px 0 18px;
+    }
+    .xmas-hero-grid {
+      gap: 20px;
+    }
+    .deposit-box {
+      grid-template-columns: 1fr;
+      padding: 14px;
+    }
+    .coin-icon {
+      width: 38px;
+      height: 38px;
+    }
+    .gift-btn,
+    .bonus-pill {
+      width: 100%;
+      min-height: 54px;
+      justify-content: center;
+      text-align: center;
     }
     .reason-grid,
     .what-grid,
@@ -1060,21 +1332,79 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
     .form-grid {
       grid-template-columns: 1fr;
     }
+    .hero-strip {
+      margin-top: 0;
+      padding: 10px 0 12px;
+    }
+    .hero-strip-grid {
+      grid-template-columns: 1fr;
+      border-radius: 14px;
+    }
+    .hero-strip article {
+      padding: 14px 16px;
+    }
     .hero-visual {
-      min-height: 430px;
+      min-height: 360px;
+      border-radius: 28px;
+      margin-top: 4px;
+    }
+    .voucher-scene {
+      inset: 24px 12px 12px;
+    }
+    .xmas-badge {
+      left: 6px;
+      top: 6px;
+      font-size: 0.58rem;
+      padding: 7px 10px;
     }
     .voucher-paper {
-      right: 5px;
-      width: 86vw;
-      padding: 28px;
+      right: 6px;
+      top: 84px;
+      width: 82vw;
+      min-height: 220px;
+      padding: 24px 22px;
+      transform: rotate(3deg);
+    }
+    .voucher-paper img {
+      width: 92px;
+      margin-bottom: 12px;
+    }
+    .voucher-paper span {
+      font-size: 1.04rem;
+    }
+    .voucher-paper p {
+      margin-top: 16px;
+      font-size: 1rem;
+    }
+    .voucher-paper::before {
+      width: 58px;
+      height: 138px;
+      left: -18px;
+      top: 18px;
     }
     .envelope {
-      right: 70px;
-      width: 330px;
+      right: 54px;
+      top: 62px;
+      width: 280px;
+      height: 190px;
+    }
+    .car-key {
+      right: 8px;
+      top: 196px;
+      width: 56px;
+      height: 100px;
+      border-radius: 18px;
     }
     .bubak-gift {
-      left: 10px;
-      width: 132px;
+      left: 6px;
+      bottom: 30px;
+      width: 116px;
+    }
+    .gift-box {
+      left: 114px;
+      bottom: 38px;
+      width: 52px;
+      height: 52px;
     }
     .hero-note {
       display: none;
@@ -1082,9 +1412,49 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
     .mini-proof {
       display: grid;
       gap: 8px;
+      margin-top: 18px;
     }
     .xmas-copy h1 {
-      font-size: clamp(2.6rem, 12vw, 4.2rem);
+      font-size: clamp(2.36rem, 11vw, 3.8rem);
+    }
+    .xmas-lead {
+      font-size: 1rem;
+    }
+    .xmas-section {
+      padding: 32px 0;
+    }
+    .center-title {
+      margin-bottom: 18px;
+      font-size: clamp(1.65rem, 8vw, 2.1rem);
+    }
+    .reason-grid article,
+    .what-grid article,
+    .how-grid article,
+    .faq-grid details {
+      padding: 20px;
+    }
+    .bonus-choice {
+      grid-template-columns: auto 1fr;
+      padding: 18px;
+    }
+    .bonus-choice input {
+      order: 0;
+    }
+    .bottom-card {
+      padding: 24px 20px;
+    }
+    .form-wrap {
+      gap: 20px;
+    }
+    .voucher-form {
+      padding: 20px;
+    }
+    .footer-inner {
+      flex-direction: column;
+      text-align: center;
+    }
+    .xmas-footer p {
+      text-align: center;
     }
   }
 </style>

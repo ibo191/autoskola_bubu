@@ -8,8 +8,17 @@ interface Props {
   description: string;
   noindex?: boolean;
   schema?: Record<string, unknown>;
+  hideHeader?: boolean;
+  hideFooter?: boolean;
 }
-const { title, description, noindex = false, schema } = Astro.props;
+const {
+  title,
+  description,
+  noindex = false,
+  schema,
+  hideHeader = false,
+  hideFooter = false,
+} = Astro.props;
 const path = Astro.url.pathname;
 const canonical = new URL(path, 'https://www.autoskolabubu.cz').href;
 const nav = [
@@ -56,36 +65,49 @@ const nav = [
     }</head
   ><body>
     <a class="skip" href="#main">Přeskočit na obsah</a>
-    <header>
-      <div class="container header-inner">
-        <a href="/" class="logo" aria-label="Autoškola BuBu – úvod"
-          ><img
-            src="/brand/logo.png"
-            alt="Autoškola BuBu"
-            width="588"
-            height="217"
-            fetchpriority="high"
-          /></a
-        ><button class="menu-toggle btn secondary" aria-expanded="false" aria-controls="navigation"
-          >Menu <span aria-hidden="true">☰</span></button
-        ><nav id="navigation" aria-label="Hlavní navigace">
-          {
-            nav.map(([href, label]) => (
-              <a
-                href={href}
-                aria-current={
-                  path === href || (href !== '/' && path.startsWith(`${href}/`))
-                    ? 'page'
-                    : undefined
-                }
-              >
-                {label}
+    {
+      !hideHeader && (
+        <header>
+          <div class="container header-inner">
+            <>
+              <a href="/" class="logo" aria-label="Autoškola BuBu – úvod">
+                <img
+                  src="/brand/logo.png"
+                  alt="Autoškola BuBu"
+                  width="588"
+                  height="217"
+                  fetchpriority="high"
+                />
               </a>
-            ))
-          }<button class="btn primary" data-order disabled>Přihlásit se ↗</button>
-        </nav>
-      </div>
-    </header>
+              <button
+                class="menu-toggle btn secondary"
+                aria-expanded="false"
+                aria-controls="navigation"
+              >
+                Menu <span aria-hidden="true">☰</span>
+              </button>
+              <nav id="navigation" aria-label="Hlavní navigace">
+                {nav.map(([href, label]) => (
+                  <a
+                    href={href}
+                    aria-current={
+                      path === href || (href !== '/' && path.startsWith(`${href}/`))
+                        ? 'page'
+                        : undefined
+                    }
+                  >
+                    {label}
+                  </a>
+                ))}
+                <button class="btn primary" data-order disabled>
+                  Přihlásit se ↗
+                </button>
+              </nav>
+            </>
+          </div>
+        </header>
+      )
+    }
     <main id="main">
       <noscript
         ><div class="container notice">
@@ -94,48 +116,66 @@ const nav = [
         </div></noscript
       ><slot />
     </main>
-    <footer>
-      <div class="container">
-        <div class="footer-grid">
-          <div>
-            <a class="logo" href="/"
-              ><img
-                src="/brand/logo.png"
-                alt="Autoškola BuBu"
-                width="588"
-                height="217"
-                loading="lazy"
-              /></a
-            ><p>Za řidičákem s lidským přístupem.<br />Praha 8 · Kladno · Statenice</p>
-          </div>{
-            branches.map((b) => (
-              <div>
+    {
+      !hideFooter && (
+        <footer>
+          <div class="container">
+            <>
+              <div class="footer-grid">
+                <div>
+                  <>
+                    <a class="logo" href="/">
+                      <img
+                        src="/brand/logo.png"
+                        alt="Autoškola BuBu"
+                        width="588"
+                        height="217"
+                        loading="lazy"
+                      />
+                    </a>
+                    <p>
+                      Za řidičákem s lidským přístupem.
+                      <br />
+                      Praha 8 · Kladno · Statenice
+                    </p>
+                  </>
+                </div>
+                {branches.map((b) => (
+                  <div>
+                    <>
+                      <h2>
+                        <a href={`/${b.id}`}>{b.name}</a>
+                      </h2>
+                      <p>{b.address}</p>
+                      <a href={`tel:${b.phone}`}>
+                        {b.phone.replace(/(\+420)(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4')}
+                      </a>
+                      <a href={`mailto:${b.email}`}>{b.email}</a>
+                    </>
+                  </div>
+                ))}
+              </div>
+              <div class="footer-bottom">
                 <>
-                  <h2>
-                    <a href={`/${b.id}`}>{b.name}</a>
-                  </h2>
-                  <p>{b.address}</p>
-                  <a href={`tel:${b.phone}`}>
-                    {b.phone.replace(/(\+420)(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4')}
-                  </a>
-                  <a href={`mailto:${b.email}`}>{b.email}</a>
+                  <span>© {new Date().getFullYear()} Autoškola BuBu</span>
+                  <div>
+                    <>
+                      <a href="/obchodni-podminky">Obchodní podmínky</a>
+                      <a href="/ochrana-osobnich-udaju">Ochrana osobních údajů</a>
+                      <a href="/zasady-pouzivani-cookies">Zásady cookies</a>
+                      <button type="button" data-open-cookie-settings class="footer-link-button">
+                        Nastavení cookies
+                      </button>
+                      <a href="/sprava">Interní správa</a>
+                    </>
+                  </div>
                 </>
               </div>
-            ))
-          }
-        </div><div class="footer-bottom">
-          <span>© {new Date().getFullYear()} Autoškola BuBu</span><div>
-            <a href="/obchodni-podminky">Obchodní podmínky</a><a href="/ochrana-osobnich-udaju"
-              >Ochrana osobních údajů</a
-            ><a href="/zasady-pouzivani-cookies">Zásady cookies</a><button
-              type="button"
-              data-open-cookie-settings
-              class="footer-link-button">Nastavení cookies</button
-            ><a href="/sprava">Interní správa</a>
+            </>
           </div>
-        </div>
-      </div>
-    </footer>
+        </footer>
+      )
+    }
     <OrderDialog />
     <CookieConsent />
     <script>
