@@ -115,7 +115,7 @@ export class CreateOrderService {
         privacy: {
           version: 'GDPR-2026-09-01',
           wording:
-            'Beru na vědomí zpracování osobních údajů potřebné pro objednávku a rezervaci zápisu.',
+            'Odesláním objednávky potvrzujete, že jste se seznámil/a s Informacemi o zpracování osobních údajů. Vaše údaje zpracováváme zejména za účelem vyřízení objednávky, rezervace zápisu a uzavření a plnění smlouvy.',
           accepted: true,
         },
         addons: serverQuote.addons,

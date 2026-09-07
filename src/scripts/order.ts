@@ -507,7 +507,7 @@ async function submitOrder() {
     selection: selectionWithAddons(),
     priceVersion: validQuote.priceVersion,
     termsAccepted: (field('terms') as HTMLInputElement).checked,
-    privacyAccepted: (field('privacy') as HTMLInputElement).checked,
+    privacyAccepted: true,
     marketingAccepted: (field('marketing') as HTMLInputElement).checked,
   };
   try {

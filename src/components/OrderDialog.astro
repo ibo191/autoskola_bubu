@@ -181,29 +181,26 @@ import { branches, courses } from '../lib/catalog';
             ><span>Ne</span>
           </div>
           <div id="calendar-days" class="calendar-days"></div>
-          <div id="slot-list" class="slot-list"><p>Vyberte zvýrazněný den v kalendáři.</p></div>`n <p
-            id="selected-slot-label"
-            class="selected-slot-label"
-          >
-            Termín zatím není vybraný.
-          </p>
+          <div id="slot-list" class="slot-list"><p>Vyberte zvýrazněný den v kalendáři.</p></div>
+          <p id="selected-slot-label" class="selected-slot-label">Termín zatím není vybraný.</p>
         </div>
         <label class="checkbox"
           ><input type="checkbox" name="terms" required /><span
-            >Souhlasím s <a href="/obchodni-podminky" target="_blank" rel="noreferrer"
-              >obchodními podmínkami</a
-            >.</span
+            >Seznámil/a jsem se s
+            <a href="/obchodni-podminky" target="_blank" rel="noreferrer"
+              >Všeobecnými obchodními podmínkami</a
+            > a souhlasím s nimi.</span
           ></label
-        ><label class="checkbox"
-          ><input type="checkbox" name="privacy" required /><span
-            >Beru na vědomí
-            <a href="/ochrana-osobnich-udaju" target="_blank" rel="noreferrer"
-              >zpracování osobních údajů</a
-            > potřebné pro objednávku a rezervaci zápisu.</span
-          ></label
-        ><label class="checkbox"
+        ><p class="legal-note">
+          Odesláním objednávky potvrzujete, že jste se seznámil/a s
+          <a href="/ochrana-osobnich-udaju" target="_blank" rel="noreferrer"
+            >Informacemi o zpracování osobních údajů</a
+          >. Vaše údaje zpracováváme zejména za účelem vyřízení objednávky, rezervace zápisu a
+          uzavření a plnění smlouvy.
+        </p><label class="checkbox"
           ><input type="checkbox" name="marketing" /><span
-            >Chci dostávat novinky a praktické informace od Autoškoly BuBu.</span
+            >Chci dostávat novinky, nabídky a informace o akcích Autoškoly BuBu. Souhlas mohu
+            kdykoliv odvolat.</span
           ></label
         ><button type="submit" id="order-submit" class="btn primary">Odeslat objednávku</button>
       </fieldset>
@@ -334,6 +331,20 @@ import { branches, courses } from '../lib/catalog';
     min-height: 20px;
     flex-shrink: 0;
     margin: 2px 8px 0 0;
+  }
+  .legal-note {
+    margin: 10px 0 18px;
+    padding: 14px 16px;
+    border: 1px solid #d7e4df;
+    border-radius: 12px;
+    background: #f8fbfa;
+    color: var(--muted);
+    font-size: 0.78rem;
+    line-height: 1.65;
+  }
+  .legal-note a {
+    color: var(--brand-dark);
+    font-weight: 700;
   }
   #package-field {
     position: absolute;

@@ -5,10 +5,9 @@ import { requestFingerprint } from '../security/rate-limit';
 import type { CaptchaAdapter } from '../integrations/contracts';
 import { createTransactionalEmailAdapter, orderNotificationEmail } from './email';
 
-const termsWording =
-  'Souhlasím se všeobecnými obchodními podmínkami Autoškoly BuBu s.r.o. zveřejněnými na webu.';
+const termsWording = 'Seznámil/a jsem se s Všeobecnými obchodními podmínkami a souhlasím s nimi.';
 const marketingWording =
-  'Souhlasím se zasíláním dobrovolných novinek a informací o službách Autoškoly BuBu s.r.o.';
+  'Chci dostávat novinky, nabídky a informace o akcích Autoškoly BuBu. Souhlas mohu kdykoliv odvolat.';
 
 class PreviewCaptcha implements CaptchaAdapter {
   async verify(input: { token: string; action: string }) {

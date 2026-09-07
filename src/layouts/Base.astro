@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import OrderDialog from '../components/OrderDialog.astro';
+import CookieConsent from '../components/CookieConsent.astro';
 import { branches } from '../lib/catalog';
 interface Props {
   title: string;
@@ -126,12 +127,17 @@ const nav = [
           <span>© {new Date().getFullYear()} Autoškola BuBu</span><div>
             <a href="/obchodni-podminky">Obchodní podmínky</a><a href="/ochrana-osobnich-udaju"
               >Ochrana osobních údajů</a
+            ><a href="/zasady-pouzivani-cookies">Zásady cookies</a><button
+              type="button"
+              data-open-cookie-settings
+              class="footer-link-button">Nastavení cookies</button
             ><a href="/sprava">Interní správa</a>
           </div>
         </div>
       </div>
     </footer>
     <OrderDialog />
+    <CookieConsent />
     <script>
       const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
       toggle?.addEventListener('click', () => {
@@ -238,6 +244,17 @@ const nav = [
   .footer-bottom > div {
     display: flex;
     gap: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .footer-link-button {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 4px;
   }
   @media (max-width: 950px) {
     .header-inner nav {
