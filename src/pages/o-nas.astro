@@ -3,6 +3,9 @@ export const prerender = true;
 import Base from '../layouts/Base.astro';
 import BranchCards from '../components/BranchCards.astro';
 import FinalCta from '../components/FinalCta.astro';
+import { Image } from 'astro:assets';
+import automaticScala from '../assets/courses/b-automatic-scala.png';
+import manualFabia from '../assets/courses/b-manual-fabia.png';
 
 const partners = [
   { name: 'Kvalty', text: 'Portál pro výběr a hodnocení autoškol.' },
@@ -10,6 +13,38 @@ const partners = [
   {
     name: 'Optiscont optika',
     text: 'Optika pro studenty, kteří řeší zrak před kurzem nebo zdravotním posudkem.',
+  },
+];
+
+const fleet = [
+  {
+    id: 'automat',
+    label: 'Automat',
+    title: 'Škoda Scala ve verzi automat',
+    text: 'Klidný start pro studenty, kteří se chtějí soustředit hlavně na provoz, značky, přednosti a bezpečné rozhodování bez řazení.',
+    meta: 'Skupina B automat',
+    image: automaticScala,
+    alt: 'Černá Škoda Scala Autoškoly BuBu pro výcvik na automat',
+  },
+  {
+    id: 'manual',
+    label: 'Manuál',
+    title: 'Škoda Fabia 3. generace v manuálu',
+    text: 'Pro manuální výcvik používáme více vozů Škoda Fabia třetí generace. Studenti tak jezdí v přehledném autě, které se dobře ovládá i při prvních jízdách.',
+    meta: 'Skupina B a L17',
+    image: manualFabia,
+    alt: 'Bílá Škoda Fabia Autoškoly BuBu pro manuální výcvik skupiny B',
+  },
+];
+
+const fleetGroups = [
+  {
+    title: 'Motorky',
+    text: 'A1 Honda 125, A2 Kawasaki, skupina A Suzuki Bandit a 2× Kawasaki Z650.',
+  },
+  {
+    title: 'Přívěsy a větší auta',
+    text: 'Pro výcvik s přívěsnými vozíky a většími auty máme přívěsný vozík a Seat Alhambra.',
   },
 ];
 ---
@@ -71,6 +106,66 @@ const partners = [
       </div>
     </div>
   </section>
+  <section class="section fleet-section" id="nas-vozovy-park">
+    <div class="container">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">Náš vozový park</span><h2>Auta a motorky, na kterých se učí.</h2><p>
+            Výcvik stavíme na technice, která studentům dává jistotu od prvních rozjezdů až po
+            závěrečnou zkoušku.
+          </p>
+        </div>
+      </div>
+      <div class="fleet-switcher" aria-label="Vozový park Autoškoly BuBu">
+        {
+          fleet.map((vehicle, index) => (
+            <>
+              <input id={`fleet-${vehicle.id}`} type="radio" name="fleet" checked={index === 0} />
+              <label for={`fleet-${vehicle.id}`}>{vehicle.label}</label>
+            </>
+          ))
+        }
+        <div class="fleet-panels">
+          {
+            fleet.map((vehicle) => (
+              <article class="fleet-panel" data-fleet-panel={vehicle.id}>
+                <div class="fleet-photo">
+                  <Image
+                    src={vehicle.image}
+                    alt={vehicle.alt}
+                    widths={[480, 760, 1040]}
+                    sizes="(max-width: 760px) 92vw, 48vw"
+                    format="webp"
+                    loading="lazy"
+                  />
+                </div>
+                <div class="fleet-copy">
+                  <span class="eyebrow">{vehicle.meta}</span>
+                  <h3>{vehicle.title}</h3>
+                  <p>{vehicle.text}</p>
+                  <ul class="checklist compact-list">
+                    <li>Vhodné pro běžný městský provoz.</li>
+                    <li>Přehledné ovládání pro začátečníky.</li>
+                    <li>Výcvik bez zbytečného stresu.</li>
+                  </ul>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+      <div class="fleet-more-grid">
+        {
+          fleetGroups.map((item) => (
+            <article class="card fleet-more-card">
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
   <section class="section partners-section">
     <div class="container">
       <div class="section-heading">
@@ -103,7 +198,129 @@ const partners = [
   .story-copy p {
     font-size: 1rem;
   }
+  .fleet-switcher {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, max-content)) 1fr;
+    gap: 12px;
+    align-items: center;
+  }
+  .fleet-switcher > input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .fleet-switcher > label {
+    min-height: 46px;
+    padding: 12px 20px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--ink);
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+      background var(--ease),
+      border-color var(--ease),
+      color var(--ease),
+      box-shadow var(--ease);
+  }
+  .fleet-switcher > input:focus-visible + label {
+    outline: 3px solid #9dd9dc;
+    outline-offset: 3px;
+  }
+  #fleet-automat:checked + label,
+  #fleet-manual:checked + label {
+    border-color: transparent;
+    background: var(--brand);
+    color: #fff;
+    box-shadow: 0 14px 32px rgba(77, 174, 182, 0.22);
+  }
+  .fleet-panels {
+    grid-column: 1 / -1;
+    margin-top: 14px;
+    border: 1px solid var(--line);
+    border-radius: 30px;
+    background: linear-gradient(135deg, #ffffff 0%, #f2fbfa 100%);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .fleet-panel {
+    display: none;
+    grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+    gap: 0;
+    align-items: stretch;
+  }
+  #fleet-automat:checked ~ .fleet-panels [data-fleet-panel='automat'],
+  #fleet-manual:checked ~ .fleet-panels [data-fleet-panel='manual'] {
+    display: grid;
+  }
+  .fleet-photo {
+    min-height: 390px;
+    background: #e8f3f4;
+  }
+  .fleet-photo img {
+    width: 100%;
+    height: 100%;
+    min-height: 390px;
+    object-fit: cover;
+    display: block;
+  }
+  .fleet-copy {
+    padding: clamp(28px, 4vw, 52px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .fleet-copy h3 {
+    font-size: clamp(2rem, 3vw, 3.2rem);
+    margin-bottom: 14px;
+  }
+  .compact-list {
+    margin-top: 22px;
+  }
+  .fleet-more-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 22px;
+  }
+  .fleet-more-card {
+    background: #fff;
+  }
   .partner-card h3 {
     font-size: 1.7rem;
+  }
+  @media (max-width: 860px) {
+    .fleet-switcher {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .fleet-switcher > label {
+      text-align: center;
+    }
+    .fleet-panel {
+      grid-template-columns: 1fr;
+    }
+    .fleet-photo,
+    .fleet-photo img {
+      min-height: 280px;
+    }
+    .fleet-more-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 560px) {
+    .fleet-switcher {
+      gap: 10px;
+    }
+    .fleet-switcher > label {
+      padding-inline: 14px;
+    }
+    .fleet-panels {
+      border-radius: 24px;
+    }
+    .fleet-photo,
+    .fleet-photo img {
+      min-height: 220px;
+    }
   }
 </style>

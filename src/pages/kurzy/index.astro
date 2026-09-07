@@ -1,8 +1,11 @@
 ---
 export const prerender = true;
+import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import FinalCta from '../../components/FinalCta.astro';
 import { branches, courses, availableAt, displayPrice, money } from '../../lib/catalog';
+import automaticScala from '../../assets/courses/b-automatic-scala.png';
+import manualFabia from '../../assets/courses/b-manual-fabia.png';
 
 const categoryLabels = {
   auto: 'Auto',
@@ -11,9 +14,9 @@ const categoryLabels = {
 } as const;
 
 const coursePhotos = {
-  b: '/images/courses/b-manual.webp',
-  'b-automat': '/images/courses/b-automatic.webp',
-  l17: '/images/courses/b-manual.webp',
+  b: manualFabia,
+  'b-automat': automaticScala,
+  l17: manualFabia,
 } as const;
 
 const courseIcons = {
@@ -88,13 +91,13 @@ const courseIcons = {
                 data-branches={availableBranches.map((branch) => branch.id).join(' ')}
               >
                 {course.id in coursePhotos && (
-                  <img
+                  <Image
                     class="course-photo"
                     src={coursePhotos[course.id as keyof typeof coursePhotos]}
                     alt={
                       course.id === 'b-automat'
-                        ? 'Černé auto Autoškoly BuBu pro automat'
-                        : 'Bílé auto Autoškoly BuBu pro manuální kurz'
+                        ? 'Černá Škoda Scala Autoškoly BuBu pro automat'
+                        : 'Bílá Škoda Fabia Autoškoly BuBu pro manuální kurz'
                     }
                     loading="lazy"
                     width="560"

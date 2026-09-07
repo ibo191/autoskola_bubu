@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
-import manualCar from '../assets/courses/b-manual.webp';
-import automaticCar from '../assets/courses/b-automatic.webp';
+import manualCar from '../assets/courses/b-manual-fabia.png';
+import automaticCar from '../assets/courses/b-automatic-scala.png';
 import moto from '../assets/moto.jpeg';
 import trailer from '../assets/trailer.jpeg';
 import { displayPrice, money, type Course, type BranchId } from '../lib/catalog';
@@ -28,9 +28,9 @@ const asset =
         src={asset}
         alt={
           course.id === 'b-automat'
-            ? 'Černé výcvikové auto Autoškoly BuBu pro automat'
+            ? 'Černá Škoda Scala Autoškoly BuBu pro automat'
             : course.category === 'auto'
-              ? 'Bílé výcvikové auto Autoškoly BuBu pro manuál'
+              ? 'Bílá Škoda Fabia Autoškoly BuBu pro manuál'
               : course.category === 'moto'
                 ? 'Motocykly Autoškoly BuBu'
                 : 'Auto s přívěsem Autoškoly BuBu'

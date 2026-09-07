@@ -12,8 +12,8 @@ import {
   money,
   type Course,
 } from '../../lib/catalog';
-import manualCar from '../../assets/courses/b-manual.webp';
-import automaticCar from '../../assets/courses/b-automatic.webp';
+import manualCar from '../../assets/courses/b-manual-fabia.png';
+import automaticCar from '../../assets/courses/b-automatic-scala.png';
 import moto from '../../assets/moto.jpeg';
 import trailer from '../../assets/trailer.jpeg';
 export const prerender = true;
@@ -154,9 +154,9 @@ const schema = {
         </div><Image
           src={photo}
           alt={course.id === 'b-automat'
-            ? 'Černé auto Autoškoly BuBu pro výcvik na automat'
+            ? 'Černá Škoda Scala Autoškoly BuBu pro výcvik na automat'
             : course.category === 'auto'
-              ? 'Bílé auto Autoškoly BuBu pro manuální výcvik skupiny B'
+              ? 'Bílá Škoda Fabia Autoškoly BuBu pro manuální výcvik skupiny B'
               : course.category === 'moto'
                 ? 'Výcvikové motocykly Autoškoly BuBu'
                 : 'Výcviková souprava s přívěsem'}
