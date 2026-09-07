@@ -15,6 +15,7 @@ export const campaignRequestSchema = z
         course: z.string().max(40).optional(),
         branch: z.string().max(40).optional(),
         bonusVariant: z.string().max(80).optional(),
+        deliveryMethod: z.enum(['shipping', 'branch-pickup']).optional(),
       })
       .default({}),
     payload: z.record(z.string(), z.unknown()).default({}),
@@ -76,7 +77,7 @@ export class CampaignRequestRepository {
         selection: input.selection,
         payload: { ...input.payload, sourceUrl: meta.sourceUrl },
         amount_due_czk: meta.amountDueCzk ?? null,
-        payment_status: meta.amountDueCzk ? 'pending_future_payment' : 'not_required',
+        payment_status: meta.amountDueCzk ? 'pending_offline_payment' : 'not_required',
         consent_terms: { ...campaignConsent.terms, accepted: true },
         consent_privacy: { ...campaignConsent.privacy, accepted: true },
         consent_marketing: { ...campaignConsent.marketing, accepted: input.marketingAccepted },

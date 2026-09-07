@@ -6,12 +6,18 @@ import { branches, money } from '../lib/catalog';
 import { campaignConsent } from '../lib/campaigns/requests';
 
 const courses = campaignCourseOptions();
-const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze zálohu ${money(christmasCampaign.depositCzk)} a my vám připravíme fyzický poukaz jako dárek.`;
+const defaultDelivery = christmasCampaign.deliveryOptions[0] ?? {
+  id: 'shipping',
+  label: 'Doručení na adresu',
+  priceCzk: christmasCampaign.packagingAndDeliveryCzk,
+  note: 'Balné a poštovné za fyzický poukaz.',
+};
+const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte zálohu ${money(christmasCampaign.depositCzk)} převodem na účet nebo osobně v autoškole. Poukaz vám doručíme, nebo si ho můžete vyzvednout na pobočce.`;
 ---
 
 <Base
   title="Vánoční poukaz Autoškola BuBu – darujte řidičák bez stresu"
-  description="Vánoční poukaz Autoškoly BuBu. Rezervujte dárek se zálohou 5 000 Kč, dárkovým balením a bonusem až 1 800 Kč."
+  description="Vánoční poukaz Autoškoly BuBu. Rezervujte dárek se zálohou 5 000 Kč, dárkovým balením a bonusem až 1 600 Kč."
   hideHeader
   hideFooter
 >
@@ -50,21 +56,21 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
             <span class="coin-icon">▣</span>
             <div>
               <strong
-                >{money(christmasCampaign.depositCzk)} záloha na kurz + {
-                  money(christmasCampaign.packagingAndDeliveryCzk)
-                } dárkové balení a doručení</strong
-              ><small>Zálohu následně v plné výši odečteme z ceny kurzu.</small>
+                >{money(christmasCampaign.depositCzk)} záloha na kurz + převzetí od {
+                  money(christmasCampaign.pickupCzk)
+                }</strong
+              ><small>Platba probíhá převodem na účet nebo osobně na pobočce.</small>
             </div>
           </div>
           <div class="xmas-actions">
             <a class="btn primary gift-btn" href="#poukaz-form">Chci darovat řidičák →</a>
             <a class="bonus-pill" href="#bonusy"
-              ><span>🎁</span> + Vánoční bonus <strong>až {money(1800)}</strong></a
+              ><span>🎁</span> + Vánoční bonus <strong>až {money(1600)}</strong></a
             >
           </div>
           <div class="mini-proof" aria-label="Výhody poukazu">
-            <span>Fyzický poukaz jako dárek</span><span>Platí na všechny pobočky</span><span
-              >Snadné objednání</span
+            <span>Fyzický poukaz jako dárek</span><span>Platba převodem nebo na pobočce</span><span
+              >Doručení nebo osobní převzetí</span
             >
           </div>
         </div>
@@ -96,7 +102,7 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
     <section class="hero-strip" aria-label="Výhody vánočního poukazu">
       <div class="container hero-strip-grid">
         <article>
-          <span>✓</span><strong>Fyzický poukaz</strong><small>hezky zabalený dárek</small>
+          <span>✓</span><strong>Fyzický poukaz</strong><small>doručení nebo osobní převzetí</small>
         </article>
         <article>
           <span>⌁</span><strong>Všechny pobočky</strong><small>Praha 8, Kladno, Statenice</small>
@@ -105,7 +111,7 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
           <span>🚗</span><strong>Skupina B</strong><small>manuál, automat i L17</small>
         </article>
         <article>
-          <span>🎄</span><strong>Vánoční bonus</strong><small>až {money(1800)} navíc</small>
+          <span>🎄</span><strong>Bez online platby</strong><small>převodem nebo na pobočce</small>
         </article>
       </div>
     </section>
@@ -125,7 +131,9 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
             </p>
           </article>
           <article>
-            <span>☝</span><h3>Jednoduché objednání</h3><p>Vše vyřídíte online za pár minut.</p>
+            <span>☝</span><h3>Jednoduché objednání</h3><p>
+              Objednávku vyplníte online, platbu doladíme převodem nebo na pobočce.
+            </p>
           </article>
           <article>
             <span>☆</span><h3>Bonus navíc před zkouškou</h3><p>
@@ -206,7 +214,7 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
           </article>
           <article>
             <span>🛒</span><h3>3. Odešlete objednávku</h3><p>
-              Zatím bez online platby; ozveme se s potvrzením.
+              Pošleme platební údaje k převodu, nebo se domluvíme na platbě při převzetí na pobočce.
             </p>
           </article>
           <article>
@@ -234,7 +242,8 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
           </details>
           <details>
             <summary>Co je zahrnuto v částce 200 Kč?</summary><p>
-              Dárkové balení a doručení fyzického poukazu.
+              Doručení stojí 200 Kč. Osobní převzetí na pobočce je zdarma a platba proběhne při
+              převzetí.
             </p>
           </details>
           <details>
@@ -264,14 +273,14 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
           <span class="xmas-kicker">Rezervace poukazu</span>
           <h2>Objednat vánoční poukaz</h2>
           <p>
-            Vyplňte údaje a my se ozveme s potvrzením. Online platbu dopojíme až po finálním
-            schválení platebního procesu.
+            Vyplňte údaje a my se ozveme s potvrzením. Platba proběhne převodem na účet, případně
+            osobně při převzetí na pobočce.
           </p>
           <div class="price-chip">
-            <strong>{money(christmasCampaign.onlineTotalCzk)}</strong><span
-              >{money(christmasCampaign.depositCzk)} záloha + {
-                money(christmasCampaign.packagingAndDeliveryCzk)
-              } balení a doručení</span
+            <strong data-voucher-total
+              >{money(christmasCampaign.depositCzk + defaultDelivery.priceCzk)}</strong
+            ><span data-voucher-total-note
+              >{money(christmasCampaign.depositCzk)} záloha + {money(defaultDelivery.priceCzk)} doručení</span
             >
           </div>
         </div>
@@ -318,6 +327,27 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
                 }</select
               ></label
             >
+            <fieldset class="wide delivery-choice">
+              <legend>Jak chcete poukaz převzít?</legend>
+              {
+                christmasCampaign.deliveryOptions.map((option, index) => (
+                  <label class:list={['delivery-option', index === 0 && 'selected']}>
+                    <input
+                      type="radio"
+                      name="deliveryMethod"
+                      value={option.id}
+                      data-price={option.priceCzk}
+                      checked={index === 0}
+                    />
+                    <span>
+                      <strong>{option.label}</strong>
+                      <small>{option.note}</small>
+                    </span>
+                    <em>{option.priceCzk ? `+ ${money(option.priceCzk)}` : '+ 0 Kč'}</em>
+                  </label>
+                ))
+              }
+            </fieldset>
             <label class="wide"
               >Osobní vzkaz na poukaz<textarea
                 name="message"
@@ -325,9 +355,14 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
                 maxlength="300"
                 placeholder="Volitelné"></textarea></label
             >
-            <label>Doručovací ulice<input name="street" required /></label>
-            <label>Město<input name="city" required /></label>
-            <label>PSČ<input name="zip" required /></label>
+            <div class="wide delivery-address" data-delivery-address>
+              <p>Doručovací adresa</p>
+              <div class="form-grid nested">
+                <label>Doručovací ulice<input name="street" required /></label>
+                <label>Město<input name="city" required /></label>
+                <label>PSČ<input name="zip" required /></label>
+              </div>
+            </div>
           </div>
           <label class="check-row"
             ><input type="checkbox" name="terms" required /><span
@@ -372,6 +407,42 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
   const voucherForm = document.querySelector<HTMLFormElement>('#voucher-form');
   const voucherStatus = document.querySelector<HTMLElement>('#voucher-status');
   const campaignName = 'vanoce';
+  const baseDeposit = 5000;
+  const formatter = new Intl.NumberFormat('cs-CZ', {
+    style: 'currency',
+    currency: 'CZK',
+    maximumFractionDigits: 0,
+  });
+  const deliveryOptions = document.querySelectorAll<HTMLInputElement>(
+    'input[name="deliveryMethod"]',
+  );
+  const deliveryCards = document.querySelectorAll<HTMLElement>('.delivery-option');
+  const deliveryAddress = document.querySelector<HTMLElement>('[data-delivery-address]');
+  const deliveryAddressInputs = deliveryAddress?.querySelectorAll<HTMLInputElement>('input') ?? [];
+  const branchSelect = voucherForm?.elements.namedItem('branch');
+  const voucherTotal = document.querySelector<HTMLElement>('[data-voucher-total]');
+  const voucherTotalNote = document.querySelector<HTMLElement>('[data-voucher-total-note]');
+  function updateDeliveryUi() {
+    const selected = Array.from(deliveryOptions).find((option) => option.checked);
+    if (!selected) return;
+    const price = Number(selected.dataset.price ?? '0');
+    const isShipping = selected.value === 'shipping';
+    deliveryCards.forEach((card) => card.classList.toggle('selected', card.contains(selected)));
+    deliveryAddress?.classList.toggle('hidden', !isShipping);
+    deliveryAddressInputs.forEach((input) => {
+      input.required = isShipping;
+      if (!isShipping) input.value = '';
+    });
+    if (branchSelect instanceof HTMLSelectElement) branchSelect.required = !isShipping;
+    if (voucherTotal) voucherTotal.textContent = formatter.format(baseDeposit + price);
+    if (voucherTotalNote) {
+      voucherTotalNote.textContent = `${formatter.format(baseDeposit)} záloha + ${formatter.format(price)} ${
+        isShipping ? 'doručení' : 'osobní převzetí'
+      }`;
+    }
+  }
+  deliveryOptions.forEach((option) => option.addEventListener('change', updateDeliveryUi));
+  updateDeliveryUi();
   window.dispatchEvent(
     new CustomEvent('bubu:tracking', { detail: { name: 'campaign_view', campaign: campaignName } }),
   );
@@ -390,7 +461,9 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
       control instanceof HTMLSelectElement ||
       control instanceof HTMLTextAreaElement
       ? control.value.trim()
-      : '';
+      : control instanceof RadioNodeList
+        ? String(control.value).trim()
+        : '';
   }
   function checked(form: HTMLFormElement, name: string) {
     const control = form.elements.namedItem(name);
@@ -429,12 +502,14 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
         course: collect(form, 'course') || undefined,
         branch: collect(form, 'branch') || undefined,
         bonusVariant: collect(form, 'bonusVariant'),
+        deliveryMethod: collect(form, 'deliveryMethod') || 'shipping',
       },
       payload: {
         recipientFirstName: collect(form, 'recipientFirstName'),
         recipientLastName: collect(form, 'recipientLastName'),
         message: collect(form, 'message'),
         delivery: {
+          method: collect(form, 'deliveryMethod') || 'shipping',
           street: collect(form, 'street'),
           city: collect(form, 'city'),
           zip: collect(form, 'zip'),
@@ -1222,8 +1297,69 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte pouze z
     color: var(--ink);
     background: #fff;
   }
+  .form-grid.nested {
+    margin-top: 10px;
+  }
   .wide {
     grid-column: 1 / -1;
+  }
+  .delivery-choice {
+    margin: 0;
+    border: 0;
+    padding: 0;
+  }
+  .delivery-choice legend,
+  .delivery-address p {
+    margin: 0 0 10px;
+    color: var(--ink);
+    font-size: 0.86rem;
+    font-weight: 850;
+  }
+  .delivery-option {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 14px;
+    border: 1px solid #d7eaf4;
+    border-radius: 16px;
+    background: #fff;
+    cursor: pointer;
+  }
+  .delivery-option + .delivery-option {
+    margin-top: 10px;
+  }
+  .delivery-option.selected {
+    border-color: #08a8dc;
+    background: #effaff;
+    box-shadow: 0 12px 28px #078bc212;
+  }
+  .delivery-option input {
+    width: 20px;
+    height: 20px;
+  }
+  .delivery-option strong,
+  .delivery-option small {
+    display: block;
+  }
+  .delivery-option small {
+    margin-top: 3px;
+    color: #60738b;
+    font-weight: 600;
+  }
+  .delivery-option em {
+    color: #086994;
+    font-style: normal;
+    font-weight: 950;
+  }
+  .delivery-address {
+    padding: 16px;
+    border-radius: 18px;
+    background: #f5fbff;
+    border: 1px solid #d7eaf4;
+  }
+  .delivery-address.hidden {
+    display: none;
   }
   .check-row {
     display: flex;

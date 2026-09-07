@@ -43,9 +43,48 @@ export const POST: APIRoute = async ({ request }) => {
         { status: 422, headers: { 'Cache-Control': 'no-store' } },
       );
     }
+    const deliveryMethod =
+      parsed.data.campaignId === 'vanoce'
+        ? (parsed.data.selection.deliveryMethod ?? 'shipping')
+        : undefined;
+    const delivery = parsed.data.payload.delivery;
+    if (
+      parsed.data.campaignId === 'vanoce' &&
+      deliveryMethod === 'shipping' &&
+      (!delivery ||
+        typeof delivery !== 'object' ||
+        !('street' in delivery) ||
+        !('city' in delivery) ||
+        !('zip' in delivery) ||
+        !String(delivery.street).trim() ||
+        !String(delivery.city).trim() ||
+        !String(delivery.zip).trim())
+    ) {
+      return Response.json(
+        { ok: false, code: 'DELIVERY_ADDRESS_REQUIRED', message: 'Vyplňte doručovací adresu.' },
+        { status: 422, headers: { 'Cache-Control': 'no-store' } },
+      );
+    }
+    if (
+      parsed.data.campaignId === 'vanoce' &&
+      deliveryMethod === 'branch-pickup' &&
+      !parsed.data.selection.branch
+    ) {
+      return Response.json(
+        { ok: false, code: 'PICKUP_BRANCH_REQUIRED', message: 'Vyberte pobočku pro převzetí.' },
+        { status: 422, headers: { 'Cache-Control': 'no-store' } },
+      );
+    }
 
+    const deliveryOption =
+      parsed.data.campaignId === 'vanoce'
+        ? christmasCampaign.deliveryOptions.find((option) => option.id === deliveryMethod)
+        : undefined;
     const amountDueCzk =
-      parsed.data.campaignId === 'vanoce' ? christmasCampaign.onlineTotalCzk : null;
+      parsed.data.campaignId === 'vanoce'
+        ? christmasCampaign.depositCzk +
+          (deliveryOption?.priceCzk ?? christmasCampaign.packagingAndDeliveryCzk)
+        : null;
     const stored = await new CampaignRequestRepository(process.env).create(parsed.data, {
       amountDueCzk,
       sourceUrl: request.headers.get('referer') ?? new URL(request.url).origin,
@@ -64,7 +103,13 @@ export const POST: APIRoute = async ({ request }) => {
         `Kurz: ${parsed.data.selection.course ?? 'neuvedeno'}`,
         `Pobočka: ${parsed.data.selection.branch ?? 'neuvedeno'}`,
         `Bonus: ${parsed.data.selection.bonusVariant ?? 'neuvedeno'}`,
-        amountDueCzk ? `Budoucí online částka: ${amountDueCzk} Kč` : null,
+        amountDueCzk ? `Částka k úhradě: ${amountDueCzk} Kč` : null,
+        parsed.data.campaignId === 'vanoce'
+          ? 'Platba: převodem na účet nebo osobně v autoškole; online platba není dostupná'
+          : null,
+        parsed.data.campaignId === 'vanoce'
+          ? `Převzetí/doručení: ${deliveryOption?.label ?? 'Doručení na adresu'}`
+          : null,
         '',
         JSON.stringify(parsed.data.payload, null, 2),
       ]

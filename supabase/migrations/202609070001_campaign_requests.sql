@@ -10,7 +10,7 @@ create table if not exists public.campaign_requests (
   selection jsonb not null default '{}'::jsonb check (jsonb_typeof(selection)='object'),
   payload jsonb not null default '{}'::jsonb check (jsonb_typeof(payload)='object'),
   amount_due_czk integer check (amount_due_czk is null or amount_due_czk >= 0),
-  payment_status text not null default 'not_required' check (payment_status in ('not_required','pending_future_payment','pending','paid','cancelled','failed')),
+  payment_status text not null default 'not_required' check (payment_status in ('not_required','pending_offline_payment','pending_future_payment','pending','paid','cancelled','failed')),
   consent_terms jsonb not null check (jsonb_typeof(consent_terms)='object'),
   consent_privacy jsonb not null check (jsonb_typeof(consent_privacy)='object'),
   consent_marketing jsonb not null check (jsonb_typeof(consent_marketing)='object')

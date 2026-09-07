@@ -32,10 +32,24 @@ export const christmasCampaign = {
   startsAt: null,
   endsAt: null,
   depositCzk: 5000,
+  pickupCzk: 0,
   packagingAndDeliveryCzk: 200,
-  onlineTotalCzk: 5200,
+  deliveryOptions: [
+    {
+      id: 'shipping',
+      label: 'Doručení na adresu',
+      priceCzk: 200,
+      note: 'Balné a poštovné za fyzický poukaz.',
+    },
+    {
+      id: 'branch-pickup',
+      label: 'Osobní převzetí na pobočce',
+      priceCzk: 0,
+      note: 'Poukaz zaplatíte a vyzvednete osobně v autoškole.',
+    },
+  ],
   headline: 'Darujte letos řidičák bez stresu.',
-  badge: '+ Vánoční bonus až 1 800 Kč',
+  badge: '+ Vánoční bonus až 1 600 Kč',
   cta: 'Chci darovat řidičák',
   eligibleCourses: courseIds,
   eligibleBranches: branchIds,
@@ -49,7 +63,7 @@ export const christmasCampaign = {
     {
       id: 'mock-exam-plus-ride',
       title: 'Zkouška nanečisto + 45 min extra jízda',
-      valueCzk: 1800,
+      valueCzk: 1600,
       description:
         'Test na pobočce a simulovaná zkoušková jízda, aby obdarovaný věděl, co ho čeká.',
     },
