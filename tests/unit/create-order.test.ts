@@ -1,6 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { BookingRepository, ProvisionalInput } from '../../src/lib/booking/repository';
+import type {
+  BookingRepository,
+  OrderWithoutAppointmentInput,
+  ProvisionalInput,
+} from '../../src/lib/booking/repository';
 import { CreateOrderService, type OrderLegalSettings } from '../../src/lib/booking/create-order';
 import { LocalCaptcha, LocalEmail } from '../../src/lib/integrations/local';
 import { LocalRateLimiter, requestFingerprint } from '../../src/lib/security/rate-limit';
@@ -31,6 +35,7 @@ const baseBody = {
 
 class FakeRepository implements BookingRepository {
   calls: ProvisionalInput[] = [];
+  kladnoCalls: OrderWithoutAppointmentInput[] = [];
   shouldFail = false;
   async listAvailableSlots() {
     return [];
@@ -45,6 +50,18 @@ class FakeRepository implements BookingRepository {
       expiresAt: '2026-08-31T10:15:00.000Z',
       startsAt: '2026-08-31T10:00:00.000Z',
       endsAt: '2026-08-31T10:10:00.000Z',
+    };
+  }
+  async createWithoutAppointment(input: OrderWithoutAppointmentInput) {
+    if (this.shouldFail) throw new Error('synthetic failure');
+    this.kladnoCalls.push(input);
+    return {
+      orderId: '22222222-2222-4222-8222-222222222222',
+      publicCode: 'BUBU-KLADNO1',
+      appointmentId: null,
+      expiresAt: null,
+      startsAt: null,
+      endsAt: null,
     };
   }
   async verifyEmail() {
@@ -132,6 +149,25 @@ test('client price fields and stale price versions are rejected', async () => {
     code: 'QUOTE_CHANGED',
   });
   assert.equal(f.repository.calls.length, 0);
+});
+
+test('Kladno stores a complete order without a booking slot and asks staff to arrange the appointment', async () => {
+  const f = fixture();
+  const captchaToken = f.captcha.issue('create_order', now);
+  const result = await f.execute({
+    ...baseBody,
+    slotId: undefined,
+    captchaToken,
+    selection: { course: 'b', branch: 'kladno', transmission: 'manual' },
+  });
+  assert.equal(result.ok, true);
+  assert.equal(f.repository.calls.length, 0);
+  assert.equal(f.repository.kladnoCalls.length, 1);
+  assert.equal(result.ok && result.appointmentId, null);
+  const internal = [...f.email.messages.values()].find(
+    (item) => item.to === 'orders@example.invalid',
+  );
+  assert.match(internal?.text ?? '', /kontaktujte zákazníka a domluvte individuální termín/i);
 });
 
 test('invalid contact, honeypot and failed captcha never reach storage', async () => {

@@ -85,21 +85,6 @@ import { branches, courses } from '../lib/catalog';
             <h3 id="upsell-title">Doplňky ke kurzu</h3>
             <p>Volitelné položky se přičtou k ceně.</p>
           </div>
-          <label class="addon-card book-addon">
-            <img
-              src="/images/products/autoskola-pohodlne.jpg"
-              alt="Knížka Autoškola Pohodlně"
-              loading="lazy"
-              width="72"
-              height="92"
-            />
-            <span
-              ><strong>Knížka Autoškola Pohodlně</strong><small
-                >Praktická příprava ke zkoušce · 300 Kč</small
-              ></span
-            >
-            <input type="checkbox" name="addonBook" />
-          </label>
           <div class="addon-card addon-quantity">
             <span><strong>Mikina Autoškola BuBu</strong><small>500 Kč/ks s DPH</small></span>
             <label
@@ -171,7 +156,7 @@ import { branches, courses } from '../lib/catalog';
       <fieldset data-step="2" hidden>
         <legend class="sr-only">Osobní zápis</legend><div id="order-summary"></div>
         <input type="hidden" name="slotId" id="slot-field" />
-        <div class="booking-calendar" aria-live="polite">
+        <div id="booking-calendar" class="booking-calendar" aria-live="polite">
           <div class="calendar-head">
             <button type="button" class="btn secondary" id="calendar-prev">‹</button>
             <strong id="calendar-title">Načítáme termíny…</strong>
@@ -491,18 +476,6 @@ import { branches, courses } from '../lib/catalog';
     display: grid;
     gap: 3px;
   }
-  .book-addon {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-  }
-  .book-addon img {
-    width: 56px;
-    height: 72px;
-    border-radius: 8px;
-    object-fit: cover;
-    object-position: center;
-    box-shadow: 0 8px 18px #17335f18;
-  }
   .addon-quantity label {
     max-width: 110px;
     margin-left: auto;
@@ -688,10 +661,6 @@ import { branches, courses } from '../lib/catalog';
     .upsell-heading {
       display: grid;
       gap: 2px;
-    }
-    .book-addon {
-      grid-template-columns: auto 1fr auto;
-      align-items: center;
     }
     .moto-package-grid {
       grid-template-columns: 1fr;

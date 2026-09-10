@@ -21,6 +21,15 @@ export type ProvisionalInput = {
   addons: OrderAddon[];
   verificationHash: string;
 };
+export type OrderWithoutAppointmentInput = Omit<ProvisionalInput, 'slotId'>;
+export type CreatedOrder = {
+  orderId: string;
+  publicCode: string;
+  appointmentId: string | null;
+  expiresAt: string | null;
+  startsAt: string | null;
+  endsAt: string | null;
+};
 export type AvailableSlot = {
   id: string;
   branch: string;
@@ -55,14 +64,8 @@ export type AdminSummary = {
 };
 export interface BookingRepository {
   listAvailableSlots(input: { branch: string; from: string; to: string }): Promise<AvailableSlot[]>;
-  createProvisional(input: ProvisionalInput): Promise<{
-    orderId: string;
-    publicCode: string;
-    appointmentId: string;
-    expiresAt: string;
-    startsAt: string;
-    endsAt: string;
-  }>;
+  createProvisional(input: ProvisionalInput): Promise<CreatedOrder>;
+  createWithoutAppointment(input: OrderWithoutAppointmentInput): Promise<CreatedOrder>;
   verifyEmail(hash: string): Promise<{ ok: boolean; orderId?: string }>;
   getPublicOrder(publicCode: string): Promise<PublicOrderOverview | null>;
   rescheduleAppointment(input: {

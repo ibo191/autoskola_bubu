@@ -514,6 +514,10 @@ const calendarDays = calendarDates.map((item) => ({
                     </div>
                   )}
                 </div>
+                <div class="branch-legend" aria-label="Rozlišení poboček">
+                  <span class="branch-badge branch-strizkov">Praha 8 · Střížkov</span>
+                  <span class="branch-badge branch-statenice">Statenice</span>
+                </div>
                 <div class="calendar-weekdays" aria-hidden="true">
                   <span>Po</span>
                   <span>Út</span>
@@ -558,7 +562,11 @@ const calendarDays = calendarDates.map((item) => ({
                           {item.contact.firstName} {item.contact.lastName}
                         </strong>
                         <br />
-                        {courseLabel(item.course)} · {branchLabel(item.branch)} · {item.publicCode}
+                        {courseLabel(item.course)} ·{' '}
+                        <span class:list={['branch-badge', `branch-${item.branch}`]}>
+                          {branchLabel(item.branch)}
+                        </span>{' '}
+                        · {item.publicCode}
                         <br />
                         <a href={`tel:${item.contact.phone}`}>{item.contact.phone}</a> ·{' '}
                         <a href={`mailto:${item.contact.email}`}>{item.contact.email}</a>
@@ -771,6 +779,34 @@ const calendarDays = calendarDates.map((item) => ({
     font-size: 0.86rem;
     font-weight: 800;
     text-decoration: none;
+  }
+  .branch-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .branch-badge {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 0.73rem;
+    font-weight: 850;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .branch-strizkov {
+    background: #dff4ef;
+    color: #075f59;
+  }
+  .branch-statenice {
+    background: #e8efff;
+    color: #254f96;
+  }
+  .branch-kladno {
+    background: #fff1d8;
+    color: #805100;
   }
   .appointment-day-chips strong,
   .calendar-day strong {

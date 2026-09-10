@@ -10,7 +10,7 @@ import { internalNewOrderEmail, orderConfirmationEmail } from '../server/email/t
 
 const requestSchema = z
   .object({
-    slotId: z.uuid(),
+    slotId: z.uuid().optional(),
     contact: contactSchema,
     selection: selectionSchema,
     captchaToken: z.string().min(16).max(512),
@@ -19,7 +19,18 @@ const requestSchema = z
     privacyAccepted: z.literal(true),
     marketingAccepted: z.boolean().default(false),
   })
-  .strict();
+  .strict()
+  .superRefine((value, ctx) => {
+    const needsAppointment = value.selection.branch !== 'kladno';
+    if (needsAppointment && !value.slotId)
+      ctx.addIssue({ code: 'custom', path: ['slotId'], message: 'Termín zápisu je povinný.' });
+    if (!needsAppointment && value.slotId)
+      ctx.addIssue({
+        code: 'custom',
+        path: ['slotId'],
+        message: 'Kladno domlouvá termín individuálně.',
+      });
+  });
 
 export type OrderLegalSettings = {
   approved: boolean;
@@ -32,10 +43,10 @@ export type CreateOrderResult =
       ok: true;
       orderId: string;
       publicCode: string;
-      appointmentId: string;
-      expiresAt: string;
-      startsAt: string;
-      endsAt: string;
+      appointmentId: string | null;
+      expiresAt: string | null;
+      startsAt: string | null;
+      endsAt: string | null;
       thankYouUrl: string;
       manageUrl: string;
     }
@@ -102,8 +113,7 @@ export class CreateOrderService {
     const verification = createToken();
     let saved: Awaited<ReturnType<BookingRepository['createProvisional']>>;
     try {
-      saved = await this.dependencies.repository.createProvisional({
-        slotId: parsed.data.slotId,
+      const persistenceInput = {
         contact: parsed.data.contact,
         selection: parsed.data.selection,
         price: serverQuote,
@@ -120,7 +130,14 @@ export class CreateOrderService {
         },
         addons: serverQuote.addons,
         verificationHash: verification.hash,
-      });
+      };
+      saved =
+        parsed.data.selection.branch === 'kladno'
+          ? await this.dependencies.repository.createWithoutAppointment(persistenceInput)
+          : await this.dependencies.repository.createProvisional({
+              ...persistenceInput,
+              slotId: parsed.data.slotId!,
+            });
     } catch {
       return { ok: false, code: 'STORAGE_FAILED' };
     }
@@ -136,11 +153,10 @@ export class CreateOrderService {
       selection: parsed.data.selection,
       price: serverQuote,
       addons: serverQuote.addons,
-      appointment: {
-        id: saved.appointmentId,
-        startsAt: saved.startsAt,
-        endsAt: saved.endsAt,
-      },
+      appointment:
+        saved.appointmentId && saved.startsAt && saved.endsAt
+          ? { id: saved.appointmentId, startsAt: saved.startsAt, endsAt: saved.endsAt }
+          : null,
       createdAt: context.now,
       thankYouUrl: thankYouUrl.href,
       manageUrl: manageUrl.href,

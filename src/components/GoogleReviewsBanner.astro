@@ -1,5 +1,9 @@
 ---
 import { fallbackGoogleReviews } from '../lib/google/reviews';
+const {
+  heading = 'Žáci oceňují klid, respekt a jasný plán.',
+  profileLabel = 'Autoškola BuBu Střížkov',
+} = Astro.props;
 const fallback = fallbackGoogleReviews;
 const fallbackReviews = fallback.reviews.slice(0, 5);
 const stars = '★★★★★';
@@ -13,13 +17,13 @@ const stars = '★★★★★';
         <div class="google-logo" aria-label="Google">
           <span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span>
         </div>
-        <h2>Žáci oceňují klid, respekt a&nbsp;jasný plán.</h2>
+        <h2>{heading}</h2>
         <div class="rating-row">
           <strong data-rating>{fallback.rating.toFixed(1).replace('.', ',')}</strong>
           <span class="stars" aria-label={`${fallback.rating} z 5 hvězdiček`}>{stars}</span>
           <span class="review-count" data-review-count>{fallback.userRatingCount} recenzí</span>
         </div>
-        <p>Reálné recenze načítáme z veřejného Google profilu pobočky Autoškola BuBu Střížkov.</p>
+        <p>Reálné recenze načítáme z veřejného Google profilu {profileLabel}.</p>
         <a
           class="all-reviews"
           data-google-link

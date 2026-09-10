@@ -29,7 +29,7 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
     <div class="container narrow">
       <span class="eyebrow">Objednávka přijata</span>
       <h1>Děkujeme, máme vaši objednávku.</h1>
-      <p>Na této stránce najdete souhrn objednávky a termín osobního zápisu.</p>
+      <p>Na této stránce najdete souhrn objednávky a další krok k osobnímu zápisu.</p>
     </div>
   </section>
   <section class="section">
@@ -38,6 +38,10 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
         order ? (
           <div class="summary-card conversion-summary" data-conversion="order-thank-you">
             <h2>Souhrn objednávky</h2>
+            <p class="confirmation-email">
+              Souhrn a potvrzení objednávky jsme odeslali na e-mail:{' '}
+              <strong>{order.contact.email}</strong>
+            </p>
             <dl>
               <div>
                 <>
@@ -77,7 +81,9 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
                   <dd>
                     {order.appointment
                       ? formatDateTime(order.appointment.startsAt)
-                      : 'Termín není vybraný'}
+                      : order.selection.branch === 'kladno'
+                        ? 'Vedoucí pobočky vás kontaktuje a domluví termín individuálně.'
+                        : 'Termín není vybraný'}
                   </dd>
                 </>
               </div>
@@ -95,8 +101,9 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
               </div>
             ) : null}
             <div class="notice strong">
-              Při zápisu se platí nevratná záloha za kurz 5 000 Kč na pobočce, ideálně v hotovosti,
-              případně okamžitým převodem na účet.
+              Kurz lze uhradit v hotovosti při zápisu nebo převodem na účet do 5 dnů od zápisu.
+              Platbu lze rozdělit do tří přibližně stejných částí; poslední část je potřeba uhradit
+              nejpozději při poslední jízdě nebo před závěrečnou zkouškou.
             </div>
             <div class="actions">
               {order.appointment ? (
@@ -104,12 +111,14 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
                   Přidat do kalendáře
                 </a>
               ) : null}
-              <a
-                class="btn secondary"
-                href={`/spravovat-termin?kod=${encodeURIComponent(order.publicCode)}`}
-              >
-                Změnit nebo zrušit termín
-              </a>
+              {order.appointment ? (
+                <a
+                  class="btn secondary"
+                  href={`/spravovat-termin?kod=${encodeURIComponent(order.publicCode)}`}
+                >
+                  Změnit nebo zrušit termín
+                </a>
+              ) : null}
             </div>
           </div>
         ) : (
@@ -160,6 +169,10 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
   }
   .addons-list {
     margin: 24px 0;
+  }
+  .confirmation-email {
+    margin-top: 12px;
+    color: var(--muted);
   }
   .strong {
     font-weight: 700;

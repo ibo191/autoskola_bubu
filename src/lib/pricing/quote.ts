@@ -19,7 +19,6 @@ const addonsSchema = z
   .default({ book: false, hoodieQty: 0, shirtQty: 0 });
 
 export const addonCatalog = {
-  book: { id: 'book-autoskola-pohodlne', title: 'Knížka Autoškola Pohodlně', unitPrice: 300 },
   hoodie: { id: 'hoodie-bubu', title: 'Mikina Autoškola BuBu', unitPrice: 500 },
   shirt: { id: 'shirt-bubu', title: 'Tričko Autoškola BuBu', unitPrice: 500 },
 } as const;
@@ -87,17 +86,6 @@ export function quote(input: unknown): Quote {
       message: 'Tato kombinace kurzu a pobočky není dostupná.',
     };
   const selectedAddons = [
-    ...(s.addons.book
-      ? [
-          {
-            id: addonCatalog.book.id,
-            title: addonCatalog.book.title,
-            quantity: 1,
-            unitPrice: addonCatalog.book.unitPrice,
-            total: addonCatalog.book.unitPrice,
-          },
-        ]
-      : []),
     ...(s.addons.hoodieQty > 0
       ? [
           {

@@ -14,12 +14,12 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
       <nav class="breadcrumbs" aria-label="Drobečková navigace">
         <a href="/">Domů</a><span>/</span><span>Ceník</span>
       </nav>
-      <span class="eyebrow">Jasný výběr. Přehledná cena.</span><h1>
-        Ceník kurzů.<br />Bez hádání.
+      <span class="eyebrow">Jasný výběr. Jasná cena.</span><h1>
+        Vyberte si kurz.<br />Cenu víte hned.
       </h1>
       <p class="lead">
-        Provedeme vás jen otázkami, které jsou pro váš kurz důležité. Cenu ukážeme až po ověření
-        celé kombinace.
+        Stačí pár odpovědí a ukážeme vám kurz, který odpovídá tomu, co chcete řídit, kde chcete
+        jezdit a jakou variantu výcviku preferujete.
       </p>
     </div>
   </section>
@@ -27,8 +27,8 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
   <section class="section" data-reveal>
     <div class="container">
       <div class="decision-header">
-        <span class="eyebrow">Průvodce ceníkem</span><h2>Najděte správnou variantu.</h2><p>
-          Odpovědi můžete kdykoli změnit. Nabídku po každé změně znovu ověří server.
+        <span class="eyebrow">Průvodce ceníkem</span><h2>Pojďme najít správný kurz.</h2><p>
+          Žádné hledání v tabulkách. Vyberte pár možností a hned uvidíte cenu kurzu pro vás.
         </p>
       </div>
 
@@ -38,19 +38,21 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
             class="choice-grid category-choices"
           >
             <button type="button" data-category="auto" aria-pressed="false"
-              ><img src="/icons/ui/blue-car.webp" alt="" width="192" height="192" />Auto a L17</button
+              ><img src="/icons/ui/blue-car.webp" alt="" width="192" height="192" /><span
+                ><strong>Auto / L17</strong><small
+                  >Řidičák skupiny B, včetně možnosti od 17 let.</small
+                ></span
+              ></button
             >
             <button type="button" data-category="moto" aria-pressed="false"
-              ><img
-                src="/icons/ui/blue-motorcycle.webp"
-                alt=""
-                width="192"
-                height="192"
-              />Motorku</button
+              ><img src="/icons/ui/blue-motorcycle.webp" alt="" width="192" height="192" /><span
+                ><strong>Motorku</strong><small>Vyberte skupinu podle věku a oprávnění.</small
+                ></span
+              ></button
             >
             <button type="button" data-category="prives" aria-pressed="false"
               ><img src="/icons/ui/blue-hands-wheel.webp" alt="" width="192" height="192" />Auto s
-              přívěsem</button
+              přívěsem <small>B96 nebo B+E podle toho, co potřebujete táhnout.</small></button
             >
           </div>
         </fieldset>
@@ -78,17 +80,20 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
         <div id="availability-message" class="notice next-question" hidden role="status"></div>
 
         <fieldset class="question next-question" id="transmission-question" hidden>
-          <legend><span>03</span> Jakou chcete převodovku?</legend><div class="choice-grid compact">
+          <legend><span>03</span> Jak chcete jezdit?</legend><div class="choice-grid compact">
             <button type="button" data-transmission="manual" aria-pressed="false">Manuál</button>
             <button type="button" data-transmission="automatic" aria-pressed="false"
               >Automat<small>pouze Střížkov</small></button
             >
-          </div><p class="question-note" id="transmission-note"></p>
+          </div><p class="question-note">
+            Vyberte převodovku, se kterou chcete absolvovat výcvik.
+          </p><p class="question-note" id="transmission-note"></p>
         </fieldset>
 
         <fieldset class="question next-question offer-picker" id="mode-question" hidden>
-          <legend>Vyberte si kurz pro zvolenou převodovku</legend><p class="picker-intro">
-            Cena je stejná pro klasický kurz i variantu L17.
+          <legend>Chcete začít už v 17 letech?</legend><p class="picker-intro">
+            S L17 můžete získat řidičák skupiny B už v 17 letech a do osmnácti jezdit se zapsaným
+            mentorem.
           </p><div class="choice-grid compact marketing-choices">
             <button type="button" data-mode="standard" aria-pressed="false">
               <span class="choice-kicker">Klasická cesta</span><strong>Kurz skupiny B</strong><span
@@ -108,7 +113,7 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
         </fieldset>
 
         <fieldset class="question next-question" id="moto-target-question" hidden>
-          <legend><span>03</span> Chci řidičák skupiny</legend><div class="choice-grid four">
+          <legend><span>03</span> Jakou skupinu chcete?</legend><div class="choice-grid four">
             {
               (['am', 'a1', 'a2', 'a'] as const).map((id) => (
                 <button type="button" data-moto-target={id} aria-pressed="false">
@@ -120,9 +125,9 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
         </fieldset>
 
         <fieldset class="question next-question" id="licence-status-question" hidden>
-          <legend><span>04</span> Jste držitelem řidičského oprávnění?</legend><div
-            class="choice-grid compact"
-          >
+          <legend><span>04</span> Máte už nějaký řidičák?</legend><p class="question-note">
+            Podle vašeho současného oprávnění vám ukážeme správnou variantu kurzu a cenu.
+          </p><div class="choice-grid compact">
             <button type="button" data-licence-status="none" aria-pressed="false"
               >Nemám žádné</button
             >
@@ -207,8 +212,8 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
       >
         <div class="result-heading">
           <div>
-            <span class="eyebrow">Vaše ověřená nabídka</span><h2 id="result-title">
-              Kurz podle vašich odpovědí
+            <span class="eyebrow">Váš kurz</span><h2 id="result-title">
+              Tohle je varianta pro vás.
             </h2>
           </div><button type="button" class="text-link reset-selection">Začít znovu</button>
         </div>
@@ -217,15 +222,19 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
             <span class="eyebrow" id="offer-label"></span><h3 id="offer-title"></h3><p
               id="offer-description"
             >
-            </p><p class="offer-variant" id="offer-variant"></p>
+            </p><p>Podle vašeho výběru vám doporučujeme:</p><p
+              class="offer-variant"
+              id="offer-variant"
+            >
+            </p>
           </div>
           <div class="offer-price">
             <strong id="offer-price"></strong><span>*</span><small
-              >* Cena kurzu nezahrnuje poplatky za zkoušku.</small
+              >Cena odpovídá zvolené pobočce a variantě kurzu. * Nezahrnuje poplatky za zkoušku.</small
             >
           </div>
           <div class="offer-actions">
-            <button class="btn primary" data-order disabled>Vybrat kurz ↗</button><a
+            <button class="btn primary" data-order disabled>Chci se přihlásit ↗</button><a
               id="offer-detail"
               class="text-link"
               href="/cenik">Podrobnosti o kurzu</a
@@ -244,8 +253,9 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
       <aside class="fees" data-reveal>
         <div class="section-heading">
           <div>
-            <span class="eyebrow">Mimo cenu kurzu</span><h2>Poplatky za zkoušku</h2><p>
-              Každá zobrazená cena kurzu je označena hvězdičkou a tyto poplatky nezahrnuje.
+            <span class="eyebrow">Mimo cenu kurzu</span><h2>S čím ještě počítat?</h2><p>
+              Ať víte předem, kolik vás celý proces bude stát. Tyto poplatky nejsou součástí ceny
+              kurzu a hradí se samostatně.
             </p>
           </div>
         </div>
@@ -257,9 +267,9 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
               width="192"
               height="192"
               loading="lazy"
-            /><h3>Autoškole za organizaci</h3><strong>{money(fees.schoolOrganization)}</strong><p>
-              Samostatný poplatek Autoškole BuBu za organizaci zkoušky.
-            </p>
+            /><h3>Autoškole za organizaci zkoušky</h3><strong
+              >{money(fees.schoolOrganization)}</strong
+            ><p>Poplatek za administrativu a zajištění závěrečné zkoušky.</p>
           </article>
           <article class="authority-fees">
             <img
@@ -268,7 +278,9 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
               width="192"
               height="192"
               loading="lazy"
-            /><h3>Úřadu za první zkoušku</h3>{
+            /><h3>Úřadu za první zkoušku</h3><p>
+              Správní poplatek hrazený úřadu při první závěrečné zkoušce.
+            </p>{
               examAuthorities.map((item) => (
                 <p>
                   <>
@@ -286,7 +298,9 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
               width="192"
               height="192"
               loading="lazy"
-            /><h3>Opakované části</h3><p>Test z předpisů <strong>100 Kč</strong></p><p>
+            /><h3>Opakované části zkoušky</h3><p>
+              Pokud některou část zkoušky opakujete, hradí se příslušný poplatek znovu.
+            </p><p>Test z předpisů <strong>100 Kč</strong></p><p>
               Ovládání a údržba <strong>200 Kč</strong>
             </p><p>Praktická jízda <strong>400 Kč</strong></p>
           </article>
@@ -297,6 +311,17 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
           >. Ceny kurzů: <a href={priceSource.url}>aktuální ceník Autoškoly BuBu</a>, ověřeno 28. 8.
           2026.
         </p>
+        <div class="payment-note">
+          <strong>Platba kurzu</strong><p>
+            Kurzovné můžete uhradit v hotovosti při zápisu nebo bankovním převodem na účet autoškoly
+            do 5 dnů od zápisu. Autoškola umožňuje také platbu na splátky podle svých podmínek.
+          </p><p>
+            Ve třech splátkách přibližně po třetinách: první při zápisu nebo do 5 dnů, druhá v
+            průběhu kurzu a třetí nejpozději při poslední jízdě nebo před přihlášením na závěrečnou
+            zkoušku. Pokud není kurzovné uhrazené podle sjednaných podmínek, student nebude
+            přihlášen k závěrečné zkoušce.
+          </p>
+        </div>
       </aside>
     </div>
   </section>
@@ -511,7 +536,7 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
       }
       showOffer(selection, result);
     } catch {
-      showContact('Cenu se nepodařilo bezpečně ověřit. Kontaktujte prosím pobočku Střížkov.');
+      showContact('Cenu se teď nepodařilo načíst. Ozvěte se nám a výběr spolu projdeme.');
     }
   }
   function showContact(message: string) {
@@ -929,6 +954,17 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
   }
   .source-note {
     margin-top: 24px;
+  }
+  .payment-note {
+    margin-top: 24px;
+    padding: 22px;
+    border: 1px solid #c8e5dc;
+    border-radius: var(--radius);
+    background: var(--brand-soft);
+  }
+  .payment-note p {
+    margin-top: 8px;
+    font-size: 0.86rem;
   }
   @keyframes question-enter {
     from {

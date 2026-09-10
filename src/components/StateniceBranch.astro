@@ -1,5 +1,6 @@
 ---
 import type { Branch } from '../lib/catalog';
+import GoogleReviewsBanner from './GoogleReviewsBanner.astro';
 
 interface Props {
   branch: Branch;
@@ -184,13 +185,17 @@ const faqs = [
           {branch.hours}
         </dd><dt>Telefon</dt><dd>
           <a href={`tel:${branch.phone}`}
-            >{branch.phone.replace(/(\+420)(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4')}</a>
+            >{branch.phone.replace(/(\+420)(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4')}</a
+          >
         </dd><dt>E-mail</dt><dd><a href={`mailto:${branch.email}`}>{branch.email}</a></dd>
       </dl><button class="btn primary" data-order disabled data-branch="statenice" data-course="b"
-        >Chci začít řidičák ↗</button>
+        >Chci začít řidičák ↗</button
+      >
     </div>
   </div>
 </section>
+
+<GoogleReviewsBanner heading="Zkušenosti žáků Autoškoly BuBu." profileLabel="Autoškola BuBu" />
 
 <section class="section tinted" id="faq">
   <div class="container faq-layout">

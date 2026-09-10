@@ -7,6 +7,7 @@ if (root) {
   const days = document.querySelector<HTMLElement>('#manage-days')!;
   const slotsEl = document.querySelector<HTMLElement>('#manage-slots')!;
   const message = document.querySelector<HTMLElement>('#manage-message')!;
+  const selectedLabel = document.querySelector<HTMLElement>('#manage-selected-slot');
   let cursor = new Date();
   cursor.setDate(1);
   let loaded: Slot[] = [];
@@ -21,6 +22,8 @@ if (root) {
   function renderSlots(date: string) {
     slotsEl.replaceChildren();
     const slots = loaded.filter((slot) => key(new Date(slot.startsAt)) === date);
+    selectedSlot = '';
+    if (selectedLabel) selectedLabel.textContent = 'Vyberte časový slot pro zvolený den.';
     if (!slots.length) {
       slotsEl.innerHTML = '<p>Pro tento den už nejsou volné časy.</p>';
       return;
@@ -37,6 +40,8 @@ if (root) {
           .querySelectorAll('.slot-option')
           .forEach((item) => item.setAttribute('aria-pressed', 'false'));
         button.setAttribute('aria-pressed', 'true');
+        if (selectedLabel)
+          selectedLabel.textContent = `Vybraný nový termín: ${time(slot.startsAt, slot.endsAt)}.`;
         button.disabled = true;
         message.textContent = 'Ukládáme nový termín…';
         const response = await fetch(`/api/orders/${encodeURIComponent(code)}/reschedule`, {

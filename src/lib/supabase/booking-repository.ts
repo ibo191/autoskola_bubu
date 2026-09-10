@@ -5,6 +5,7 @@ import type {
   AvailableSlot,
   BookingRepository,
   ProvisionalInput,
+  OrderWithoutAppointmentInput,
   PublicOrderOverview,
 } from '../booking/repository';
 import type { RateLimiter } from '../security/rate-limit';
@@ -16,6 +17,14 @@ const createdSchema = z.object({
   expiresAt: z.iso.datetime({ offset: true }),
   startsAt: z.iso.datetime({ offset: true }),
   endsAt: z.iso.datetime({ offset: true }),
+});
+const createdWithoutAppointmentSchema = z.object({
+  orderId: z.uuid(),
+  publicCode: z.string().min(6),
+  appointmentId: z.null(),
+  expiresAt: z.null(),
+  startsAt: z.null(),
+  endsAt: z.null(),
 });
 const slotSchema = z.object({
   id: z.uuid(),
@@ -155,6 +164,7 @@ export class SupabaseBookingRepository implements BookingRepository {
     name:
       | 'bubu_available_slots'
       | 'bubu_create_provisional'
+      | 'bubu_create_without_appointment'
       | 'bubu_verify_email'
       | 'bubu_admin_summary'
       | 'bubu_public_order'
@@ -202,6 +212,26 @@ export class SupabaseBookingRepository implements BookingRepository {
     return createdSchema.parse(
       await this.rpc('bubu_create_provisional', {
         p_slot: input.slotId,
+        p_contact: input.contact,
+        p_selection: input.selection,
+        p_price: input.price,
+        p_terms: input.terms,
+        p_privacy: input.privacy,
+        p_marketing: input.marketing,
+        p_items: input.addons.map((item) => ({
+          product_id: item.id,
+          variant_id: item.id,
+          title: item.title,
+          quantity: item.quantity,
+          unit_price_czk: item.unitPrice,
+        })),
+        p_token_hash: input.verificationHash,
+      }),
+    );
+  }
+  async createWithoutAppointment(input: OrderWithoutAppointmentInput) {
+    return createdWithoutAppointmentSchema.parse(
+      await this.rpc('bubu_create_without_appointment', {
         p_contact: input.contact,
         p_selection: input.selection,
         p_price: input.price,

@@ -6,6 +6,7 @@ import pg from 'pg';
 const { Client } = pg;
 const root = process.cwd();
 const migrationsDir = path.join(root, 'supabase', 'migrations');
+const onlyMigration = process.env.MIGRATION_ONLY;
 const connectionString =
   process.env.SUPABASE_DB_URL ?? process.env.DATABASE_URL ?? process.env.LOCAL_DATABASE_URL;
 
@@ -38,9 +39,16 @@ async function main() {
     `);
     await client.query('commit');
 
-    const files = (await fs.readdir(migrationsDir))
+    let files = (await fs.readdir(migrationsDir))
       .filter((file) => /^\d+.*\.sql$/.test(file))
       .sort((a, b) => a.localeCompare(b));
+
+    if (onlyMigration) {
+      if (!/^\d+.*\.sql$/.test(onlyMigration))
+        throw new Error('MIGRATION_ONLY must name one migration SQL file.');
+      files = files.filter((file) => file === onlyMigration);
+      if (!files.length) throw new Error(`Migration ${onlyMigration} was not found.`);
+    }
 
     if (!files.length) throw new Error(`No migrations found in ${migrationsDir}`);
 

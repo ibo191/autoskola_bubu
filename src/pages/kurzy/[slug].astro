@@ -4,6 +4,7 @@ import Base from '../../layouts/Base.astro';
 import Roadmap from '../../components/Roadmap.astro';
 import Faq from '../../components/Faq.astro';
 import FinalCta from '../../components/FinalCta.astro';
+import CourseIncludedBenefits from '../../components/CourseIncludedBenefits.astro';
 import {
   courses,
   branches,
@@ -207,6 +208,7 @@ const schema = {
       </div>
     </div>
   </section>
+  {(course.category === 'auto' || course.category === 'moto') && <CourseIncludedBenefits />}
   <Roadmap />
   <section class="section tinted" id="cena">
     <div class="container">

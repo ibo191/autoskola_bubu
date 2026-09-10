@@ -131,11 +131,28 @@ function selectionWithAddons() {
     heldLicences: moto && heldLicence ? [heldLicence] : [],
     ...(moto && direct ? { holdingPeriod: field('holdingPeriod').value } : {}),
     addons: {
-      book: (field('addonBook') as HTMLInputElement).checked,
+      book: false,
       hoodieQty: Number(field('addonHoodieQty').value || 0),
       shirtQty: Number(field('addonShirtQty').value || 0),
     },
   };
+}
+
+function requiresAppointment() {
+  return field('branch').value !== 'kladno';
+}
+
+function updateOrderStepCopy() {
+  const steps = document.querySelectorAll<HTMLLIElement>('.wizard-steps li');
+  const intro = document.querySelector<HTMLElement>('#order-intro')!;
+  if (requiresAppointment()) {
+    intro.textContent = 'Nejprve kurz, potom kontakt a osobní zápis na pobočce.';
+    if (steps[2]) steps[2].textContent = '3. Osobní zápis';
+    return;
+  }
+  intro.textContent =
+    'Vyberete kurz a kontakt. Termín zápisu s vámi následně domluví vedoucí pobočky.';
+  if (steps[2]) steps[2].textContent = '3. Potvrzení';
 }
 
 function setStep(value: number) {
@@ -150,6 +167,7 @@ function setStep(value: number) {
   back.hidden = step === 0;
   next.hidden = step === 2;
   error.textContent = '';
+  updateOrderStepCopy();
   if (step === 2) {
     const course = (field('course') as HTMLSelectElement).selectedOptions[0]?.textContent;
     const branch = (field('branch') as HTMLSelectElement).selectedOptions[0]?.textContent;
@@ -158,13 +176,25 @@ function setStep(value: number) {
       : '';
     document.querySelector('#order-summary')!.textContent =
       `${course} · ${branch} · ${validQuote ? money(validQuote.amount) : ''}${addons}`;
-    slotField.value = '';
-    selectedSlotId = '';
-    selectedDate = '';
-    selectedSlotLabel.textContent = 'Termín zatím není vybraný.';
-    monthCursor = new Date();
-    monthCursor.setDate(1);
-    void loadSlots();
+    const calendar = document.querySelector<HTMLElement>('#booking-calendar')!;
+    if (!requiresAppointment()) {
+      calendar.hidden = true;
+      slotField.value = '';
+      selectedSlotId = '';
+      selectedDate = '';
+      selectedSlotLabel.textContent = '';
+      document.querySelector('#order-summary')!.textContent =
+        `${course} · ${branch} · ${validQuote ? money(validQuote.amount) : ''} · Termín zápisu s vámi individuálně domluví vedoucí pobočky.${addons}`;
+    } else {
+      calendar.hidden = false;
+      slotField.value = '';
+      selectedSlotId = '';
+      selectedDate = '';
+      selectedSlotLabel.textContent = 'Termín zatím není vybraný.';
+      monthCursor = new Date();
+      monthCursor.setDate(1);
+      void loadSlots();
+    }
   }
   form
     .querySelector<HTMLElement>(`[data-step="${step}"] input,[data-step="${step}"] select`)
@@ -181,6 +211,7 @@ function reset() {
   selectedSlotId = '';
   slotField.value = '';
   selectedSlotLabel.textContent = 'Termín zatím není vybraný.';
+  document.querySelector<HTMLElement>('#booking-calendar')!.hidden = false;
   setStep(0);
 }
 
@@ -260,6 +291,7 @@ form.addEventListener('input', () => {
   dirty = true;
 });
 form.addEventListener('change', () => {
+  updateOrderStepCopy();
   void updateQuote();
 });
 back.addEventListener('click', () => setStep(step - 1));
@@ -474,7 +506,7 @@ async function submitOrder() {
     error.textContent = 'Nejdříve vyberte dostupný kurz.';
     return;
   }
-  if (!slotField.value) {
+  if (requiresAppointment() && !slotField.value) {
     error.textContent = 'Vyberte prosím termín zápisu v kalendáři.';
     slotList.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     return;
@@ -495,7 +527,7 @@ async function submitOrder() {
   submit.textContent = 'Odesíláme…';
   error.textContent = '';
   const body = {
-    slotId: slotField.value,
+    ...(requiresAppointment() ? { slotId: slotField.value } : {}),
     contact: {
       firstName: field('firstName').value,
       lastName: field('lastName').value,

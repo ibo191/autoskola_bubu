@@ -50,41 +50,55 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
               {order.appointment ? formatDateTime(order.appointment.startsAt) : 'bez termínu'}
             </p>
             <div class="notice strong">
-              Při zápisu se platí nevratná záloha za kurz 5 000 Kč na pobočce, ideálně v hotovosti,
-              případně okamžitým převodem na účet.
+              Kurz lze uhradit v hotovosti při zápisu nebo převodem na účet do 5 dnů od zápisu.
+              Platbu lze rozdělit do tří přibližně stejných částí; poslední část je potřeba uhradit
+              nejpozději při poslední jízdě nebo před závěrečnou zkouškou.
             </div>
-            <div class="booking-calendar" aria-live="polite">
-              <div class="calendar-head">
-                <button type="button" class="btn secondary" id="manage-prev">
-                  ‹
-                </button>
-                <strong id="manage-title">Načítáme termíny…</strong>
-                <button type="button" class="btn secondary" id="manage-next">
-                  ›
-                </button>
+            {order.appointment ? (
+              <div class="booking-calendar" aria-live="polite">
+                <div class="calendar-head">
+                  <button type="button" class="btn secondary" id="manage-prev">
+                    ‹
+                  </button>
+                  <strong id="manage-title">Načítáme termíny…</strong>
+                  <button type="button" class="btn secondary" id="manage-next">
+                    ›
+                  </button>
+                </div>
+                <div class="calendar-weekdays" aria-hidden="true">
+                  <>
+                    <span>Po</span>
+                    <span>Út</span>
+                    <span>St</span>
+                    <span>Čt</span>
+                    <span>Pá</span>
+                    <span>So</span>
+                    <span>Ne</span>
+                  </>
+                </div>
+                <div id="manage-days" class="calendar-days" />
+                <div id="manage-slots" class="slot-list">
+                  <p>Vyberte zvýrazněný den.</p>
+                </div>
+                <p id="manage-selected-slot" class="selected-slot-label">
+                  Termín zatím není vybraný.
+                </p>
               </div>
-              <div class="calendar-weekdays" aria-hidden="true">
-                <>
-                  <span>Po</span>
-                  <span>Út</span>
-                  <span>St</span>
-                  <span>Čt</span>
-                  <span>Pá</span>
-                  <span>So</span>
-                  <span>Ne</span>
-                </>
+            ) : (
+              <div class="notice">
+                Termín zápisu vám pro tuto objednávku domluví vedoucí pobočky individuálně.
               </div>
-              <div id="manage-days" class="calendar-days" />
-              <div id="manage-slots" class="slot-list">
-                <p>Vyberte zvýrazněný den.</p>
-              </div>
-            </div>
-            <p id="manage-message" class="error" role="alert" />
-            <div class="actions">
-              <button type="button" id="cancel-appointment" class="btn secondary">
-                Zrušit termín zápisu
-              </button>
-            </div>
+            )}
+            {order.appointment ? (
+              <>
+                <p id="manage-message" class="error" role="alert" />
+                <div class="actions">
+                  <button type="button" id="cancel-appointment" class="btn secondary">
+                    Zrušit termín zápisu
+                  </button>
+                </div>
+              </>
+            ) : null}
           </div>
         ) : code ? (
           <div class="notice">{message || 'Objednávka s tímto číslem nebyla nalezena.'}</div>
@@ -230,5 +244,11 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
     color: #fff;
     border-color: var(--brand-dark);
     box-shadow: 0 10px 24px #126b6026;
+  }
+  .selected-slot-label {
+    margin: 12px 0 0;
+    color: var(--brand-dark);
+    font-size: 0.84rem;
+    font-weight: 750;
   }
 </style>

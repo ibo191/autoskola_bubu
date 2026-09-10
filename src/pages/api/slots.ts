@@ -78,6 +78,17 @@ export const GET: APIRoute = async ({ request }) => {
     if (!parsed.success)
       return Response.json({ message: 'Neplatný výběr termínů.' }, { status: 400 });
 
+    if (parsed.data.branch === 'kladno') {
+      return Response.json(
+        {
+          ok: true,
+          slots: [],
+          message: 'V Kladně termín zápisu domlouvá vedoucí pobočky individuálně po objednávce.',
+        },
+        { headers: { 'Cache-Control': 'no-store' } },
+      );
+    }
+
     const branch = branches.find((item) => item.id === parsed.data.branch);
     if (!branch?.hours) {
       return Response.json(
