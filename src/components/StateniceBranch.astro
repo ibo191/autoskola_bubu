@@ -1,0 +1,367 @@
+---
+import type { Branch } from '../lib/catalog';
+
+interface Props {
+  branch: Branch;
+}
+
+const { branch } = Astro.props;
+
+const steps = [
+  [
+    '01',
+    'První jízdy – cvičiště',
+    'V klidném prostředí se seznámíte s autem, jeho základním ovládáním a prací se spojkou, plynem a brzdou. Cílem je získat cit pro vozidlo ještě před jízdou v provozu.',
+  ],
+  [
+    '02',
+    'Statenice a rozjezdy do kopce',
+    'Po zvládnutí základů se přesouváme do provozu ve Statenicích. Směrem na Horoměřice lze využít kopcovitější úseky pro nácvik rozjezdů do kopce, směrových světel a bezpečného objíždění překážek.',
+  ],
+  [
+    '03',
+    'Zóny 30 a Lysolaje',
+    'Klidnější obytné oblasti a zóny 30 mohou pomoci procvičit práci s rychlostí, sledování okolí a situace typické pro menší ulice.',
+  ],
+  [
+    '04',
+    'Jízda mimo obec',
+    'S rostoucí jistotou lze zařadit delší trasy přes Tuchoměřice, Číčovice a okolí Statenic, kde procvičíte volbu rychlosti, zatáčky a plynulou jízdu mimo obec.',
+  ],
+  [
+    '05',
+    'Samostatnější jízda',
+    'Postupně se učíte číst provoz, samostatně se rozhodovat a zvládat nové situace i bez znalosti konkrétní trasy.',
+  ],
+];
+
+const reasons = [
+  [
+    'Postupná obtížnost',
+    'Začít můžeme v klidném prostředí a náročnost provozu zvyšovat podle toho, jak se za volantem zlepšujete.',
+  ],
+  [
+    'Různé typy silnic',
+    'Během výcviku se můžete setkat s obytnými ulicemi, zónami 30, kopci, zatáčkami i jízdou mezi obcemi.',
+  ],
+  [
+    'Reálné situace',
+    'Cílem je zvládat situace, se kterými se po získání řidičáku skutečně setkáte.',
+  ],
+  [
+    'Výcvik podle vás',
+    'Tempo a obtížnost jednotlivých jízd přizpůsobujeme tomu, jak postupně získáváte jistotu.',
+  ],
+];
+
+const faqs = [
+  [
+    'Kde probíhají první jízdy ve Statenicích?',
+    'První jízdy začínají na cvičišti, kde se v klidném prostředí seznámíte s ovládáním vozidla a osvojíte si základní práci s autem.',
+  ],
+  [
+    'Kde se během výcviku jezdí?',
+    'Podle zkušeností žáka se výcvik postupně přesouvá do Statenic a okolí. Může vést například směrem na Horoměřice, Lysolaje, Tuchoměřice nebo Číčovice.',
+  ],
+  [
+    'Budu hned jezdit v náročném provozu?',
+    'Ne. Obtížnost tras zvyšujeme postupně podle vašich schopností a jistoty za volantem.',
+  ],
+  [
+    'Trénují se ve Statenicích rozjezdy do kopce?',
+    'Ano. V okolí Statenic využíváme vhodné kopcovité úseky, kde je možné rozjezdy do kopce bezpečně procvičovat.',
+  ],
+  [
+    'Je pobočka vhodná i pro žáky z okolních obcí?',
+    'Ano. Lokalita je vhodná také pro zájemce z Horoměřic, Velkých Přílep, Tuchoměřic a dalších obcí Praha-západ.',
+  ],
+];
+---
+
+<section class="section statenice-training" id="vycvik">
+  <div class="container">
+    <div class="section-heading narrow-heading">
+      <div>
+        <span class="eyebrow">Praktický výcvik</span><h2>
+          Od prvních metrů až po samostatnou jízdu.
+        </h2><p>
+          Nezačínáme tím, že vás pošleme rovnou do složitého provozu. Výcvik stavíme postupně podle
+          toho, jak získáváte jistotu za volantem.
+        </p>
+      </div>
+    </div>
+    <ol class="training-timeline">
+      {
+        steps.map(([number, title, text]) => (
+          <li>
+            <>
+              <span>{number}</span>
+              <div>
+                <>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                </>
+              </div>
+            </>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<section class="section tinted" id="kde-jezdime">
+  <div class="container split local-split">
+    <div>
+      <span class="eyebrow">Kde se jezdí</span><h2>Výcvik ve Statenicích a okolí.</h2><p
+        class="lead"
+      >
+        Díky poloze Statenic nejsme odkázaní pouze na jednu stále stejnou trasu.
+      </p><p>
+        Kombinujeme klidnější ulice, menší obce, kopcovité úseky, obytné zóny i silnice mimo obec.
+        Konkrétní trasa vždy závisí na průběhu výcviku a na tom, co právě potřebujete procvičit.
+      </p>
+    </div>
+    <div class="route-card">
+      <h3>Lokality, které lze zařadit</h3><ul>
+        <li>Statenice a Horoměřice</li><li>Lysolaje a Velké Přílepy</li><li>
+          Tuchoměřice a Číčovice
+        </li><li>Roholičky a další obce Praha-západ</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-heading narrow-heading">
+      <div>
+        <span class="eyebrow">Proč Statenice</span><h2>Výcvik podle vás, ne podle jedné trasy.</h2>
+      </div>
+    </div><div class="grid reasons-grid">
+      {
+        reasons.map(([title, text]) => (
+          <article class="card">
+            <>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<section class="section tinted" id="pro-koho">
+  <div class="container split local-split">
+    <div>
+      <span class="eyebrow">Praha-západ</span><h2>Autoškola pro Statenice a okolí.</h2><p
+        class="lead"
+      >
+        Pobočka není určená pouze místním. Využít ji mohou i zájemci z Horoměřic, Velkých Přílep,
+        Tuchoměřic a dalších obcí v okolí.
+      </p>
+    </div><div class="approach-card">
+      <p>
+        Výhodou lokality je možnost postupně přecházet od klidnějších úseků k náročnějším situacím a
+        získávat jistotu v různých typech prostředí.
+      </p><p class="small">Tempo výcviku upravujeme podle zkušeností každého žáka.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="pobocka">
+  <div class="container split local-split">
+    <div>
+      <span class="eyebrow">Pobočka Statenice</span><h2>Chcete začít řídit?</h2><p class="lead">
+        Vyberte si kurz ve Statenicích a udělejte první krok k řidičáku. Od prvních jízd vás
+        povedeme postupně k jistotě do běžného provozu.
+      </p>
+    </div><div class="contact-panel">
+      <dl>
+        <dt>Adresa</dt><dd>{branch.address}</dd><dt>Kdy nás zastihnete</dt><dd>
+          {branch.hours}
+        </dd><dt>Telefon</dt><dd>
+          <a href={`tel:${branch.phone}`}
+            >{branch.phone.replace(/(\+420)(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4')}</a>
+        </dd><dt>E-mail</dt><dd><a href={`mailto:${branch.email}`}>{branch.email}</a></dd>
+      </dl><button class="btn primary" data-order disabled data-branch="statenice" data-course="b"
+        >Chci začít řidičák ↗</button>
+    </div>
+  </div>
+</section>
+
+<section class="section tinted" id="faq">
+  <div class="container faq-layout">
+    <div>
+      <span class="eyebrow">FAQ Statenice</span><h2>Nejčastější otázky před zápisem.</h2><p>
+        Co čekat před první jízdou i v průběhu výcviku.
+      </p>
+    </div><div>
+      {
+        faqs.map(([question, answer]) => (
+          <details>
+            <>
+              <summary>
+                {question}
+                <span aria-hidden="true">+</span>
+              </summary>
+              <p>{answer}</p>
+            </>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .narrow-heading {
+    max-width: 780px;
+  }
+  .training-timeline {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .training-timeline li {
+    min-height: 220px;
+    padding: 26px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: #fff;
+  }
+  .training-timeline li > span {
+    display: inline-grid;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    margin-bottom: 24px;
+    border-radius: 50%;
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+    font-size: 0.78rem;
+    font-weight: 800;
+  }
+  .training-timeline h3,
+  .route-card h3 {
+    font-size: 1.2rem;
+  }
+  .training-timeline p {
+    margin-top: 11px;
+    font-size: 0.9rem;
+    line-height: 1.62;
+  }
+  .local-split {
+    align-items: center;
+  }
+  .local-split > div > p + p {
+    margin-top: 14px;
+  }
+  .route-card,
+  .approach-card,
+  .contact-panel {
+    padding: 32px;
+    border-radius: var(--radius-lg);
+    background: #fff;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+  .route-card ul {
+    display: grid;
+    gap: 13px;
+    padding: 0;
+    margin: 22px 0 0;
+    list-style: none;
+  }
+  .route-card li::before {
+    content: '✓';
+    color: var(--brand-dark);
+    font-weight: 800;
+    margin-right: 10px;
+  }
+  .approach-card p + p {
+    margin-top: 20px;
+  }
+  .reasons-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .reasons-grid .card {
+    min-height: 180px;
+  }
+  .faq-layout {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: 70px;
+  }
+  .faq-layout > div > p {
+    margin: 24px 0 18px;
+  }
+  details {
+    border-bottom: 1px solid var(--line);
+  }
+  summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    cursor: pointer;
+    font-weight: 650;
+    font-size: 0.94rem;
+    padding: 23px 0;
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary span {
+    font-size: 1.35rem;
+    color: var(--brand-dark);
+  }
+  details[open] summary span {
+    transform: rotate(45deg);
+  }
+  details p {
+    padding-bottom: 24px;
+    font-size: 0.91rem;
+  }
+  .contact-panel dl {
+    margin: 0 0 24px;
+  }
+  .contact-panel dt {
+    margin-top: 18px;
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+  .contact-panel dd {
+    margin: 4px 0 0;
+    font-weight: 650;
+    overflow-wrap: anywhere;
+  }
+  @media (max-width: 950px) {
+    .training-timeline {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .reasons-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 760px) {
+    .training-timeline,
+    .reasons-grid,
+    .faq-layout {
+      grid-template-columns: 1fr;
+    }
+    .training-timeline li {
+      min-height: auto;
+    }
+    .route-card,
+    .approach-card,
+    .contact-panel {
+      padding: 25px;
+    }
+  }
+</style>

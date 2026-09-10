@@ -4,6 +4,8 @@ import Base from '../layouts/Base.astro';
 import Roadmap from '../components/Roadmap.astro';
 import Faq from '../components/Faq.astro';
 import FinalCta from '../components/FinalCta.astro';
+import KladnoBranch from '../components/KladnoBranch.astro';
+import StateniceBranch from '../components/StateniceBranch.astro';
 import { branches, money, type Branch } from '../lib/catalog';
 import manualCar from '../assets/courses/b-manual-fabia.png';
 export const prerender = true;
@@ -15,6 +17,8 @@ interface Props {
 }
 const { branch } = Astro.props;
 const isStrizkov = branch.id === 'strizkov';
+const isKladno = branch.id === 'kladno';
+const isStatenice = branch.id === 'statenice';
 const phoneFormatted = branch.phone.replace(/(\+420)(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4');
 const mapQuery = encodeURIComponent('Autoškola BuBu U Kapliček 34 Praha 8 Střížkov');
 const localBoxes = [
@@ -83,10 +87,20 @@ const schema = {
 ---
 
 <Base
-  title={isStrizkov ? 'Autoškola Praha 8 Střížkov bez stresu' : `Autoškola ${branch.name}`}
+  title={isStrizkov
+    ? 'Autoškola Praha 8 Střížkov bez stresu'
+    : isKladno
+      ? 'Autoškola Kladno | Řidičák bez stresu'
+      : isStatenice
+        ? 'Autoškola Statenice | Řidičák bez stresu'
+        : `Autoškola ${branch.name}`}
   description={isStrizkov
     ? 'Autoškola Praha 8 Střížkov. Řidičák skupiny B s jasným plánem výcviku, přípravou na pražský provoz a lidským přístupem bez křiku.'
-    : `Autoškola BuBu ${branch.name}. ${branch.address}. Kurz B za ${money(branch.bPrice)}. Osobní zápis a výcvik s lidským přístupem.`}
+    : isKladno
+      ? 'Autoškola v Kladně s klidným a lidským přístupem. Kurz skupiny B, kondiční jízdy a postupný výcvik od prvních jízd až po běžný provoz.'
+      : isStatenice
+        ? 'Autoškola Statenice s postupným výcvikem bez stresu. Řidičák skupiny B pro Statenice, Horoměřice, Velké Přílepy a okolí Prahy-západ.'
+        : `Autoškola BuBu ${branch.name}. ${branch.address}. Kurz B za ${money(branch.bPrice)}. Osobní zápis a výcvik s lidským přístupem.`}
   schema={schema}
 >
   <section class="page-hero">
@@ -101,13 +115,21 @@ const schema = {
             {
               isStrizkov
                 ? 'Autoškola Praha 8 Střížkov bez stresu'
-                : `Za řidičákem do ${branch.id === 'kladno' ? 'Kladna' : 'Statenic'}.`
+                : isKladno
+                  ? 'Autoškola Kladno – řidičák bez stresu'
+                  : isStatenice
+                    ? 'Autoškola Statenice – řidičák bez stresu'
+                    : `Za řidičákem do ${branch.name}.`
             }
           </h1><p class="lead">
             {
               isStrizkov
                 ? 'Řidičák sk. B s jasným plánem výcviku a přípravou na reálný pražský provoz. Bez křiku, bez chaosu a lidsky.'
-                : 'Začínáte od nuly? To je v pořádku. V BuBu vás provedeme od prvního rozjezdu až k závěrečné zkoušce.'
+                : isKladno
+                  ? 'Výuku i praktický výcvik stavíme postupně – od prvního seznámení s autem až po jízdu v běžném městském provozu, mimo obec, po dálnici nebo v Praze. Učíme klidně, lidsky a bez zbytečného stresu.'
+                  : isStatenice
+                    ? 'Naučíme vás řídit postupně – od prvních metrů na cvičišti až po samostatnější jízdu v běžném provozu. Ve Statenicích a okolí trénujeme rozjezdy do kopce, menší ulice, zóny 30, zatáčky i jízdu mimo obec.'
+                    : 'Začínáte od nuly? To je v pořádku. V BuBu vás provedeme od prvního rozjezdu až k závěrečné zkoušce.'
             }
           </p>{
             isStrizkov && (
@@ -117,14 +139,32 @@ const schema = {
                 bez křiku a s přípravou na reálnou zkoušku.
               </p>
             )
+          }{
+            isKladno && (
+              <p class="hero-copy">
+                Pobočka je vhodná pro zájemce z Kladna, Unhoště, Buštěhradu, Vinařic, Libušína i pro
+                studenty, kteří do Kladna pravidelně dojíždějí.
+              </p>
+            )
+          }{
+            isStatenice && (
+              <p class="hero-copy">
+                Výcvik probíhá ve Statenicích a okolních obcích na Praze-západ. Trasy přizpůsobujeme
+                zkušenostem žáka, aby náročnost rostla postupně.
+              </p>
+            )
           }<div class="actions">
             <button class="btn primary" data-order disabled data-branch={branch.id} data-course="b">
-              {isStrizkov ? 'Přihlásit se do kurzu ↗' : 'Chci řidičák ↗'}
+              {isStrizkov ? 'Přihlásit se do kurzu ↗' : 'Chci začít řidičák ↗'}
             </button>
             {
               isStrizkov ? (
                 <a class="btn secondary" href={`tel:${branch.phone}`}>
                   Zavolat a zeptat se
+                </a>
+              ) : isKladno || isStatenice ? (
+                <a class="btn secondary" href="#vycvik">
+                  {isKladno ? 'Jak probíhá výcvik' : 'Zjistit více o výcviku'}
                 </a>
               ) : (
                 <a class="btn secondary" href="#pobocka">
@@ -154,7 +194,7 @@ const schema = {
     </div>
   </div>
 
-  <Roadmap />
+  {!isKladno && !isStatenice && <Roadmap />}
 
   {
     isStrizkov ? (
@@ -323,6 +363,10 @@ const schema = {
         </section>
         <script src="../scripts/branch-contact.ts" />
       </>
+    ) : isKladno ? (
+      <KladnoBranch branch={branch} />
+    ) : isStatenice ? (
+      <StateniceBranch branch={branch} />
     ) : (
       <>
         <section class="section tinted" id="pobocka">

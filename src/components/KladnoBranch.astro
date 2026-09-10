@@ -1,0 +1,516 @@
+---
+import type { Branch } from '../lib/catalog';
+import { money } from '../lib/catalog';
+
+interface Props {
+  branch: Branch;
+}
+
+const { branch } = Astro.props;
+
+const trainingSteps = [
+  [
+    '01',
+    'Seznámení s vozidlem',
+    'První jízdy začínají na autocvičišti v Kladně. V klidném prostředí si nastavíte správnou pozici, poznáte ovládání auta a procvičíte rozjezdy, zastavení, řazení, zatáčení i základní manévrování.',
+  ],
+  [
+    '02',
+    'Klidnější provoz',
+    'Jakmile máte základní kontrolu nad vozidlem, přecházíme do klidnějšího provozu v Kladně a okolí. Soustředíte se na jízdu v pruhu, křižovatky, směrová světla, rychlost a vnímání provozu.',
+  ],
+  [
+    '03',
+    'Městský provoz',
+    'S rostoucí jistotou zařazujeme náročnější části Kladna: větší křižovatky, kruhové objezdy, řazení do pruhů a běžné městské situace.',
+  ],
+  [
+    '04',
+    'Mimo město a Praha',
+    'Podle fáze výcviku a vašich schopností může jízda vést mimo obec, po dálnici, směrem na Prahu nebo i do pražského provozu. Nejde o pevný seznam tras pro každého žáka.',
+  ],
+  [
+    '05',
+    'Situace z běžného života',
+    'Když to průběh výcviku umožní, procvičujeme i parkování v garáži, čerpací stanici, automyčku nebo parkování v obchodních a městských lokalitách.',
+  ],
+  [
+    '06',
+    'Samostatnější jízda',
+    'Cílem není zapamatovat si trasu ke zkoušce, ale číst provoz, rozhodovat se včas a zvládnout i cestu, kterou předem neznáte.',
+  ],
+];
+
+const reasons = [
+  [
+    'Postupná obtížnost',
+    'Od základního ovládání vozidla postupujeme ke stále složitějším dopravním situacím.',
+  ],
+  [
+    'Město i jízda mimo něj',
+    'Výcvik může spojit městský provoz v Kladně s jízdou mimo obec a dalšími typy komunikací.',
+  ],
+  [
+    'Reálné řidičské situace',
+    'Připravujeme vás nejen na zkoušku, ale i na situace, které přijdou po získání řidičského průkazu.',
+  ],
+  [
+    'Výcvik podle žáka',
+    'Tempo a náročnost jízd přizpůsobujeme tomu, jak postupně získáváte jistotu za volantem.',
+  ],
+];
+
+const faqs = [
+  [
+    'Kde probíhají první jízdy autoškoly v Kladně?',
+    'První jízdy začínají v klidném prostředí na autocvičišti v Kladně, kde se nejprve seznámíte s vozidlem a jeho základním ovládáním.',
+  ],
+  [
+    'Jezdí se pouze v Kladně?',
+    'Ne. Hlavní část výcviku probíhá v Kladně a okolí, ale podle fáze výcviku a schopností žáka může být součástí také jízda mimo obec, po dálnici nebo směrem do Prahy.',
+  ],
+  [
+    'Budu hned jezdit v hustém provozu?',
+    'Ne. Náročnost zvyšujeme postupně: od základního ovládání vozidla a klidnějších situací až k náročnějšímu provozu.',
+  ],
+  [
+    'Kde probíhá teorie v Kladně?',
+    'Podle vypsaného termínu probíhá na Střední průmyslové škole stavební a Obchodní akademii Kladno nebo na Střední zdravotnické škole a Vyšší odborné škole zdravotnické Kladno.',
+  ],
+  [
+    'Kolik stojí řidičák skupiny B v Kladně?',
+    `Aktuální cena kurzu skupiny B na pobočce Kladno je ${money(branch.bPrice)}. K ceně se mohou připočítat poplatky související se závěrečnou zkouškou.`,
+  ],
+  [
+    'Nabízíte v Kladně kondiční jízdy?',
+    'Ano. Jsou vhodné pro držitele řidičského průkazu, kteří si chtějí obnovit řidičské návyky nebo procvičit konkrétní situace.',
+  ],
+  [
+    'Je pobočka vhodná i pro zájemce mimo Kladno?',
+    'Ano. Pobočku mohou využít také zájemci z Unhoště, Buštěhradu, Vinařic, Libušína a dalších okolních obcí.',
+  ],
+];
+---
+
+<section class="section kladno-training" id="vycvik">
+  <div class="container">
+    <div class="section-heading narrow-heading">
+      <div>
+        <span class="eyebrow">Praktický výcvik</span>
+        <h2>Od prvních metrů až po skutečný provoz.</h2>
+        <p>
+          Výcvik stavíme tak, abyste získávali jistotu postupně a dokázali po řidičáku fungovat i v
+          běžných situacích na silnici.
+        </p>
+      </div>
+    </div>
+    <ol class="training-timeline">
+      {
+        trainingSteps.map(([number, title, text]) => (
+          <li>
+            <span>{number}</span>
+            <div>
+              <>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<section class="section tinted" id="kde-jezdime">
+  <div class="container split local-split">
+    <div>
+      <span class="eyebrow">Kde se jezdí</span>
+      <h2>Kde se jezdí během autoškoly v Kladně?</h2>
+      <p class="lead">Praktický výcvik probíhá v Kladně a jeho okolí.</p>
+      <p>
+        Podle fáze výcviku a zkušeností žáka kombinujeme klidnější lokality s městským provozem,
+        jízdou mimo obec nebo náročnějšími dopravními situacemi.
+      </p>
+    </div>
+    <div class="route-card">
+      <h3>Postupně podle jistoty za volantem</h3>
+      <ul>
+        <li>Kladno a okolí Kladna</li>
+        <li>Jízda mimo obec</li>
+        <li>Dálnice</li>
+        <li>Praha podle fáze výcviku</li>
+      </ul>
+      <p class="small">
+        Konkrétní průběh každé jízdy volí instruktor podle vašich schopností a situace v provozu.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-heading narrow-heading">
+      <div>
+        <span class="eyebrow">Proč BuBu Kladno</span><h2>
+          Výcvik, který nekončí přípravou na zkoušku.
+        </h2>
+      </div>
+    </div>
+    <div class="grid reasons-grid">
+      {
+        reasons.map(([title, text]) => (
+          <article class="card">
+            <>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<section class="section tinted">
+  <div class="container split local-split">
+    <div>
+      <span class="eyebrow">Lidský přístup</span>
+      <h2>Klid za volantem je součást výuky.</h2>
+      <p class="lead">
+        V Autoškole BuBu si zakládáme na výuce bez křiku, chaosu a zbytečného stresu.
+      </p>
+    </div>
+    <div class="approach-card">
+      <p>
+        Část našich učitelů tvoří současní nebo bývalí příslušníci složek integrovaného záchranného
+        systému. Jejich zkušenost využíváme jako praktický pohled na bezpečné řízení, předvídání
+        rizik a rozhodování za volantem.
+      </p>
+      <p class="small">
+        Každý instruktor vede výcvik vlastním lidským způsobem; společné je soustředění na bezpečí a
+        srozumitelné vysvětlení.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="teorie">
+  <div class="container">
+    <div class="section-heading narrow-heading">
+      <div>
+        <span class="eyebrow">Teoretická výuka</span><h2>Kde probíhá teorie v Kladně?</h2><p>
+          Podle konkrétního termínu využíváme dvě lokality v Kladně. Přesné místo vždy najdete u
+          vypsaného termínu.
+        </p>
+      </div>
+    </div>
+    <div class="grid theory-grid">
+      <article class="card">
+        <span class="card-label">Lokalita 01</span><h3>
+          SPŠ stavební a Obchodní akademie Kladno
+        </h3><p>Cyrila Boudy 2954, Kladno</p><p class="small">V blízkosti OC Central Kladno.</p>
+      </article>
+      <article class="card">
+        <span class="card-label">Lokalita 02</span><h3>
+          Střední zdravotnická škola a VOŠ zdravotnická Kladno
+        </h3><p>Havířská 1141, Kladno</p><p class="small">V blízkosti Kladenského zámku.</p>
+      </article>
+    </div>
+    <div class="theory-note">
+      <p>
+        Teorie je rozdělena do čtyř bloků. Po absolvování prvního bloku může být přidělen instruktor
+        a začít praktický výcvik.
+      </p><a class="text-link" href="/jak-probiha-vyuka">Jak probíhá autoškola ↗</a>
+    </div>
+  </div>
+</section>
+
+<section class="section tinted" id="kurz-b">
+  <div class="container split local-split">
+    <div>
+      <span class="eyebrow">Kurz skupiny B</span>
+      <h2>Řidičský průkaz skupiny B v Kladně.</h2>
+      <p class="lead">
+        Kurz zahrnuje zákonem stanovenou teoretickou výuku a praktický výcvik. Cena se načítá z
+        aktuálního ceníku pobočky.
+      </p>
+    </div>
+    <div class="price-card">
+      <span>Aktuální cena kurzu</span><strong>{money(branch.bPrice)}</strong><p>
+        Poplatky spojené se závěrečnou zkouškou nejsou součástí ceny kurzu.
+      </p><div class="actions">
+        <a class="btn primary" href="/kurzy/ridicak-skupina-b">Zobrazit kurz skupiny B ↗</a><a
+          class="btn secondary"
+          href="/cenik?branch=kladno">Zobrazit ceník</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="kondicni-jizdy">
+  <div class="container split local-split">
+    <div>
+      <span class="eyebrow">Kondiční jízdy</span>
+      <h2>Vraťte se za volant s větší jistotou.</h2>
+      <p class="lead">
+        Kondiční jízdy v Kladně jsou pro řidiče, kteří mají řidičský průkaz, ale chtějí si obnovit
+        návyky nebo procvičit konkrétní situace.
+      </p>
+      <a class="text-link" href="/kontakt">Chci se zeptat na kondiční jízdy ↗</a>
+    </div>
+    <div class="route-card">
+      <h3>Co lze procvičit</h3><ul>
+        <li>Městský provoz a křižovatky</li><li>Parkování a manévrování</li><li>
+          Kruhové objezdy
+        </li><li>Rozjezdy a základní návyky</li><li>Dálnice nebo cesta do Prahy</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section tinted" id="faq">
+  <div class="container faq-layout">
+    <div>
+      <span class="eyebrow">FAQ Kladno</span><h2>Nejčastější otázky před zápisem.</h2><p>
+        Praktické odpovědi pro zájemce z Kladna i okolí.
+      </p>
+    </div>
+    <div>
+      {
+        faqs.map(([question, answer]) => (
+          <details>
+            <>
+              <summary>
+                {question}
+                <span aria-hidden="true">+</span>
+              </summary>
+              <p>{answer}</p>
+            </>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<section class="section" id="pobocka">
+  <div class="container split local-split">
+    <div>
+      <span class="eyebrow">Pobočka Kladno</span><h2>Začněte tam, kde se vám to hodí.</h2><p
+        class="lead"
+      >
+        Pobočka je vhodná pro zájemce z Kladna, Unhoště, Buštěhradu, Vinařic, Libušína i dalších
+        obcí v okolí.
+      </p><p>Přesné místo osobního zápisu vám potvrdí pobočka podle zvoleného termínu.</p>
+    </div>
+    <div class="contact-panel">
+      <dl>
+        <dt>Telefon</dt><dd>
+          <a href={`tel:${branch.phone}`}
+            >{branch.phone.replace(/(\+420)(\d{3})(\d{3})(\d{3})/, '$1 $2 $3 $4')}</a>
+        </dd><dt>E-mail</dt><dd><a href={`mailto:${branch.email}`}>{branch.email}</a></dd>
+      </dl><button class="btn primary" data-order disabled data-branch="kladno" data-course="b"
+        >Chci začít řidičák ↗</button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .narrow-heading {
+    max-width: 780px;
+  }
+  .training-timeline {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: none;
+  }
+  .training-timeline li {
+    min-height: 220px;
+    padding: 26px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: #fff;
+  }
+  .training-timeline li > span {
+    display: inline-grid;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    margin-bottom: 24px;
+    border-radius: 50%;
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+    font-size: 0.78rem;
+    font-weight: 800;
+  }
+  .training-timeline h3,
+  .route-card h3,
+  .price-card strong {
+    font-size: 1.2rem;
+  }
+  .training-timeline p {
+    margin-top: 11px;
+    font-size: 0.9rem;
+    line-height: 1.62;
+  }
+  .local-split {
+    align-items: center;
+  }
+  .local-split > div > p + p {
+    margin-top: 14px;
+  }
+  .route-card,
+  .approach-card,
+  .price-card,
+  .contact-panel {
+    padding: 32px;
+    border-radius: var(--radius-lg);
+    background: #fff;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+  .route-card ul {
+    display: grid;
+    gap: 13px;
+    padding: 0;
+    margin: 22px 0;
+    list-style: none;
+  }
+  .route-card li::before {
+    content: '✓';
+    color: var(--brand-dark);
+    font-weight: 800;
+    margin-right: 10px;
+  }
+  .approach-card p + p {
+    margin-top: 20px;
+  }
+  .reasons-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .reasons-grid .card {
+    min-height: 180px;
+  }
+  .theory-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .card-label,
+  .price-card > span {
+    color: var(--brand-dark);
+    font-weight: 750;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .theory-grid h3 {
+    margin: 15px 0 10px;
+    font-size: 1.2rem;
+  }
+  .theory-note {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 25px;
+    margin-top: 22px;
+    padding: 24px;
+    border-radius: var(--radius);
+    background: var(--brand-soft);
+  }
+  .theory-note p {
+    max-width: 700px;
+  }
+  .price-card strong {
+    display: block;
+    margin: 12px 0;
+    font-size: clamp(2.1rem, 5vw, 3.3rem);
+    color: var(--ink);
+  }
+  .price-card .actions {
+    margin-top: 24px;
+  }
+  .faq-layout {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: 70px;
+  }
+  .faq-layout > div > p {
+    margin: 24px 0 18px;
+  }
+  details {
+    border-bottom: 1px solid var(--line);
+  }
+  summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    cursor: pointer;
+    font-weight: 650;
+    font-size: 0.94rem;
+    padding: 23px 0;
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary span {
+    font-size: 1.35rem;
+    color: var(--brand-dark);
+  }
+  details[open] summary span {
+    transform: rotate(45deg);
+  }
+  details p {
+    padding-bottom: 24px;
+    font-size: 0.91rem;
+  }
+  .contact-panel dl {
+    margin: 0 0 24px;
+  }
+  .contact-panel dt {
+    margin-top: 18px;
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+  .contact-panel dd {
+    margin: 4px 0 0;
+    font-weight: 650;
+    overflow-wrap: anywhere;
+  }
+  @media (max-width: 950px) {
+    .training-timeline {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .reasons-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 760px) {
+    .training-timeline,
+    .reasons-grid,
+    .theory-grid,
+    .faq-layout {
+      grid-template-columns: 1fr;
+    }
+    .training-timeline li {
+      min-height: auto;
+    }
+    .theory-note {
+      display: block;
+    }
+    .theory-note .text-link {
+      display: inline-block;
+      margin-top: 18px;
+    }
+    .route-card,
+    .approach-card,
+    .price-card,
+    .contact-panel {
+      padding: 25px;
+    }
+  }
+</style>
