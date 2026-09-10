@@ -404,6 +404,16 @@ function formatSlotTime(start: string, end: string) {
   return `${new Intl.DateTimeFormat('cs-CZ', { hour: '2-digit', minute: '2-digit' }).format(from)}–${new Intl.DateTimeFormat('cs-CZ', { hour: '2-digit', minute: '2-digit' }).format(to)}`;
 }
 
+function formatSelectedSlot(start: string, end: string) {
+  const date = new Intl.DateTimeFormat('cs-CZ', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(start));
+  return `${date} · ${formatSlotTime(start, end)}`;
+}
+
 function renderSlotsForDate(date: string) {
   const slots = loadedSlots.filter((slot) => localDateKey(new Date(slot.startsAt)) === date);
   slotList.replaceChildren();
@@ -423,7 +433,7 @@ function renderSlotsForDate(date: string) {
     button.addEventListener('click', () => {
       selectedSlotId = slot.id;
       slotField.value = slot.id;
-      selectedSlotLabel.textContent = `Vybraný termín: ${formatSlotTime(slot.startsAt, slot.endsAt)}.`;
+      selectedSlotLabel.textContent = `Vybraný termín: ${formatSelectedSlot(slot.startsAt, slot.endsAt)}.`;
       slotList
         .querySelectorAll('.slot-option')
         .forEach((item) => item.setAttribute('aria-pressed', 'false'));

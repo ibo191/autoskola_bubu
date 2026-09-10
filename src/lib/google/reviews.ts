@@ -71,37 +71,15 @@ export const fallbackGoogleReviews: GoogleReviewsPayload = {
   configured: false,
   source: 'fallback',
   placeName: 'Autoškola BuBu Praha 8 Střížkov',
-  rating: 5,
-  userRatingCount: 28,
+  rating: 0,
+  userRatingCount: 0,
   googleMapsUri:
     'https://www.google.com/maps/search/?api=1&query=Auto%C5%A1kola%20BuBu%20U%20Kapli%C4%8Dek%2034%20Praha%208%20St%C5%99%C3%AD%C5%BEkov',
-  reviews: [
-    {
-      id: 'fallback-approach',
-      authorName: 'Google recenze',
-      rating: 5,
-      text: 'Žáci u nás nejčastěji oceňují klidný přístup, srozumitelné vysvětlení a přípravu na reálný provoz.',
-      relativeTime: 'veřejný profil Google',
-    },
-    {
-      id: 'fallback-profile',
-      authorName: 'Profil pobočky Střížkov',
-      rating: 5,
-      text: 'Po napojení Google Places API se zde budou automaticky zobrazovat aktuální recenze z profilu Autoškola BuBu Střížkov.',
-      relativeTime: 'čeká na API klíč',
-    },
-    {
-      id: 'fallback-confidence',
-      authorName: 'Autoškola BuBu',
-      rating: 5,
-      text: 'Naším cílem je vést žáky klidně, lidsky a tak, aby od zkoušky neodcházeli jen s papírem, ale hlavně s jistotou v provozu.',
-      relativeTime: 'pobočka Střížkov',
-    },
-  ],
+  reviews: [],
 };
 
 export async function loadGoogleReviews(env: Record<string, string | undefined>) {
-  const apiKey = env.GOOGLE_PLACES_API_KEY;
+  const apiKey = env.GOOGLE_PLACES_API_KEY ?? env.google_places_api_key;
   if (!apiKey) {
     console.warn('Google reviews fallback: GOOGLE_PLACES_API_KEY is missing.');
     return fallbackGoogleReviews;

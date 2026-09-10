@@ -19,9 +19,17 @@ const stars = '★★★★★';
         </div>
         <h2>{heading}</h2>
         <div class="rating-row">
-          <strong data-rating>{fallback.rating.toFixed(1).replace('.', ',')}</strong>
+          <strong data-rating
+            >{fallback.rating ? fallback.rating.toFixed(1).replace('.', ',') : '—'}</strong
+          >
           <span class="stars" aria-label={`${fallback.rating} z 5 hvězdiček`}>{stars}</span>
-          <span class="review-count" data-review-count>{fallback.userRatingCount} recenzí</span>
+          <span class="review-count" data-review-count>
+            {
+              fallback.userRatingCount
+                ? `${fallback.userRatingCount} recenzí`
+                : 'Načítáme hodnocení'
+            }
+          </span>
         </div>
         <p>Reálné recenze načítáme z veřejného Google profilu {profileLabel}.</p>
         <a
@@ -46,20 +54,26 @@ const stars = '★★★★★';
         </div>
         <div class="reviews-list" data-reviews-list>
           {
-            fallbackReviews.map((review) => (
-              <article class="review-card">
-                <div class="review-head">
-                  <div>
-                    <strong>{review.authorName}</strong>
-                    <span>{review.relativeTime}</span>
+            fallbackReviews.length ? (
+              fallbackReviews.map((review) => (
+                <article class="review-card">
+                  <div class="review-head">
+                    <div>
+                      <strong>{review.authorName}</strong>
+                      <span>{review.relativeTime}</span>
+                    </div>
                   </div>
-                </div>
-                <span class="stars" aria-label={`${review.rating} z 5 hvězdiček`}>
-                  {stars.slice(0, Math.round(review.rating))}
-                </span>
-                <p>{review.text}</p>
-              </article>
-            ))
+                  <span class="stars" aria-label={`${review.rating} z 5 hvězdiček`}>
+                    {stars.slice(0, Math.round(review.rating))}
+                  </span>
+                  <p>{review.text}</p>
+                </article>
+              ))
+            ) : (
+              <p class="reviews-loading" data-reviews-state>
+                Načítáme aktuální recenze z Google…
+              </p>
+            )
           }
         </div>
       </div>
@@ -140,11 +154,17 @@ const stars = '★★★★★';
       });
       if (!response.ok) return;
       const data = (await response.json()) as ReviewsPayload;
-      rating.textContent = data.rating.toFixed(1).replace('.', ',');
-      count.textContent = `${data.userRatingCount} recenzí`;
+      rating.textContent = data.rating ? data.rating.toFixed(1).replace('.', ',') : '—';
+      count.textContent = data.userRatingCount
+        ? `${data.userRatingCount} recenzí`
+        : 'Hodnocení není dostupné';
       link.href = data.googleMapsUri;
-      link.innerHTML = `Zobrazit všech ${data.userRatingCount} recenzí na Google <span aria-hidden="true">↗</span>`;
-      if (data.reviews.length) list.innerHTML = data.reviews.slice(0, 5).map(renderReview).join('');
+      link.innerHTML = data.userRatingCount
+        ? `Zobrazit všech ${data.userRatingCount} recenzí na Google <span aria-hidden="true">↗</span>`
+        : 'Otevřít profil na Google <span aria-hidden="true">↗</span>';
+      list.innerHTML = data.reviews.length
+        ? data.reviews.slice(0, 5).map(renderReview).join('')
+        : '<p class="reviews-loading">Aktuální recenze jsou dostupné na Google profilu.</p>';
     } catch {
       /* The static fallback stays visible when Google reviews are unavailable. */
     }
@@ -249,6 +269,12 @@ const stars = '★★★★★';
     font-size: 0.86rem;
     font-weight: 750;
     text-decoration: none;
+  }
+  [data-google-reviews] .reviews-loading {
+    margin: 0;
+    padding: 24px 6px;
+    color: #5f6368;
+    font-size: 0.92rem;
   }
   [data-google-reviews] .all-reviews {
     display: inline-flex;
