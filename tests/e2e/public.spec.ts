@@ -10,7 +10,7 @@ test('B pricing asks for transmission and L17, with manual only outside Prague',
   await expect(page.getByRole('button', { name: /Automat/ })).toBeDisabled();
   await page.getByRole('button', { name: 'Manuál', exact: true }).click();
   await page.getByRole('button', { name: /Kurz skupiny B/ }).click();
-  await expect(page.locator('#offer-price')).toHaveText('20 000 Kč');
+  await expect(page.locator('#offer-price')).toHaveText('21 000 Kč');
   await expect(page.locator('#offer-variant')).toHaveText('Manuál');
   await expect(page.locator('.offer-price')).toContainText(
     'Cena kurzu nezahrnuje poplatky za zkoušku.',
@@ -82,7 +82,7 @@ test('Prefilled order, server price, contact back navigation and honest booking 
   await expect(dialog.getByRole('combobox', { name: 'Pobočka', exact: true })).toHaveValue(
     'strizkov',
   );
-  await expect(dialog.locator('#quote-amount')).toHaveText('24 900 Kč');
+  await expect(dialog.locator('#quote-amount')).toHaveText('25 900 Kč');
   await dialog.getByRole('button', { name: 'Pokračovat →', exact: true }).click();
   await dialog.getByLabel('Jméno', { exact: true }).fill('Fiktivní');
   await dialog.getByLabel('Příjmení', { exact: true }).fill('Test');

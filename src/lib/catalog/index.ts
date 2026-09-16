@@ -21,7 +21,7 @@ export const branches = z.array(branchSchema).parse([
     phone: '+420725717755',
     email: 'strizkov@autoskolabubu.cz',
     hours: 'Pondělí a čtvrtek 15:00–18:00',
-    bPrice: 24900,
+    bPrice: 25900,
   },
   {
     id: 'kladno',
@@ -31,7 +31,7 @@ export const branches = z.array(branchSchema).parse([
     phone: '+420725857884',
     email: 'kladno@autoskolabubu.cz',
     hours: null,
-    bPrice: 20000,
+    bPrice: 21000,
   },
   {
     id: 'statenice',
@@ -41,7 +41,7 @@ export const branches = z.array(branchSchema).parse([
     phone: '+420725703171',
     email: 'statenice@autoskolabubu.cz',
     hours: 'Středa 15:00–18:00',
-    bPrice: 24900,
+    bPrice: 25900,
   },
 ]);
 export type Branch = (typeof branches)[number];

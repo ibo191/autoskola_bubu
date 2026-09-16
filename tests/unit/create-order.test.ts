@@ -112,7 +112,7 @@ test('order workflow recalculates price, stores a hash, then sends customer and 
   const result = await f.execute({ ...baseBody, captchaToken });
   assert.equal(result.ok, true);
   assert.equal(f.repository.calls.length, 1);
-  assert.equal(f.repository.calls[0]?.price.amount, 24900);
+  assert.equal(f.repository.calls[0]?.price.amount, 25900);
   assert.match(f.repository.calls[0]?.verificationHash ?? '', /^[a-f0-9]{64}$/);
   assert.equal(f.repository.calls[0]?.terms.accepted, true);
   assert.equal(f.repository.calls[0]?.marketing.accepted, false);

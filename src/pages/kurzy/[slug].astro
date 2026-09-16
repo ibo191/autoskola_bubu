@@ -192,7 +192,11 @@ const schema = {
       <div class="grid includes">
         <article class="card">
           <h3>Jasný postup</h3><p>
-            Víte, co vás čeká: online objednávka, osobní zápis, teorie, jízdy a závěrečná zkouška.
+            {
+              course.id === 'b'
+                ? 'Naše teoretická a praktická výuka má jasný směr. Osnovy jsme vytvářeli a upravovali přesně podle potřeb studentů. V provozu se nevěnujeme jen zákonným požadavkům, ale v mnohém jdeme i nad jejich rámec.'
+                : 'Víte, co vás čeká: online objednávka, osobní zápis, teorie, jízdy a závěrečná zkouška.'
+            }
           </p>
         </article>
         <article class="card">

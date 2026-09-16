@@ -21,7 +21,14 @@ const asset =
         : trailer;
 ---
 
-<article class:list={['course-card', { photographic: photo }]} data-category={course.category}>
+<article
+  class:list={['course-card', { photographic: photo }]}
+  data-category={course.category}
+  data-course-url={`/kurzy/${course.slug}`}
+  tabindex="0"
+  role="link"
+  aria-label={`Otevřít kurz ${course.label}`}
+>
   {
     photo && (
       <Image
@@ -43,9 +50,9 @@ const asset =
     )
   }
   <div class="course-body">
-    <span class="eyebrow">{course.label}</span><h3>
-      <a href={`/kurzy/${course.slug}`}>{course.name}</a>
-    </h3><p>{course.description}</p><div class="price">
+    <span class="eyebrow">{course.label}</span><h3>{course.name}</h3><p>{course.description}</p><div
+      class="price"
+    >
       {course.category === 'moto' && <small>od </small>}{money(displayPrice(course, branch))}
     </div><p class="small">
       {
@@ -56,11 +63,27 @@ const asset =
     </p><div class="card-actions">
       <button class="btn primary" data-order disabled data-course={course.id} data-branch={branch}
         >Vybrat kurz ↗</button
-      ><a href={`/kurzy/${course.slug}`} aria-label={`Více o kurzu: ${course.label}`}>Podrobnosti</a
-      >
+      ><span class="text-link" aria-hidden="true">Otevřít kurz →</span>
     </div>
   </div>
 </article>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-course-url]').forEach((card) => {
+    const openCourse = () => {
+      const url = card.dataset.courseUrl;
+      if (url) window.location.assign(url);
+    };
+    card.addEventListener('click', (event) => {
+      if ((event.target as HTMLElement).closest('button, a')) return;
+      openCourse();
+    });
+    card.addEventListener('keydown', (event) => {
+      if (event.target !== card || (event.key !== 'Enter' && event.key !== ' ')) return;
+      event.preventDefault();
+      openCourse();
+    });
+  });
+</script>
 <style>
   .course-card {
     overflow: hidden;
@@ -69,6 +92,7 @@ const asset =
     background: white;
     display: flex;
     flex-direction: column;
+    cursor: pointer;
     transition:
       transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
       box-shadow 280ms ease,
@@ -78,6 +102,10 @@ const asset =
     transform: translateY(-5px);
     border-color: #9ed6ce;
     box-shadow: var(--shadow);
+  }
+  .course-card:focus-visible {
+    outline: 3px solid var(--brand);
+    outline-offset: 3px;
   }
   .course-card > img {
     width: 100%;
@@ -95,9 +123,6 @@ const asset =
   }
   .course-body h3 {
     font-size: 1.4rem;
-  }
-  .course-body h3 a {
-    text-decoration: none;
   }
   .course-body > p {
     font-size: 0.88rem;
@@ -119,7 +144,7 @@ const asset =
     flex-wrap: wrap;
     margin-top: 24px;
   }
-  .card-actions a {
+  .card-actions .text-link {
     font-size: 0.78rem;
     font-weight: 600;
   }

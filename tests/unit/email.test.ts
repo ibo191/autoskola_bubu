@@ -31,8 +31,8 @@ const orderInput = {
   },
   price: {
     ok: true as const,
-    amount: 24900,
-    baseAmount: 24900,
+    amount: 25900,
+    baseAmount: 25900,
     addonsAmount: 0,
     addons: [],
     currency: 'CZK' as const,

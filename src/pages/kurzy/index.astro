@@ -89,6 +89,10 @@ const courseIcons = {
               <article
                 class="course-tile"
                 data-branches={availableBranches.map((branch) => branch.id).join(' ')}
+                data-course-url={`/kurzy/${course.slug}`}
+                tabindex="0"
+                role="link"
+                aria-label={`Otevřít kurz ${course.label}`}
               >
                 {course.id in coursePhotos && (
                   <Image
@@ -116,9 +120,7 @@ const courseIcons = {
                     />
                   </span>
                 </div>
-                <h3>
-                  <a href={`/kurzy/${course.slug}`}>{course.label}</a>
-                </h3>
+                <h3>{course.label}</h3>
                 <p class="tile-name">{course.name}</p>
                 <p>{course.description}</p>
                 <div class="tile-meta">
@@ -129,9 +131,9 @@ const courseIcons = {
                   <small>{availableBranches.map((branch) => branch.name).join(' · ')}</small>
                 </div>
                 <div class="tile-actions">
-                  <a class="text-link" href={`/kurzy/${course.slug}`}>
-                    Detail kurzu →
-                  </a>
+                  <span class="text-link" aria-hidden="true">
+                    Otevřít kurz →
+                  </span>
                   <button class="btn secondary" data-order disabled data-course={course.id}>
                     Přihlásit se
                   </button>
@@ -180,6 +182,21 @@ const courseIcons = {
         });
       });
     });
+    tiles.forEach((tile) => {
+      const openCourse = () => {
+        const url = tile.dataset.courseUrl;
+        if (url) window.location.assign(url);
+      };
+      tile.addEventListener('click', (event) => {
+        if ((event.target as HTMLElement).closest('button, a')) return;
+        openCourse();
+      });
+      tile.addEventListener('keydown', (event) => {
+        if (event.target !== tile || (event.key !== 'Enter' && event.key !== ' ')) return;
+        event.preventDefault();
+        openCourse();
+      });
+    });
   </script>
 </Base>
 <style>
@@ -202,6 +219,7 @@ const courseIcons = {
     min-height: 100%;
     position: relative;
     overflow: hidden;
+    cursor: pointer;
     transition:
       transform var(--ease),
       border-color var(--ease),
@@ -223,6 +241,10 @@ const courseIcons = {
     transform: translateY(-4px);
     border-color: #a8d8d1;
     box-shadow: var(--shadow);
+  }
+  .course-tile:focus-visible {
+    outline: 3px solid var(--brand);
+    outline-offset: 3px;
   }
   .course-photo {
     width: calc(100% + 56px);
@@ -270,9 +292,6 @@ const courseIcons = {
   }
   .course-tile h3 {
     font-size: 2rem;
-  }
-  .course-tile h3 a {
-    text-decoration: none;
   }
   .tile-name {
     color: var(--ink);
