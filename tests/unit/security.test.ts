@@ -40,6 +40,28 @@ test('Vercel preview forces safe stage A adapters', () => {
     'https://autoskola-bubu.vercel.app',
   );
 });
+test('Vercel production fails closed until required integrations are configured', () => {
+  const base = {
+    VERCEL: '1',
+    VERCEL_ENV: 'production',
+    VERCEL_PROJECT_PRODUCTION_URL: 'www.autoskolabubu.cz',
+    APP_ORIGIN: 'https://www.autoskolabubu.cz',
+  };
+  assert.throws(() => readConfig(base), /Missing required production environment variables/);
+  const config = readConfig({
+    ...base,
+    SUPABASE_URL: 'https://example.supabase.co',
+    SUPABASE_SERVICE_ROLE_KEY: 'service-role-key',
+    RATE_LIMIT_SECRET: 'rate-limit-secret',
+    LETTERMINT_PROJECT_TOKEN: 'lettermint-token',
+    ORDER_NOTIFICATION_EMAIL: 'objednavky@autoskolabubu.cz',
+    CRON_SECRET: 'cron-secret',
+    RECAPTCHA_SECRET_KEY: 'recaptcha-secret',
+    PUBLIC_RECAPTCHA_SITE_KEY: 'recaptcha-site-key',
+  });
+  assert.equal(config.APP_ENV, 'production');
+  assert.equal(config.APP_ORIGIN, 'https://www.autoskolabubu.cz');
+});
 test('Captcha is single-use, action-bound, host-bound and expires', async () => {
   const captcha = new LocalCaptcha({ APP_ENV: 'local' });
   const now = new Date('2026-08-31T10:00:00Z');

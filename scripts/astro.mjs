@@ -1,11 +1,16 @@
 import { spawnSync } from 'node:child_process';
 
-// Keep Astro telemetry disabled in every documented local command.
+// Keep Astro telemetry disabled in every documented command.
 process.env.ASTRO_TELEMETRY_DISABLED = '1';
-process.env.APP_ENV = process.env.VERCEL === '1' ? 'preview' : (process.env.APP_ENV ?? 'local');
+process.env.APP_ENV =
+  process.env.VERCEL === '1'
+    ? process.env.VERCEL_ENV === 'production'
+      ? 'production'
+      : 'preview'
+    : (process.env.APP_ENV ?? 'local');
 
-if (!['local', 'preview'].includes(process.env.APP_ENV)) {
-  throw new Error('Only local or preview builds are permitted before production launch.');
+if (!['local', 'preview', 'production'].includes(process.env.APP_ENV)) {
+  throw new Error('APP_ENV must be local, preview or production.');
 }
 
 const result = spawnSync(

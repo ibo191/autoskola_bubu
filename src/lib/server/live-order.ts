@@ -3,6 +3,7 @@ import { CreateOrderService, type OrderLegalSettings } from '../booking/create-o
 import { SupabaseBookingRepository, SupabaseRateLimiter } from '../supabase/booking-repository';
 import { requestFingerprint } from '../security/rate-limit';
 import type { CaptchaAdapter } from '../integrations/contracts';
+import { RecaptchaV3 } from '../integrations/recaptcha';
 import { createTransactionalEmailAdapter, orderNotificationEmail } from './email';
 
 const termsWording = 'Seznámil/a jsem se s Všeobecnými obchodními podmínkami a souhlasím s nimi.';
@@ -30,7 +31,7 @@ export function createLiveOrderService(env: Record<string, string | undefined>) 
   const config = readConfig(env);
   return new CreateOrderService({
     repository: new SupabaseBookingRepository(env),
-    captcha: new PreviewCaptcha(),
+    captcha: config.APP_ENV === 'production' ? new RecaptchaV3(env) : new PreviewCaptcha(),
     email: createTransactionalEmailAdapter(env),
     rateLimiter: new SupabaseRateLimiter(env),
     legal: legalSettings,

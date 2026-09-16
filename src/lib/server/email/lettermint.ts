@@ -2,9 +2,10 @@ import { z } from 'zod';
 import type { EmailAdapter, EmailMessage, EmailSendResult } from '../../integrations/contracts';
 import { stripHeader } from './utils';
 
-const responseSchema = z
-  .object({ message_id: z.string().optional(), status: z.string().optional() })
-  .passthrough();
+const responseSchema = z.looseObject({
+  message_id: z.string().optional(),
+  status: z.string().optional(),
+});
 
 const DEFAULT_FROM = 'Autoškola BuBu <objednavky@autoskolabubu.cz>';
 

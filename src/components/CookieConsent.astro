@@ -2,14 +2,15 @@
 
 ---
 
-<section class="cookie-consent" data-cookie-consent hidden aria-live="polite">
+<section class="cookie-consent" data-cookie-consent aria-live="polite">
   <div class="cookie-card" data-cookie-banner>
     <div>
       <span class="eyebrow">Soukromí na webu</span>
       <h2 id="cookie-title">Cookies máme pod kontrolou</h2>
       <p>
         Nezbytné cookies drží web funkční. Analytiku a marketing zapneme jen tehdy, když nám k tomu
-        dáte souhlas. Google ani Meta skripty teď bez souhlasu nespouštíme.
+        dáte souhlas. Google ani Meta skripty bez souhlasu nespouštíme. Při odeslání objednávky
+        používáme bezpečnostní ověření reCAPTCHA.
       </p>
     </div>
     <div class="cookie-actions" aria-labelledby="cookie-title">
@@ -199,7 +200,11 @@
     });
 
     document.addEventListener('bubu:open-cookie-settings', openSettings);
-    if (!readCookie()) openBanner();
+    if (readCookie()) {
+      root.hidden = true;
+    } else {
+      openBanner();
+    }
   })();
 </script>
 
@@ -211,6 +216,10 @@
     display: flex;
     justify-content: center;
     pointer-events: none;
+  }
+  .cookie-consent[hidden],
+  .cookie-card[hidden] {
+    display: none !important;
   }
   .cookie-card {
     width: min(960px, 100%);

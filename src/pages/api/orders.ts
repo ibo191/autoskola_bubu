@@ -48,8 +48,10 @@ export const POST: APIRoute = async ({ request }) => {
     }
     const body = await readJson(request);
     const url = new URL(request.url);
+    const isProduction =
+      process.env.VERCEL_ENV === 'production' || process.env.APP_ENV === 'production';
     const result = await createLiveOrderService(process.env).execute({
-      body: { ...body, captchaToken: 'preview-order-submission' },
+      body: isProduction ? body : { ...body, captchaToken: 'preview-order-submission' },
       hostname: url.hostname,
       clientFingerprint: fingerprintRequest(request, process.env),
       now: new Date(),

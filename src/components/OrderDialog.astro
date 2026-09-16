@@ -1,8 +1,19 @@
 ---
 import { branches, courses } from '../lib/catalog';
+interface Props {
+  recaptchaSiteKey?: string;
+  captchaRequired?: boolean;
+}
+const { recaptchaSiteKey = '', captchaRequired = false } = Astro.props;
 ---
 
-<dialog id="order-dialog" aria-labelledby="order-title" aria-describedby="order-intro">
+<dialog
+  id="order-dialog"
+  aria-labelledby="order-title"
+  aria-describedby="order-intro"
+  data-recaptcha-site-key={recaptchaSiteKey}
+  data-captcha-required={captchaRequired ? 'true' : 'false'}
+>
   <div class="dialog-head">
     <span class="dialog-brand">AUTOŠKOLA <strong>BuBu</strong></span><button
       type="button"

@@ -10,7 +10,7 @@ const placeDetailsSchema = z.object({
   displayName: localizedTextSchema.optional(),
   rating: z.number().optional(),
   userRatingCount: z.number().int().nonnegative().optional(),
-  googleMapsUri: z.string().url().optional(),
+  googleMapsUri: z.url().optional(),
   reviews: z
     .array(
       z.object({
@@ -20,12 +20,12 @@ const placeDetailsSchema = z.object({
         originalText: localizedTextSchema.optional(),
         rating: z.number().optional(),
         publishTime: z.string().optional(),
-        googleMapsUri: z.string().url().optional(),
+        googleMapsUri: z.url().optional(),
         authorAttribution: z
           .object({
             displayName: z.string().optional(),
-            uri: z.string().url().optional(),
-            photoUri: z.string().url().optional(),
+            uri: z.url().optional(),
+            photoUri: z.url().optional(),
           })
           .optional(),
       }),

@@ -104,7 +104,14 @@ const phoneLabel = (phone: string) => phone.replace('+420', '+420 ');
         <label>Telefon<input name="phone" type="tel" autocomplete="tel" /></label>
         <label>Předmět<input name="subject" value="Dotaz k autoškole" /></label>
         <label>Vaše zpráva<textarea name="message" rows="6" required></textarea></label>
-        <label class="hp">Web<input name="website" tabindex="-1" autocomplete="off" /></label>
+        <label class="hp"
+          >Web<input
+            name="website"
+            tabindex="-1"
+            autocomplete="off"
+            aria-label="Nevyplňujte"
+          /></label
+        >
         <button class="btn primary" type="submit">Odeslat dotaz</button>
         <p class="small" data-contact-status role="status"></p>
       </form>

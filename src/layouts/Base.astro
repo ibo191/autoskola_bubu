@@ -21,6 +21,9 @@ const {
 } = Astro.props;
 const path = Astro.url.pathname;
 const canonical = new URL(path, 'https://www.autoskolabubu.cz').href;
+const isProduction =
+  process.env.VERCEL_ENV === 'production' || process.env.APP_ENV === 'production';
+const recaptchaSiteKey = import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY ?? '';
 const nav = [
   ['/kurzy', 'Kurzy'],
   ['/cenik', 'Ceník'],
@@ -44,7 +47,7 @@ const nav = [
       content={description}
     /><link rel="canonical" href={canonical} /><meta
       name="robots"
-      content={noindex ? 'noindex, nofollow' : 'noindex, follow'}
+      content={noindex || !isProduction ? 'noindex, nofollow' : 'index, follow'}
     /><meta property="og:title" content={`${title} | Autoškola BuBu`} /><meta
       property="og:description"
       content={description}
@@ -176,7 +179,7 @@ const nav = [
         </footer>
       )
     }
-    <OrderDialog />
+    <OrderDialog recaptchaSiteKey={recaptchaSiteKey} captchaRequired={isProduction} />
     <CookieConsent />
     <script>
       const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');

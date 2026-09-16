@@ -1,7 +1,13 @@
 import type { APIRoute } from 'astro';
 export const prerender = true;
-// Stage A is deliberately not indexable. Launch policy changes only in stage B.
+const isProduction =
+  process.env.VERCEL_ENV === 'production' || process.env.APP_ENV === 'production';
 export const GET: APIRoute = () =>
-  new Response('User-agent: *\nDisallow: /\n', {
-    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-  });
+  new Response(
+    isProduction
+      ? 'User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /sprava\nDisallow: /spravovat-termin\nSitemap: https://www.autoskolabubu.cz/sitemap-index.xml\n'
+      : 'User-agent: *\nDisallow: /\n',
+    {
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+    },
+  );

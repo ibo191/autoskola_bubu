@@ -2,9 +2,9 @@ import { z } from 'zod';
 const schema = z.object({
   APP_ENV: z.enum(['local', 'preview', 'production']),
   APP_ORIGIN: z.url().default('http://127.0.0.1:4321'),
-  RECAPTCHA_ADAPTER: z.literal('local').default('local'),
-  EMAIL_ADAPTER: z.literal('local').default('local'),
-  ANALYTICS_ADAPTER: z.literal('noop').default('noop'),
+  RECAPTCHA_ADAPTER: z.enum(['local', 'recaptcha']).default('local'),
+  EMAIL_ADAPTER: z.enum(['local', 'lettermint']).default('local'),
+  ANALYTICS_ADAPTER: z.enum(['noop', 'google-meta']).default('noop'),
 });
 
 const localHosts = ['127.0.0.1', 'localhost', '[::1]'];
@@ -27,20 +27,25 @@ function vercelOrigin(env: Record<string, string | undefined>) {
     const origin = normalizeOrigin(value);
     if (origin) return origin;
   }
-  throw new Error('A valid Vercel origin is required for preview builds.');
+  throw new Error('A valid Vercel origin is required.');
 }
 
 export function readConfig(env: Record<string, string | undefined>) {
-  const isVercelPreview = env.VERCEL === '1';
+  const isVercel = env.VERCEL === '1';
+  const isProductionDeployment = isVercel && env.VERCEL_ENV === 'production';
   const value = schema.parse(
-    isVercelPreview
+    isVercel
       ? {
           ...env,
-          APP_ENV: 'preview',
+          APP_ENV: isProductionDeployment ? 'production' : 'preview',
           APP_ORIGIN: vercelOrigin(env),
-          RECAPTCHA_ADAPTER: 'local',
-          EMAIL_ADAPTER: 'local',
-          ANALYTICS_ADAPTER: 'noop',
+          ...(isProductionDeployment
+            ? {}
+            : {
+                RECAPTCHA_ADAPTER: 'local',
+                EMAIL_ADAPTER: 'local',
+                ANALYTICS_ADAPTER: 'noop',
+              }),
         }
       : env,
   );
@@ -48,12 +53,26 @@ export function readConfig(env: Record<string, string | undefined>) {
   if (value.APP_ENV === 'local' && !localHosts.includes(host))
     throw new Error('Local origin required');
   if (value.APP_ENV !== 'local' && new URL(value.APP_ORIGIN).protocol !== 'https:')
-    throw new Error('Preview origin must use HTTPS');
+    throw new Error('Preview and production origins must use HTTPS');
   if (
     value.APP_ENV === 'local' &&
     env.SUPABASE_URL &&
     !localHosts.includes(new URL(env.SUPABASE_URL).hostname)
   )
     throw new Error('Cloud database is forbidden in stage A');
+  if (value.APP_ENV === 'production') {
+    const missing = [
+      'SUPABASE_URL',
+      'SUPABASE_SERVICE_ROLE_KEY',
+      'RATE_LIMIT_SECRET',
+      'LETTERMINT_PROJECT_TOKEN',
+      'ORDER_NOTIFICATION_EMAIL',
+      'CRON_SECRET',
+      'RECAPTCHA_SECRET_KEY',
+      'PUBLIC_RECAPTCHA_SITE_KEY',
+    ].filter((key) => !env[key]);
+    if (missing.length)
+      throw new Error(`Missing required production environment variables: ${missing.join(', ')}`);
+  }
   return value;
 }

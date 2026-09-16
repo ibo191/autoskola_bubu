@@ -98,6 +98,17 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     const configured = Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+    const isProduction =
+      process.env.VERCEL_ENV === 'production' || process.env.APP_ENV === 'production';
+    if (!configured && isProduction) {
+      return Response.json(
+        {
+          ok: false,
+          message: 'Rezervační kalendář teď není nakonfigurovaný. Kontaktujte prosím pobočku.',
+        },
+        { status: 503, headers: { 'Cache-Control': 'no-store' } },
+      );
+    }
     const slots = configured
       ? await requireLiveRepository(process.env).listAvailableSlots(parsed.data)
       : previewSlots(parsed.data.branch, parsed.data.from, parsed.data.to);

@@ -18,6 +18,43 @@ const slotList = document.querySelector<HTMLElement>('#slot-list')!;
 const selectedSlotLabel = document.querySelector<HTMLElement>('#selected-slot-label')!;
 const motoPackageCards = document.querySelector<HTMLElement>('#moto-package-cards')!;
 const motoPackageOptions = document.querySelector<HTMLElement>('#moto-package-options')!;
+
+declare global {
+  interface Window {
+    grecaptcha?: {
+      ready(callback: () => void): void;
+      execute(siteKey: string, options: { action: string }): Promise<string>;
+    };
+  }
+}
+
+let recaptchaScript: Promise<void> | undefined;
+
+async function getCaptchaToken() {
+  if (dialog.dataset.captchaRequired !== 'true') return 'preview-order-submission';
+  const siteKey = dialog.dataset.recaptchaSiteKey;
+  if (!siteKey) throw new Error('CAPTCHA_NOT_CONFIGURED');
+  if (!recaptchaScript) {
+    recaptchaScript = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = `https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(siteKey)}`;
+      script.async = true;
+      script.defer = true;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('CAPTCHA_LOAD_FAILED'));
+      document.head.append(script);
+    });
+  }
+  await recaptchaScript;
+  const captcha = window.grecaptcha;
+  if (!captcha) throw new Error('CAPTCHA_LOAD_FAILED');
+  return new Promise<string>((resolve, reject) => {
+    captcha.ready(() => {
+      captcha.execute(siteKey, { action: 'create_order' }).then(resolve, reject);
+    });
+  });
+}
+
 let step = 0;
 let dirty = false;
 let validQuote: Extract<Quote, { ok: true }> | undefined;
@@ -536,6 +573,15 @@ async function submitOrder() {
   submit.disabled = true;
   submit.textContent = 'Odesíláme…';
   error.textContent = '';
+  let captchaToken: string;
+  try {
+    captchaToken = await getCaptchaToken();
+  } catch {
+    error.textContent = 'Bezpečnostní ověření se nepodařilo načíst. Zkuste to prosím znovu.';
+    submit.disabled = false;
+    submit.textContent = 'Odeslat objednávku';
+    return;
+  }
   const body = {
     ...(requiresAppointment() ? { slotId: slotField.value } : {}),
     contact: {
@@ -546,6 +592,7 @@ async function submitOrder() {
     },
     selection: selectionWithAddons(),
     priceVersion: validQuote.priceVersion,
+    captchaToken,
     termsAccepted: (field('terms') as HTMLInputElement).checked,
     privacyAccepted: true,
     marketingAccepted: (field('marketing') as HTMLInputElement).checked,
