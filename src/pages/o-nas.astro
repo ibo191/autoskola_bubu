@@ -6,6 +6,7 @@ import FinalCta from '../components/FinalCta.astro';
 import { Image } from 'astro:assets';
 import automaticScala from '../assets/courses/b-automatic-scala.png';
 import manualFabia from '../assets/courses/b-manual-fabia.png';
+import storyDriving from '../assets/about-story-driving.png';
 
 const partners = [
   { name: 'Kvalty', text: 'Portál pro výběr a hodnocení autoškol.' },
@@ -67,21 +68,30 @@ const fleetGroups = [
   title="O nás"
   description="Autoškola BuBu vznikla s myšlenkou vychovávat bezpečné a zodpovědné řidiče. Za školou stojí lidé se zkušeností z provozu i policie."
 >
-  <section class="page-hero">
-    <div class="container">
+  <section class="about-hero">
+    <div class="about-hero-shape about-hero-shape-left" aria-hidden="true"></div>
+    <div class="about-hero-shape about-hero-shape-right" aria-hidden="true"></div>
+    <div class="container about-hero-inner">
       <nav class="breadcrumbs" aria-label="Drobečková navigace">
         <a href="/">Domů</a><span>/</span><span>O nás</span>
       </nav>
-      <span class="eyebrow">Autoškola BuBu</span><h1>Nechceme jen odučit kurz.</h1><p class="lead">
-        Chceme vychovávat řidiče, které se nebudeme bát pustit do provozu.
+      <div class="about-hero-copy">
+        <span class="eyebrow">Autoškola BuBu</span><h1>Nechceme jen odučit kurz.</h1><p
+          class="lead"
+        >
+          Chceme vychovávat řidiče, které se nebudeme bát pustit do provozu.
+        </p>
+      </div>
+      <img class="about-hero-bubak" src="/brand/bubak.png" alt="" aria-hidden="true" />
+      <p class="about-hero-note" aria-hidden="true">
+        Lepší řidiči<br />dělají klidnější<br />silnice.
       </p>
     </div>
   </section>
-  <section class="section">
-    <div class="container split story-split">
-      <div>
+  <section class="section about-story-section">
+    <div class="container about-story-grid">
+      <div class="content about-story-copy">
         <span class="eyebrow">Proč jsme vznikli</span><h2>Více bezpečnosti na cestách.</h2>
-      </div><div class="content story-copy">
         <p>
           Naše autoškola byla založená s myšlenkou přinést na cesty více bezpečnosti a přejít od
           přístupu „odučit kurz“ k tomu, abychom vychovávali skutečné řidiče, kteří se na cestě cítí
@@ -92,30 +102,54 @@ const fleetGroups = [
           zkušenosti další generaci řidičů. Nechceme z vás udělat člověka, který jen projde
           zkouškou. Chceme, abyste rozuměli provozu a zvládli v něm fungovat s klidem.
         </p>
+        <a class="btn primary about-story-cta" href="#hodnoty"
+          >Poznejte náš přístup <span aria-hidden="true">→</span></a
+        >
+      </div>
+      <div class="about-story-image">
+        <Image
+          src={storyDriving}
+          alt="Instruktor Autoškoly BuBu podporuje studentku při jízdě autem"
+          widths={[640, 960, 1280]}
+          sizes="(max-width: 860px) 92vw, 54vw"
+          format="webp"
+        />
+        <div class="about-story-message">
+          <strong>Bez stresu.<br />Bez křiku.<br />S respektem.</strong>
+          <span>Protože lepší řidiči dělají klidnější silnice.</span>
+        </div>
       </div>
     </div>
   </section>
-  <section class="section tinted">
+  <section class="section about-values" id="hodnoty">
     <div class="container">
       <div class="section-heading">
         <div><span class="eyebrow">Naše hodnoty</span><h2>Bez křiku. S odpovědností.</h2></div>
       </div>
-      <div class="grid">
-        <article class="card">
-          <span class="eyebrow">01 / Bezpečnost</span><h3>Nejdřív člověk, potom zkouška.</h3><p>
-            Učíme tak, aby student rozuměl rizikům, ne aby jen mechanicky splnil úlohu.
-          </p>
+      <div class="about-value-grid">
+        <article class="about-value-card">
+          <span class="about-value-icon" aria-hidden="true">⛨</span><div>
+            <span class="eyebrow">01 / Bezpečnost</span><h3>Nejdřív člověk, potom zkouška.</h3><p>
+              Bezpečnost je pro nás na prvním místě. Nejde jen o splnění testu, ale o to, abyste se
+              na silnici cítili jistě i po kurzu.
+            </p>
+          </div>
         </article>
-        <article class="card">
-          <span class="eyebrow">02 / Praxe</span><h3>Zkušenosti z reálného provozu.</h3><p>
-            Do výuky vnášíme pohled lidí, kteří provoz znali profesně a viděli následky špatných
-            návyků.
-          </p>
+        <article class="about-value-card">
+          <span class="about-value-icon" aria-hidden="true">▰</span><div>
+            <span class="eyebrow">02 / Praxe</span><h3>Zkušenosti z reálného provozu.</h3><p>
+              Učíme na situacích, které skutečně potkáte. Předáváme reálné zkušenosti z každodenního
+              provozu, nejen teorii z učebnic.
+            </p>
+          </div>
         </article>
-        <article class="card">
-          <span class="eyebrow">03 / Klid</span><h3>Respekt k tomu, že se učíte.</h3><p>
-            Chyby patří k výcviku. Důležité je pochopit je, opravit a získat jistotu.
-          </p>
+        <article class="about-value-card">
+          <span class="about-value-icon" aria-hidden="true">●</span><div>
+            <span class="eyebrow">03 / Klid</span><h3>Respekt k tomu, že se učíte.</h3><p>
+              Chyby patří k výcviku. Důležité je klidně si je přiznat, pochopit a postupovat vaším
+              tempem.
+            </p>
+          </div>
         </article>
       </div>
     </div>
@@ -218,11 +252,216 @@ const fleetGroups = [
   <BranchCards /><FinalCta />
 </Base>
 <style>
-  .story-split {
-    align-items: start;
+  .about-hero {
+    position: relative;
+    overflow: hidden;
+    min-height: 330px;
+    background:
+      radial-gradient(circle at 63% 48%, #d2f2ef 0 12%, transparent 12.4%),
+      linear-gradient(105deg, #f9fdfc 0%, #edfafa 48%, #d8f3f0 100%);
   }
-  .story-copy p {
+  .about-hero::after {
+    content: '';
+    position: absolute;
+    right: -8%;
+    bottom: -125px;
+    width: 62%;
+    height: 260px;
+    border: 2px dashed #7dcac6;
+    border-width: 2px 0 0;
+    border-radius: 52% 48% 0 0;
+    opacity: 0.5;
+    transform: rotate(-7deg);
+  }
+  .about-hero-inner {
+    position: relative;
+    z-index: 1;
+    min-height: 330px;
+    padding-top: 24px;
+    padding-bottom: 44px;
+  }
+  .about-hero-copy {
+    position: relative;
+    z-index: 2;
+    max-width: 610px;
+    margin-top: 26px;
+  }
+  .about-hero h1 {
+    max-width: 620px;
+    margin: 10px 0 12px;
+    color: var(--ink);
+    font-size: clamp(3rem, 5vw, 5.25rem);
+    line-height: 0.97;
+    letter-spacing: -0.07em;
+  }
+  .about-hero .lead {
+    max-width: 510px;
+    font-size: 1.03rem;
+  }
+  .about-hero-bubak {
+    position: absolute;
+    z-index: 1;
+    right: 28%;
+    bottom: -10px;
+    width: min(190px, 16vw);
+    filter: drop-shadow(0 18px 16px #102e5a1a);
+    transform: rotate(7deg);
+  }
+  .about-hero-note {
+    position: absolute;
+    z-index: 2;
+    right: 12%;
+    top: 88px;
+    margin: 0;
+    color: #4bafa7;
+    font-size: clamp(1.25rem, 2.2vw, 2rem);
+    font-weight: 700;
+    line-height: 1.05;
+    transform: rotate(-7deg);
+  }
+  .about-hero-shape {
+    position: absolute;
+    bottom: -116px;
+    border-radius: 50% 50% 0 0;
+    background: #e4f8f5;
+  }
+  .about-hero-shape-left {
+    left: 43%;
+    width: 40%;
+    height: 230px;
+    transform: rotate(-13deg);
+  }
+  .about-hero-shape-right {
+    right: -14%;
+    width: 44%;
+    height: 360px;
+    background: #d1efed;
+    transform: rotate(12deg);
+  }
+  .about-story-section {
+    padding-block: clamp(58px, 8vw, 100px);
+  }
+  .about-story-grid {
+    display: grid;
+    grid-template-columns: minmax(300px, 0.8fr) minmax(420px, 1.35fr);
+    gap: clamp(40px, 7vw, 100px);
+    align-items: center;
+  }
+  .about-story-copy {
+    max-width: 500px;
+  }
+  .about-story-copy h2 {
+    margin: 12px 0 18px;
+    font-size: clamp(2.3rem, 3.5vw, 4rem);
+    line-height: 0.98;
+    letter-spacing: -0.06em;
+  }
+  .about-story-copy p {
     font-size: 1rem;
+    line-height: 1.55;
+  }
+  .about-story-cta {
+    margin-top: 12px;
+  }
+  .about-story-cta span {
+    margin-left: 18px;
+    font-size: 1.25em;
+  }
+  .about-story-image {
+    position: relative;
+    min-height: 470px;
+    overflow: hidden;
+    border-radius: 24px;
+    background: #e6f4f3;
+    box-shadow: 0 24px 60px #12335d1c;
+  }
+  .about-story-image :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 470px;
+    object-fit: cover;
+  }
+  .about-story-message {
+    position: absolute;
+    top: 28px;
+    left: 28px;
+    display: grid;
+    gap: 26px;
+    width: min(225px, calc(100% - 56px));
+    padding: 26px;
+    border-radius: 20px;
+    background: linear-gradient(145deg, #55c8bd, #2ca89f);
+    color: #fff;
+    box-shadow: 0 16px 32px #166f682e;
+  }
+  .about-story-message strong {
+    font-size: clamp(1.45rem, 2.1vw, 2.1rem);
+    line-height: 1.04;
+  }
+  .about-story-message span {
+    font-size: 0.88rem;
+    line-height: 1.35;
+  }
+  .about-values {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(120deg, #edfafa, #dff5f2);
+  }
+  .about-values::before {
+    content: '';
+    position: absolute;
+    left: -70px;
+    bottom: -145px;
+    width: 340px;
+    height: 300px;
+    border-radius: 50%;
+    background: #d3eeec;
+  }
+  .about-values .container {
+    position: relative;
+    z-index: 1;
+  }
+  .about-values h2 {
+    font-size: clamp(2rem, 3vw, 3.25rem);
+    letter-spacing: -0.055em;
+  }
+  .about-value-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+  .about-value-card {
+    display: grid;
+    grid-template-columns: 58px 1fr;
+    gap: 18px;
+    min-height: 220px;
+    padding: 28px;
+    border: 1px solid #dcebea;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 12px 30px #153c6020;
+  }
+  .about-value-icon {
+    display: grid;
+    width: 58px;
+    height: 58px;
+    place-items: center;
+    border-radius: 50%;
+    background: #ddf5f1;
+    color: var(--brand-dark);
+    font-size: 1.7rem;
+    font-weight: 800;
+  }
+  .about-value-card h3 {
+    margin: 6px 0 7px;
+    font-size: 1.1rem;
+    line-height: 1.14;
+  }
+  .about-value-card p {
+    margin: 0;
+    font-size: 0.86rem;
+    line-height: 1.45;
   }
   .fleet-switcher {
     display: grid;
@@ -330,6 +569,35 @@ const fleetGroups = [
     object-position: left center;
   }
   @media (max-width: 860px) {
+    .about-hero,
+    .about-hero-inner {
+      min-height: 300px;
+    }
+    .about-hero-bubak {
+      right: 27%;
+      width: 145px;
+    }
+    .about-hero-note {
+      right: 7%;
+      top: 118px;
+    }
+    .about-story-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    .about-story-copy {
+      max-width: 620px;
+    }
+    .about-story-image,
+    .about-story-image :global(img) {
+      min-height: min(62vw, 480px);
+    }
+    .about-value-grid {
+      grid-template-columns: 1fr;
+    }
+    .about-value-card {
+      min-height: 0;
+    }
     .fleet-switcher {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -348,6 +616,58 @@ const fleetGroups = [
     }
   }
   @media (max-width: 560px) {
+    .about-hero,
+    .about-hero-inner {
+      min-height: 315px;
+    }
+    .about-hero-inner {
+      padding-top: 18px;
+    }
+    .about-hero-copy {
+      margin-top: 20px;
+      max-width: 72%;
+    }
+    .about-hero h1 {
+      font-size: clamp(2.65rem, 13vw, 3.5rem);
+    }
+    .about-hero .lead {
+      font-size: 0.92rem;
+    }
+    .about-hero-bubak {
+      right: 6%;
+      bottom: 6px;
+      width: 118px;
+    }
+    .about-hero-note {
+      display: none;
+    }
+    .about-story-section {
+      padding-block: 52px;
+    }
+    .about-story-image,
+    .about-story-image :global(img) {
+      min-height: 340px;
+    }
+    .about-story-message {
+      top: 16px;
+      left: 16px;
+      gap: 14px;
+      width: min(190px, calc(100% - 32px));
+      padding: 18px;
+    }
+    .about-story-message span {
+      font-size: 0.76rem;
+    }
+    .about-value-card {
+      grid-template-columns: 46px 1fr;
+      gap: 14px;
+      padding: 22px;
+    }
+    .about-value-icon {
+      width: 46px;
+      height: 46px;
+      font-size: 1.35rem;
+    }
     .fleet-switcher {
       gap: 10px;
     }
