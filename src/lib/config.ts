@@ -33,6 +33,7 @@ function vercelOrigin(env: Record<string, string | undefined>) {
 export function readConfig(env: Record<string, string | undefined>) {
   const isVercel = env.VERCEL === '1';
   const isProductionDeployment = isVercel && env.VERCEL_ENV === 'production';
+  const recaptchaConfigured = Boolean(env.RECAPTCHA_SECRET_KEY && env.PUBLIC_RECAPTCHA_SITE_KEY);
   const value = schema.parse(
     isVercel
       ? {
@@ -41,7 +42,7 @@ export function readConfig(env: Record<string, string | undefined>) {
           APP_ORIGIN: vercelOrigin(env),
           // These are deployment-owned choices. Do not let obsolete Vercel variables such as
           // "smtp" or "gtm" break prerendering; production secrets are checked below.
-          RECAPTCHA_ADAPTER: isProductionDeployment ? 'recaptcha' : 'local',
+          RECAPTCHA_ADAPTER: isProductionDeployment && recaptchaConfigured ? 'recaptcha' : 'local',
           EMAIL_ADAPTER: isProductionDeployment ? 'lettermint' : 'local',
           ANALYTICS_ADAPTER: isProductionDeployment ? 'google-meta' : 'noop',
         }
@@ -66,8 +67,6 @@ export function readConfig(env: Record<string, string | undefined>) {
       'LETTERMINT_PROJECT_TOKEN',
       'ORDER_NOTIFICATION_EMAIL',
       'CRON_SECRET',
-      'RECAPTCHA_SECRET_KEY',
-      'PUBLIC_RECAPTCHA_SITE_KEY',
     ].filter((key) => !env[key]);
     if (missing.length)
       throw new Error(`Missing required production environment variables: ${missing.join(', ')}`);

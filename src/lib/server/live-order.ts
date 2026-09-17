@@ -31,7 +31,7 @@ export function createLiveOrderService(env: Record<string, string | undefined>) 
   const config = readConfig(env);
   return new CreateOrderService({
     repository: new SupabaseBookingRepository(env),
-    captcha: config.APP_ENV === 'production' ? new RecaptchaV3(env) : new PreviewCaptcha(),
+    captcha: config.RECAPTCHA_ADAPTER === 'recaptcha' ? new RecaptchaV3(env) : new PreviewCaptcha(),
     email: createTransactionalEmailAdapter(env),
     rateLimiter: new SupabaseRateLimiter(env),
     legal: legalSettings,

@@ -64,6 +64,16 @@ test('Vercel production fails closed until required integrations are configured'
   assert.equal(config.RECAPTCHA_ADAPTER, 'recaptcha');
   assert.equal(config.EMAIL_ADAPTER, 'lettermint');
   assert.equal(config.ANALYTICS_ADAPTER, 'google-meta');
+  const withoutRecaptcha = readConfig({
+    ...base,
+    SUPABASE_URL: 'https://example.supabase.co',
+    SUPABASE_SERVICE_ROLE_KEY: 'service-role-key',
+    RATE_LIMIT_SECRET: 'rate-limit-secret',
+    LETTERMINT_PROJECT_TOKEN: 'lettermint-token',
+    ORDER_NOTIFICATION_EMAIL: 'objednavky@autoskolabubu.cz',
+    CRON_SECRET: 'cron-secret',
+  });
+  assert.equal(withoutRecaptcha.RECAPTCHA_ADAPTER, 'local');
 });
 test('Captcha is single-use, action-bound, host-bound and expires', async () => {
   const captcha = new LocalCaptcha({ APP_ENV: 'local' });
