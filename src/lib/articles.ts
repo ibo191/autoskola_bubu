@@ -15,6 +15,7 @@ type ArticleFrontmatter = {
   sourceUrl: string;
   relatedCourses: string[];
   reviewStatus: 'imported' | 'approved';
+  readingTime?: number;
   image?: string;
   imageAlt?: string;
 };
