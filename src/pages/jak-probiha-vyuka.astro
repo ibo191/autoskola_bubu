@@ -9,15 +9,114 @@ import FinalCta from '../components/FinalCta.astro';
 <Base
   title="Jak probíhá výuka"
   description="Pět kroků k řidičáku v Autoškole BuBu: online objednávka, osobní zápis, teorie, praktické jízdy a závěrečná zkouška."
-  ><section class="page-hero">
-    <div class="container">
+  ><section class="page-hero learning-hero">
+    <div class="learning-hero-shape learning-hero-shape-left" aria-hidden="true"></div>
+    <div class="learning-hero-shape learning-hero-shape-right" aria-hidden="true"></div>
+    <div class="container learning-hero-inner">
       <nav class="breadcrumbs" aria-label="Drobečková navigace">
         <a href="/">Domů</a><span>/</span><span>Jak probíhá výuka</span>
-      </nav><span class="eyebrow">Ať víte, do čeho jdete</span><h1>
-        Od první otázky<br />k vlastní cestě.
-      </h1><p class="lead">
-        Nemusíte znát celý postup předem. Tady je přehled toho, co spolu projdeme.
+      </nav><div class="learning-hero-copy">
+        <span class="eyebrow">Ať víte, do čeho jdete</span><h1>
+          Od první otázky<br />k vlastní cestě.
+        </h1><p class="lead">
+          Nemusíte znát celý postup předem. Tady je přehled toho, co spolu projdeme.
+        </p>
+      </div><img class="learning-hero-bubak" src="/brand/bubak.png" alt="" aria-hidden="true" /><p
+        class="learning-hero-note"
+        aria-hidden="true"
+      >
+        V klidu krok<br />za krokem.
       </p>
     </div>
   </section><Roadmap /><Faq /><FinalCta /></Base
 >
+<style>
+  .learning-hero {
+    min-height: 310px;
+    overflow: hidden;
+    position: relative;
+  }
+  .learning-hero::after {
+    background: linear-gradient(90deg, transparent, rgba(72, 190, 178, 0.12));
+    content: '';
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+  }
+  .learning-hero-inner {
+    min-height: 310px;
+    position: relative;
+    z-index: 1;
+  }
+  .learning-hero-copy {
+    max-width: 620px;
+    padding: 42px 0 45px;
+  }
+  .learning-hero h1 {
+    max-width: 650px;
+  }
+  .learning-hero-shape {
+    background: #d9f3ef;
+    border-radius: 48% 52% 0 0;
+    bottom: -130px;
+    position: absolute;
+  }
+  .learning-hero-shape-left {
+    height: 330px;
+    right: 27%;
+    transform: rotate(-15deg);
+    width: 360px;
+  }
+  .learning-hero-shape-right {
+    height: 420px;
+    right: -8%;
+    transform: rotate(18deg);
+    width: 530px;
+  }
+  .learning-hero-bubak {
+    bottom: 9px;
+    height: 230px;
+    object-fit: contain;
+    position: absolute;
+    right: 16%;
+    transform: rotate(-4deg);
+    width: auto;
+    z-index: 2;
+  }
+  .learning-hero-note {
+    color: var(--teal);
+    font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+    font-weight: 700;
+    line-height: 1.15;
+    position: absolute;
+    right: 5%;
+    text-align: center;
+    top: 72px;
+    transform: rotate(-8deg);
+    z-index: 3;
+  }
+  @media (max-width: 760px) {
+    .learning-hero,
+    .learning-hero-inner {
+      min-height: 290px;
+    }
+    .learning-hero-copy {
+      padding: 34px 0 38px;
+      max-width: 72%;
+    }
+    .learning-hero-bubak {
+      bottom: 4px;
+      height: 150px;
+      right: 4%;
+    }
+    .learning-hero-note {
+      display: none;
+    }
+    .learning-hero-shape-left {
+      right: 1%;
+    }
+    .learning-hero-shape-right {
+      right: -45%;
+    }
+  }
+</style>

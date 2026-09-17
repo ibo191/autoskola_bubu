@@ -182,9 +182,27 @@ const groups: FaqGroup[] = [
     gap: 34px;
   }
   .faq-group h3 {
+    align-items: center;
     color: var(--brand-dark);
-    font-size: 1.12rem;
-    margin: 0 0 3px;
+    display: flex;
+    font-size: clamp(1.35rem, 2.3vw, 1.72rem);
+    font-weight: 800;
+    gap: 14px;
+    letter-spacing: -0.025em;
+    margin: 0 0 8px;
+  }
+  .faq-group h3::before {
+    background: var(--teal);
+    border-radius: 99px;
+    content: '';
+    height: 9px;
+    width: 9px;
+  }
+  .faq-group {
+    background: rgba(255, 255, 255, 0.58);
+    border: 1px solid rgba(207, 223, 226, 0.8);
+    border-radius: 18px;
+    padding: 23px 25px 5px;
   }
   details {
     border-bottom: 1px solid var(--line);
