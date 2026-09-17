@@ -1,136 +1,65 @@
 ---
-type FaqItem = [question: string, answer: string];
-type FaqGroup = [title: string, items: FaqItem[]];
+import source from '../content/faq-source.md?raw';
 
-const groups: FaqGroup[] = [
-  [
-    'Autoškola BuBu',
-    [
-      [
-        'Co je Autoškola BuBu?',
-        'Jsme česká autoškola v Praze 8 – Střížkově, Statenicích a na Kladně. Učíme systematicky, klidně a bez zbytečného stresu; cílem je bezpečné samostatné řízení, ne jen zkouška.',
-      ],
-      [
-        'Pro koho je Autoškola BuBu vhodná?',
-        'Pro začátečníky, řidiče L17, zájemce o motorku i držitele řidičáku, kteří chtějí obnovit jistotu kondičními jízdami. Hodí se i pro lidi s respektem z řízení nebo špatnou zkušeností z jiné autoškoly.',
-      ],
-      [
-        'Učíte opravdu bez křiku?',
-        'Ano. Chybu považujeme za běžnou součást učení. Instruktor vysvětlí, proč vznikla a jak ji příště zvládnout lépe.',
-      ],
-    ],
-  ],
-  [
-    'Řidičák skupiny B',
-    [
-      [
-        'Jak probíhá kurz skupiny B?',
-        'Kurz spojuje teorii, praktický výcvik a závěrečnou zkoušku. Začínáme ovládáním vozidla a pokračujeme přes jednodušší provoz až ke složitějším situacím, testům a přípravě na zkoušku.',
-      ],
-      [
-        'Jak dlouho trvá autoškola?',
-        'Samotný výcvik obvykle trvá 6 až 10 týdnů. Záleží na dostupnosti instruktora, vašem čase a pravidelnosti jízd. Termín zkoušky následně přiděluje příslušný úřad.',
-      ],
-      [
-        'Kolik stojí řidičák a lze platit na splátky?',
-        'Cena se liší podle pobočky a kurzu; aktuální částky najdete v ceníku. U vybraných kurzů lze cenu rozdělit do několika plateb.',
-      ],
-    ],
-  ],
-  [
-    'Manuál, automat a L17',
-    [
-      [
-        'Můžu dělat autoškolu na automatu?',
-        'Ano, automatickou převodovku nabízíme pouze na pobočce Praha 8 – Střížkov. Zkouška na automatu znamená omezení oprávnění na vozidla s automatickou převodovkou.',
-      ],
-      [
-        'Můžu pak řídit manuál?',
-        'Ne bez dalšího kroku. Omezení lze odstranit příslušnou doplňovací zkouškou z praktické jízdy na manuální převodovce.',
-      ],
-      [
-        'Co je L17 a kdo může být mentor?',
-        'L17 umožňuje získat skupinu B od 17 let; do 18 let se řídí se zapsaným mentorem. Mentor musí splnit zákonné podmínky, mít skupinu B déle než 10 let, posledních 5 let ji nepřetržitě držet a mít 0 bodů. Zapsat lze nejvýše čtyři mentory.',
-      ],
-    ],
-  ],
-  [
-    'Teorie a praktické jízdy',
-    [
-      [
-        'Probíhá teorie online a kde se učím testy?',
-        'Základní teorie probíhá prezenčně. Online materiály a eTesty slouží jako doplněk domácí přípravy a vycházejí z oficiálních otázek Ministerstva dopravy.',
-      ],
-      [
-        'Jak dlouhá je jedna jízda a jak často budu jezdit?',
-        'Jedna vyučovací hodina trvá 45 minut, běžně spojujeme dvě hodiny do přibližně 90minutového setkání. Snažíme se o minimálně jedno setkání týdně, ideálně více.',
-      ],
-      [
-        'Můžu si vybrat instruktora nebo čas jízd?',
-        'Požadavek nám sdělte při zápisu. Budeme se mu snažit vyhovět, ale konkrétního instruktora ani vytížené odpolední či víkendové termíny nelze vždy garantovat.',
-      ],
-      [
-        'Co když mi instruktor nevyhovuje?',
-        'Řekněte nám to. Podle personálních a kapacitních možností společně najdeme řešení.',
-      ],
-    ],
-  ],
-  [
-    'Závěrečná zkouška',
-    [
-      [
-        'Jak probíhá závěrečná zkouška?',
-        'U skupiny B se skládá z testu pravidel provozu a praktické jízdy. Hodnotí ji zkušební komisař příslušného úřadu, nikoli instruktor autoškoly.',
-      ],
-      [
-        'Kdo určuje datum zkoušky?',
-        'Autoškola vás po ukončení výcviku přihlásí, termín ale určuje příslušný obecní úřad obce s rozšířenou působností podle své kapacity.',
-      ],
-      [
-        'Co když zkoušku neudělám?',
-        'Nemusíte automaticky absolvovat celý kurz znovu. Další postup závisí na části zkoušky a předchozích pokusech; konkrétně jej s vámi projdeme.',
-      ],
-    ],
-  ],
-  [
-    'Přihlášení, kondiční jízdy a pobočky',
-    [
-      [
-        'Jak se přihlásit a co potřebuji k zápisu?',
-        'Online vyberete kurz, pobočku a termín zápisu. Na zápis si připravte žádost o přijetí k výuce a výcviku, posudek o zdravotní způsobilosti ne starší než tři měsíce a doklad totožnosti.',
-      ],
-      [
-        'Můžu přestoupit z jiné autoškoly?',
-        'Ano, posuzujeme to individuálně podle absolvované teorie, jízd a aktuální kapacity. Napište nám dosavadní rozsah výcviku a důvod přestupu.',
-      ],
-      [
-        'Co jsou kondiční jízdy?',
-        'Jsou pro držitele řidičského oprávnění, kteří chtějí obnovit jistotu nebo procvičit parkování, rozjezdy, křižovatky či městský provoz. Automat nabízíme pouze ve Střížkově.',
-      ],
-      [
-        'Kde nabízíte automat, motorky a přívesy?',
-        'Automatickou převodovku, motorky AM/A1/A2/A i výcvik pro přívesy nabízíme pouze na pobočce Praha 8 – Střížkov. Na Kladně a ve Statenicích probíhá výcvik na manuálu.',
-      ],
-      [
-        'Mohou u vás absolvovat autoškolu cizinci?',
-        'Ano, pokud splní podmínky pro české oprávnění a bezpečně rozumí česky. Výuku i praktický výcvik poskytujeme pouze v češtině; pro komunikaci je potřebná zhruba úroveň B2.',
-      ],
-    ],
-  ],
-  [
-    'Po úspěšné zkoušce',
-    [
-      [
-        'Můžu po úspěšné zkoušce hned řídit?',
-        'Až po udělení a zápisu řidičského oprávnění. Samotné složení zkoušky nestačí. Od roku 2026 není vždy nutné čekat na plastovou kartičku, pokud jsou splněny zákonné podmínky.',
-      ],
-      [
-        'Co platí pro L17 po zkoušce?',
-        'Do 18 let můžete řídit pouze se svým zapsaným mentorem na sedadle vedle řidiče.',
-      ],
-    ],
-  ],
-];
+type Item = { question: string; answer: string };
+type Group = { title: string; items: Item[] };
+
+function escapeHtml(value: string) {
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function formatAnswer(value: string) {
+  const lines = value.trim().split(/\n{2,}/);
+  return lines
+    .map((block) => {
+      const text = escapeHtml(block)
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br />');
+      if (block.split('\n').every((line) => /^\* /.test(line))) {
+        return `<ul>${block
+          .split('\n')
+          .map(
+            (line) =>
+              `<li>${escapeHtml(line.replace(/^\* /, '')).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</li>`,
+          )
+          .join('')}</ul>`;
+      }
+      if (/^\d+\. /.test(block)) {
+        return `<ol>${block
+          .split('\n')
+          .map(
+            (line) =>
+              `<li>${escapeHtml(line.replace(/^\d+\. /, '')).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</li>`,
+          )
+          .join('')}</ol>`;
+      }
+      return `<p>${text}</p>`;
+    })
+    .join('');
+}
+
+const groups: Group[] = [];
+let active: Group | undefined;
+let question = '';
+let answer: string[] = [];
+for (const line of source.replace(/\r/g, '').split('\n')) {
+  if (line.startsWith('# ')) {
+    if (active && question)
+      active.items.push({ question, answer: formatAnswer(answer.join('\n')) });
+    active = { title: line.slice(2), items: [] };
+    groups.push(active);
+    question = '';
+    answer = [];
+  } else if (line.startsWith('## ')) {
+    if (active && question)
+      active.items.push({ question, answer: formatAnswer(answer.join('\n')) });
+    question = line.slice(3);
+    answer = [];
+  } else if (active && question) {
+    answer.push(line);
+  }
+}
+if (active && question) active.items.push({ question, answer: formatAnswer(answer.join('\n')) });
 ---
 
 <section class="section tinted">
@@ -142,16 +71,16 @@ const groups: FaqGroup[] = [
     </aside>
     <div class="faq-groups">
       {
-        groups.map(([title, items]) => (
+      groups.filter((group) => group.items.length > 0).map((group) => (
           <section class="faq-group">
-            <h3>{title}</h3>
-            {items.map(([q, a]) => (
+            <h3>{group.title}</h3>
+            {group.items.map((item) => (
               <details>
                 <summary>
-                  {q}
+                  {item.question}
                   <span aria-hidden="true">+</span>
                 </summary>
-                <p>{a}</p>
+                <div class="faq-answer" set:html={item.answer} />
               </details>
             ))}
           </section>
@@ -181,6 +110,12 @@ const groups: FaqGroup[] = [
     display: grid;
     gap: 34px;
   }
+  .faq-group {
+    background: rgba(255, 255, 255, 0.58);
+    border: 1px solid rgba(207, 223, 226, 0.8);
+    border-radius: 18px;
+    padding: 23px 25px 5px;
+  }
   .faq-group h3 {
     align-items: center;
     color: var(--brand-dark);
@@ -197,12 +132,6 @@ const groups: FaqGroup[] = [
     content: '';
     height: 9px;
     width: 9px;
-  }
-  .faq-group {
-    background: rgba(255, 255, 255, 0.58);
-    border: 1px solid rgba(207, 223, 226, 0.8);
-    border-radius: 18px;
-    padding: 23px 25px 5px;
   }
   details {
     border-bottom: 1px solid var(--line);
@@ -228,11 +157,21 @@ const groups: FaqGroup[] = [
   details[open] summary span {
     transform: rotate(45deg);
   }
-  details p {
+  .faq-answer :global(p),
+  .faq-answer :global(li) {
     font-size: 0.91rem;
     line-height: 1.6;
-    margin: 0;
-    padding: 0 34px 21px 0;
+  }
+  .faq-answer :global(p) {
+    margin: 0 0 14px;
+  }
+  .faq-answer :global(ul),
+  .faq-answer :global(ol) {
+    margin: 0 0 16px;
+    padding-left: 22px;
+  }
+  .faq-answer {
+    padding: 0 34px 10px 0;
   }
   @media (max-width: 760px) {
     .faq-layout {
