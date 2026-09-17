@@ -39,13 +39,11 @@ export function readConfig(env: Record<string, string | undefined>) {
           ...env,
           APP_ENV: isProductionDeployment ? 'production' : 'preview',
           APP_ORIGIN: vercelOrigin(env),
-          ...(isProductionDeployment
-            ? {}
-            : {
-                RECAPTCHA_ADAPTER: 'local',
-                EMAIL_ADAPTER: 'local',
-                ANALYTICS_ADAPTER: 'noop',
-              }),
+          // These are deployment-owned choices. Do not let obsolete Vercel variables such as
+          // "smtp" or "gtm" break prerendering; production secrets are checked below.
+          RECAPTCHA_ADAPTER: isProductionDeployment ? 'recaptcha' : 'local',
+          EMAIL_ADAPTER: isProductionDeployment ? 'lettermint' : 'local',
+          ANALYTICS_ADAPTER: isProductionDeployment ? 'google-meta' : 'noop',
         }
       : env,
   );

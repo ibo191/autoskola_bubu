@@ -61,6 +61,9 @@ test('Vercel production fails closed until required integrations are configured'
   });
   assert.equal(config.APP_ENV, 'production');
   assert.equal(config.APP_ORIGIN, 'https://www.autoskolabubu.cz');
+  assert.equal(config.RECAPTCHA_ADAPTER, 'recaptcha');
+  assert.equal(config.EMAIL_ADAPTER, 'lettermint');
+  assert.equal(config.ANALYTICS_ADAPTER, 'google-meta');
 });
 test('Captcha is single-use, action-bound, host-bound and expires', async () => {
   const captcha = new LocalCaptcha({ APP_ENV: 'local' });
