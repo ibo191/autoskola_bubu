@@ -272,7 +272,7 @@ const schema = {
       </div>
     </div>
   </section>
-  {course.category === 'auto' && <CourseFaq course={course} />}<FinalCta />
+  {(course.id === 'b' || course.id === 'b-automat') && <CourseFaq course={course} />}<FinalCta />
 </Base>
 <style>
   .microcopy {

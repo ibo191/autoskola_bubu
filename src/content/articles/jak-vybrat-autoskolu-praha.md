@@ -139,9 +139,39 @@ Ptejte se: „Kolik stojí doplňková jízda a kdy ji doporučujete?“ Férov�
 - necítím tlak,
 - mám pocit, že se mnou budou jednat normálně. To je praktičtější než hledat „nejlepší autoškolu v Praze“ podle jednoho žebříčku.
 
-Checklist: rychlé hodnocení autoškoly před přihláškou Použijte tuto tabulku předtím, než se přihlásíte. Ke každému bodu si dejte 0 až 2 body. Kritérium 0 bodů 1 bod 2 body Cena Nejasná, skryté poplatky Cena uvedená, ale bez detailů Jasná cena včetně vysvětlení Dostupnost jízd Nejasné termíny Orientační informace Konkrétní dostupnost a frekvence Instruktoři Bez informací Základní informace Jasný přístup, možnost změny instruktora Přístup ke stresu Bagatelizuje nervozitu Obecné ujištění Konkrétní práce s nervózními studenty Recenze Slabé nebo problémové Dobré, ale obecné Konkrétní pochvaly výuky a komunikace Vozový park Nejasný Základní informace Přehledná auta, manuál/automat, servis Příprava na zkoušku Nejasná Základní příprava Systematická příprava teorie i jízd Komunikace Pomalá nebo chaotická Průměrná Rychlá, jasná, lidská Výcvik v Praze Neřeší specifika Prahy Částečně Připravuje na reálný pražský provoz Doplňkové jízdy Nejasné Dostupné bez detailů Jasná cena a doporučení Přizpůsobení studentovi Jeden styl pro všechny Částečná flexibilita Individuální tempo a přístup Celková důvěra Mám pochybnosti Působí přijatelně Rozumím všemu a cítím jistotu Vyhodnocení Výsledek Co znamená 0–10 bodů Autoškolu raději nevybírejte. Riziko zklamání je vysoké. 11–17 bodů Průměrná volba. Doptat se na slabá místa.
+## Checklist: rychlé hodnocení autoškoly před přihláškou
 
-18–22 bodů Dobrá volba. Pravděpodobně rozumný poměr ceny a výkonu. 23–24 bodů Velmi silná volba. Pokud sedí lokalita a cena, není moc co řešit. Chcete si výběr zjednodušit? Podívejte se na kurz skupiny B v Autoškole BuBu nebo rovnou zkontrolujte aktuální ceník. Jak poznat nejlepší autoškolu v Praze? Nejlepší autoškola v Praze není automaticky ta nejlevnější, nejdražší ani ta s největší reklamou. Nejlepší je ta, která odpovídá vašim potřebám. Pro někoho je nejlepší autoškola ta, která má nejrychlejší termíny. Pro jiného ta, která umí pracovat se stresem. Pro někoho je rozhodující automat, pro jiného dostupnost v konkrétní části Prahy. Praktické pravidlo zní: Vyberte si autoškolu, která má transparentní cenu, dobré recenze, jasnou komunikaci, kvalitní instruktory a přístup, ve kterém se nebojíte dělat chyby. Chyby jsou přirozenou součástí učení. Důležité je, jestli vás za ně někdo zbytečně vystresuje, nebo vás jimi provede.
+Použijte tuto tabulku předtím, než se přihlásíte. Ke každému bodu si dejte 0 až 2 body.
+
+| Kritérium | 0 bodů | 1 bod | 2 body |
+| --- | --- | --- | --- |
+| Cena | Nejasná, skryté poplatky | Cena uvedená, ale bez detailů | Jasná cena včetně vysvětlení |
+| Dostupnost jízd | Nejasné termíny | Orientační informace | Konkrétní dostupnost a frekvence |
+| Instruktoři | Bez informací | Základní informace | Jasný přístup, možnost změny instruktora |
+| Přístup ke stresu | Bagatelizuje nervozitu | Obecné ujištění | Konkrétní práce s nervózními studenty |
+| Recenze | Slabé nebo problémové | Dobré, ale obecné | Konkrétní pochvaly výuky a komunikace |
+| Vozový park | Nejasný | Základní informace | Přehledná auta, manuál/automat, servis |
+| Příprava na zkoušku | Nejasná | Základní příprava | Systematická příprava teorie i jízd |
+| Komunikace | Pomalá nebo chaotická | Průměrná | Rychlá, jasná, lidská |
+| Výcvik v Praze | Neřeší specifika Prahy | Částečně | Připravuje na reálný pražský provoz |
+| Doplňkové jízdy | Nejasné | Dostupné bez detailů | Jasná cena a doporučení |
+| Přizpůsobení studentovi | Jeden styl pro všechny | Částečná flexibilita | Individuální tempo a přístup |
+| Celková důvěra | Mám pochybnosti | Působí přijatelně | Rozumím všemu a cítím jistotu |
+
+### Vyhodnocení
+
+| Výsledek | Co znamená |
+| --- | --- |
+| 0–10 bodů | Autoškolu raději nevybírejte. Riziko zklamání je vysoké. |
+| 11–17 bodů | Průměrná volba. Doptat se na slabá místa. |
+| 18–22 bodů | Dobrá volba. Pravděpodobně rozumný poměr ceny a výkonu. |
+| 23–24 bodů | Velmi silná volba. Pokud sedí lokalita a cena, není moc co řešit. |
+
+Chcete si výběr zjednodušit? Podívejte se na kurz skupiny B v Autoškole BuBu nebo rovnou zkontrolujte aktuální ceník.
+
+## Jak poznat nejlepší autoškolu v Praze?
+
+Nejlepší autoškola v Praze není automaticky ta nejlevnější, nejdražší ani ta s největší reklamou. Nejlepší je ta, která odpovídá vašim potřebám. Pro někoho je nejlepší autoškola ta, která má nejrychlejší termíny. Pro jiného ta, která umí pracovat se stresem. Pro někoho je rozhodující automat, pro jiného dostupnost v konkrétní části Prahy. Praktické pravidlo zní: Vyberte si autoškolu, která má transparentní cenu, dobré recenze, jasnou komunikaci, kvalitní instruktory a přístup, ve kterém se nebojíte dělat chyby. Chyby jsou přirozenou součástí učení. Důležité je, jestli vás za ně někdo zbytečně vystresuje, nebo vás jimi provede.
 
 Kdy dává smysl vybrat Autoškolu BuBu? Autoškola BuBu dává největší smysl pro lidi, kteří nechtějí výcvik postavený na stresu, křiku a tlaku. Značka stojí na myšlence, že i z věcí, kterých se člověk bojí, se může stát bezpečná a zvládnutelná zkušenost, pokud ho někdo vede správným způsobem. BuBu je vhodná hlavně tehdy, pokud:
 - chcete řidičák bez zbytečného stresu,

@@ -107,7 +107,26 @@ Jak zvládnout autoškolu bez stresu
 
 Chyba → pochopit proč → opravit → jet dál. Takto vzniká jistota.
 
-Co vás čeká u závěrečné zkoušky Závěrečná zkouška se skládá z více částí. Uchazeč musí zvládnout test z pravidel silničního provozu a zdravotnické přípravy, dále ovládání a údržbu vozidla a praktickou jízdu. Ministerstvo dopravy uvádza, že vedľa elektronického testu uchazeč skládá také zkoušku z ovládání a údržby vozidla a z praktické jízdy. Test Test probíhá elektronicky. Obsahuje otázky z pravidel silničního provozu, dopravních situací a zdravotnické přípravy. Základní parametry: Část Hodnota Počet otázek 25 Maximum bodů 50 Minimum pro úspěch 43 Typ odpovědi jedna správná odpověď Praktická jízda Praktická jízda ověřuje, jestli umíte bezpečně řídit v běžném provozu. Nejde o to, jestli jedete jako profesionální řidič. Jde o to, jestli rozumíte provozu, dodržujete pravidla a umíte bezpečně reagovat. Hodnotí se hlavně:
+## Co vás čeká u závěrečné zkoušky
+
+Závěrečná zkouška se skládá z více částí. Uchazeč musí zvládnout test z pravidel silničního provozu a zdravotnické přípravy, dále ovládání a údržbu vozidla a praktickou jízdu. Ministerstvo dopravy uvádza, že vedľa elektronického testu uchazeč skládá také zkoušku z ovládání a údržby vozidla a z praktické jízdy.
+
+### Test
+
+Test probíhá elektronicky. Obsahuje otázky z pravidel silničního provozu, dopravních situací a zdravotnické přípravy.
+
+### Základní parametry
+
+| Část | Hodnota |
+| --- | --- |
+| Počet otázek | 25 |
+| Maximum bodů | 50 |
+| Minimum pro úspěch | 43 |
+| Typ odpovědi | jedna správná odpověď |
+
+### Praktická jízda
+
+Praktická jízda ověřuje, jestli umíte bezpečně řídit v běžném provozu. Nejde o to, jestli jedete jako profesionální řidič. Jde o to, jestli rozumíte provozu, dodržujete pravidla a umíte bezpečně reagovat. Hodnotí se hlavně:
 - bezpečnost,
 - plynulost,
 - orientace v provozu,

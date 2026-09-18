@@ -17,7 +17,18 @@ readingTime: 3
 
 Cena autoškoly se může výrazně lišit podle města, kvality výuky nebo modernosti vozového parku. V tomto článku najdete aktuální přehled nákladů, co všechno musí být v ceně zahrnuto a proč se vyplatí dělat výcvik právě v Praze.
 
-Autoškola BuBu Průměrná cena řidičáku v Česku v roce 2026 V roce 2026 se cena za řidičský průkaz skupiny B (osobní auto) v České republice nejčastěji pohybuje v rozmezí 20 000 Kč až 28 000 Kč. Rychlý přehled nákladů (Tabulka) Položka Odhadovaná cena (2026) Poznámka Základní kurz (Skupina B) 20 000 – 28 000 Kč Cena kurzu v autoškole Lékařský posudek 500 – 900 Kč Platí se u obvodního lékaře Správní poplatek magistrátu 700 Kč Poplatek za závěrečnou zkoušku Kondiční jízda (45 min) cca 800 Kč Dobrovolné jízdy navíc
+## Průměrná cena řidičáku v Česku v roce 2026
+
+V roce 2026 se cena za řidičský průkaz skupiny B (osobní auto) v České republice nejčastěji pohybuje v rozmezí 20 000 Kč až 28 000 Kč.
+
+### Rychlý přehled nákladů
+
+| Položka | Odhadovaná cena (2026) | Poznámka |
+| --- | --- | --- |
+| Základní kurz (Skupina B) | 20 000–28 000 Kč | Cena kurzu v autoškole |
+| Lékařský posudek | 500–900 Kč | Platí se u obvodního lékaře |
+| Správní poplatek magistrátu | 700 Kč | Poplatek za závěrečnou zkoušku |
+| Kondiční jízda (45 min) | cca 800 Kč | Dobrovolné jízdy navíc |
 
 Cena závisí hlavně na lokalitě, kvalitě instruktorů a modernosti vozidel. Ve velkých městech, zejména v Praze, bývá cena obvykle vyšší než v menších regionech kvůli nákladům na provoz a náročnosti výcviku. Kolik stojí řidičák v Praze a na Střížkově? Praha patří mezi města s nejvyššími cenami, ale také s nejkvalitnější přípravou na reálný provoz. Průměrná cena kurzu se zde pohybuje mezi 23 000 Kč a 28 000 Kč. Například v Autoškole BuBu Praha – Střížkov stojí základní kurz pro skupinu B: 24 900 Kč Tato částka představuje ideální poměr mezi férovou cenou a vysokou kvalitou výuky v náročném pražském provozu. Co všechno zahrnuje cena kurzu? Při porovnávání cen si vždy ověřte, zda balíček obsahuje vše potřebné. Standardní kurz by měl obsahovat: 
 

@@ -28,13 +28,44 @@ Co znamená „nejlevnější autoškola“ v roce 2026? Na první pohled je to 
 - počítá s reálnou úspěšností u zkoušek
 - minimalizuje nutnost dokupování jízd
 
-Největší past: „nejlevnější ≠ konečná cena“ Než se přihlásíte, zkontrolujte tyto položky: Položka Běžná praxe Kolik zaplatíte Závěrečná zkouška Není v ceně 700–1 000 Kč Opakovaná zkouška Není v ceně 700–1 300 Kč Kondiční jízdy Často nutné 700–1 100 Kč Palivový příplatek Trend 2026 500–2 000 Kč Učební materiály Někdy placené 300–1 000 Kč Storno jízdy Přísné podmínky 500–1 000 Kč Víkendové jízdy Často příplatek 100–300 Kč / hod Zdravověda Má být v ceně 500-1000 Kč Realita: Autoškola za 17 000 Kč se může vyšplhat klidně na 25 000 Kč+ Srovnání cen autoškol v Praze (2026)
+## Největší past: „nejlevnější ≠ konečná cena“
 
-Přehled podle kvality Typ autoškoly Cena Co obvykle dostanete Riziko Low-cost 18 000–21 000 Kč Minimum jízd, starší auta Vysoké Standard 24 000–28 000 Kč Moderní auta, lepší dostupnost Nízké VIP / Expres / Plus 30 000 Kč+ Flexibilita, rychlé termíny Velmi nízké
+Než se přihlásíte, zkontrolujte tyto položky:
 
-Reálná konečná cena Typ autoškoly Startovací cena Reálná cena Low-cost 18 000 Kč 21 000–26 000 Kč Standard 25 000 Kč 25 000–28 000 Kč
+| Položka | Běžná praxe | Kolik zaplatíte |
+| --- | --- | --- |
+| Závěrečná zkouška | Není v ceně | 700–1 000 Kč |
+| Opakovaná zkouška | Není v ceně | 700–1 300 Kč |
+| Kondiční jízdy | Často nutné | 700–1 100 Kč |
+| Palivový příplatek | Trend 2026 | 500–2 000 Kč |
+| Učební materiály | Někdy placené | 300–1 000 Kč |
+| Storno jízdy | Přísné podmínky | 500–1 000 Kč |
+| Víkendové jízdy | Často příplatek | 100–300 Kč / hod |
+| Zdravověda | Má být v ceně | 500–1 000 Kč |
 
-VIP / Expres / Plus 30 000 Kč 30 000–35 000 Kč Závěr: Levná autoškola často není ve finále nejlevnější. Jak poznat opravdu dobrou autoškolu? 5 znaků férové ceny
+**Realita:** Autoškola za 17 000 Kč se může vyšplhat klidně na 25 000 Kč+.
+
+## Srovnání cen autoškol v Praze (2026)
+
+### Přehled podle kvality
+
+| Typ autoškoly | Cena | Co obvykle dostanete | Riziko |
+| --- | --- | --- | --- |
+| Low-cost | 18 000–21 000 Kč | Minimum jízd, starší auta | Vysoké |
+| Standard | 24 000–28 000 Kč | Moderní auta, lepší dostupnost | Nízké |
+| VIP / Expres / Plus | 30 000 Kč+ | Flexibilita, rychlé termíny | Velmi nízké |
+
+### Reálná konečná cena
+
+| Typ autoškoly | Startovací cena | Reálná cena |
+| --- | --- | --- |
+| Low-cost | 18 000 Kč | 21 000–26 000 Kč |
+| Standard | 25 000 Kč | 25 000–28 000 Kč |
+| VIP / Expres / Plus | 30 000 Kč | 30 000–35 000 Kč |
+
+## Závěr: Levná autoškola často není ve finále nejlevnější
+
+### Jak poznat opravdu dobrou autoškolu? 5 znaků férové ceny
 - cena obsahuje všechny poplatky (kromě poplatku úřadu za zkoušky)
 - žádný palivový příplatek
 - dostatek jízd (ideálně 2× týdně)
