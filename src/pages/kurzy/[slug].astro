@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import Roadmap from '../../components/Roadmap.astro';
-import Faq from '../../components/Faq.astro';
+import CourseFaq from '../../components/CourseFaq.astro';
 import FinalCta from '../../components/FinalCta.astro';
 import CourseIncludedBenefits from '../../components/CourseIncludedBenefits.astro';
 import {
@@ -137,8 +137,8 @@ const schema = {
           >{course.label}</span
         >
       </nav>
-      <div class="split">
-        <div>
+      <div class="course-hero-grid">
+        <div class="course-hero-copy">
           <span class="eyebrow">{categoryLabel} · {course.label}</span><h1>{hero.h1}</h1><p
             class="lead"
           >
@@ -152,7 +152,8 @@ const schema = {
           <p class="microcopy">
             Objednávka je nezávazný první krok. Termín zápisu si vyberete až v posledním kroku.
           </p>
-        </div><Image
+          <div class="hero-signals"><span>◌ Jasný plán kurzu</span><span>♡ Klidný přístup</span><span>◈ Reálný provoz</span></div>
+        </div><div class="course-photo-wrap"><Image
           src={photo}
           alt={course.id === 'b-automat'
             ? 'Černá Škoda Scala Autoškoly BuBu pro výcvik na automat'
@@ -166,18 +167,14 @@ const schema = {
           format="webp"
           loading="eager"
           fetchpriority="high"
-        />
+        /><span class="photo-note">Učíme v přátelské atmosféře<br />a v reálném provozu.</span><span class="fleet-note">▱ Moderní a bezpečný vozový park</span></div>
       </div>
     </div>
   </section>
   <section class="section">
-    <div class="container split">
-      <div><span class="eyebrow">Je to pro vás?</span><h2>Kurz bez zbytečného tlaku.</h2></div>
-      <div>
-        <p class="lead">{hero.fit}</p><ul class="checklist course-benefits">
-          {benefits.map((item) => <li>{item}</li>)}
-        </ul>
-      </div>
+    <div class="container fit-grid">
+      <div class="fit-copy"><span class="eyebrow">Je to pro vás?</span><h2>Kurz bez zbytečného tlaku.</h2><p class="lead">{hero.fit}</p></div>
+      <div class="fit-benefits">{benefits.map((item) => <div><span>✓</span><p>{item}</p></div>)}</div>
     </div>
   </section>
   <section class="section tinted">
@@ -275,7 +272,7 @@ const schema = {
       </div>
     </div>
   </section>
-  <Faq /><FinalCta />
+  {course.category === 'auto' && <CourseFaq course={course} />}<FinalCta />
 </Base>
 <style>
   .microcopy {
@@ -297,5 +294,43 @@ const schema = {
   }
   .soft-close {
     align-items: start;
+  }
+  .course-hero {
+    background: radial-gradient(circle at 76% 15%, #d6f5ef 0, #f7fbfb 36%, #fff 80%);
+    overflow: hidden;
+  }
+  .course-hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.94fr) minmax(360px, 1.06fr);
+    align-items: center;
+    gap: 46px;
+    padding-bottom: 58px;
+  }
+  .course-hero-copy h1 { font-size: clamp(3rem, 5.4vw, 5.7rem); max-width: 670px; }
+  .course-photo-wrap { position: relative; }
+  .course-photo-wrap :global(img) { width: 100%; aspect-ratio: 1.25; object-fit: cover; border-radius: 20px; box-shadow: 0 22px 42px #17335f25; }
+  .photo-note { position: absolute; top: 30px; left: -25px; padding: 15px 18px; background: #fffffff2; border-radius: 10px; color: var(--blue); box-shadow: var(--shadow); font-family: cursive; font-weight: 700; transform: rotate(-4deg); }
+  .fleet-note { position: absolute; right: -24px; bottom: 20px; padding: 12px 15px; border-radius: 11px; background: white; box-shadow: var(--shadow); color: var(--ink); font-size: 0.72rem; font-weight: 750; }
+  .hero-signals { display: flex; flex-wrap: wrap; gap: 12px 22px; margin-top: 28px; color: var(--brand-dark); font-size: 0.72rem; font-weight: 720; }
+  .hero-signals span { white-space: nowrap; }
+  .fit-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(400px, 1.1fr); gap: 68px; align-items: center; }
+  .fit-copy .lead { margin-top: 20px; }
+  .fit-benefits { border: 1px solid #d5eae5; border-radius: 16px; background: #fff; padding: 7px 24px; }
+  .fit-benefits > div { display: flex; align-items: start; gap: 14px; padding: 15px 0; }
+  .fit-benefits > div + div { border-top: 1px solid var(--line); }
+  .fit-benefits span { display: grid; place-items: center; flex: 0 0 25px; height: 25px; border-radius: 50%; background: var(--brand-soft); color: var(--brand-dark); font-weight: 800; }
+  .fit-benefits p { font-size: 0.88rem; font-weight: 650; color: var(--ink); }
+  @media (max-width: 900px) {
+    .course-hero-grid, .fit-grid { grid-template-columns: 1fr; gap: 32px; }
+    .course-photo-wrap { max-width: 680px; }
+    .photo-note { left: 18px; }
+    .fleet-note { right: 14px; }
+    .course-hero-copy h1 { font-size: clamp(3rem, 11vw, 5rem); }
+  }
+  @media (max-width: 540px) {
+    .course-hero-grid { padding-bottom: 40px; }
+    .photo-note { top: 14px; left: 12px; font-size: 0.8rem; }
+    .fleet-note { right: 8px; bottom: 10px; max-width: 160px; }
+    .fit-benefits { padding-inline: 18px; }
   }
 </style>
