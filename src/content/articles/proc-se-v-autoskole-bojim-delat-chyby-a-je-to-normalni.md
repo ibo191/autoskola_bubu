@@ -12,7 +12,10 @@ perex: 'Autoškola jako bezpečný prostor'
 sourceUrl: 'https://www.autoskolabubu.cz/post/proč-se-v-autoškole-bojím-dělat-chyby-a-je-to-normální'
 relatedCourses: ['b']
 reviewStatus: 'imported'
+readingTime: 4
 ---
+
+## Autoškola jako bezpečný prostor
 
 Pro mnoho lidí je autoškola jedním z největších stresů v životě. Nejde jen o zvládnutí techniky řízení, ale také o tlak, očekávání a strach z chyb. Přitom právě chyby jsou tím, co nás posouvá dál – pokud k nim máme správný přístup. Moderní autoškola by proto neměla být místem strachu, ale bezpečným prostorem pro učení.
 

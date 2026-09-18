@@ -3,54 +3,318 @@ export const prerender = true;
 import Base from '../../layouts/Base.astro';
 import FinalCta from '../../components/FinalCta.astro';
 import { getArticles } from '../../lib/articles';
+import manualCar from '../../assets/courses/b-manual-fabia.png';
+import automaticCar from '../../assets/courses/b-automatic-scala.png';
+import drivingLesson from '../../assets/about-story-driving.png';
 const articles = getArticles();
+const featured = articles[0];
+const visuals = [manualCar, automaticCar, drivingLesson];
+const categories = [...new Set(articles.map((article) => article.data.category))];
 ---
 
 <Base
-  title="Blog – rady na cestu k řidičáku"
-  description="První jízda, nejistota za volantem i příprava ke zkoušce. Přečtěte si články Autoškoly BuBu."
-  ><section class="page-hero">
+  title="Blog Autoškoly BuBu – praktické rady k řidičáku"
+  description="Praktické a srozumitelné články o autoškole, jízdách, testech a řidičáku od Autoškoly BuBu."
+>
+  <section class="blog-hero">
     <div class="container">
       <nav class="breadcrumbs" aria-label="Drobečková navigace">
         <a href="/">Domů</a><span>/</span><span>Blog</span>
-      </nav><span class="eyebrow">Čtení před první jízdou</span><h1>
-        O řidičáku.<br />Bez zbytečných otázek.
-      </h1><p class="lead">Rady z autoškoly pro chvíle, kdy chcete vědět trochu víc.</p>
-    </div>
-  </section><section class="section">
-    <div class="container">
-      <div class="grid">
+      </nav>
+      <div class="blog-hero-grid">
+        <div>
+          <span class="eyebrow">Rady od Autoškoly BuBu</span>
+          <h1>Řidičák s větším<br /><em>klidem a přehledem.</em></h1>
+          <p class="lead">
+            Vše podstatné před první jízdou, během kurzu i před závěrečnou zkouškou. Krátce,
+            prakticky a srozumitelně.
+          </p>
+          <div class="blog-stats">
+            <span><strong>{articles.length}</strong> praktických článků</span><span
+              ><strong>3</strong> pobočky</span>
+          </div>
+        </div>
         {
-          articles.map((article) => (
-            <article class="card">
+          featured && (
+            <a class="featured-card" href={`/blog/${featured.id}`}>
               <>
-                <span class="eyebrow">{article.data.category}</span>
-                <h2 class="article-title">
-                  <a href={`/blog/${article.id}`}>{article.data.title}</a>
-                </h2>
-                <p>{article.data.description}</p>
-                <p class="small">
-                  {article.data.author} ·{' '}
-                  <time datetime={article.data.publishedAt.toISOString()}>
-                    {article.data.publishedAt.toLocaleDateString('cs-CZ')}
-                  </time>
-                </p>
-                <a class="text-link" href={`/blog/${article.id}`}>
-                  Přečíst článek ↗
-                </a>
+                <img src={manualCar.src} alt="Výcvikový vůz Autoškoly BuBu" />
+                <div>
+                  <>
+                    <span>{featured.data.category}</span>
+                    <strong>{featured.data.title}</strong>
+                    <small>Přečíst článek →</small>
+                  </>
+                </div>
               </>
-            </article>
-          ))
+            </a>
+          )
         }
       </div>
     </div>
-  </section><FinalCta /></Base
-><style>
-  .article-title {
-    font-size: 1.4rem;
-    line-height: 1.3;
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="section-heading">
+        <div><span class="eyebrow">Vyberte si téma</span><h2>Co zrovna řešíte?</h2></div><div
+          class="topic-pills"
+        >
+          {categories.map((category) => <span>{category}</span>)}
+        </div>
+      </div>
+      <div class="article-grid">
+        {
+          articles.map((article, index) => {
+          const visual = visuals[index % visuals.length] ?? manualCar;
+            return (
+              <article class="article-card" data-reveal>
+                <a
+                  class="article-image"
+                  href={`/blog/${article.id}`}
+                  tabindex="-1"
+                  aria-hidden="true"
+                >
+                  <>
+                    <img src={visual.src} alt="" loading={index > 2 ? 'lazy' : undefined} />
+                    <span>{article.data.category}</span>
+                  </>
+                </a>
+                <div class="article-card-content">
+                  <p class="article-meta">
+                    <i aria-hidden="true">·</i>
+                    {article.data.readingTime ?? 5} min čtení
+                  </p>
+                  <>
+                    <h3>
+                      <a href={`/blog/${article.id}`}>{article.data.title}</a>
+                    </h3>
+                    <p>{article.data.description}</p>
+                    <a class="article-read" href={`/blog/${article.id}`}>
+                      Přečíst článek <span>→</span>
+                    </a>
+                  </>
+                </div>
+              </article>
+            );
+          })
+        }
+      </div>
+    </div>
+  </section>
+  <FinalCta />
+</Base>
+
+<style>
+  .blog-hero {
+    overflow: hidden;
+    background: linear-gradient(130deg, #f8fbfb 15%, #e0f5f1 100%);
   }
-  .article-title a {
+  .blog-hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 0.9fr;
+    gap: 60px;
+    align-items: center;
+    padding: 38px 0 72px;
+  }
+  .blog-hero h1 em {
+    color: var(--brand-dark);
+    font-style: normal;
+  }
+  .blog-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 26px;
+    margin-top: 30px;
+    color: var(--muted);
+    font-size: 0.84rem;
+  }
+  .blog-stats strong {
+    color: var(--ink);
+    font-size: 1.2rem;
+    margin-right: 5px;
+  }
+  .featured-card {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    min-height: 340px;
+    border-radius: 24px;
+    color: white;
     text-decoration: none;
+    box-shadow: 0 24px 52px #17335f24;
+  }
+  .featured-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, #112d54e8 4%, #112d5400 70%);
+  }
+  .featured-card img {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+    object-fit: cover;
+  }
+  .featured-card div {
+    position: relative;
+    z-index: 1;
+    min-height: 340px;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    padding: 28px;
+  }
+  .featured-card span {
+    font-size: 0.72rem;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #9bf0e5;
+  }
+  .featured-card strong {
+    font-size: 1.45rem;
+    line-height: 1.2;
+    margin: 8px 0 18px;
+  }
+  .featured-card small {
+    font-weight: 700;
+  }
+  .topic-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: 500px;
+  }
+  .topic-pills span {
+    border: 1px solid var(--line);
+    padding: 7px 11px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    color: var(--brand-dark);
+    background: white;
+    font-weight: 650;
+  }
+  .article-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+  }
+  .article-card {
+    border: 1px solid var(--line);
+    overflow: hidden;
+    border-radius: 18px;
+    background: white;
+    box-shadow: 0 8px 22px #17335f08;
+    transition:
+      transform var(--ease),
+      box-shadow var(--ease);
+  }
+  .article-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow);
+  }
+  .article-image {
+    display: block;
+    height: 184px;
+    position: relative;
+    overflow: hidden;
+    background: var(--brand-soft);
+  }
+  .article-image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #17335f05, #17335f48);
+  }
+  .article-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 450ms ease;
+  }
+  .article-card:hover .article-image img {
+    transform: scale(1.045);
+  }
+  .article-image span {
+    position: absolute;
+    z-index: 1;
+    top: 14px;
+    left: 14px;
+    background: #ffffffec;
+    color: var(--brand-dark);
+    border-radius: 999px;
+    padding: 5px 9px;
+    font-size: 0.64rem;
+    font-weight: 750;
+  }
+  .article-card-content {
+    padding: 22px;
+  }
+  .article-meta {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .article-meta i {
+    margin: 0 6px;
+  }
+  .article-card h3 {
+    font-size: 1.22rem;
+    line-height: 1.27;
+  }
+  .article-card h3 a {
+    text-decoration: none;
+  }
+  .article-card-content > p:not(.article-meta) {
+    font-size: 0.84rem;
+    line-height: 1.65;
+    margin-top: 12px;
+  }
+  .article-read {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 17px;
+    color: var(--brand-dark);
+    font-size: 0.8rem;
+    font-weight: 750;
+    text-decoration: none;
+  }
+  .article-read span {
+    font-size: 1.1rem;
+    transition: transform var(--ease);
+  }
+  .article-read:hover span {
+    transform: translateX(3px);
+  }
+  @media (max-width: 850px) {
+    .blog-hero-grid {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+    .featured-card,
+    .featured-card div {
+      min-height: 260px;
+    }
+    .article-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .topic-pills {
+      justify-content: flex-start;
+      margin-top: 16px;
+    }
+  }
+  @media (max-width: 560px) {
+    .blog-hero-grid {
+      padding-bottom: 52px;
+    }
+    .article-grid {
+      grid-template-columns: 1fr;
+    }
+    .article-image {
+      height: 205px;
+    }
   }
 </style>

@@ -2,12 +2,10 @@
 import Base from '../../layouts/Base.astro';
 import FinalCta from '../../components/FinalCta.astro';
 import { getArticles, type ArticleEntry } from '../../lib/articles';
+import manualCar from '../../assets/courses/b-manual-fabia.png';
 export const prerender = true;
 export async function getStaticPaths() {
-  return getArticles().map((article) => ({
-    params: { slug: article.id },
-    props: { article },
-  }));
+  return getArticles().map((article) => ({ params: { slug: article.id }, props: { article } }));
 }
 interface Props {
   article: ArticleEntry;
@@ -15,6 +13,9 @@ interface Props {
 const { article } = Astro.props;
 const Content = article.Content;
 const a = article.data;
+const related = getArticles()
+  .filter((item) => item.id !== article.id)
+  .slice(0, 3);
 const schema = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
@@ -22,8 +23,11 @@ const schema = {
   description: a.description,
   datePublished: a.publishedAt.toISOString(),
   dateModified: a.updatedAt.toISOString(),
-  author: { '@type': 'Person', name: a.author },
+  articleSection: a.category,
+  inLanguage: 'cs-CZ',
   mainEntityOfPage: a.canonical,
+  image: `https://www.autoskolabubu.cz${manualCar.src}`,
+  author: { '@type': 'Organization', name: a.author },
   publisher: {
     '@type': 'Organization',
     name: 'Autoškola BuBu',
@@ -32,41 +36,325 @@ const schema = {
 };
 ---
 
-<Base title={a.title} description={a.description} schema={schema}
-  ><article>
-    <header class="page-hero">
-      <div class="container content">
-        <nav class="breadcrumbs" aria-label="Drobečková navigace">
-          <a href="/">Domů</a><span>/</span><a href="/blog">Blog</a>
-        </nav><span class="eyebrow">{a.category}</span><h1 class="article-heading">{a.title}</h1><p
-          class="byline"
-        >
-          {a.author} · Publikováno {a.publishedAt.toLocaleDateString('cs-CZ')} · Aktualizováno {
-            a.updatedAt.toLocaleDateString('cs-CZ')
-          }
-        </p><p class="lead">{a.perex}</p>
+<Base title={a.title} description={a.description} schema={schema}>
+  <article>
+    <header class="article-hero">
+      <div class="container article-hero-grid">
+        <div>
+          <nav class="breadcrumbs" aria-label="Drobečková navigace">
+            <a href="/">Domů</a><span>/</span><a href="/blog">Blog</a><span>/</span><span
+              >{a.category}</span>
+          </nav>
+          <span class="article-category">{a.category}</span><h1>{a.title}</h1><p
+            class="article-perex"
+          >
+            {a.perex}
+          </p>
+          <p class="article-byline">
+            <span>{a.author}</span><i aria-hidden="true">·</i><time
+              datetime={a.publishedAt.toISOString()}
+              >{a.publishedAt.toLocaleDateString('cs-CZ')}</time
+            ><i aria-hidden="true">·</i>{a.readingTime ?? 5} min čtení
+          </p>
+        </div><figure class="article-cover">
+          <img src={manualCar.src} alt="Výcvikový vůz Autoškoly BuBu" />
+        </figure>
       </div>
-    </header><div class="section">
-      <div class="container content">
-        {Content && <Content />}<p class="source small">
-          Článek převzat z <a href={a.sourceUrl}>dosavadního webu Autoškoly BuBu</a>. Datum výše je
-          původní redakční aktualizace.
-        </p><a class="btn primary" href="/kurzy/ridicak-skupina-b">Prohlédnout kurz skupiny B ↗</a>
+    </header>
+    <div class="section article-layout">
+      <div class="container article-layout-grid">
+        <aside class="article-aside" aria-label="Navigace článku">
+          <p>Obsah článku</p><ol data-article-toc></ol><a href="#article-cta">Vybrat si kurz →</a>
+        </aside>
+        <div class="article-body content">
+          {Content && <Content />}
+          <section class="article-cta" id="article-cta">
+            <span>Jste připravení začít?</span><h2>Řidičák bez zbytečného stresu.</h2><p>
+              Vyberte si kurz a pobočku. Se zbytkem vám pomůžeme při zápisu.
+            </p><a class="btn primary" href="/kurzy">Prohlédnout kurzy →</a>
+          </section>
+          <p class="source small">
+            Text článku je převzat v původním znění z archivu Autoškoly BuBu.
+          </p>
+        </div>
       </div>
     </div>
-  </article><FinalCta /></Base
-><style>
-  .article-heading {
-    font-size: clamp(2rem, 4vw, 3.3rem);
-    line-height: 1.18;
+  </article>
+  {
+    related.length > 0 && (
+      <section class="section related-section">
+        <div class="container">
+          <>
+            <div class="section-heading">
+              <>
+                <div>
+                  <>
+                    <span class="eyebrow">Pokračujte ve čtení</span>
+                    <h2>Mohlo by vás zajímat</h2>
+                  </>
+                </div>
+                <a class="text-link" href="/blog">
+                  Všechny články →
+                </a>
+              </>
+            </div>
+            <div class="related-grid">
+              {related.map((item) => (
+                <a href={`/blog/${item.id}`}>
+                  <span>{item.data.category}</span>
+                  <strong>{item.data.title}</strong>
+                  <small>{item.data.readingTime ?? 5} min čtení</small>
+                </a>
+              ))}
+            </div>
+          </>
+        </div>
+      </section>
+    )
   }
-  .byline {
+  <FinalCta />
+</Base>
+<script>
+  const content = document.querySelector('.article-body');
+  const toc = document.querySelector('[data-article-toc]');
+  if (content && toc) {
+    content.querySelectorAll('h2').forEach((heading, index) => {
+      const id = heading.id || `sekce-${index + 1}`;
+      heading.id = id;
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = `#${id}`;
+      link.textContent = heading.textContent;
+      item.append(link);
+      toc.append(item);
+    });
+    if (!toc.children.length) toc.closest('.article-aside')?.remove();
+  }
+</script>
+<style>
+  .article-hero {
+    overflow: hidden;
+    background: linear-gradient(135deg, #f7fbfb, #e0f5f1);
+    border-bottom: 1px solid var(--line);
+  }
+  .article-hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.7fr);
+    align-items: center;
+    gap: 55px;
+    padding-bottom: 60px;
+  }
+  .article-category {
+    display: inline-block;
+    padding: 6px 11px;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--brand-dark);
+    font-size: 0.69rem;
+    font-weight: 750;
+    margin-bottom: 16px;
+  }
+  .article-hero h1 {
+    font-size: clamp(2.15rem, 4.1vw, 4rem);
+    max-width: 820px;
+  }
+  .article-perex {
+    margin-top: 20px;
+    max-width: 720px;
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+  .article-byline {
+    margin-top: 22px;
+    font-size: 0.76rem;
+    color: var(--muted);
+  }
+  .article-byline span {
+    font-weight: 750;
+    color: var(--ink);
+  }
+  .article-byline i {
+    font-style: normal;
+    margin: 0 7px;
+  }
+  .article-cover {
+    margin: 0;
+    min-height: 280px;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 20px 44px #17335f24;
+  }
+  .article-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .article-layout {
+    padding-top: 62px;
+  }
+  .article-layout-grid {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 760px);
+    gap: 65px;
+    justify-content: center;
+  }
+  .article-aside {
+    position: sticky;
+    top: 22px;
+    align-self: start;
+    background: #f3faf8;
+    border: 1px solid #d7ebe6;
+    border-radius: 14px;
+    padding: 19px;
+    font-size: 0.74rem;
+  }
+  .article-aside > p {
+    color: var(--ink);
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+  .article-aside ol {
+    padding-left: 20px;
+    margin: 0;
+  }
+  .article-aside li {
+    margin: 7px 0;
+    padding-left: 1px;
+  }
+  .article-aside a {
+    color: var(--brand-dark);
+    text-decoration: none;
+  }
+  .article-aside > a {
+    display: block;
+    border-top: 1px solid #cae7e0;
+    padding-top: 13px;
+    margin-top: 15px;
+    font-weight: 750;
+  }
+  .article-body :global(h2) {
+    color: var(--ink);
+    font-size: clamp(1.45rem, 2.2vw, 2rem);
+    margin-top: 45px;
+    scroll-margin-top: 24px;
+  }
+  .article-body :global(h3) {
+    color: var(--ink);
+    font-size: 1.22rem;
+    margin-top: 30px;
+  }
+  .article-body :global(p),
+  .article-body :global(li) {
+    font-size: 0.98rem;
+    line-height: 1.78;
+  }
+  .article-body :global(table) {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    margin: 26px 0;
+    font-size: 0.85rem;
+  }
+  .article-body :global(th),
+  .article-body :global(td) {
+    border: 1px solid var(--line);
+    padding: 10px 12px;
+    text-align: left;
+  }
+  .article-body :global(th) {
+    background: var(--brand-dark);
+    color: white;
+  }
+  .article-cta {
+    margin-top: 48px;
+    padding: 30px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--brand-dark), #1c9184);
+    color: white;
+  }
+  .article-cta span {
     font-size: 0.7rem;
-    margin-top: 24px;
+    font-weight: 750;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #bdf5ed;
+  }
+  .article-cta h2 {
+    color: white !important;
+    margin: 8px 0 !important;
+  }
+  .article-cta p {
+    color: white !important;
+    max-width: 580px;
+    margin-bottom: 20px;
+  }
+  .article-cta .btn {
+    background: white;
+    color: var(--brand-dark);
   }
   .source {
-    padding-top: 24px;
+    margin-top: 30px !important;
+    padding-top: 18px;
     border-top: 1px solid var(--line);
-    margin-top: 36px !important;
+  }
+  .related-section {
+    background: var(--canvas);
+  }
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .related-grid a {
+    padding: 22px;
+    border-radius: 14px;
+    background: white;
+    border: 1px solid var(--line);
+    text-decoration: none;
+    transition:
+      transform var(--ease),
+      box-shadow var(--ease);
+  }
+  .related-grid a:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+  }
+  .related-grid span,
+  .related-grid small {
+    display: block;
+    color: var(--brand-dark);
+    font-size: 0.68rem;
+    font-weight: 750;
+  }
+  .related-grid strong {
+    display: block;
+    font-size: 1rem;
+    line-height: 1.32;
+    margin: 9px 0 16px;
+  }
+  .related-grid small {
+    color: var(--muted);
+    font-weight: 550;
+  }
+  @media (max-width: 850px) {
+    .article-hero-grid {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+    .article-cover {
+      max-height: 310px;
+    }
+    .article-layout-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    .article-aside {
+      position: static;
+    }
+    .related-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
