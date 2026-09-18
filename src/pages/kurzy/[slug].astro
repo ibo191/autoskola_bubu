@@ -1,336 +1,102 @@
 ---
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
-import Roadmap from '../../components/Roadmap.astro';
 import CourseFaq from '../../components/CourseFaq.astro';
-import FinalCta from '../../components/FinalCta.astro';
-import CourseIncludedBenefits from '../../components/CourseIncludedBenefits.astro';
-import {
-  courses,
-  branches,
-  availableAt,
-  displayPrice,
-  money,
-  type Course,
-} from '../../lib/catalog';
+import { courses, branches, availableAt, displayPrice, money, type Course } from '../../lib/catalog';
 import manualCar from '../../assets/courses/b-manual-fabia.png';
 import automaticCar from '../../assets/courses/b-automatic-scala.png';
 import moto from '../../assets/moto.jpeg';
 import trailer from '../../assets/trailer.jpeg';
+
 export const prerender = true;
 export function getStaticPaths() {
   return courses.map((course) => ({ params: { slug: course.slug }, props: { course } }));
 }
-interface Props {
-  course: Course;
-}
+interface Props { course: Course; }
 const { course } = Astro.props;
-const photo =
-  course.id === 'b-automat'
-    ? automaticCar
-    : course.category === 'auto'
-      ? manualCar
-      : course.category === 'moto'
-        ? moto
-        : trailer;
-const availableBranches = branches.filter((b) => availableAt(course, b.id));
-const minPrice = Math.min(...availableBranches.map((b) => displayPrice(course, b.id)));
-const categoryLabel =
-  course.category === 'auto'
-    ? 'Řidičák na auto'
-    : course.category === 'moto'
-      ? 'Motocyklový kurz'
-      : 'Kurz na přívěs';
-const hero = {
-  b: {
-    h1: 'Řidičák skupiny B bez chaosu.',
-    lead: 'Kurz pro začátečníky, kteří chtějí jasný plán, klidný přístup a přípravu na reálný provoz.',
-    fit: 'Sedí vám, pokud chcete začít od nuly a postupně se dostat od prvních rozjezdů k samostatné jízdě.',
-  },
-  'b-automat': {
-    h1: 'Řidičák na automat bez zbytečného stresu.',
-    lead: 'Výcvik pro ty, kteří chtějí řešit provoz, přednosti a bezpečnost bez starostí s řazením.',
-    fit: 'Sedí vám, pokud víte, že budete jezdit automatem, nebo chcete klidnější start za volantem.',
-  },
-  l17: {
-    h1: 'Řidičák L17 pro bezpečný začátek.',
-    lead: 'Skupina B už od 17 let s mentorem po zkoušce. Dává čas získat zkušenosti dřív, ale s oporou.',
-    fit: 'Sedí studentům, kteří chtějí řídit dřív a mají mentora, se kterým budou po získání řidičáku jezdit.',
-  },
-  am: {
-    h1: 'Skupina AM: první krok na motorce.',
-    lead: 'Kurz pro lehké motocykly a první zkušenost s provozem na dvou kolech.',
-    fit: 'Sedí vám, pokud chcete začít bezpečně a potřebujete si osvojit ovládání motorky od základů.',
-  },
-  a1: {
-    h1: 'Skupina A1 pro lehkou motorku.',
-    lead: 'Motocyklový kurz s důrazem na ovládání stroje, cvičiště a jistotu v provozu.',
-    fit: 'Pokud je A1 váš první řidičák, nabídneme Moto Jistotu prvořidičák s rozšířenou teoretickou přípravou.',
-  },
-  a2: {
-    h1: 'Skupina A2 jako další krok na motorce.',
-    lead: 'Kurz nebo rozšíření podle toho, jaké oprávnění už držíte a jak dlouho.',
-    fit: 'Sedí vám, pokud chcete silnější motorku a potřebujete zvolit správnou cestu mezi kurzem, rozšířením a doplňovací zkouškou.',
-  },
-  a: {
-    h1: 'Skupina A pro velkou motorku.',
-    lead: 'Kurz pro velké motocykly s výběrem správného postupu podle předchozího oprávnění.',
-    fit: 'Sedí zkušenějším jezdcům i žadatelům, kteří potřebují jasně ověřit, zda jdou na rozšíření nebo doplňovací zkoušku.',
-  },
-  b96: {
-    h1: 'Rozšíření B96 pro větší soupravu.',
-    lead: 'Praktické rozšíření pro situace, kdy vám běžná skupina B už nestačí.',
-    fit: 'Sedí vám, pokud potřebujete tahat větší přívěs, ale nemusíte jít rovnou do skupiny B+E.',
-  },
-  be: {
-    h1: 'Skupina B+E pro auto s přívěsem.',
-    lead: 'Výcvik pro řízení soupravy s přívěsem, která už přesahuje možnosti běžného oprávnění B.',
-    fit: 'Sedí vám, pokud potřebujete jezdit s těžším přívěsem, vozíkem, karavanem nebo pracovní soupravou.',
-  },
+const photo = course.id === 'b-automat' ? automaticCar : course.category === 'auto' ? manualCar : course.category === 'moto' ? moto : trailer;
+const availableBranches = branches.filter((branch) => availableAt(course, branch.id));
+const minPrice = Math.min(...availableBranches.map((branch) => displayPrice(course, branch.id)));
+const category = course.category === 'auto' ? 'ŘIDIČÁK NA AUTO' : course.category === 'moto' ? 'ŘIDIČÁK NA MOTORKU' : 'ŘIDIČÁK S PŘÍVĚSEM';
+const details = {
+  b: ['Řidičák skupiny B bez chaosu.', 'Kurz pro začátečníky, kteří chtějí jasný plán, klidný přístup a přípravu na reálný provoz.', 'Sedí vám, pokud chcete začít od nuly a postupně se dostat od prvních rozjezdů k samostatné jízdě.'],
+  'b-automat': ['Řidičák na automat bez zbytečného stresu.', 'Soustreďte se na provoz, přednosti a bezpečnou jízdu. Řazení nechte na autě.', 'Sedí vám, pokud víte, že budete jezdit automatem, nebo chcete klidnější start za volantem.'],
+  l17: ['Řidičák L17 pro bezpečný začátek.', 'Skupina B už od 17 let: více času na zkušenosti, ale s oporou mentora.', 'Sedí studentům, kteří chtějí řídit dřív a mají mentora, se kterým budou po získání řidičáku jezdit.'],
+  am: ['Skupina AM: první kilometry na motorce.', 'Bezpečný začátek na dvou kolech s důrazem na ovládání a jistotu v provozu.', 'Sedí vám, pokud chcete začít bezpečně a potřebujete si osvojit ovládání motorky od základů.'],
+  a1: ['Skupina A1 pro lehkou motorku.', 'Motocyklový kurz s důrazem na ovládání stroje, cvičiště a jistotu v provozu.', 'Pokud je A1 váš první řidičák, nabídneme Moto Jistotu prvořidičák s rozšířenou teoretickou přípravou.'],
+  a2: ['Skupina A2 jako další krok na motorce.', 'Kurz nebo rozšíření podle toho, jaké oprávnění už držíte a jak dlouho.', 'Pomůžeme vám zvolit správnou cestu mezi kurzem, rozšířením a doplňovací zkouškou.'],
+  a: ['Skupina A pro velkou motorku.', 'Kurz pro velké motocykly s výběrem správného postupu podle předchozího oprávnění.', 'Sedí zkušenějším jezdcům i žadatelům, kteří potřebují jasně ověřit správný postup.'],
+  b96: ['Rozšíření B96 pro větší soupravu.', 'Praktické rozšíření pro situace, kdy vám běžná skupina B už nestačí.', 'Sedí vám, pokud potřebujete tahat větší přívěs, ale nemusíte jít rovnou do skupiny B+E.'],
+  be: ['Skupina B+E pro auto s přívěsem.', 'Příprava na řízení soupravy s přívěsem: prakticky, klidně a s jasným plánem.', 'Sedí vám, pokud potřebujete jezdit s těžším přívěsem, vozíkem, karavanem nebo pracovní soupravou.'],
 }[course.id];
-const benefits =
-  course.category === 'moto'
-    ? [
-        'Výcvik pouze na pobočce Praha 8 Střížkov.',
-        'Výběr balíčku podle zkušeností a oprávnění.',
-        'Cvičiště, ovládání motorky a příprava na zkoušku.',
-      ]
-    : course.category === 'prives'
-      ? [
-          'Výcvik přívěsů pouze na Střížkově.',
-          'Praktická příprava na manipulaci se soupravou.',
-          'Pomůžeme ověřit, zda potřebujete B96 nebo B+E.',
-        ]
-      : [
-          'Jasný plán od zápisu po zkoušku.',
-          'Teorie propojená s reálným provozem.',
-          'Možnost klasického B, L17 i automatu podle pobočky.',
-        ];
+const [headline, lead, fit] = details;
+const checklist = course.category === 'moto'
+  ? ['Výcvik na pobočce Praha 8 – Střížkov.', 'Balíček Moto Základ nebo Moto Jistota podle zkušeností.', 'Cvičiště, ovládání motorky a příprava na zkoušku.', 'Trpělivý přístup od prvních metrů.']
+  : course.category === 'prives'
+    ? ['Výcvik přívěsů na pobočce Praha 8 – Střížkov.', 'Praktická příprava na manipulaci se soupravou.', 'Pomůžeme ověřit, zda potřebujete B96 nebo B+E.', 'Jasný postup od zápisu po zkoušku.']
+    : ['Jasný plán od zápisu po zkoušku.', 'Teorie propojená s reálným provozem.', 'Výběr manuálu, automatu nebo L17 podle vašich potřeb.', 'Vstřícný a trpělivý přístup.'];
+const valueCards = [
+  ['graduation', 'Jasný postup', course.id === 'b' ? 'Naše teoretická a praktická výuka má jasný směr. Osnovy jsme upravovali podle potřeb studentů a v provozu jdeme i nad zákonné minimum.' : 'Výuka a praktický výcvik na sebe navazují od základů až ke složitějším situacím.'],
+  ['idea', 'Klidné vysvětlení', 'Když něco nejde napoprvé, vrátíme se k tomu. Bez křiku a bez shazování.'],
+  ['hands-wheel', 'Příprava na realitu', 'Trénujeme situace, které potkáte u zkoušky i při běžném řízení po kurzu.'],
+];
+const included = [
+  ['settings', 'Propracovaný plán výuky', 'Výuka a praktický výcvik na sebe navazují podle propracované osnovy.'],
+  ['classroom-outline', 'Učební materiály v ceně', 'Od začátku máte jasné materiály, ke kterým se můžete vracet.'],
+  ['download', 'Výukové materiály online', 'Studijní obsah máte vždy po ruce ve svém tempu i mezi přednáškami.'],
+  ['phone', 'Online učebnice kdekoliv', 'Doma, cestou do školy i v MHD. Na mobilu, tabletu nebo počítači.'],
+];
 const schema = {
-  '@context': 'https://schema.org',
-  '@type': 'Course',
-  name: course.name,
-  description: hero.lead,
-  provider: {
-    '@type': 'Organization',
-    name: 'Autoškola BuBu',
-    url: 'https://www.autoskolabubu.cz',
-  },
-  offers: {
-    '@type': 'Offer',
-    price: minPrice,
-    priceCurrency: 'CZK',
-    availability: 'https://schema.org/InStock',
-  },
+  '@context': 'https://schema.org', '@type': 'Course', name: course.name, description: lead,
+  provider: { '@type': 'Organization', name: 'Autoškola BuBu', url: 'https://www.autoskolabubu.cz' },
+  offers: { '@type': 'Offer', price: minPrice, priceCurrency: 'CZK', availability: 'https://schema.org/InStock' },
 };
 ---
 
-<Base
-  title={`${course.label} – ${course.name}`}
-  description={`${hero.h1} ${hero.lead} Autoškola BuBu Praha 8, Kladno a Statenice.`}
-  schema={schema}
->
-  <section class="page-hero course-hero">
-    <div class="container">
-      <nav class="breadcrumbs" aria-label="Drobečková navigace">
-        <a href="/">Domů</a><span>/</span><a href="/kurzy">Kurzy</a><span>/</span><span
-          >{course.label}</span
-        >
-      </nav>
-      <div class="course-hero-grid">
-        <div class="course-hero-copy">
-          <span class="eyebrow">{categoryLabel} · {course.label}</span><h1>{hero.h1}</h1><p
-            class="lead"
-          >
-            {hero.lead}
-          </p>
-          <div class="actions">
-            <button class="btn primary" data-order disabled data-course={course.id}
-              >Přihlásit se do kurzu ↗</button
-            ><a class="btn secondary" href="#cena">Zobrazit cenu</a>
-          </div>
-          <p class="microcopy">
-            Objednávka je nezávazný první krok. Termín zápisu si vyberete až v posledním kroku.
-          </p>
-          <div class="hero-signals"><span>◌ Jasný plán kurzu</span><span>♡ Klidný přístup</span><span>◈ Reálný provoz</span></div>
-        </div><div class="course-photo-wrap"><Image
-          src={photo}
-          alt={course.id === 'b-automat'
-            ? 'Černá Škoda Scala Autoškoly BuBu pro výcvik na automat'
-            : course.category === 'auto'
-              ? 'Bílá Škoda Fabia Autoškoly BuBu pro manuální výcvik skupiny B'
-              : course.category === 'moto'
-                ? 'Výcvikové motocykly Autoškoly BuBu'
-                : 'Výcviková souprava s přívěsem'}
-          widths={[480, 800]}
-          sizes="(max-width:640px) 90vw,45vw"
-          format="webp"
-          loading="eager"
-          fetchpriority="high"
-        /><span class="photo-note">Učíme v přátelské atmosféře<br />a v reálném provozu.</span><span class="fleet-note">▱ Moderní a bezpečný vozový park</span></div>
-      </div>
-    </div>
-  </section>
-  <section class="section">
-    <div class="container fit-grid">
-      <div class="fit-copy"><span class="eyebrow">Je to pro vás?</span><h2>Kurz bez zbytečného tlaku.</h2><p class="lead">{hero.fit}</p></div>
-      <div class="fit-benefits">{benefits.map((item) => <div><span>✓</span><p>{item}</p></div>)}</div>
-    </div>
-  </section>
-  <section class="section tinted">
-    <div class="container">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">Co získáte</span><h2>Výcvik, který má směr.</h2><p>
-            Nejde jen o odchozený kurz. Cílem je, abyste rozuměli tomu, co na silnici děláte.
-          </p>
+<Base title={`${course.label} – ${course.name}`} description={`${headline} ${lead}`} schema={schema}>
+  <main class="course-page">
+    <section class="product-hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">{category} · {course.label}</span>
+          <h1>{headline}</h1><p class="lead">{lead}</p>
+          <div class="actions"><button class="btn primary" data-order disabled data-course={course.id}>Přihlásit se do kurzu ↗</button><a class="btn secondary" href="#cena">Zobrazit cenu</a></div>
+          <div class="hero-signals"><span>♧ Už 10+ let pomáháme řidičům</span><span>♡ Individuální a klidný přístup</span><span>◈ Příprava na reálný provoz</span></div>
+        </div>
+        <div class="hero-image">
+          <Image src={photo} alt={course.id === 'b-automat' ? 'Černá Škoda Scala Autoškoly BuBu pro výcvik na automat' : course.category === 'auto' ? 'Bílá Škoda Fabia Autoškoly BuBu pro manuální výcvik' : course.category === 'moto' ? 'Výcvikový motocykl Autoškoly BuBu' : 'Výcvik s přívěsem Autoškoly BuBu'} widths={[480, 800]} sizes="(max-width: 720px) 100vw, 46vw" format="webp" loading="eager" fetchpriority="high" />
+          <span class="hand-note">Učíme v přátelské<br />atmosféře a v reálném<br />provozu.</span><span class="fleet-badge">▱ <b>Moderní vozový park</b><small>Pohodlně a bezpečně</small></span>
         </div>
       </div>
-      <div class="grid includes">
-        <article class="card">
-          <h3>Jasný postup</h3><p>
-            {
-              course.id === 'b'
-                ? 'Naše teoretická a praktická výuka má jasný směr. Osnovy jsme vytvářeli a upravovali přesně podle potřeb studentů. V provozu se nevěnujeme jen zákonným požadavkům, ale v mnohém jdeme i nad jejich rámec.'
-                : 'Víte, co vás čeká: online objednávka, osobní zápis, teorie, jízdy a závěrečná zkouška.'
-            }
-          </p>
-        </article>
-        <article class="card">
-          <h3>Klidné vysvětlení</h3><p>
-            Když něco nejde napoprvé, vrátíme se k tomu. Bez křiku a bez shazování.
-          </p>
-        </article>
-        <article class="card">
-          <h3>Příprava na realitu</h3><p>
-            Trénujeme situace, které potkáte u zkoušky i při běžném řízení po kurzu.
-          </p>
-        </article>
-      </div>
-    </div>
-  </section>
-  {(course.category === 'auto' || course.category === 'moto') && <CourseIncludedBenefits />}
-  <Roadmap />
-  <section class="section tinted" id="cena">
-    <div class="container">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">Cena a dostupnost</span><h2>Vyberte pobočku, která dává smysl.</h2>
-        </div><a class="text-link" href="/cenik">Kompletní ceník ↗</a>
-      </div>
-      <div class="grid">
-        {
-          availableBranches.map((b) => (
-            <article class="card price-card">
-              <>
-                <span class="eyebrow">{b.locality}</span>
-                <h3>{b.name}</h3>
-                <div class="price">
-                  {course.category === 'moto' && <small>od </small>}
-                  {money(displayPrice(course, b.id))}
-                  <small>*</small>
-                </div>
-              </>
-              <p>
-                {course.category === 'moto'
-                  ? 'Moto Základ 24 900 Kč / Moto Jistota 31 900 Kč. Správnou variantu nabídneme podle vašich zkušeností a oprávnění.'
-                  : course.category === 'prives'
-                    ? 'Cena kurzu nezahrnuje poplatky za zkoušku.'
-                    : 'Jedna cena kurzu na zvolené pobočce. Bez matoucích balíčků.'}
-              </p>
-              <button
-                class="btn primary"
-                data-order
-                disabled
-                data-course={course.id}
-                data-branch={b.id}
-              >
-                Vybrat {b.name} ↗
-              </button>
-            </article>
-          ))
-        }
-      </div><p class="fee-note">
-        * Ceny kurzů nezahrnují poplatky za zkoušku. Ty najdete přehledně v <a href="/cenik"
-          >ceníku</a
-        >.
-      </p>
-    </div>
-  </section>
-  <section class="section">
-    <div class="container split soft-close">
-      <div><span class="eyebrow">Další krok</span><h2>Stačí si vybrat termín zápisu.</h2></div>
-      <div>
-        <p class="lead">
-          Pokud vám kurz sedí, objednávka vás provede výběrem pobočky a termínu zápisu. Pokud si
-          nejste jistí, klidně nám nejdřív zavolejte nebo napište.
-        </p><div class="actions">
-          <button class="btn primary" data-order disabled data-course={course.id}
-            >Přihlásit se ↗</button
-          ><a class="btn secondary" href="/kontakt">Zeptat se</a>
-        </div>
-      </div>
-    </div>
-  </section>
-  {(course.id === 'b' || course.id === 'b-automat') && <CourseFaq course={course} />}<FinalCta />
+    </section>
+
+    <section class="section fit-section"><div class="container fit-grid">
+      <div><span class="eyebrow">Je to pro vás?</span><h2>Kurz bez zbytečného tlaku.</h2><p class="fit-lead">{fit}</p><div class="fit-photo"><Image src={photo} alt="Výcvik Autoškoly BuBu" widths={[400, 650]} sizes="(max-width: 720px) 100vw, 30vw" format="webp" loading="lazy" /><span>Váš cíl je blíž,<br />než si myslíte.</span></div></div>
+      <div class="checklist">{checklist.map((item) => <div><b>✓</b><p>{item}</p></div>)}</div>
+      <blockquote><span>“</span><p>„Skvělí instruktoři, trpělivý přístup a výborná příprava na zkoušky. Doporučuji všem!“</p><footer>— Klára, absolventka</footer><i>● ◦ ◦</i></blockquote>
+    </div></section>
+
+    <section class="section value-section"><div class="container">
+      <div class="section-head"><div><span class="eyebrow">Co získáte</span><h2>Výcvik, který má směr.</h2></div><p>Nejde jen o odchozený kurz. Cílem je, abyste rozuměli tomu, co na silnici děláte, a cítili se za volantem bezpečně.</p></div>
+      <div class="value-grid">{valueCards.map(([icon, title, text]) => <article><img src={`/icons/ui/blue-${icon}.webp`} alt="" width="192" height="192" loading="lazy" /><h3>{title}</h3><p>{text}</p></article>)}</div>
+    </div></section>
+
+    <section class="section"><div class="container">
+      <div class="section-head"><div><span class="eyebrow">V kurzu máte mnohem víc</span><h2>V kurzu máte mnohem víc než jen jízdy.</h2></div><p>Od prvního dne máte k dispozici materiály a přípravu, které vám pomohou zvládnout autoškolu systematicky.</p></div>
+      <div class="included-grid"><div class="included-cards">{included.map(([icon, title, text]) => <article><img src={`/icons/ui/mint-${icon}.webp`} alt="" width="192" height="192" loading="lazy" /><div><h3>{title}</h3><p>{text}</p></div></article>)}</div><aside class="etesty"><span>VELKÁ VÝHODA</span><b>▤</b><h3>Oficiální testové otázky přímo ve vašem účtu</h3><p>Ve studentském systému máte integrované eTesty s oficiálními testovými otázkami Ministerstva dopravy.</p><strong>✓ 100 kreditů na testy v ceně</strong><small>1 kredit = 1 test. Další test stojí 1 Kč.</small></aside></div>
+    </div></section>
+
+    <section class="section price-section" id="cena"><div class="container">
+      <div class="section-head"><div><span class="eyebrow">Cena a dostupnost</span><h2>Vyberte pobočku, která dává smysl.</h2></div><a class="text-link" href="/cenik">Kompletní ceník ↗</a></div>
+      <div class="branch-grid">{availableBranches.map((branch, index) => <article class:list={{ featured: index === 1 }}><span class="eyebrow">{branch.locality}</span>{index === 1 && <em>Nejlepší cena</em>}<h3>{branch.name}</h3><strong>{course.category === 'moto' && 'od '}{money(displayPrice(course, branch.id))}</strong><p>{course.category === 'moto' ? 'Moto Základ nebo Moto Jistota podle vašich zkušeností.' : course.category === 'prives' ? 'Cena kurzu nezahrnuje poplatky za zkoušku.' : 'Jedna cena kurzu na zvolené pobočce. Bez matoucích balíčků.'}</p><button class="btn primary" data-order disabled data-course={course.id} data-branch={branch.id}>Vybrat {branch.name} ↗</button></article>)}</div>
+      <p class="fee-note">* Ceny kurzů nezahrnují poplatky za zkoušku. Ty najdete přehledně v <a href="/cenik">ceníku</a>.</p>
+    </div></section>
+
+    <section class="next-step"><div class="container next-grid"><div><span>DALŠÍ KROK</span><h2>Stačí si vybrat termín zápisu.</h2><p>Pokud vám kurz sedí, objednávka vás provede výběrem pobočky a termínu zápisu.</p></div><div><div class="actions"><button class="btn primary" data-order disabled data-course={course.id}>Přihlásit se ↗</button><a class="btn secondary" href="/kontakt">Zeptat se</a></div><p class="next-contact">☎ 725 717 251 <i>·</i> ✉ info@autoskolabubu.cz</p></div></div></section>
+    {(course.id === 'b' || course.id === 'b-automat') && <CourseFaq course={course} />}
+  </main>
 </Base>
+
 <style>
-  .microcopy {
-    margin-top: 18px;
-    font-size: 0.82rem;
-  }
-  .includes {
-    margin-top: 32px;
-  }
-  .course-benefits {
-    margin-top: 24px;
-  }
-  .price-card .btn {
-    margin-top: 22px;
-  }
-  .fee-note {
-    font-size: 0.8rem;
-    margin-top: 28px;
-  }
-  .soft-close {
-    align-items: start;
-  }
-  .course-hero {
-    background: radial-gradient(circle at 76% 15%, #d6f5ef 0, #f7fbfb 36%, #fff 80%);
-    overflow: hidden;
-  }
-  .course-hero-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 0.94fr) minmax(360px, 1.06fr);
-    align-items: center;
-    gap: 46px;
-    padding-bottom: 58px;
-  }
-  .course-hero-copy h1 { font-size: clamp(3rem, 5.4vw, 5.7rem); max-width: 670px; }
-  .course-photo-wrap { position: relative; }
-  .course-photo-wrap :global(img) { width: 100%; aspect-ratio: 1.25; object-fit: cover; border-radius: 20px; box-shadow: 0 22px 42px #17335f25; }
-  .photo-note { position: absolute; top: 30px; left: -25px; padding: 15px 18px; background: #fffffff2; border-radius: 10px; color: var(--blue); box-shadow: var(--shadow); font-family: cursive; font-weight: 700; transform: rotate(-4deg); }
-  .fleet-note { position: absolute; right: -24px; bottom: 20px; padding: 12px 15px; border-radius: 11px; background: white; box-shadow: var(--shadow); color: var(--ink); font-size: 0.72rem; font-weight: 750; }
-  .hero-signals { display: flex; flex-wrap: wrap; gap: 12px 22px; margin-top: 28px; color: var(--brand-dark); font-size: 0.72rem; font-weight: 720; }
-  .hero-signals span { white-space: nowrap; }
-  .fit-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(400px, 1.1fr); gap: 68px; align-items: center; }
-  .fit-copy .lead { margin-top: 20px; }
-  .fit-benefits { border: 1px solid #d5eae5; border-radius: 16px; background: #fff; padding: 7px 24px; }
-  .fit-benefits > div { display: flex; align-items: start; gap: 14px; padding: 15px 0; }
-  .fit-benefits > div + div { border-top: 1px solid var(--line); }
-  .fit-benefits span { display: grid; place-items: center; flex: 0 0 25px; height: 25px; border-radius: 50%; background: var(--brand-soft); color: var(--brand-dark); font-weight: 800; }
-  .fit-benefits p { font-size: 0.88rem; font-weight: 650; color: var(--ink); }
-  @media (max-width: 900px) {
-    .course-hero-grid, .fit-grid { grid-template-columns: 1fr; gap: 32px; }
-    .course-photo-wrap { max-width: 680px; }
-    .photo-note { left: 18px; }
-    .fleet-note { right: 14px; }
-    .course-hero-copy h1 { font-size: clamp(3rem, 11vw, 5rem); }
-  }
-  @media (max-width: 540px) {
-    .course-hero-grid { padding-bottom: 40px; }
-    .photo-note { top: 14px; left: 12px; font-size: 0.8rem; }
-    .fleet-note { right: 8px; bottom: 10px; max-width: 160px; }
-    .fit-benefits { padding-inline: 18px; }
-  }
+  .course-page{overflow:hidden}.product-hero{background:radial-gradient(circle at 75% 10%,#d9f4ef 0,transparent 34%),linear-gradient(135deg,#f8fcfb,#fff 76%);border-bottom:1px solid #e3f0ed}.hero-grid{display:grid;grid-template-columns:minmax(0,.92fr) minmax(390px,1.08fr);gap:68px;align-items:center;padding:68px 0 52px}.hero-copy h1{max-width:610px;font-size:clamp(3.25rem,5.65vw,5.6rem);line-height:.98;letter-spacing:-.065em}.hero-copy .lead{max-width:520px;margin-top:20px;font-size:1.11rem;line-height:1.52;color:var(--muted)}.actions{margin-top:25px}.hero-signals{display:flex;gap:20px;margin-top:32px;color:var(--blue);font-size:.68rem;font-weight:700}.hero-signals span{max-width:145px;line-height:1.35}.hero-image{position:relative}.hero-image :global(img){width:100%;aspect-ratio:1.36;object-fit:cover;border-radius:18px;box-shadow:0 20px 44px #17335f21}.hand-note{position:absolute;top:24px;left:-28px;padding:14px 18px;border-radius:10px;background:#fffffff2;color:#21457f;box-shadow:0 12px 25px #17335f1c;font-family:cursive;font-size:.92rem;font-weight:700;line-height:1.3;transform:rotate(-5deg)}.fleet-badge{position:absolute;right:-23px;bottom:17px;display:grid;grid-template-columns:auto 1fr;column-gap:8px;padding:11px 15px;border-radius:10px;background:#fff;box-shadow:0 12px 25px #17335f1a;color:#204276;font-size:.7rem}.fleet-badge:first-letter{color:var(--brand);font-size:1.3rem}.fleet-badge b{font-size:.7rem}.fleet-badge small{grid-column:2;font-size:.62rem;color:var(--muted)}.fit-section{padding:78px 0}.fit-grid{display:grid;grid-template-columns:.92fr 1fr .55fr;gap:22px;align-items:start}.fit-grid h2,.section-head h2{max-width:610px;font-size:clamp(2rem,3vw,3rem);line-height:1.03;letter-spacing:-.045em}.fit-lead{max-width:390px;margin-top:15px;font-size:.98rem;line-height:1.65;color:var(--muted)}.fit-photo{position:relative;margin-top:22px;overflow:hidden;border-radius:13px}.fit-photo :global(img){width:100%;height:145px;object-fit:cover}.fit-photo span{position:absolute;right:12px;top:13px;padding:10px;background:#fffffff0;border-radius:8px;color:#21457f;font-family:cursive;font-weight:700;font-size:.78rem;transform:rotate(-5deg)}.checklist{padding:8px 20px;border:1px solid #d8ebe7;border-radius:13px;background:#fff}.checklist>div{display:flex;gap:12px;padding:15px 0}.checklist>div+div{border-top:1px solid #e2eeeb}.checklist b{display:grid;place-items:center;flex:0 0 24px;height:24px;border-radius:50%;background:#dff6f1;color:#009b8b;font-size:.78rem}.checklist p{color:#17335f;font-weight:700;font-size:.81rem;line-height:1.35}.fit-grid blockquote{min-height:100%;margin:0;padding:23px 20px;background:#e6f8f4;color:#234878}.fit-grid blockquote>span{display:block;color:#17a997;font-size:2.9rem;line-height:.7}.fit-grid blockquote p{margin-top:14px;font-size:.88rem;line-height:1.55}.fit-grid blockquote footer{margin-top:25px;font-size:.72rem;color:#55a79e}.fit-grid blockquote i{display:block;margin-top:28px;color:#18a794;font-size:.64rem;font-style:normal}.value-section,.price-section{background:linear-gradient(110deg,#f3fcfa,#effaf8 60%,#fff)}.section-head{display:flex;justify-content:space-between;align-items:end;gap:45px}.section-head>p{max-width:410px;margin-bottom:4px;font-size:.84rem;line-height:1.55;color:var(--muted)}.value-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:30px}.value-grid article{padding:27px 24px;border:1px solid #dceae8;border-radius:12px;background:#fff}.value-grid img,.included-cards img{width:44px;height:44px;padding:10px;border-radius:50%;background:#e4f7fb;object-fit:contain}.value-grid h3{margin-top:17px;font-size:1.03rem;color:#17335f}.value-grid p{margin-top:10px;font-size:.78rem;line-height:1.62;color:var(--muted)}.included-grid{display:grid;grid-template-columns:1.55fr .75fr;gap:16px;margin-top:30px}.included-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}.included-cards article{display:flex;gap:14px;padding:17px;border:1px solid #dceae8;border-radius:10px;background:white}.included-cards img{flex:0 0 42px;width:42px;height:42px;background:#e8f9f5}.included-cards h3{font-size:.8rem;color:#17335f}.included-cards p{margin-top:6px;font-size:.69rem;line-height:1.45;color:var(--muted)}.etesty{position:relative;padding:27px;border-radius:11px;background:linear-gradient(135deg,#134079,#2160ad);color:#fff;box-shadow:0 15px 28px #17335f30}.etesty>span{display:inline-block;padding:5px 9px;border-radius:999px;background:#9ee9da;color:#135576;font-size:.58rem;font-weight:800}.etesty>b{position:absolute;right:23px;top:26px;font-size:2rem}.etesty h3{max-width:240px;margin-top:19px;font-size:1.1rem;line-height:1.18}.etesty p{margin-top:12px;font-size:.74rem;line-height:1.55;color:#dae7fb}.etesty strong{display:block;margin-top:20px;color:#a8f1df;font-size:.76rem}.etesty small{display:block;margin-top:6px;color:#d3e3f8;font-size:.61rem}.price-section{padding-top:67px}.branch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:30px}.branch-grid article{position:relative;padding:23px 20px 18px;border:1px solid #dceae8;border-radius:11px;background:#fff}.branch-grid article.featured{border-color:#4bc8b9;box-shadow:inset 0 0 0 1px #a9e7de}.branch-grid em{position:absolute;top:18px;right:18px;padding:5px 9px;border-radius:999px;background:#20ae9b;color:#fff;font-size:.59rem;font-style:normal;font-weight:800}.branch-grid h3{margin-top:9px;color:#204276;font-size:1.05rem}.branch-grid strong{display:block;margin-top:8px;color:#173f7c;font-size:1.78rem;letter-spacing:-.05em}.branch-grid p{min-height:40px;margin-top:9px;font-size:.7rem;line-height:1.45;color:var(--muted)}.branch-grid .btn{margin-top:12px;padding:10px 14px;font-size:.73rem}.fee-note{margin-top:13px;font-size:.67rem;color:var(--muted)}.next-step{margin:0 0 55px;color:#fff}.next-grid{display:grid;grid-template-columns:1fr .72fr;gap:50px;padding:30px 36px;border-radius:12px;background:linear-gradient(120deg,#153b77,#0c2859)}.next-grid>div>span{color:#71e1d2;font-size:.64rem;font-weight:800;letter-spacing:.12em}.next-grid h2{margin-top:5px;color:#fff;font-size:clamp(1.7rem,3vw,2.45rem);line-height:1.05}.next-grid p{margin-top:8px;color:#dae5f6;font-size:.82rem;line-height:1.55}.next-grid>div:last-child{align-self:center}.next-grid .btn.primary{background:#35c7b5}.next-grid .btn.secondary{border-color:#c7d8ef;color:#fff}.next-contact{font-size:.69rem}.next-contact i{margin:0 7px;font-style:normal;color:#6bdaca}@media(max-width:950px){.hero-grid{grid-template-columns:1fr;gap:35px}.hero-image{max-width:720px}.fit-grid{grid-template-columns:1fr 1fr}.fit-grid blockquote{grid-column:1/-1}.included-grid{grid-template-columns:1fr}.etesty{min-height:245px}.branch-grid{grid-template-columns:repeat(2,1fr)}.next-grid{grid-template-columns:1fr;gap:22px}}@media(max-width:650px){.hero-grid{padding:42px 0 38px}.hero-copy h1{font-size:clamp(2.85rem,14vw,4.4rem)}.hero-signals{display:grid;grid-template-columns:1fr 1fr;gap:12px}.hand-note{left:13px;top:13px;font-size:.77rem}.fleet-badge{right:8px;bottom:9px}.fit-grid,.value-grid,.included-cards,.branch-grid{grid-template-columns:1fr}.section-head{display:block}.section-head>p{margin-top:15px}.fit-section{padding:56px 0}.fit-grid blockquote{grid-column:auto}.fit-photo :global(img){height:175px}.next-step{margin-bottom:35px}.next-grid{padding:26px 22px}.actions{gap:10px}.actions .btn{padding:12px 14px;font-size:.77rem}}
 </style>
