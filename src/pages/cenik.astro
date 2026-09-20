@@ -427,8 +427,16 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
     press('[data-period]', state.period);
     press('[data-package]', state.package);
     press('[data-trailer]', state.trailer);
-    show('#branch-question', !!state.category);
-    if (!state.category || !state.branch) return;
+    if (!state.category) return;
+    if (state.category === 'moto') {
+      const message = document.querySelector('#availability-message')!;
+      message.textContent =
+        'Přihlašování do motocyklových kurzů je momentálně pozastavené. Otevřeme ho v průběhu zimy pro příští rok.';
+      reveal('#availability-message');
+      return;
+    }
+    show('#branch-question', true);
+    if (!state.branch) return;
     if ((state.category === 'moto' || state.category === 'prives') && state.branch !== 'strizkov') {
       const message = document.querySelector('#availability-message')!;
       message.textContent =

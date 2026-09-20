@@ -4,7 +4,9 @@ import { branches, courses, type BranchId, type CourseId, availableAt } from '..
 export const campaignId = z.enum(['black-friday', 'vanoce']);
 export type CampaignId = z.infer<typeof campaignId>;
 
-const courseIds = courses.map((course) => course.id) as CourseId[];
+const courseIds = courses
+  .filter((course) => course.category !== 'moto')
+  .map((course) => course.id) as CourseId[];
 const branchIds = branches.map((branch) => branch.id) as BranchId[];
 
 export const blackFridayCampaign = {
@@ -62,10 +64,10 @@ export const christmasCampaign = {
     },
     {
       id: 'mock-exam-plus-ride',
-      title: 'Zkouška nanečisto + 45 min extra jízda',
+      title: '2 × 45 min extra jízdy',
       valueCzk: 1600,
       description:
-        'Test na pobočce a simulovaná zkoušková jízda, aby obdarovaný věděl, co ho čeká.',
+        'Dvě jízdy navíc, které dávají prostor soustředit se na to, co obdarovaný potřebuje doladit.',
     },
   ],
 };
@@ -76,7 +78,9 @@ export const campaigns = {
 } as const;
 
 export function campaignCourseOptions() {
-  return courses.map((course) => ({ id: course.id, label: course.label, name: course.name }));
+  return courses
+    .filter((course) => course.category !== 'moto')
+    .map((course) => ({ id: course.id, label: course.label, name: course.name }));
 }
 
 export function campaignBranchOptions(courseId?: CourseId) {

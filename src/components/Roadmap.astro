@@ -29,13 +29,6 @@ const steps = [
     icon: 'car',
   },
   {
-    title: 'Zkouška nanečisto',
-    summary: 'Dobrovolně si vyzkoušíte průběh celé zkoušky.',
-    detail:
-      'Jako doplňkovou službu vám nabízíme možnost vyzkoušet si zkoušku nanečisto. Je čistě na vás, zda ji využijete. Čeká vás simulace teoretického testu i praktické jízdy v podobě, která odpovídá ostré zkoušce na úřadě.',
-    icon: 'target',
-  },
-  {
     title: 'Závěrečná zkouška',
     summary: 'Teoretická část a závěrečná praktická jízda.',
     detail:
@@ -126,7 +119,7 @@ const steps = [
     --road-progress: 0%;
     position: relative;
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 12px;
     list-style: none;
     padding: 0;
@@ -142,18 +135,15 @@ const steps = [
     border-radius: 3px;
   }
   .roadmap[data-road-progress='1'] {
-    --road-progress: 20%;
+    --road-progress: 25%;
   }
   .roadmap[data-road-progress='2'] {
-    --road-progress: 40%;
+    --road-progress: 50%;
   }
   .roadmap[data-road-progress='3'] {
-    --road-progress: 60%;
+    --road-progress: 75%;
   }
   .roadmap[data-road-progress='4'] {
-    --road-progress: 80%;
-  }
-  .roadmap[data-road-progress='5'] {
     --road-progress: 100%;
   }
   .roadmap::before {

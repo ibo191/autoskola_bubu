@@ -15,58 +15,16 @@ test('B pricing asks for transmission and L17, with manual only outside Prague',
   await expect(page.locator('.offer-price')).toContainText('Nezahrnuje poplatky za zkoušku.');
 });
 
-test('Moto and trailer courses are available only in Prague', async ({ page }) => {
+test('Moto enrollment is paused in the price guide while trailer courses remain Prague-only', async ({ page }) => {
   await page.goto('/cenik');
   await page.getByRole('button', { name: /^Motorku/ }).click();
-  await page.getByRole('button', { name: /^Kladno/ }).click();
-  await expect(page.locator('#availability-message')).toContainText('pouze na pobočce Střížkov');
+  await expect(page.locator('#availability-message')).toContainText('Přihlašování do motocyklových kurzů je momentálně pozastavené');
   await expect(page.locator('#pricing-results')).toBeHidden();
   await page.getByRole('button', { name: /^Auto s přívěsem/ }).click();
+  await page.getByRole('button', { name: /^Kladno/ }).click();
   await expect(page.locator('#availability-message')).toContainText('pouze na pobočce Střížkov');
 });
 
-test('A1 without a licence offers only extended Moto Jistota', async ({ page }) => {
-  await page.goto('/cenik');
-  await page.getByRole('button', { name: /^Motorku/ }).click();
-  await page.getByRole('button', { name: /^Střížkov/ }).click();
-  await page.getByRole('button', { name: 'A1', exact: true }).click();
-  await page.getByRole('button', { name: 'Nemám žádné', exact: true }).click();
-  await expect(page.locator('#offer-price')).toHaveText('31 900 Kč');
-  await expect(page.locator('#offer-variant')).toHaveText(
-    'Moto Jistota · 20 hodin jízd · 2 hodiny teorie navíc',
-  );
-  await expect(page.locator('#package-question')).toBeHidden();
-});
-
-test('A1 to A2 after more than two years offers the supplementary exam course', async ({
-  page,
-}) => {
-  await page.goto('/cenik');
-  await page.getByRole('button', { name: /^Motorku/ }).click();
-  await page.getByRole('button', { name: /^Střížkov/ }).click();
-  await page.getByRole('button', { name: 'A2', exact: true }).click();
-  await page.getByRole('button', { name: 'Ano, mám', exact: true }).click();
-  await page.locator('#licences-question label').filter({ hasText: /^B$/ }).click();
-  await page.locator('#licences-question label').filter({ hasText: /^A1$/ }).click();
-  await page.getByRole('button', { name: 'Déle než 2 roky', exact: true }).click();
-  await expect(page.locator('#offer-price')).toHaveText('7 500 Kč');
-  await expect(page.locator('#offer-variant')).toHaveText('Doplňovací zkouška · 4 hodiny jízd');
-});
-
-test('A1 to A2 within two years keeps both extension packages', async ({ page }) => {
-  await page.goto('/cenik');
-  await page.getByRole('button', { name: /^Motorku/ }).click();
-  await page.getByRole('button', { name: /^Střížkov/ }).click();
-  await page.getByRole('button', { name: 'A2', exact: true }).click();
-  await page.getByRole('button', { name: 'Ano, mám', exact: true }).click();
-  await page.locator('#licences-question label').filter({ hasText: /^A1$/ }).click();
-  await page.getByRole('button', { name: '2 roky nebo méně', exact: true }).click();
-  await expect(page.locator('#package-question')).toBeVisible();
-  await page.getByRole('button', { name: /Moto Základ/ }).click();
-  await expect(page.locator('#offer-price')).toHaveText('24 900 Kč');
-  await page.getByRole('button', { name: /Moto Jistota/ }).click();
-  await expect(page.locator('#offer-price')).toHaveText('31 900 Kč');
-});
 test('Prefilled order, server price, contact back navigation and booking calendar', async ({
   page,
 }) => {
@@ -95,31 +53,30 @@ test('Prefilled order, server price, contact back navigation and booking calenda
   await expect(dialog.locator('[name="marketing"]')).not.toBeChecked();
   await expect(dialog.locator('[name="terms"]')).not.toBeChecked();
 });
-test('Six-step journey reveals the selected detail', async ({ page }) => {
+test('Five-step journey reveals the selected detail', async ({ page }) => {
   await page.goto('/');
-  const finalStep = page.getByRole('button', { name: /06 Závěrečná zkouška/ });
+  const finalStep = page.getByRole('button', { name: /05 Závěrečná zkouška/ });
   await finalStep.click();
   await expect(finalStep).toHaveAttribute('aria-pressed', 'true');
   await expect(finalStep).toHaveAttribute('aria-expanded', 'true');
-  await expect(page.locator('#road-detail-5')).toContainText('Teoretická část závěrečné zkoušky');
+  await expect(page.locator('#road-detail-4')).toContainText('Teoretická část závěrečné zkoušky');
   await expect(page.getByRole('button', { name: /01 Online objednávka/ })).toHaveAttribute(
     'aria-pressed',
     'false',
   );
 });
-for (const course of ['am', 'a1', 'a2', 'a'])
-  test(`Moto ${course} no licence: only Jistota`, async ({ page }) => {
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Přihlásit se ↗', exact: true }).click();
-    const dialog = page.getByRole('dialog');
-    await dialog.getByRole('combobox', { name: 'Pobočka', exact: true }).selectOption('strizkov');
-    await dialog.getByRole('combobox', { name: 'Kurz', exact: true }).selectOption(course);
-    await expect(dialog.locator('#quote-amount')).toHaveText('31 900 Kč');
-    await expect(dialog.locator('[name="package"] option')).toHaveCount(1);
-    if (course === 'a1') {
-      await expect(dialog.locator('#quote-note')).toContainText('2 hodiny teorie navíc');
-    }
-  });
+test('Order dialog excludes moto and limits Kladno and Statenice to B and L17', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Přihlásit se ↗', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  const course = dialog.getByRole('combobox', { name: 'Kurz', exact: true });
+  await expect(course.locator('option[value="a1"]')).toHaveCount(0);
+  await dialog.getByRole('combobox', { name: 'Pobočka', exact: true }).selectOption('kladno');
+  await expect(course.locator('option[value="b-automat"]')).toHaveJSProperty('hidden', true);
+  await expect(course.locator('option[value="b96"]')).toHaveJSProperty('hidden', true);
+  await expect(course.locator('option[value="b"]')).toHaveJSProperty('hidden', false);
+  await expect(course.locator('option[value="l17"]')).toHaveJSProperty('hidden', false);
+});
 test('Dialog keyboard confinement, safe discard and focus restoration', async ({ page }) => {
   await page.goto('/');
   const trigger = page.getByRole('button', { name: 'Přihlásit se ↗', exact: true });

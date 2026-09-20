@@ -132,6 +132,9 @@ export const courses = z.array(courseSchema).parse([
 ]);
 export type Course = (typeof courses)[number];
 export const getCourse = (id: CourseId) => courses.find((c) => c.id === id)!;
+export const motoEnrollmentPaused = true;
+export const motoEnrollmentPausedMessage =
+  'Přihlašování do motocyklových kurzů je momentálně pozastavené. Otevřeme ho v průběhu zimy pro příští rok.';
 export const priceSource = {
   url: 'https://www.autoskolabubu.cz/cenik-autoskolabubu',
   checkedAt: '2026-08-28',

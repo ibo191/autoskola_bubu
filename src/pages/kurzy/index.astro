@@ -3,7 +3,14 @@ export const prerender = true;
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import FinalCta from '../../components/FinalCta.astro';
-import { branches, courses, availableAt, displayPrice, money } from '../../lib/catalog';
+import {
+  branches,
+  courses,
+  availableAt,
+  displayPrice,
+  money,
+  motoEnrollmentPausedMessage,
+} from '../../lib/catalog';
 import automaticScala from '../../assets/courses/b-automatic-scala.png';
 import manualFabia from '../../assets/courses/b-manual-fabia.png';
 
@@ -78,6 +85,15 @@ const courseIcons = {
           ))
         }
       </div>
+      <div class="tabs course-filter" role="group" aria-label="Filtrovat kurzy podle typu">
+        <button type="button" data-course-category="all" aria-pressed="true">Všechny typy</button>
+        <button type="button" data-course-category="auto" aria-pressed="false">Auto a L17</button>
+        <button type="button" data-course-category="moto" aria-pressed="false">Motorky</button>
+        <button type="button" data-course-category="prives" aria-pressed="false">Přívěsy</button>
+      </div>
+      <p id="moto-enrollment-notice" class="moto-notice" hidden role="status">
+        {motoEnrollmentPausedMessage}
+      </p>
       <div class="course-tile-grid" id="course-tile-grid">
         {
           courses.map((course) => {
@@ -89,6 +105,7 @@ const courseIcons = {
               <article
                 class="course-tile"
                 data-branches={availableBranches.map((branch) => branch.id).join(' ')}
+                data-category={course.category}
                 data-course-url={`/kurzy/${course.slug}`}
                 tabindex="0"
                 role="link"
@@ -134,9 +151,15 @@ const courseIcons = {
                   <span class="text-link" aria-hidden="true">
                     Otevřít kurz →
                   </span>
-                  <button class="btn secondary" data-order disabled data-course={course.id}>
-                    Přihlásit se
-                  </button>
+                  {
+                    course.category === 'moto' ? (
+                      <a class="btn secondary" href={`/kurzy/${course.slug}`}>Zjistit více</a>
+                    ) : (
+                      <button class="btn secondary" data-order disabled data-course={course.id}>
+                        Přihlásit se
+                      </button>
+                    )
+                  }
                 </div>
               </article>
             );
@@ -170,16 +193,33 @@ const courseIcons = {
   </section>
   <FinalCta />
   <script>
-    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-course-branch]');
+    const branchButtons = document.querySelectorAll<HTMLButtonElement>('[data-course-branch]');
+    const categoryButtons = document.querySelectorAll<HTMLButtonElement>('[data-course-category]');
     const tiles = document.querySelectorAll<HTMLElement>('.course-tile');
-    buttons.forEach((button) => {
+    const motoNotice = document.querySelector<HTMLElement>('#moto-enrollment-notice');
+    let selectedBranch = 'all';
+    let selectedCategory = 'all';
+    const filterTiles = () => {
+      tiles.forEach((tile) => {
+        const branchMatches =
+          selectedBranch === 'all' || (tile.dataset.branches ?? '').split(' ').includes(selectedBranch);
+        const categoryMatches = selectedCategory === 'all' || tile.dataset.category === selectedCategory;
+        tile.hidden = !branchMatches || !categoryMatches;
+      });
+      if (motoNotice) motoNotice.hidden = selectedCategory !== 'moto';
+    };
+    branchButtons.forEach((button) => {
       button.addEventListener('click', () => {
-        const branch = button.dataset.courseBranch ?? 'all';
-        buttons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
-        tiles.forEach((tile) => {
-          tile.hidden =
-            branch !== 'all' && !(tile.dataset.branches ?? '').split(' ').includes(branch);
-        });
+        selectedBranch = button.dataset.courseBranch ?? 'all';
+        branchButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+        filterTiles();
+      });
+    });
+    categoryButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        selectedCategory = button.dataset.courseCategory ?? 'all';
+        categoryButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+        filterTiles();
       });
     });
     tiles.forEach((tile) => {
@@ -202,6 +242,15 @@ const courseIcons = {
 <style>
   .course-filter {
     margin-bottom: 28px;
+  }
+  .moto-notice {
+    margin: -10px 0 24px;
+    padding: 16px 18px;
+    border: 1px solid #a7d8d1;
+    border-radius: 12px;
+    background: #eefaf7;
+    color: var(--brand-dark);
+    font-weight: 700;
   }
   .course-tile-grid {
     display: grid;

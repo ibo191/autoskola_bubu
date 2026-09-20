@@ -60,9 +60,15 @@ const asset =
           : 'Jedna cena kurzu. Bez volby balíčku.'
       }
     </p><div class="card-actions">
-      <button class="btn primary" data-order disabled data-course={course.id} data-branch={branch}
-        >Vybrat kurz ↗</button
-      ><span class="text-link" aria-hidden="true">Otevřít kurz →</span>
+      {
+        course.category === 'moto' ? (
+          <a class="btn secondary" href={`/kurzy/${course.slug}`}>Přihlašování pozastaveno</a>
+        ) : (
+          <button class="btn primary" data-order disabled data-course={course.id} data-branch={branch}
+            >Vybrat kurz ↗</button
+          >
+        )
+      }<span class="text-link" aria-hidden="true">Otevřít kurz →</span>
     </div>
   </div>
 </article>

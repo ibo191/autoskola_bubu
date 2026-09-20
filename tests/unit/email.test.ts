@@ -27,7 +27,7 @@ const orderInput = {
     transmission: 'manual' as const,
     package: 'single' as const,
     heldLicences: [],
-    addons: { book: false, hoodieQty: 0, shirtQty: 0 },
+    addons: { book: false },
   },
   price: {
     ok: true as const,

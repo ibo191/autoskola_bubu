@@ -23,111 +23,26 @@ for (const branch of branches)
         }
       });
     }
-for (const course of ['am', 'a1', 'a2', 'a']) {
-  test(`${course}: no licence means only Jistota`, () => {
-    const selection = { course, branch: 'strizkov', heldLicences: [] };
-    const rejected = quote({ ...selection, package: 'moto-basic' });
-    assert.equal(rejected.ok, false);
-    if (!rejected.ok) assert.deepEqual(rejected.allowedPackages, ['moto-confidence']);
-    const accepted = quote({ ...selection, package: 'moto-confidence' });
-    assert.equal(accepted.ok, true);
-    if (accepted.ok) {
-      assert.equal(accepted.amount, 31900);
-      assert.equal(accepted.extraTheoryHours, course === 'a1' ? 2 : 0);
+for (const course of ['am', 'a1', 'a2', 'a'])
+  test(`${course}: enrollment is paused server-side`, () => {
+    const result = quote({ course, branch: 'strizkov', package: 'moto-confidence' });
+    assert.equal(result.ok, false);
+    if (!result.ok) {
+      assert.equal(result.code, 'UNAVAILABLE');
+      assert.match(result.message, /Přihlašování do motocyklových kurzů je momentálně pozastavené/);
     }
   });
-  for (const branch of ['kladno', 'statenice'])
-    test(`${course} forbidden in ${branch}`, () =>
-      assert.equal(quote({ course, branch, package: 'moto-confidence' }).ok, false));
-  for (const pkg of ['moto-basic', 'moto-confidence'])
-    test(`${course} extension from B ${pkg}`, () => {
-      const result = quote({ course, branch: 'strizkov', heldLicences: ['B'], package: pkg });
-      assert.equal(result.ok, true);
-      if (result.ok) {
-        assert.equal(result.training, 'extension');
-        assert.equal(result.amount, pkg === 'moto-basic' ? 24900 : 31900);
-      }
-    });
-}
-for (const [held, course] of [
-  ['A1', 'a2'],
-  ['A2', 'a'],
-]) {
-  test(`${held} to ${course}: over two years`, () => {
-    const r = quote({
-      course,
-      branch: 'strizkov',
-      heldLicences: [held],
-      holdingPeriod: 'more-than-two',
-      package: 'supplement',
-    });
-    assert.equal(r.ok, true);
-    if (r.ok) {
-      assert.equal(r.amount, 7500);
-      assert.equal(r.training, 'supplement');
-    }
-  });
-  test(`${held} to ${course}: less than two years`, () => {
-    const r = quote({
-      course,
-      branch: 'strizkov',
-      heldLicences: [held],
-      holdingPeriod: 'less-than-two',
-      package: 'moto-basic',
-    });
-    assert.equal(r.ok, true);
-    if (r.ok) assert.equal(r.amount, 24900);
-  });
-  for (const period of ['unknown', 'exactly-two'])
-    test(`${held} to ${course}: ${period} fails closed`, () =>
-      assert.equal(
-        quote({
-          course,
-          branch: 'strizkov',
-          heldLicences: [held],
-          holdingPeriod: period,
-          package: 'supplement',
-        }).ok,
-        false,
-      ));
-}
-test('A1 to A is extension, never supplemental', () => {
-  assert.equal(
-    quote({ course: 'a', branch: 'strizkov', heldLicences: ['A1'], package: 'supplement' }).ok,
-    false,
-  );
-  assert.equal(
-    quote({ course: 'a', branch: 'strizkov', heldLicences: ['A1'], package: 'moto-basic' }).ok,
-    true,
-  );
-});
-test('Unknown, duplicate, same or higher moto licences need contact', () => {
-  for (const heldLicences of [['other'], ['A'], ['A2'], ['A1', 'A1']])
-    assert.equal(
-      quote({ course: 'a2', branch: 'strizkov', heldLicences, package: 'moto-basic' }).ok,
-      false,
-    );
-});
-test('Multiple held groups use the highest relevant moto group', () => {
-  const supplement = quote({
+test('Moto enrollment pause applies before a direct selection can create an offer', () => {
+  const result = quote({
     course: 'a2',
     branch: 'strizkov',
-    heldLicences: ['B', 'A1'],
+    heldLicences: ['A1'],
     holdingPeriod: 'more-than-two',
     package: 'supplement',
   });
-  assert.equal(supplement.ok, true);
-  if (supplement.ok) assert.equal(supplement.amount, 7500);
-  const extension = quote({
-    course: 'a',
-    branch: 'strizkov',
-    heldLicences: ['AM', 'B', 'A1'],
-    package: 'moto-basic',
-  });
-  assert.equal(extension.ok, true);
-  if (extension.ok) assert.equal(extension.training, 'extension');
-});
-for (const [course, price] of [
+  assert.equal(result.ok, false);
+  if (!result.ok) assert.equal(result.code, 'UNAVAILABLE');
+});for (const [course, price] of [
   ['b96', 8000],
   ['be', 10500],
 ] as const)

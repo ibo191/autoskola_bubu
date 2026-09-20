@@ -19,6 +19,8 @@ const slotList = document.querySelector<HTMLElement>('#slot-list')!;
 const selectedSlotLabel = document.querySelector<HTMLElement>('#selected-slot-label')!;
 const motoPackageCards = document.querySelector<HTMLElement>('#moto-package-cards')!;
 const motoPackageOptions = document.querySelector<HTMLElement>('#moto-package-options')!;
+const restrictedBranches = new Set(['kladno', 'statenice']);
+const limitedBranchCourses = new Set(['b', 'l17']);
 
 async function getCaptchaToken() {
   if (dialog.dataset.captchaRequired !== 'true') return 'preview-order-submission';
@@ -137,12 +139,17 @@ function selectionWithAddons() {
     package: moto ? field('package').value : 'single',
     heldLicences: moto && heldLicence ? [heldLicence] : [],
     ...(moto && direct ? { holdingPeriod: field('holdingPeriod').value } : {}),
-    addons: {
-      book: false,
-      hoodieQty: Number(field('addonHoodieQty').value || 0),
-      shirtQty: Number(field('addonShirtQty').value || 0),
-    },
   };
+}
+
+function syncAvailableCourses() {
+  const branch = field('branch').value;
+  const course = field('course') as HTMLSelectElement;
+  for (const option of [...course.options]) {
+    if (!option.value) continue;
+    option.hidden = restrictedBranches.has(branch) && !limitedBranchCourses.has(option.value);
+  }
+  if (restrictedBranches.has(branch) && !limitedBranchCourses.has(course.value)) course.value = '';
 }
 
 function requiresAppointment() {
@@ -298,6 +305,7 @@ form.addEventListener('input', () => {
   dirty = true;
 });
 form.addEventListener('change', () => {
+  syncAvailableCourses();
   updateOrderStepCopy();
   void updateQuote();
 });

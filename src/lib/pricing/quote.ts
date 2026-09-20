@@ -8,20 +8,9 @@ import {
   prices,
   fees,
   priceSource,
+  motoEnrollmentPaused,
+  motoEnrollmentPausedMessage,
 } from '../catalog/index';
-
-const addonsSchema = z
-  .object({
-    book: z.boolean().default(false),
-    hoodieQty: z.number().int().min(0).max(10).default(0),
-    shirtQty: z.number().int().min(0).max(10).default(0),
-  })
-  .default({ book: false, hoodieQty: 0, shirtQty: 0 });
-
-export const addonCatalog = {
-  hoodie: { id: 'hoodie-bubu', title: 'Mikina Autoškola BuBu', unitPrice: 500 },
-  shirt: { id: 'shirt-bubu', title: 'Tričko Autoškola BuBu', unitPrice: 500 },
-} as const;
 
 export const selectionSchema = z
   .object({
@@ -34,7 +23,6 @@ export const selectionSchema = z
       .max(6)
       .default([]),
     holdingPeriod: z.enum(['less-than-two', 'exactly-two', 'more-than-two', 'unknown']).optional(),
-    addons: addonsSchema,
   })
   .strict()
   .transform((value) => ({
@@ -85,30 +73,9 @@ export function quote(input: unknown): Quote {
       code: 'UNAVAILABLE',
       message: 'Tato kombinace kurzu a pobočky není dostupná.',
     };
-  const selectedAddons = [
-    ...(s.addons.hoodieQty > 0
-      ? [
-          {
-            id: addonCatalog.hoodie.id,
-            title: addonCatalog.hoodie.title,
-            quantity: s.addons.hoodieQty,
-            unitPrice: addonCatalog.hoodie.unitPrice,
-            total: s.addons.hoodieQty * addonCatalog.hoodie.unitPrice,
-          },
-        ]
-      : []),
-    ...(s.addons.shirtQty > 0
-      ? [
-          {
-            id: addonCatalog.shirt.id,
-            title: addonCatalog.shirt.title,
-            quantity: s.addons.shirtQty,
-            unitPrice: addonCatalog.shirt.unitPrice,
-            total: s.addons.shirtQty * addonCatalog.shirt.unitPrice,
-          },
-        ]
-      : []),
-  ];
+  if (course.category === 'moto' && motoEnrollmentPaused)
+    return { ok: false, code: 'UNAVAILABLE', message: motoEnrollmentPausedMessage };
+  const selectedAddons: { id: string; title: string; quantity: number; unitPrice: number; total: number }[] = [];
   const addonsAmount = selectedAddons.reduce((sum, item) => sum + item.total, 0);
   const result = (
     baseAmount: number,
