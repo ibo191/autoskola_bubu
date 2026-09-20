@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import OrderDialog from '../components/OrderDialog.astro';
 import CookieConsent from '../components/CookieConsent.astro';
+import GoogleAnalytics from '../components/GoogleAnalytics.astro';
 import { branches } from '../lib/catalog';
 interface Props {
   title: string;
@@ -33,6 +34,7 @@ const pageTitle = title.includes('Autoškola BuBu') ? title : `${title} | Autoš
 const isProduction =
   process.env.VERCEL_ENV === 'production' || process.env.APP_ENV === 'production';
 const recaptchaSiteKey = import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY ?? '';
+const gaMeasurementId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID ?? '';
 const organizationId = 'https://www.autoskolabubu.cz/#organization';
 const websiteId = 'https://www.autoskolabubu.cz/#website';
 const pageSchemas = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
@@ -128,7 +130,7 @@ const nav = [
         />
       )
     }</head
-  ><body data-recaptcha-site-key={recaptchaSiteKey}>
+  ><body data-recaptcha-site-key={recaptchaSiteKey} data-ga-measurement-id={gaMeasurementId}>
     <a class="skip" href="#main">Přeskočit na obsah</a>
     {
       !hideHeader && (
@@ -242,6 +244,7 @@ const nav = [
       )
     }
     <OrderDialog recaptchaSiteKey={recaptchaSiteKey} captchaRequired={isProduction} />
+    {/^G-[A-Z0-9]+$/i.test(gaMeasurementId) && <GoogleAnalytics />}
     <CookieConsent />
     <script>
       const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');

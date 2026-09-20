@@ -591,6 +591,15 @@ async function submitOrder() {
       return;
     }
     dirty = false;
+    window.dispatchEvent(
+      new CustomEvent('bubu:tracking', {
+        detail: {
+          name: 'generate_lead',
+          course: body.selection.course,
+          branch: body.selection.branch,
+        },
+      }),
+    );
     window.location.href =
       result.thankYouUrl ?? `/dekujeme?kod=${encodeURIComponent(result.publicCode ?? '')}`;
   } catch {
