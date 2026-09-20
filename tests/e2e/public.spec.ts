@@ -15,10 +15,34 @@ test('B pricing asks for transmission and L17, with manual only outside Prague',
   await expect(page.locator('.offer-price')).toContainText('Nezahrnuje poplatky za zkoušku.');
 });
 
-test('Moto enrollment is paused in the price guide while trailer courses remain Prague-only', async ({ page }) => {
+test('Course overview renders crawlable links for every course detail', async ({ page }) => {
+  await page.goto('/kurzy');
+  const courseLinks = page.locator('.course-tile > a.course-tile-overlay[href^="/kurzy/"]');
+  await expect(courseLinks).toHaveCount(9);
+  for (const href of [
+    '/kurzy/ridicak-skupina-b',
+    '/kurzy/ridicak-skupina-b-automat',
+    '/kurzy/l17',
+    '/kurzy/ridicak-skupina-a',
+    '/kurzy/ridicak-skupina-a1',
+    '/kurzy/ridicak-skupina-a2',
+    '/kurzy/ridicak-skupina-am',
+    '/kurzy/b96',
+    '/kurzy/be',
+  ])
+    await expect(page.locator(`.course-tile > a.course-tile-overlay[href="${href}"]`)).toHaveCount(
+      1,
+    );
+});
+
+test('Moto enrollment is paused in the price guide while trailer courses remain Prague-only', async ({
+  page,
+}) => {
   await page.goto('/cenik');
   await page.getByRole('button', { name: /^Motorku/ }).click();
-  await expect(page.locator('#availability-message')).toContainText('Přihlašování do motocyklových kurzů je momentálně pozastavené');
+  await expect(page.locator('#availability-message')).toContainText(
+    'Přihlašování do motocyklových kurzů je momentálně pozastavené',
+  );
   await expect(page.locator('#pricing-results')).toBeHidden();
   await page.getByRole('button', { name: /^Auto s přívěsem/ }).click();
   await page.getByRole('button', { name: /^Kladno/ }).click();
@@ -65,7 +89,9 @@ test('Five-step journey reveals the selected detail', async ({ page }) => {
     'false',
   );
 });
-test('Order dialog excludes moto and limits Kladno and Statenice to B and L17', async ({ page }) => {
+test('Order dialog excludes moto and limits Kladno and Statenice to B and L17', async ({
+  page,
+}) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Přihlásit se ↗', exact: true }).click();
   const dialog = page.getByRole('dialog');

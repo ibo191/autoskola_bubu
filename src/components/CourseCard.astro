@@ -21,13 +21,11 @@ const asset =
         : trailer;
 ---
 
-<article
-  class:list={['course-card', { photographic: photo }]}
-  data-category={course.category}
-  data-course-url={`/kurzy/${course.slug}`}
-  tabindex="0"
-  role="link"
->
+<article class:list={['course-card', { photographic: photo }]} data-category={course.category}>
+  <a
+    class="course-card-overlay"
+    href={`/kurzy/${course.slug}`}
+    aria-label={`Otevřít kurz ${course.label}`}></a>
   {
     photo && (
       <Image
@@ -62,35 +60,27 @@ const asset =
     </p><div class="card-actions">
       {
         course.category === 'moto' ? (
-          <a class="btn secondary" href={`/kurzy/${course.slug}`}>Přihlašování pozastaveno</a>
+          <a class="btn secondary" href={`/kurzy/${course.slug}`}>
+            Přihlašování pozastaveno
+          </a>
         ) : (
-          <button class="btn primary" data-order disabled data-course={course.id} data-branch={branch}
-            >Vybrat kurz ↗</button
+          <button
+            class="btn primary"
+            data-order
+            disabled
+            data-course={course.id}
+            data-branch={branch}
           >
+            Vybrat kurz ↗
+          </button>
         )
-      }<span class="text-link" aria-hidden="true">Otevřít kurz →</span>
+      }
     </div>
   </div>
 </article>
-<script>
-  document.querySelectorAll<HTMLElement>('[data-course-url]').forEach((card) => {
-    const openCourse = () => {
-      const url = card.dataset.courseUrl;
-      if (url) window.location.assign(url);
-    };
-    card.addEventListener('click', (event) => {
-      if ((event.target as HTMLElement).closest('button, a')) return;
-      openCourse();
-    });
-    card.addEventListener('keydown', (event) => {
-      if (event.target !== card || (event.key !== 'Enter' && event.key !== ' ')) return;
-      event.preventDefault();
-      openCourse();
-    });
-  });
-</script>
 <style>
   .course-card {
+    position: relative;
     overflow: hidden;
     border: 1px solid var(--line);
     border-radius: var(--radius);
@@ -108,9 +98,14 @@ const asset =
     border-color: #9ed6ce;
     box-shadow: var(--shadow);
   }
-  .course-card:focus-visible {
+  .course-card-overlay {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+  }
+  .course-card-overlay:focus-visible {
     outline: 3px solid var(--brand);
-    outline-offset: 3px;
+    outline-offset: -3px;
   }
   .course-card > img {
     width: 100%;
@@ -148,6 +143,8 @@ const asset =
     gap: 16px;
     flex-wrap: wrap;
     margin-top: 24px;
+    position: relative;
+    z-index: 3;
   }
   .card-actions .text-link {
     font-size: 0.78rem;
