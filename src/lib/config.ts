@@ -8,6 +8,7 @@ const schema = z.object({
 });
 
 const localHosts = ['127.0.0.1', 'localhost', '[::1]'];
+export const PRODUCTION_PUBLIC_ORIGIN = 'https://www.autoskolabubu.cz';
 
 function normalizeOrigin(value: string | undefined) {
   if (!value) return undefined;
@@ -73,4 +74,13 @@ export function readConfig(env: Record<string, string | undefined>) {
       throw new Error(`Missing required production environment variables: ${missing.join(', ')}`);
   }
   return value;
+}
+
+/**
+ * URLs that leave the application (transactional e-mails, calendar files) must
+ * never expose a temporary Vercel deployment hostname in production.
+ */
+export function publicAppOrigin(env: Record<string, string | undefined>) {
+  const config = readConfig(env);
+  return config.APP_ENV === 'production' ? PRODUCTION_PUBLIC_ORIGIN : config.APP_ORIGIN;
 }

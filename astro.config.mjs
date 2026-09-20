@@ -21,8 +21,15 @@ export default defineConfig({
   devToolbar: { enabled: false },
   markdown: { processor: unified(), syntaxHighlight: false },
   trailingSlash: 'never',
+  // Browsers percent-encode Czech characters in legacy Wix paths. Register both
+  // forms so each old URL reaches its relevant replacement page.
   redirects: Object.fromEntries(
-    Object.entries(redirects).map(([from, to]) => [from, { status: 301, destination: to }]),
+    Object.entries(redirects).flatMap(([from, to]) =>
+      [...new Set([from, encodeURI(from)])].map((legacyPath) => [
+        legacyPath,
+        { status: 301, destination: to },
+      ]),
+    ),
   ),
   security: {
     checkOrigin: true,

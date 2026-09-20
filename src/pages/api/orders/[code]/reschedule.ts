@@ -7,6 +7,7 @@ import {
 } from '../../../../lib/server/email';
 import { appointmentChangedEmail } from '../../../../lib/server/email/templates';
 import { verifyRecaptcha } from '../../../../lib/server/recaptcha';
+import { publicAppOrigin } from '../../../../lib/config';
 
 export const prerender = false;
 const bodySchema = z
@@ -41,7 +42,7 @@ export const POST: APIRoute = async ({ request, params }) => {
     if (result.ok && isTransactionalEmailConfigured(process.env)) {
       const order = await repository.getPublicOrder(params.code);
       if (order) {
-        const manageUrl = new URL('/spravovat-termin', new URL(request.url).origin);
+        const manageUrl = new URL('/spravovat-termin', publicAppOrigin(process.env));
         manageUrl.searchParams.set('kod', order.publicCode);
         createTransactionalEmailAdapter(process.env)
           .send(appointmentChangedEmail({ order, manageUrl: manageUrl.href, kind: 'rescheduled' }))

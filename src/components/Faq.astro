@@ -3,9 +3,10 @@ import { faqGroups as groups } from '../lib/faqs';
 
 interface Props {
   compact?: boolean;
+  quiet?: boolean;
 }
 
-const { compact = false } = Astro.props;
+const { compact = false, quiet = false } = Astro.props;
 const homeFaqs = [
   {
     question: 'Jak se přihlásím do autoškoly?',
@@ -37,7 +38,7 @@ const displayedGroups = compact ? [{ title: 'Nejčastější dotazy', items: hom
 ---
 
 <section class="section tinted">
-  <div class="container faq-layout">
+  <div class:list={['container', 'faq-layout', { quiet }]}>
     <aside>
       <span class="eyebrow">Vše na jednom místě</span><h2>Časté otázky</h2><p>
         Vyberte si téma a rozbalte odpověď. Nenašli jste ji? Ozvěte se nám.
@@ -48,7 +49,7 @@ const displayedGroups = compact ? [{ title: 'Nejčastější dotazy', items: hom
         displayedGroups
           .filter((group) => group.items.length > 0)
           .map((group) => (
-            <section class:list={['faq-group', { compact }]}>
+            <section class:list={['faq-group', { compact, quiet }]}>
               {!compact && <h3>{group.title}</h3>}
               {group.items.map((item) => (
                 <details>
@@ -160,6 +161,42 @@ const displayedGroups = compact ? [{ title: 'Nejčastější dotazy', items: hom
   }
   .faq-group.compact summary {
     font-size: 1rem;
+  }
+  .faq-layout.quiet {
+    gap: 58px;
+  }
+  .faq-group.quiet {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+  }
+  .faq-group.quiet h3 {
+    color: var(--brand-dark);
+    font-size: clamp(1.25rem, 2vw, 1.55rem);
+    font-weight: 650;
+    margin: 0 0 4px;
+  }
+  .faq-group.quiet h3::before {
+    height: 7px;
+    width: 7px;
+  }
+  .faq-group.quiet details:first-of-type {
+    border-top: 1px solid var(--line);
+  }
+  .faq-group.quiet summary {
+    font-size: clamp(1rem, 1.45vw, 1.12rem);
+    font-weight: 500;
+    line-height: 1.45;
+    padding: 21px 0;
+  }
+  .faq-group.quiet summary span {
+    color: var(--teal);
+    font-size: 1.25rem;
+  }
+  .faq-group.quiet .faq-answer {
+    max-width: 780px;
+    padding-bottom: 16px;
   }
   @media (max-width: 760px) {
     .faq-layout {

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readConfig } from '../../src/lib/config';
+import { PRODUCTION_PUBLIC_ORIGIN, publicAppOrigin, readConfig } from '../../src/lib/config';
 import { LocalCaptcha, LocalEmail, NoopAnalytics } from '../../src/lib/integrations/local';
 import { createToken, tokenMatches } from '../../src/lib/security/tokens';
 import { contactSchema } from '../../src/lib/validation/contact';
@@ -65,6 +65,19 @@ test('Vercel production fails closed until required integrations are configured'
   assert.equal(config.RECAPTCHA_ADAPTER, 'recaptcha');
   assert.equal(config.EMAIL_ADAPTER, 'lettermint');
   assert.equal(config.ANALYTICS_ADAPTER, 'google-meta');
+  assert.equal(
+    publicAppOrigin({
+      ...base,
+      APP_ORIGIN: 'https://autoskola-bubu.vercel.app',
+      SUPABASE_URL: 'https://example.supabase.co',
+      SUPABASE_SERVICE_ROLE_KEY: 'service-role-key',
+      RATE_LIMIT_SECRET: 'rate-limit-secret',
+      LETTERMINT_PROJECT_TOKEN: 'lettermint-token',
+      ORDER_NOTIFICATION_EMAIL: 'objednavky@autoskolabubu.cz',
+      CRON_SECRET: 'cron-secret',
+    }),
+    PRODUCTION_PUBLIC_ORIGIN,
+  );
   const withoutRecaptcha = readConfig({
     ...base,
     SUPABASE_URL: 'https://example.supabase.co',

@@ -1,4 +1,4 @@
-import { readConfig } from '../config';
+import { publicAppOrigin, readConfig } from '../config';
 import { CreateOrderService, type OrderLegalSettings } from '../booking/create-order';
 import { SupabaseBookingRepository, SupabaseRateLimiter } from '../supabase/booking-repository';
 import { requestFingerprint } from '../security/rate-limit';
@@ -35,7 +35,7 @@ export function createLiveOrderService(env: Record<string, string | undefined>) 
     email: createTransactionalEmailAdapter(env),
     rateLimiter: new SupabaseRateLimiter(env),
     legal: legalSettings,
-    origin: config.APP_ORIGIN,
+    origin: publicAppOrigin(env),
     notificationEmail: orderNotificationEmail(env),
   });
 }

@@ -23,6 +23,7 @@ import {
   toPragueDate,
 } from './utils';
 import type { EmailMessage } from '../../integrations/contracts';
+import { publicAppOrigin } from '../../config';
 
 export function assertCronAuthorized(request: Request, env: Record<string, string | undefined>) {
   const secret = env.CRON_SECRET;
@@ -110,7 +111,7 @@ export async function processEmailReminders(
   now = new Date(),
 ) {
   if (!isTransactionalEmailConfigured(env)) return { ok: false, code: 'EMAIL_NOT_CONFIGURED' };
-  const origin = env.APP_ORIGIN || 'https://autoskolabubu.vercel.app';
+  const origin = publicAppOrigin(env);
   const repository = new SupabaseEmailRepository(env);
   const email = createTransactionalEmailAdapter(env);
   const today = toPragueDate(now);

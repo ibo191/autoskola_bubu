@@ -7,6 +7,7 @@ import {
 import { appointmentChangedEmail } from '../../../../lib/server/email/templates';
 import { z } from 'zod';
 import { verifyRecaptcha } from '../../../../lib/server/recaptcha';
+import { publicAppOrigin } from '../../../../lib/config';
 
 export const prerender = false;
 const bodySchema = z.object({ recaptchaToken: z.string().max(4096).optional() }).strict();
@@ -36,7 +37,7 @@ export const POST: APIRoute = async ({ request, params }) => {
     const before = await repository.getPublicOrder(params.code);
     const result = await repository.cancelAppointment(params.code);
     if (result.ok && before && isTransactionalEmailConfigured(process.env)) {
-      const manageUrl = new URL('/spravovat-termin', new URL(request.url).origin);
+      const manageUrl = new URL('/spravovat-termin', publicAppOrigin(process.env));
       manageUrl.searchParams.set('kod', before.publicCode);
       createTransactionalEmailAdapter(process.env)
         .send(

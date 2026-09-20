@@ -185,11 +185,11 @@ const nav = [
     </main>
     {
       !hideFooter && (
-        <footer>
+        <footer class="site-footer">
           <div class="container">
             <>
               <div class="footer-grid">
-                <div>
+                <div class="footer-brand">
                   <>
                     <a class="logo" href="/">
                       <img
@@ -208,7 +208,7 @@ const nav = [
                   </>
                 </div>
                 {branches.map((b) => (
-                  <div>
+                  <div class="footer-branch">
                     <>
                       <h2>
                         <a href={`/${b.id}`}>{b.name}</a>
@@ -225,7 +225,7 @@ const nav = [
               <div class="footer-bottom">
                 <>
                   <span>© {new Date().getFullYear()} Autoškola BuBu</span>
-                  <div>
+                  <div class="footer-legal">
                     <>
                       <a href="/obchodni-podminky">Obchodní podmínky</a>
                       <a href="/ochrana-osobnich-udaju">Ochrana osobních údajů</a>
@@ -313,7 +313,7 @@ const nav = [
   .menu-toggle {
     display: none;
   }
-  footer {
+  .site-footer {
     padding: 52px 0 24px;
     border-top: 1px solid var(--line);
     background: var(--canvas);
@@ -325,19 +325,27 @@ const nav = [
   }
   .footer-grid h2 {
     font-size: 1rem;
+    font-weight: 700;
     margin-bottom: 18px;
   }
   .footer-grid h2 a {
     text-decoration: none;
   }
   .footer-grid p {
+    font-weight: 500;
     font-size: 0.77rem;
     margin: 20px 0 14px;
   }
-  .footer-grid > div > a:not(.logo) {
+  .footer-branch > a {
     display: block;
     font-size: 0.72rem;
+    font-weight: 600;
     margin-top: 8px;
+    text-decoration: none;
+  }
+  .footer-branch > a:hover {
+    color: var(--brand-dark);
+    text-decoration: underline;
   }
   .footer-bottom {
     display: flex;
@@ -354,6 +362,10 @@ const nav = [
     gap: 20px;
     flex-wrap: wrap;
     align-items: center;
+  }
+  .footer-legal a,
+  .footer-link-button {
+    font-weight: 500;
   }
   .footer-link-button {
     border: 0;
