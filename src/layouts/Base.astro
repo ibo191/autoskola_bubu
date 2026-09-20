@@ -7,7 +7,13 @@ interface Props {
   title: string;
   description: string;
   noindex?: boolean;
-  schema?: Record<string, unknown>;
+  schema?: Record<string, unknown> | Record<string, unknown>[];
+  ogType?: 'website' | 'article';
+  article?: {
+    publishedTime: string;
+    modifiedTime: string;
+    author: string;
+  };
   hideHeader?: boolean;
   hideFooter?: boolean;
 }
@@ -16,14 +22,56 @@ const {
   description,
   noindex = false,
   schema,
+  ogType = 'website',
+  article,
   hideHeader = false,
   hideFooter = false,
 } = Astro.props;
 const path = Astro.url.pathname;
 const canonical = new URL(path, 'https://www.autoskolabubu.cz').href;
+const pageTitle = title.includes('Autoškola BuBu') ? title : `${title} | Autoškola BuBu`;
 const isProduction =
   process.env.VERCEL_ENV === 'production' || process.env.APP_ENV === 'production';
 const recaptchaSiteKey = import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY ?? '';
+const organizationId = 'https://www.autoskolabubu.cz/#organization';
+const websiteId = 'https://www.autoskolabubu.cz/#website';
+const pageSchemas = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': organizationId,
+      name: 'Autoškola BuBu',
+      url: 'https://www.autoskolabubu.cz',
+      logo: 'https://www.autoskolabubu.cz/brand/logo.png',
+      email: 'info@autoskolabubu.cz',
+      telephone: '+420725717755',
+      areaServed: ['Praha 8', 'Kladno', 'Statenice', 'Praha-západ'],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': websiteId,
+      url: 'https://www.autoskolabubu.cz',
+      name: 'Autoškola BuBu',
+      inLanguage: 'cs-CZ',
+      publisher: { '@id': organizationId },
+    },
+    {
+      '@type': 'WebPage',
+      '@id': canonical,
+      url: canonical,
+      name: pageTitle,
+      description,
+      inLanguage: 'cs-CZ',
+      isPartOf: { '@id': websiteId },
+    },
+    ...pageSchemas.map((item) => {
+      const { '@context': _context, ...node } = item;
+      return node;
+    }),
+  ],
+};
 const nav = [
   ['/kurzy', 'Kurzy'],
   ['/cenik', 'Ceník'],
@@ -42,27 +90,41 @@ const nav = [
       content="width=device-width, initial-scale=1"
     /><script is:inline>
       document.documentElement.classList.add('js');
-    </script><title>{title} | Autoškola BuBu</title><meta
-      name="description"
-      content={description}
-    /><link rel="canonical" href={canonical} /><meta
+    </script><title>{pageTitle}</title><meta name="description" content={description} /><link
+      rel="canonical"
+      href={canonical}
+    /><meta
       name="robots"
       content={noindex || !isProduction ? 'noindex, nofollow' : 'index, follow'}
-    /><meta property="og:title" content={`${title} | Autoškola BuBu`} /><meta
+    /><meta property="og:title" content={pageTitle} /><meta
       property="og:description"
       content={description}
     /><meta property="og:url" content={canonical} /><meta
       property="og:type"
-      content="website"
+      content={ogType}
     /><meta property="og:locale" content="cs_CZ" /><meta
-      property="og:image"
-      content="https://www.autoskolabubu.cz/brand/bubak.png"
-    /><link rel="icon" href="/brand/bubak.png" /><meta name="theme-color" content="#4ab9ab" />{
-      schema && (
+      property="og:site_name"
+      content="Autoškola BuBu"
+    /><meta property="og:image" content="https://www.autoskolabubu.cz/brand/bubak.png" /><meta
+      property="og:image:alt"
+      content="Autoškola BuBu"
+    /><meta name="twitter:card" content="summary_large_image" /><meta
+      name="twitter:title"
+      content={pageTitle}
+    /><meta name="twitter:description" content={description} />{
+      article && (
+        <>
+          <meta property="article:published_time" content={article.publishedTime} />
+          <meta property="article:modified_time" content={article.modifiedTime} />
+          <meta property="article:author" content={article.author} />
+        </>
+      )
+    }<link rel="icon" href="/brand/bubak.png" /><meta name="theme-color" content="#4ab9ab" />{
+      (
         <script
           is:inline
           type="application/ld+json"
-          set:html={JSON.stringify(schema).replace(/</g, '\\u003c')}
+          set:html={JSON.stringify(structuredData).replace(/</g, '\\u003c')}
         />
       )
     }</head
@@ -75,7 +137,7 @@ const nav = [
             <>
               <a href="/" class="logo" aria-label="Autoškola BuBu – úvod">
                 <img
-                  src="/brand/logo.png"
+                  src="/brand/logo.webp"
                   alt="Autoškola BuBu"
                   width="588"
                   height="217"
@@ -129,7 +191,7 @@ const nav = [
                   <>
                     <a class="logo" href="/">
                       <img
-                        src="/brand/logo.png"
+                        src="/brand/logo.webp"
                         alt="Autoškola BuBu"
                         width="588"
                         height="217"
@@ -163,13 +225,21 @@ const nav = [
                   <span>© {new Date().getFullYear()} Autoškola BuBu</span>
                   <div>
                     <>
-                      <a href="/obchodni-podminky">Obchodní podmínky</a>
-                      <a href="/ochrana-osobnich-udaju">Ochrana osobních údajů</a>
-                      <a href="/zasady-pouzivani-cookies">Zásady cookies</a>
+                      <a class="footer-link" href="/obchodni-podminky">
+                        Obchodní podmínky
+                      </a>
+                      <a class="footer-link" href="/ochrana-osobnich-udaju">
+                        Ochrana osobních údajů
+                      </a>
+                      <a class="footer-link" href="/zasady-pouzivani-cookies">
+                        Zásady cookies
+                      </a>
                       <button type="button" data-open-cookie-settings class="footer-link-button">
                         Nastavení cookies
                       </button>
-                      <a href="/sprava">Interní správa</a>
+                      <a class="footer-link" href="/sprava">
+                        Interní správa
+                      </a>
                     </>
                   </div>
                 </>
@@ -290,12 +360,19 @@ const nav = [
     flex-wrap: wrap;
     align-items: center;
   }
+  .footer-link,
+  .footer-link-button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 8px 2px;
+    margin: -4px -2px;
+  }
   .footer-link-button {
     border: 0;
     background: transparent;
     color: inherit;
     font: inherit;
-    padding: 0;
     text-decoration: underline;
     text-underline-offset: 4px;
   }

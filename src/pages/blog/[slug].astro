@@ -16,7 +16,7 @@ const a = article.data;
 const related = getArticles()
   .filter((item) => item.id !== article.id)
   .slice(0, 3);
-const schema = {
+const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
   headline: a.title,
@@ -34,16 +34,35 @@ const schema = {
     url: 'https://www.autoskolabubu.cz',
   },
 };
+const breadcrumbSchema = {
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Domů', item: 'https://www.autoskolabubu.cz/' },
+    { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://www.autoskolabubu.cz/blog' },
+    { '@type': 'ListItem', position: 3, name: a.title, item: a.canonical },
+  ],
+};
 ---
 
-<Base title={a.title} description={a.description} schema={schema}>
+<Base
+  title={a.seoTitle ?? a.title}
+  description={a.description}
+  ogType="article"
+  article={{
+    publishedTime: a.publishedAt.toISOString(),
+    modifiedTime: a.updatedAt.toISOString(),
+    author: a.author,
+  }}
+  schema={[articleSchema, breadcrumbSchema]}
+>
   <article>
     <header class="article-hero">
       <div class="container article-hero-grid">
         <div>
           <nav class="breadcrumbs" aria-label="Drobečková navigace">
             <a href="/">Domů</a><span>/</span><a href="/blog">Blog</a><span>/</span><span
-              >{a.category}</span>
+              >{a.category}</span
+            >
           </nav>
           <span class="article-category">{a.category}</span><h1>{a.title}</h1><p
             class="article-perex"
@@ -64,7 +83,9 @@ const schema = {
     <div class="section article-layout">
       <div class="container article-layout-grid">
         <aside class="article-aside" aria-label="Navigace článku">
-          <p>V článku najdete</p><ul data-article-toc></ul><a href="#article-cta">Vybrat si kurz →</a>
+          <p>V článku najdete</p><ul data-article-toc></ul><a href="#article-cta"
+            >Vybrat si kurz →</a
+          >
         </aside>
         <div class="article-body content">
           {Content && <Content />}

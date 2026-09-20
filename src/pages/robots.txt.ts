@@ -5,7 +5,7 @@ const isProduction =
 export const GET: APIRoute = () =>
   new Response(
     isProduction
-      ? 'User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /sprava\nDisallow: /spravovat-termin\nSitemap: https://www.autoskolabubu.cz/sitemap-index.xml\n'
+      ? 'User-agent: *\nAllow: /\nSitemap: https://www.autoskolabubu.cz/sitemap-index.xml\n'
       : 'User-agent: *\nDisallow: /\n',
     {
       headers: { 'Content-Type': 'text/plain; charset=utf-8' },

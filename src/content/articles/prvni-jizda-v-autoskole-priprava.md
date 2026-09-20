@@ -1,5 +1,6 @@
 ---
 title: 'Jak se připravit na první jízdu v autoškole: Tipy pro klidný start na Praze 8'
+seoTitle: 'První jízda v autoškole: jak se připravit'
 description: 'Bojíte se první jízdy? Přečtěte si, co vás čeká v Autoškole BuBu na Střížkově. Poradíme vám, co si vzít na sebe a jak probíhá první lekce na našem cvičišti.'
 slug: 'prvni-jizda-v-autoskole-priprava'
 canonical: 'https://www.autoskolabubu.cz/blog/prvni-jizda-v-autoskole-priprava'
@@ -17,13 +18,13 @@ readingTime: 3
 
 První jízda v autoškole je pro většinu lidí velký milník. Pro někoho splněný sen, pro jiného chvíle plná nervozity. V Autoškole BuBu na Střížkově moc dobře víme, že první usednutí za volant vyvolává spoustu otázek. Dobrá zpráva? Od začátečníka nikdo nečeká dokonalost! Pokud ale víte, jak se připravit, první lekce pro vás bude příjemným zážitkem místo stresu. Tady je náš návod, jak na to.
 
-## 
+##
 
 ## 1. Základní teorie (nebojte se, stačí základy)
 
 Nemusíte znát zákon o silničním provozu nazpaměť. Pomůže vám ale, když budete vědět, co znamená červená na semaforu nebo jak vypadá značka „Dej přednost v jízdě“. Čím méně budete přemýšlet nad teorií, tím více kapacity vám zbude na ovládání volantu a pedálů.
 
-## 
+##
 
 ## 2. Instruktor je váš parťák, ne zkoušející
 
@@ -45,7 +46,7 @@ Psychika je u řízení 90 % úspěchu. Jak se na to připravit?
 
 - Jídlo: Nechoďte s úplně prázdným žaludkem, ale vyhněte se i těžkým jídlům. Lehké občerstvení vám dodá energii.
 
-## 
+##
 
 ## 4. Správné boty jsou základ citu
 
@@ -57,7 +58,7 @@ Pro první lekci je nejdůležitější obuv. Potřebujete cítit odpor pedálů
 
 - Oblečení: Zvolte cokoli, co vás neškrtí a umožňuje vám volný pohyb rukou i nohou.
 
-## 
+##
 
 ## 5. Nebojte se zeptat na cokoli
 
@@ -75,7 +76,7 @@ V Autoškole BuBu razíme pravidlo, že žádná otázka není hloupá. Pokud v�
 
 ## 7. Kde probíhají první jízdy v
 
- Autoškole BuBu?
+Autoškole BuBu?
 
 Začínáme v lokalitách, které jsou pro začátečníky přátelské. Naše zázemí na Střížkově (Praha 8) nám umožňuje vyjet do klidnějších částí, kde si v klidu osvojíte základy řízení, než se vydáme do hustšího pražského provozu.
 
@@ -89,13 +90,13 @@ Získání řidičáku je velký krok k vaší nezávislosti. V Autoškole BuBu 
 
 Sebejistota za volantem přichází s praxí. Nezapomeňte, že každý začátek je těžký. Věnujte se řízení pravidelně. Čím více času strávíte za volantem, tím lépe se budete cítit.
 
-## 
+##
 
 ## 10. Učení se od ostatních
 
 Naučte se také od ostatních řidičů. Sledujte, jak se chovají na silnici. Učte se z jejich chyb i úspěchů. Všímejte si, jak reagují v různých situacích. To vám pomůže rozvinout vaše dovednosti.
 
-## 
+##
 
 ## 11. Závěrem
 

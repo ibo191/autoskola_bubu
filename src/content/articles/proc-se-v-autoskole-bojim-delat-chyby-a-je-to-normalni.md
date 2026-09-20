@@ -1,5 +1,6 @@
 ---
 title: 'Autoškola BuBu: Proč jsou chyby klíčem k sebevědomému řízení'
+seoTitle: 'Chyby v autoškole: proč se jich nebát'
 description: 'Bojíte se chyb v autoškole? Zjistěte, proč je strach normální a jak kvalitní autoškola v Praze 8 nebo Kladně vytváří bezpečný prostor pro učení bez stresu.'
 slug: 'proc-se-v-autoskole-bojim-delat-chyby-a-je-to-normalni'
 canonical: 'https://www.autoskolabubu.cz/blog/proc-se-v-autoskole-bojim-delat-chyby-a-je-to-normalni'

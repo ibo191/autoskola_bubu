@@ -1,14 +1,99 @@
 ---
 import type { Course } from '../lib/catalog';
-interface Props { course: Course; }
+import { courseFaqs } from '../lib/course-faq';
+interface Props {
+  course: Course;
+}
 const { course } = Astro.props;
-const questions = course.id === 'b-automat'
-  ? [['Můžu po kurzu na automat řídit manuál?', 'Ne. Oprávnění bude platit pro vozidla s automatickou převodovkou. Pokud chcete řídit i manuál, zvolte klasickou skupinu B.'], ['Je automat vhodný pro začátečníka?', 'Ano. Můžete se více soustředit na provoz, přednosti a bezpečnou jízdu.'], ['Kde výcvik na automat probíhá?', 'Výcvik na automat nabízíme na pobočce Praha 8 – Střížkov.']]
-  : course.id === 'l17'
-    ? [['Co znamená režim L17?', 'Po úspěšné zkoušce můžete řídit od 17 let s předepsaným mentorem až do dovršení 18 let.'], ['Je kurz L17 jiný než běžná skupina B?', 'Výuka a výcvik odpovídají skupině B. Rozdíl je v navazujícím řízení s mentorem po získání oprávnění.'], ['Co vyřídíme při zápisu?', 'Společně projdeme dokumenty, platbu, termín začátku kurzu a vše potřebné pro zahájení výuky.']]
-    : [['Jak se přihlásím do kurzu?', 'Online vyplníte objednávku a v posledním kroku si zvolíte termín zápisu. E-mail není nutné předem ověřovat.'], ['Co vyřeším na pobočce?', 'Při zápisu spolu projdeme dokumenty, domluvíme platbu a oznámíme vám datum zahájení kurzu.'], ['Mohu dělat skupinu B na automat?', 'Ano. Výcvik na automat nabízíme na Střížkově. Pokud chcete později řídit manuál, zvolte klasickou skupinu B.'], ['Jak probíhá teorie a výcvik?', 'Výuka má jasný postup. Teorie se propojuje s jízdami a kromě zákonného minima se věnujeme i reálným situacím v provozu.']];
+const questions = courseFaqs(course);
 ---
-<section class="section course-faq" id="faq"><div class="container"><div class="faq-head"><div><span class="eyebrow">Časté otázky</span><h2>Skupina B bez nejasností.</h2></div><p>Praktické odpovědi před objednávkou. Pokud zde něco chybí, napište nám nebo zavolejte.</p></div><div class="faq-list">{questions.map(([question, answer]) => <details><summary>{question}<span aria-hidden="true">+</span></summary><p>{answer}</p></details>)}</div></div></section>
+
+<section class="section course-faq" id="faq">
+  <div class="container">
+    <div class="faq-head">
+      <div><span class="eyebrow">Časté otázky</span><h2>Skupina B bez nejasností.</h2></div><p>
+        Praktické odpovědi před objednávkou. Pokud zde něco chybí, napište nám nebo zavolejte.
+      </p>
+    </div><div class="faq-list">
+      {
+        questions.map(([question, answer]) => (
+          <details>
+            <>
+              <summary>
+                {question}
+                <span aria-hidden="true">+</span>
+              </summary>
+              <p>{answer}</p>
+            </>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
 <style>
-.course-faq{background:var(--canvas)}.faq-head{display:flex;justify-content:space-between;align-items:end;gap:36px;margin-bottom:28px}.faq-head p{max-width:440px;font-size:.9rem}.faq-list{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:white}details+details{border-top:1px solid var(--line)}summary{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:19px 22px;cursor:pointer;font-weight:720;font-size:.93rem;list-style:none}summary::-webkit-details-marker{display:none}summary span{color:var(--brand-dark);font-size:1.3rem}details[open] summary span{transform:rotate(45deg)}details p{padding:0 22px 20px;max-width:860px;font-size:.9rem;line-height:1.7}@media(max-width:680px){.faq-head{display:block}.faq-head p{margin-top:16px}summary{padding:17px}details p{padding:0 17px 18px}}
+  .course-faq {
+    background: var(--canvas);
+  }
+  .faq-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 36px;
+    margin-bottom: 28px;
+  }
+  .faq-head p {
+    max-width: 440px;
+    font-size: 0.9rem;
+  }
+  .faq-list {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    background: white;
+  }
+  details + details {
+    border-top: 1px solid var(--line);
+  }
+  summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 19px 22px;
+    cursor: pointer;
+    font-weight: 720;
+    font-size: 0.93rem;
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary span {
+    color: var(--brand-dark);
+    font-size: 1.3rem;
+  }
+  details[open] summary span {
+    transform: rotate(45deg);
+  }
+  details p {
+    padding: 0 22px 20px;
+    max-width: 860px;
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  @media (max-width: 680px) {
+    .faq-head {
+      display: block;
+    }
+    .faq-head p {
+      margin-top: 16px;
+    }
+    summary {
+      padding: 17px;
+    }
+    details p {
+      padding: 0 17px 18px;
+    }
+  }
 </style>

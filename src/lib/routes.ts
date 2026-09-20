@@ -6,6 +6,8 @@ export const publicRoutes = [
   '/kontakt',
   '/o-nas',
   '/blog',
+  '/black-friday',
+  '/vanoce',
   ...branches.map((b) => `/${b.id}`),
   ...courses.map((c) => `/kurzy/${c.slug}`),
 ];

@@ -3,6 +3,7 @@ import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
 
 type ArticleFrontmatter = {
   title: string;
+  seoTitle?: string;
   description: string;
   slug?: string;
   canonical: string;

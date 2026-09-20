@@ -1,6 +1,7 @@
 ---
 title: 'Jak na bezpečné řízení Praha: Tipy a triky pro Prahu 8'
-description: 'Jak se v pražském provozu připravit na cyklisty, chodce, tramvaje, křižovatky i stres.'
+seoTitle: 'Bezpečné řízení v Praze: praktické tipy'
+description: 'Praktické tipy pro bezpečné řízení v Praze 8: cyklisté, chodci, tramvaje, křižovatky i práce se stresem. Naučte se číst provoz s větším klidem.'
 slug: 'bezpecne-rizeni-praha-8'
 canonical: 'https://www.autoskolabubu.cz/blog/bezpecne-rizeni-praha-8'
 publishedAt: '2026-02-05T09:00:00.000Z'
@@ -39,23 +40,23 @@ Teď už víš, co je potřeba sledovat. Ale jak to udělat, aby ses opravdu cí
 
 ## 1. Plánuj trasu dopředu
 
- Než vyjedeš, mrkni na mapu nebo navigaci. Vyhni se místům, kde jsou často dopravní zácpy nebo opravy. Praha 8 má několik oblastí, kde se to může zkomplikovat, například kolem Palmovky nebo Kobylis.
+Než vyjedeš, mrkni na mapu nebo navigaci. Vyhni se místům, kde jsou často dopravní zácpy nebo opravy. Praha 8 má několik oblastí, kde se to může zkomplikovat, například kolem Palmovky nebo Kobylis.
 
 ## 2. Buď vidět a slyšet
 
- Zapni si světla i přes den, ať tě ostatní řidiči a chodci lépe vidí. Používej klakson jen v případě nutnosti, ne jako projev frustrace.
+Zapni si světla i přes den, ať tě ostatní řidiči a chodci lépe vidí. Používej klakson jen v případě nutnosti, ne jako projev frustrace.
 
 ## 3. Dodržuj rychlostní limity
 
- V Praze 8 jsou často zóny s omezením na 30 km/h, hlavně v obytných částech. Respektuj je, jde o bezpečnost všech.
+V Praze 8 jsou často zóny s omezením na 30 km/h, hlavně v obytných částech. Respektuj je, jde o bezpečnost všech.
 
 ## 4. Buď připravený na nečekané situace
 
- Děti, senioři, nebo zvířata mohou náhle vběhnout do vozovky. Měj oči na stopkách a buď připravený zastavit.
+Děti, senioři, nebo zvířata mohou náhle vběhnout do vozovky. Měj oči na stopkách a buď připravený zastavit.
 
 ## 5. Zvládni parkování
 
- Parkování v Praze 8 může být oříšek. Nauč se parkovat nejen na rovné ploše, ale i v mírných svazích a úzkých uličkách. Pomůže ti to ušetřit nervy i čas.
+Parkování v Praze 8 může být oříšek. Nauč se parkovat nejen na rovné ploše, ale i v mírných svazích a úzkých uličkách. Pomůže ti to ušetřit nervy i čas.
 
 A pokud chceš mít jistotu, že to zvládneš opravdu dobře, zvaž lekce s profesionály. Já osobně doporučuji Autoškolu BuBu Praha 8 – autoškolu, kde tě naučí všechno od základů až po pokročilé techniky řízení.
 

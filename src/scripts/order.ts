@@ -236,7 +236,7 @@ document.querySelectorAll<HTMLElement>('[data-order]').forEach((button) => {
     field('course').value = button.dataset.course ?? '';
     field('branch').value = button.dataset.branch ?? '';
     dialog.showModal();
-    document.body.style.overflow = 'hidden';
+    document.body.classList.add('dialog-open');
     void updateQuote();
   });
   button.removeAttribute('disabled');
@@ -278,7 +278,7 @@ dialog.addEventListener('keydown', (event) => {
   }
 });
 dialog.addEventListener('close', () => {
-  document.body.style.overflow = '';
+  document.body.classList.remove('dialog-open');
   trigger?.focus();
 });
 document.querySelector('.close-dialog')!.addEventListener('click', requestClose);

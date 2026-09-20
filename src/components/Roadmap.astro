@@ -54,7 +54,7 @@ const steps = [
         </h2>
       </div><a class="text-link" href="/jak-probiha-vyuka">Jak probíhá výuka ↗</a>
     </div>
-    <ol class="roadmap" style="--road-progress: 0%">
+    <ol class="roadmap" data-road-progress="0">
       {
         steps.map((step, i) => (
           <li class:list={{ active: i === 0 }}>
@@ -116,13 +116,14 @@ const steps = [
           step.closest('li')?.classList.toggle('active', active);
         });
         details?.forEach((detail, detailIndex) => (detail.hidden = detailIndex !== index));
-        roadmap.style.setProperty('--road-progress', `${(index / (buttons.length - 1)) * 100}%`);
+        roadmap.dataset.roadProgress = String(index);
       });
     });
   });
 </script>
 <style>
   .roadmap {
+    --road-progress: 0%;
     position: relative;
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -139,6 +140,21 @@ const steps = [
     left: 0;
     height: 3px;
     border-radius: 3px;
+  }
+  .roadmap[data-road-progress='1'] {
+    --road-progress: 20%;
+  }
+  .roadmap[data-road-progress='2'] {
+    --road-progress: 40%;
+  }
+  .roadmap[data-road-progress='3'] {
+    --road-progress: 60%;
+  }
+  .roadmap[data-road-progress='4'] {
+    --road-progress: 80%;
+  }
+  .roadmap[data-road-progress='5'] {
+    --road-progress: 100%;
   }
   .roadmap::before {
     width: 100%;

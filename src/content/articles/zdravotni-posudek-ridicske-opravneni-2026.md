@@ -1,6 +1,7 @@
 ---
 title: 'Zdravotní posudek k řidičskému oprávnění od roku 2026'
-description: 'Jak dnes funguje elektronický lékařský posudek, kde ho uvidíte a co řešit před nástupem do autoškoly.'
+seoTitle: 'Zdravotní posudek k řidičáku v roce 2026'
+description: 'Zdravotní posudek k řidičskému oprávnění v roce 2026: kdo jej vystaví, jak funguje elektronický záznam v EZKartě a co doložit před nástupem do autoškoly.'
 slug: 'zdravotni-posudek-ridicske-opravneni-2026'
 canonical: 'https://www.autoskolabubu.cz/blog/zdravotni-posudek-ridicske-opravneni-2026'
 publishedAt: '2026-01-10T09:00:00.000Z'
@@ -20,6 +21,7 @@ readingTime: 3
 Elektronický posudek, méně papírů a jednodušší cesta do autoškoly Od 1. ledna 2026 vstupují v platnost významné změny v oblasti zdravotních posudků k řidičskému průkazu. Nově budou lékařské posudky o zdravotní způsobilosti k řízení motorových vozidel vydávány primárně v elektronické podobě. Cílem změn je zjednodušení administrativy, rychlejší proces a menší zátěž pro žadatele o řidičské oprávnění i autoškoly.
 
 Co se mění od 1. 1. 2026? Hlavní změnou je zavedení elektronického zdravotního posudku, který lékař zapisuje do Kmenového registru pacientů Ministerstva zdravotnictví ČR. Hlavní přínosy změny:
+
 - elektronické vydávání zdravotních posudků,
 - méně papírových dokumentů,
 - možnost online ověření posudku,
@@ -27,6 +29,7 @@ Co se mění od 1. 1. 2026? Hlavní změnou je zavedení elektronického zdravot
 - rychlejší proces při přihlášení do autoškoly.
 
 Elektronický zdravotní posudek k řízení Kdo má elektronický posudek? Pokud je žadatel evidován v základním registru obyvatel, lékař:
+
 - zapíše zdravotní posudek elektronicky,
 - není nutné nosit papírový dokument. Jak prokázat zdravotní způsobilost? Zdravotní způsobilost k řízení lze doložit:
 - prostřednictvím mobilní aplikace EZ Karta,
@@ -34,17 +37,20 @@ Elektronický zdravotní posudek k řízení Kdo má elektronický posudek? Poku
 - nebo pomocí PDF verze posudku, kterou si žadatel může stáhnout. Zkušební komisař má možnost ověřit platnost posudku elektronicky.
 
 Papírový zdravotní posudek: kdy je potřeba? Papírová forma zdravotního posudku zůstává zachována, ale pouze v těchto případech:
+
 - pokud o papírový posudek žadatel výslovně požádá,
 - pokud žadatel není evidován v základním registru obyvatel. Ve všech ostatních případech je elektronický posudek plnohodnotnou náhradou. Zdravotní posudek a nástup do autoškoly Při přihlášení do autoškoly nadále platí důležité pravidlo: Zdravotní posudek nesmí být starší než 3 měsíce Toto pravidlo se nemění. Mění se pouze forma předkládání zdravotní způsobilosti – nově především elektronicky.
 
 Co když nejsem v registru obyvatel?
 
 U osob, které nejsou evidovány v základním registru obyvatel (např. někteří cizinci), zůstává postup stejný jako doposud:
+
 - lékař vystaví papírový zdravotní posudek,
 - posudek se přikládá k žádosti do autoškoly,
 - kontrola probíhá fyzicky.
 
 Shrnutí změn zdravotních posudků od roku 2026
+
 - elektronický zdravotní posudek je nový standard,
 - papírový posudek pouze na vyžádání nebo ve výjimečných případech,
 - možnost online prokázání zdravotní způsobilosti,

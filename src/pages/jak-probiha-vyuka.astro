@@ -4,11 +4,44 @@ import Base from '../layouts/Base.astro';
 import Roadmap from '../components/Roadmap.astro';
 import Faq from '../components/Faq.astro';
 import FinalCta from '../components/FinalCta.astro';
+import { faqGroups } from '../lib/faqs';
+
+const schema = [
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Domů', item: 'https://www.autoskolabubu.cz/' },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Jak probíhá výuka',
+        item: 'https://www.autoskolabubu.cz/jak-probiha-vyuka',
+      },
+    ],
+  },
+  {
+    '@type': 'FAQPage',
+    mainEntity: faqGroups.flatMap((group) =>
+      group.items.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer
+            .replace(/<[^>]+>/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim(),
+        },
+      })),
+    ),
+  },
+];
 ---
 
 <Base
   title="Jak probíhá výuka"
   description="Pět kroků k řidičáku v Autoškole BuBu: online objednávka, osobní zápis, teorie, praktické jízdy a závěrečná zkouška."
+  schema={schema}
   ><section class="page-hero learning-hero">
     <div class="learning-hero-shape learning-hero-shape-left" aria-hidden="true"></div>
     <div class="learning-hero-shape learning-hero-shape-right" aria-hidden="true"></div>
@@ -21,7 +54,7 @@ import FinalCta from '../components/FinalCta.astro';
         </h1><p class="lead">
           Nemusíte znát celý postup předem. Tady je přehled toho, co spolu projdeme.
         </p>
-      </div><img class="learning-hero-bubak" src="/brand/bubak.png" alt="" aria-hidden="true" /><p
+      </div><img class="learning-hero-bubak" src="/brand/bubak.webp" alt="" aria-hidden="true" /><p
         class="learning-hero-note"
         aria-hidden="true"
       >
