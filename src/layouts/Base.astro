@@ -93,9 +93,9 @@ const nav = [
     /><script is:inline>
       document.documentElement.classList.add('js');
     </script><title>{pageTitle}</title><meta name="description" content={description} /><link
-      rel="canonical"
-      href={canonical}
-    /><meta
+       rel="canonical"
+       href={canonical}
+    /><link rel="sitemap" href="/sitemap-index.xml" /><meta
       name="robots"
       content={noindex || !isProduction ? 'noindex, nofollow' : 'index, follow'}
     /><meta property="og:title" content={pageTitle} /><meta
