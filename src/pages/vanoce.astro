@@ -404,6 +404,8 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte zálohu
 </Base>
 
 <script>
+  import { getRecaptchaToken } from '../scripts/recaptcha';
+
   const voucherForm = document.querySelector<HTMLFormElement>('#voucher-form');
   const voucherStatus = document.querySelector<HTMLElement>('#voucher-status');
   const campaignName = 'vanoce';
@@ -490,35 +492,37 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte zálohu
     if (!submit) return;
     submit.disabled = true;
     voucherStatus.textContent = 'Odesíláme rezervaci…';
-    const body = {
-      campaignId: 'vanoce',
-      contact: {
-        firstName: collect(form, 'firstName'),
-        lastName: collect(form, 'lastName'),
-        email: collect(form, 'email'),
-        phone: collect(form, 'phone'),
-      },
-      selection: {
-        course: collect(form, 'course') || undefined,
-        branch: collect(form, 'branch') || undefined,
-        bonusVariant: collect(form, 'bonusVariant'),
-        deliveryMethod: collect(form, 'deliveryMethod') || 'shipping',
-      },
-      payload: {
-        recipientFirstName: collect(form, 'recipientFirstName'),
-        recipientLastName: collect(form, 'recipientLastName'),
-        message: collect(form, 'message'),
-        delivery: {
-          method: collect(form, 'deliveryMethod') || 'shipping',
-          street: collect(form, 'street'),
-          city: collect(form, 'city'),
-          zip: collect(form, 'zip'),
-        },
-      },
-      termsAccepted: checked(form, 'terms'),
-      marketingAccepted: checked(form, 'marketing'),
-    };
     try {
+      const recaptchaToken = await getRecaptchaToken('campaign_request');
+      const body = {
+        campaignId: 'vanoce',
+        contact: {
+          firstName: collect(form, 'firstName'),
+          lastName: collect(form, 'lastName'),
+          email: collect(form, 'email'),
+          phone: collect(form, 'phone'),
+        },
+        selection: {
+          course: collect(form, 'course') || undefined,
+          branch: collect(form, 'branch') || undefined,
+          bonusVariant: collect(form, 'bonusVariant'),
+          deliveryMethod: collect(form, 'deliveryMethod') || 'shipping',
+        },
+        payload: {
+          recipientFirstName: collect(form, 'recipientFirstName'),
+          recipientLastName: collect(form, 'recipientLastName'),
+          message: collect(form, 'message'),
+          delivery: {
+            method: collect(form, 'deliveryMethod') || 'shipping',
+            street: collect(form, 'street'),
+            city: collect(form, 'city'),
+            zip: collect(form, 'zip'),
+          },
+        },
+        termsAccepted: checked(form, 'terms'),
+        marketingAccepted: checked(form, 'marketing'),
+        recaptchaToken,
+      };
       const response = await fetch('/api/campaign-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -526,7 +530,11 @@ const heroPerex = `Vánoční poukaz na kurz Autoškoly BUBU. Zaplatíte zálohu
       });
       const result = await response.json();
       if (!response.ok || !result.ok)
-        throw new Error(result.message || 'Formulář se nepodařilo odeslat.');
+        throw new Error(
+          result.code === 'CAPTCHA_FAILED'
+            ? 'Odeslání se nepodařilo. Zkuste to prosím znovu.'
+            : result.message || 'Formulář se nepodařilo odeslat.',
+        );
       window.dispatchEvent(
         new CustomEvent('bubu:tracking', {
           detail: {

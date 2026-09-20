@@ -1,5 +1,6 @@
 import { money } from '../lib/format';
 import type { Quote, Selection } from '../lib/pricing/quote';
+import { getRecaptchaToken } from './recaptcha';
 
 type Slot = { id: string; branch: string; startsAt: string; endsAt: string; remaining: number };
 
@@ -19,40 +20,9 @@ const selectedSlotLabel = document.querySelector<HTMLElement>('#selected-slot-la
 const motoPackageCards = document.querySelector<HTMLElement>('#moto-package-cards')!;
 const motoPackageOptions = document.querySelector<HTMLElement>('#moto-package-options')!;
 
-declare global {
-  interface Window {
-    grecaptcha?: {
-      ready(callback: () => void): void;
-      execute(siteKey: string, options: { action: string }): Promise<string>;
-    };
-  }
-}
-
-let recaptchaScript: Promise<void> | undefined;
-
 async function getCaptchaToken() {
   if (dialog.dataset.captchaRequired !== 'true') return 'preview-order-submission';
-  const siteKey = dialog.dataset.recaptchaSiteKey;
-  if (!siteKey) throw new Error('CAPTCHA_NOT_CONFIGURED');
-  if (!recaptchaScript) {
-    recaptchaScript = new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = `https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(siteKey)}`;
-      script.async = true;
-      script.defer = true;
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error('CAPTCHA_LOAD_FAILED'));
-      document.head.append(script);
-    });
-  }
-  await recaptchaScript;
-  const captcha = window.grecaptcha;
-  if (!captcha) throw new Error('CAPTCHA_LOAD_FAILED');
-  return new Promise<string>((resolve, reject) => {
-    captcha.ready(() => {
-      captcha.execute(siteKey, { action: 'create_order' }).then(resolve, reject);
-    });
-  });
+  return getRecaptchaToken('order');
 }
 
 let step = 0;

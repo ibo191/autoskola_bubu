@@ -108,7 +108,7 @@ test('order workflow fails closed while legal texts are not approved', async () 
 
 test('order workflow recalculates price, stores a hash, then sends customer and internal order messages', async () => {
   const f = fixture();
-  const captchaToken = f.captcha.issue('create_order', now);
+  const captchaToken = f.captcha.issue('order', now);
   const result = await f.execute({ ...baseBody, captchaToken });
   assert.equal(result.ok, true);
   assert.equal(f.repository.calls.length, 1);
@@ -138,12 +138,12 @@ test('order workflow recalculates price, stores a hash, then sends customer and 
 
 test('client price fields and stale price versions are rejected', async () => {
   const f = fixture();
-  let token = f.captcha.issue('create_order', now);
+  let token = f.captcha.issue('order', now);
   assert.deepEqual(await f.execute({ ...baseBody, captchaToken: token, amount: 1 }), {
     ok: false,
     code: 'INVALID_REQUEST',
   });
-  token = f.captcha.issue('create_order', now);
+  token = f.captcha.issue('order', now);
   assert.deepEqual(await f.execute({ ...baseBody, captchaToken: token, priceVersion: 'old' }), {
     ok: false,
     code: 'QUOTE_CHANGED',
@@ -153,7 +153,7 @@ test('client price fields and stale price versions are rejected', async () => {
 
 test('Kladno stores a complete order without a booking slot and asks staff to arrange the appointment', async () => {
   const f = fixture();
-  const captchaToken = f.captcha.issue('create_order', now);
+  const captchaToken = f.captcha.issue('order', now);
   const result = await f.execute({
     ...baseBody,
     slotId: undefined,
@@ -183,7 +183,7 @@ test('invalid contact, honeypot and failed captcha never reach storage', async (
 test('storage failure sends no verification message', async () => {
   const f = fixture();
   f.repository.shouldFail = true;
-  const captchaToken = f.captcha.issue('create_order', now);
+  const captchaToken = f.captcha.issue('order', now);
   assert.deepEqual(await f.execute({ ...baseBody, captchaToken }), {
     ok: false,
     code: 'STORAGE_FAILED',
@@ -193,8 +193,10 @@ test('storage failure sends no verification message', async () => {
 
 test('sixth order attempt in ten minutes is rate limited', async () => {
   const f = fixture();
-  for (let attempt = 0; attempt < 5; attempt += 1) await f.execute();
-  assert.deepEqual(await f.execute(), {
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    await f.execute({ ...baseBody, captchaToken: f.captcha.issue('order', now) });
+  }
+  assert.deepEqual(await f.execute({ ...baseBody, captchaToken: f.captcha.issue('order', now) }), {
     ok: false,
     code: 'RATE_LIMITED',
     retryAfterSeconds: 600,

@@ -33,7 +33,6 @@ function vercelOrigin(env: Record<string, string | undefined>) {
 export function readConfig(env: Record<string, string | undefined>) {
   const isVercel = env.VERCEL === '1';
   const isProductionDeployment = isVercel && env.VERCEL_ENV === 'production';
-  const recaptchaConfigured = Boolean(env.RECAPTCHA_SECRET_KEY && env.PUBLIC_RECAPTCHA_SITE_KEY);
   const value = schema.parse(
     isVercel
       ? {
@@ -42,7 +41,9 @@ export function readConfig(env: Record<string, string | undefined>) {
           APP_ORIGIN: vercelOrigin(env),
           // These are deployment-owned choices. Do not let obsolete Vercel variables such as
           // "smtp" or "gtm" break prerendering; production secrets are checked below.
-          RECAPTCHA_ADAPTER: isProductionDeployment && recaptchaConfigured ? 'recaptcha' : 'local',
+          // Production always uses the server verifier. If its key is missing, the verifier
+          // fails closed per request instead of allowing a local/preview bypass.
+          RECAPTCHA_ADAPTER: isProductionDeployment ? 'recaptcha' : 'local',
           EMAIL_ADAPTER: isProductionDeployment ? 'lettermint' : 'local',
           ANALYTICS_ADAPTER: isProductionDeployment ? 'google-meta' : 'noop',
         }

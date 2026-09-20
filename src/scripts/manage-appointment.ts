@@ -1,4 +1,5 @@
 type Slot = { id: string; branch: string; startsAt: string; endsAt: string; remaining: number };
+import { getRecaptchaToken } from './recaptcha';
 const root = document.querySelector<HTMLElement>('[data-manage-order]');
 if (root) {
   const code = root.dataset.manageOrder!;
@@ -44,17 +45,25 @@ if (root) {
           selectedLabel.textContent = `Vybraný nový termín: ${time(slot.startsAt, slot.endsAt)}.`;
         button.disabled = true;
         message.textContent = 'Ukládáme nový termín…';
-        const response = await fetch(`/api/orders/${encodeURIComponent(code)}/reschedule`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ slotId: slot.id }),
-        });
-        const result = await response.json().catch(() => ({ ok: false }));
-        if (response.ok && result.ok) {
-          window.location.href = `/dekujeme?kod=${encodeURIComponent(code)}`;
-          return;
+        try {
+          const recaptchaToken = await getRecaptchaToken('reservation');
+          const response = await fetch(`/api/orders/${encodeURIComponent(code)}/reschedule`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ slotId: slot.id, recaptchaToken }),
+          });
+          const result = await response.json().catch(() => ({ ok: false }));
+          if (response.ok && result.ok) {
+            window.location.href = `/dekujeme?kod=${encodeURIComponent(code)}`;
+            return;
+          }
+          message.textContent =
+            result.code === 'CAPTCHA_FAILED'
+              ? 'Odeslání se nepodařilo. Zkuste to prosím znovu.'
+              : 'Termín se nepodařilo změnit. Zkuste prosím jiný čas.';
+        } catch {
+          message.textContent = 'Odeslání se nepodařilo. Zkuste to prosím znovu.';
         }
-        message.textContent = 'Termín se nepodařilo změnit. Zkuste prosím jiný čas.';
         button.disabled = false;
       });
       slotsEl.append(button);
@@ -121,12 +130,23 @@ if (root) {
   document.querySelector('#cancel-appointment')!.addEventListener('click', async () => {
     if (!confirm('Opravdu chcete zrušit termín zápisu? Objednávka zůstane v systému.')) return;
     message.textContent = 'Rušíme termín…';
-    const response = await fetch(`/api/orders/${encodeURIComponent(code)}/cancel`, {
-      method: 'POST',
-    });
-    const result = await response.json().catch(() => ({ ok: false }));
-    message.textContent =
-      response.ok && result.ok ? 'Termín zápisu byl zrušen.' : 'Termín se nepodařilo zrušit.';
+    try {
+      const recaptchaToken = await getRecaptchaToken('reservation');
+      const response = await fetch(`/api/orders/${encodeURIComponent(code)}/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recaptchaToken }),
+      });
+      const result = await response.json().catch(() => ({ ok: false }));
+      message.textContent =
+        response.ok && result.ok
+          ? 'Termín zápisu byl zrušen.'
+          : result.code === 'CAPTCHA_FAILED'
+            ? 'Odeslání se nepodařilo. Zkuste to prosím znovu.'
+            : 'Termín se nepodařilo zrušit.';
+    } catch {
+      message.textContent = 'Odeslání se nepodařilo. Zkuste to prosím znovu.';
+    }
   });
   void load();
 }

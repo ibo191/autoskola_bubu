@@ -4,6 +4,7 @@ import { CampaignRequestRepository, campaignRequestSchema } from '../../lib/camp
 import { assertSameOrigin } from '../../lib/server/live-order';
 import { createTransactionalEmailAdapter, orderNotificationEmail } from '../../lib/server/email';
 import { contactFormEmail } from '../../lib/server/email/templates';
+import { verifyRecaptcha } from '../../lib/server/recaptcha';
 
 export const prerender = false;
 
@@ -41,6 +42,19 @@ export const POST: APIRoute = async ({ request }) => {
       return Response.json(
         { ok: false, code: 'INVALID_REQUEST', issues: parsed.error.issues },
         { status: 422, headers: { 'Cache-Control': 'no-store' } },
+      );
+    }
+    const captchaValid = await verifyRecaptcha(parsed.data.recaptchaToken, 'campaign_request', {
+      hostname: new URL(request.url).hostname,
+    });
+    if (!captchaValid) {
+      return Response.json(
+        {
+          ok: false,
+          code: 'CAPTCHA_FAILED',
+          message: 'Odeslání se nepodařilo. Zkuste to prosím znovu.',
+        },
+        { status: 403, headers: { 'Cache-Control': 'no-store' } },
       );
     }
     const deliveryMethod =

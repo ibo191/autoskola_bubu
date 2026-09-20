@@ -24,7 +24,6 @@ const canonical = new URL(path, 'https://www.autoskolabubu.cz').href;
 const isProduction =
   process.env.VERCEL_ENV === 'production' || process.env.APP_ENV === 'production';
 const recaptchaSiteKey = import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY ?? '';
-const recaptchaRequired = Boolean(recaptchaSiteKey && process.env.RECAPTCHA_SECRET_KEY);
 const nav = [
   ['/kurzy', 'Kurzy'],
   ['/cenik', 'Ceník'],
@@ -67,7 +66,7 @@ const nav = [
         />
       )
     }</head
-  ><body>
+  ><body data-recaptcha-site-key={recaptchaSiteKey}>
     <a class="skip" href="#main">Přeskočit na obsah</a>
     {
       !hideHeader && (
@@ -180,10 +179,7 @@ const nav = [
         </footer>
       )
     }
-    <OrderDialog
-      recaptchaSiteKey={recaptchaSiteKey}
-      captchaRequired={isProduction && recaptchaRequired}
-    />
+    <OrderDialog recaptchaSiteKey={recaptchaSiteKey} captchaRequired={isProduction} />
     <CookieConsent />
     <script>
       const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');

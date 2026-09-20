@@ -1,9 +1,4 @@
-export type CaptchaAction =
-  | 'create_order'
-  | 'verify_email'
-  | 'resend_verification'
-  | 'reschedule_appointment'
-  | 'cancel_appointment';
+export type CaptchaAction = 'order' | 'reservation' | 'contact' | 'campaign_request';
 export interface CaptchaAdapter {
   verify(input: {
     token: string;

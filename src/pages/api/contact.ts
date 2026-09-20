@@ -6,6 +6,7 @@ import {
   isTransactionalEmailConfigured,
 } from '../../lib/server/email';
 import { contactFormEmail } from '../../lib/server/email/templates';
+import { verifyRecaptcha } from '../../lib/server/recaptcha';
 
 export const prerender = false;
 
@@ -20,6 +21,7 @@ const bodySchema = z
     subject: z.string().trim().max(160).optional().default('Dotaz z webu'),
     message: z.string().trim().min(5).max(2500),
     website: z.literal('').default(''),
+    recaptchaToken: z.string().max(4096).optional(),
   })
   .strict();
 
@@ -38,6 +40,19 @@ export const POST: APIRoute = async ({ request }) => {
     const parsed = bodySchema.safeParse(await readJson(request));
     if (!parsed.success) {
       return Response.json({ ok: false, code: 'INVALID_REQUEST' }, { status: 422 });
+    }
+    const captchaValid = await verifyRecaptcha(parsed.data.recaptchaToken, 'contact', {
+      hostname: new URL(request.url).hostname,
+    });
+    if (!captchaValid) {
+      return Response.json(
+        {
+          ok: false,
+          code: 'CAPTCHA_FAILED',
+          message: 'Odeslání se nepodařilo. Zkuste to prosím znovu.',
+        },
+        { status: 403, headers: { 'Cache-Control': 'no-store' } },
+      );
     }
     if (!isTransactionalEmailConfigured(process.env)) {
       return Response.json(

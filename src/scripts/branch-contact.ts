@@ -1,4 +1,5 @@
 export {};
+import { getRecaptchaToken } from './recaptcha';
 const forms = document.querySelectorAll<HTMLFormElement>('[data-branch-contact]');
 for (const form of forms) {
   const status = form.querySelector<HTMLElement>('[data-contact-status]')!;
@@ -14,6 +15,13 @@ for (const form of forms) {
     button.textContent = 'Odesíláme…';
     const data = new FormData(form);
     try {
+      let recaptchaToken: string;
+      try {
+        recaptchaToken = await getRecaptchaToken('contact');
+      } catch {
+        status.textContent = 'Odeslání se nepodařilo. Zkuste to prosím znovu.';
+        return;
+      }
       const response = await fetch('/api/branch-contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -24,6 +32,7 @@ for (const form of forms) {
           phone: String(data.get('phone') ?? ''),
           message: String(data.get('message') ?? ''),
           website: String(data.get('website') ?? ''),
+          recaptchaToken,
         }),
       });
       const result = await response.json().catch(() => ({ ok: false }));
@@ -34,7 +43,9 @@ for (const form of forms) {
         status.textContent =
           result.code === 'CONTACT_NOT_CONFIGURED'
             ? 'Formulář je připravený, ale server ještě nemá nastavené odesílání e-mailů.'
-            : 'Dotaz se nepodařilo odeslat. Zkuste prosím zavolat na pobočku.';
+            : result.code === 'CAPTCHA_FAILED'
+              ? 'Odeslání se nepodařilo. Zkuste to prosím znovu.'
+              : 'Dotaz se nepodařilo odeslat. Zkuste prosím zavolat na pobočku.';
       }
     } catch {
       status.textContent = 'Dotaz se nepodařilo odeslat. Zkuste prosím zavolat na pobočku.';

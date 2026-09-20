@@ -13,7 +13,7 @@ const requestSchema = z
     slotId: z.uuid().optional(),
     contact: contactSchema,
     selection: selectionSchema,
-    captchaToken: z.string().min(16).max(512),
+    captchaToken: z.string().max(4096).optional(),
     priceVersion: z.string().min(1).max(80),
     termsAccepted: z.literal(true),
     privacyAccepted: z.literal(true),
@@ -84,6 +84,19 @@ export class CreateOrderService {
   }): Promise<CreateOrderResult> {
     if (!this.dependencies.legal.approved) return { ok: false, code: 'ORDERS_DISABLED' };
 
+    const parsed = requestSchema.safeParse(context.body);
+    if (!parsed.success) return { ok: false, code: 'INVALID_REQUEST' };
+
+    if (!parsed.data.captchaToken) return { ok: false, code: 'CAPTCHA_FAILED' };
+
+    const captchaValid = await this.dependencies.captcha.verify({
+      token: parsed.data.captchaToken,
+      action: 'order',
+      hostname: context.hostname,
+      now: context.now,
+    });
+    if (!captchaValid) return { ok: false, code: 'CAPTCHA_FAILED' };
+
     const rate = await this.dependencies.rateLimiter.consume({
       scope: 'create_order',
       key: context.clientFingerprint,
@@ -93,17 +106,6 @@ export class CreateOrderService {
     });
     if (!rate.allowed)
       return { ok: false, code: 'RATE_LIMITED', retryAfterSeconds: rate.retryAfterSeconds };
-
-    const parsed = requestSchema.safeParse(context.body);
-    if (!parsed.success) return { ok: false, code: 'INVALID_REQUEST' };
-
-    const captchaValid = await this.dependencies.captcha.verify({
-      token: parsed.data.captchaToken,
-      action: 'create_order',
-      hostname: context.hostname,
-      now: context.now,
-    });
-    if (!captchaValid) return { ok: false, code: 'CAPTCHA_FAILED' };
 
     const serverQuote = quote(parsed.data.selection);
     if (!serverQuote.ok) return { ok: false, code: 'SELECTION_UNAVAILABLE' };

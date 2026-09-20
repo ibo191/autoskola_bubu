@@ -57,7 +57,13 @@ export const POST: APIRoute = async ({ request }) => {
       now: new Date(),
     });
     return Response.json(result, {
-      status: result.ok ? 200 : result.code === 'RATE_LIMITED' ? 429 : 422,
+      status: result.ok
+        ? 200
+        : result.code === 'RATE_LIMITED'
+          ? 429
+          : result.code === 'CAPTCHA_FAILED'
+            ? 403
+            : 422,
       headers: { 'Cache-Control': 'no-store' },
     });
   } catch (error) {

@@ -21,6 +21,7 @@ export const campaignRequestSchema = z
     payload: z.record(z.string(), z.unknown()).default({}),
     termsAccepted: z.literal(true),
     marketingAccepted: z.boolean().default(false),
+    recaptchaToken: z.string().max(4096).optional(),
   })
   .strict();
 

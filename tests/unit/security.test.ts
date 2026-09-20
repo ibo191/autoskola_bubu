@@ -4,6 +4,7 @@ import { readConfig } from '../../src/lib/config';
 import { LocalCaptcha, LocalEmail, NoopAnalytics } from '../../src/lib/integrations/local';
 import { createToken, tokenMatches } from '../../src/lib/security/tokens';
 import { contactSchema } from '../../src/lib/validation/contact';
+import { verifyRecaptcha } from '../../src/lib/server/recaptcha';
 test('Stage A rejects production, cloud DB and non-local origin', () => {
   assert.throws(() => readConfig({ APP_ENV: 'production' }));
   assert.throws(() => readConfig({ APP_ORIGIN: 'https://example.com' }));
@@ -73,24 +74,18 @@ test('Vercel production fails closed until required integrations are configured'
     ORDER_NOTIFICATION_EMAIL: 'objednavky@autoskolabubu.cz',
     CRON_SECRET: 'cron-secret',
   });
-  assert.equal(withoutRecaptcha.RECAPTCHA_ADAPTER, 'local');
+  assert.equal(withoutRecaptcha.RECAPTCHA_ADAPTER, 'recaptcha');
 });
 test('Captcha is single-use, action-bound, host-bound and expires', async () => {
   const captcha = new LocalCaptcha({ APP_ENV: 'local' });
   const now = new Date('2026-08-31T10:00:00Z');
-  const token = captcha.issue('create_order', now);
-  assert.equal(
-    await captcha.verify({ token, action: 'create_order', hostname: '127.0.0.1', now }),
-    true,
-  );
-  assert.equal(
-    await captcha.verify({ token, action: 'create_order', hostname: '127.0.0.1', now }),
-    false,
-  );
+  const token = captcha.issue('order', now);
+  assert.equal(await captcha.verify({ token, action: 'order', hostname: '127.0.0.1', now }), true);
+  assert.equal(await captcha.verify({ token, action: 'order', hostname: '127.0.0.1', now }), false);
   assert.equal(
     await captcha.verify({
-      token: captcha.issue('create_order', now),
-      action: 'verify_email',
+      token: captcha.issue('order', now),
+      action: 'contact',
       hostname: '127.0.0.1',
       now,
     }),
@@ -98,8 +93,8 @@ test('Captcha is single-use, action-bound, host-bound and expires', async () => 
   );
   assert.equal(
     await captcha.verify({
-      token: captcha.issue('create_order', now),
-      action: 'create_order',
+      token: captcha.issue('order', now),
+      action: 'order',
       hostname: 'example.com',
       now,
     }),
@@ -107,13 +102,41 @@ test('Captcha is single-use, action-bound, host-bound and expires', async () => 
   );
   assert.equal(
     await captcha.verify({
-      token: captcha.issue('create_order', now),
-      action: 'create_order',
+      token: captcha.issue('order', now),
+      action: 'order',
       hostname: '127.0.0.1',
       now: new Date(now.getTime() + 120000),
     }),
     false,
   );
+});
+test('server reCAPTCHA verification requires success, expected action and a score of at least 0.5', async () => {
+  const env = { RECAPTCHA_SECRET_KEY: 'server-only-test-secret' };
+  const valid = await verifyRecaptcha('valid-token', 'order', {
+    env,
+    hostname: 'www.autoskolabubu.cz',
+    fetcher: async () =>
+      Response.json({
+        success: true,
+        action: 'order',
+        score: 0.7,
+        hostname: 'www.autoskolabubu.cz',
+      }),
+  });
+  assert.equal(valid, true);
+  const wrongAction = await verifyRecaptcha('valid-token', 'order', {
+    env,
+    fetcher: async () => Response.json({ success: true, action: 'contact', score: 0.9 }),
+  });
+  assert.equal(wrongAction, false);
+  const lowScore = await verifyRecaptcha('valid-token', 'order', {
+    env,
+    fetcher: async () => Response.json({ success: true, action: 'order', score: 0.49 }),
+  });
+  assert.equal(lowScore, false);
+});
+test('server reCAPTCHA verification fails closed when its secret is unavailable', async () => {
+  assert.equal(await verifyRecaptcha('token', 'order', { env: {} }), false);
 });
 test('Local email adapter deduplicates; performs no network I/O', async () => {
   const email = new LocalEmail({ APP_ENV: 'local' });
