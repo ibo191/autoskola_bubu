@@ -225,21 +225,13 @@ const nav = [
                   <span>© {new Date().getFullYear()} Autoškola BuBu</span>
                   <div>
                     <>
-                      <a class="footer-link" href="/obchodni-podminky">
-                        Obchodní podmínky
-                      </a>
-                      <a class="footer-link" href="/ochrana-osobnich-udaju">
-                        Ochrana osobních údajů
-                      </a>
-                      <a class="footer-link" href="/zasady-pouzivani-cookies">
-                        Zásady cookies
-                      </a>
+                      <a href="/obchodni-podminky">Obchodní podmínky</a>
+                      <a href="/ochrana-osobnich-udaju">Ochrana osobních údajů</a>
+                      <a href="/zasady-pouzivani-cookies">Zásady cookies</a>
                       <button type="button" data-open-cookie-settings class="footer-link-button">
                         Nastavení cookies
                       </button>
-                      <a class="footer-link" href="/sprava">
-                        Interní správa
-                      </a>
+                      <a href="/sprava">Interní správa</a>
                     </>
                   </div>
                 </>
@@ -360,19 +352,12 @@ const nav = [
     flex-wrap: wrap;
     align-items: center;
   }
-  .footer-link,
-  .footer-link-button {
-    display: inline-flex;
-    align-items: center;
-    min-height: 32px;
-    padding: 8px 2px;
-    margin: -4px -2px;
-  }
   .footer-link-button {
     border: 0;
     background: transparent;
     color: inherit;
     font: inherit;
+    padding: 0;
     text-decoration: underline;
     text-underline-offset: 4px;
   }

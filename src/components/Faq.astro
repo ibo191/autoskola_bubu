@@ -1,5 +1,39 @@
 ---
 import { faqGroups as groups } from '../lib/faqs';
+
+interface Props {
+  compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
+const homeFaqs = [
+  {
+    question: 'Jak se přihlásím do autoškoly?',
+    answer:
+      'Online si vyberete kurz, pobočku a termín zápisu. Potvrzení s dalším postupem vám pošleme e-mailem.',
+  },
+  {
+    question: 'Jak probíhá kurz skupiny B?',
+    answer:
+      'Navazujeme teorií, praktickými jízdami a přípravou na závěrečnou zkoušku. Tempo postupně přizpůsobujeme tomu, jak získáváte jistotu.',
+  },
+  {
+    question: 'Mohu si vybrat manuál, automat nebo L17?',
+    answer:
+      'Ano. Manuál a L17 nabízíme na všech pobočkách; automatická převodovka je dostupná ve Střížkově.',
+  },
+  {
+    question: 'Kolik kurz stojí?',
+    answer:
+      'Aktuální cenu podle kurzu a pobočky najdete v ceníku. Při zápisu s vámi projdeme také možnosti platby.',
+  },
+  {
+    question: 'Co potřebuji přinést k zápisu?',
+    answer:
+      'Připravte si občanský průkaz, zdravotní posudek a vyplněnou žádost o přijetí k výuce a výcviku.',
+  },
+];
+const displayedGroups = compact ? [{ title: 'Nejčastější dotazy', items: homeFaqs }] : groups;
 ---
 
 <section class="section tinted">
@@ -11,11 +45,11 @@ import { faqGroups as groups } from '../lib/faqs';
     </aside>
     <div class="faq-groups">
       {
-        groups
+        displayedGroups
           .filter((group) => group.items.length > 0)
           .map((group) => (
-            <section class="faq-group">
-              <h3>{group.title}</h3>
+            <section class:list={['faq-group', { compact }]}>
+              {!compact && <h3>{group.title}</h3>}
               {group.items.map((item) => (
                 <details>
                   <summary>
@@ -114,6 +148,18 @@ import { faqGroups as groups } from '../lib/faqs';
   }
   .faq-answer {
     padding: 0 34px 10px 0;
+  }
+  .faq-group.compact {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+  }
+  .faq-group.compact details:first-of-type {
+    border-top: 1px solid var(--line);
+  }
+  .faq-group.compact summary {
+    font-size: 1rem;
   }
   @media (max-width: 760px) {
     .faq-layout {
