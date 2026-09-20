@@ -73,8 +73,8 @@ export default defineConfig({
       },
       directives: [
         "default-src 'self'",
-        "img-src 'self' data: https://www.google.com https://www.gstatic.com https://www.recaptcha.net https://www.google-analytics.com",
-        "connect-src 'self' https://www.google.com https://www.gstatic.com https://www.recaptcha.net https://www.googletagmanager.com https://www.google-analytics.com https://region1.google-analytics.com",
+        "img-src 'self' data: https://www.google.com https://www.gstatic.com https://www.recaptcha.net https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com",
+        "connect-src 'self' https://www.google.com https://www.gstatic.com https://www.recaptcha.net https://www.googletagmanager.com https://www.google-analytics.com https://region1.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com",
         "font-src 'self'",
         "object-src 'none'",
         "base-uri 'self'",

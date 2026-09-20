@@ -7,11 +7,13 @@ declare global {
 }
 
 const cookieName = 'bubu_cookie_consent';
-const measurementId = document.body.dataset.gaMeasurementId?.trim() ?? '';
+const googleTagId = document.body.dataset.googleTagId?.trim() ?? '';
 
-if (/^G-[A-Z0-9]+$/i.test(measurementId)) {
-  const disabledKey = `ga-disable-${measurementId}`;
-  const gaWindow = window as unknown as Window & Record<string, boolean | unknown>;
+// Basic Consent Mode: no Google script, storage or network request exists until
+// the visitor expressly grants analytics consent.
+if (/^AW-\d+$/i.test(googleTagId)) {
+  const disabledKey = `ga-disable-${googleTagId}`;
+  const googleWindow = window as unknown as Window & Record<string, boolean | unknown>;
   let initialized = false;
 
   function readConsent() {
@@ -31,7 +33,7 @@ if (/^G-[A-Z0-9]+$/i.test(measurementId)) {
   }
 
   function updateConsent(granted: boolean) {
-    gaWindow[disabledKey] = !granted;
+    googleWindow[disabledKey] = !granted;
     if (!initialized) return;
     gtag('consent', 'update', {
       analytics_storage: granted ? 'granted' : 'denied',
@@ -41,13 +43,13 @@ if (/^G-[A-Z0-9]+$/i.test(measurementId)) {
     });
   }
 
-  function loadAnalytics() {
+  function loadGoogleTag() {
     if (initialized) {
       updateConsent(true);
       return;
     }
     initialized = true;
-    gaWindow[disabledKey] = false;
+    googleWindow[disabledKey] = false;
     gtag('js', new Date());
     gtag('consent', 'default', {
       analytics_storage: 'granted',
@@ -55,21 +57,23 @@ if (/^G-[A-Z0-9]+$/i.test(measurementId)) {
       ad_user_data: 'denied',
       ad_personalization: 'denied',
     });
-    gtag('config', measurementId, { send_page_view: true });
+    // AW is the one global Google tag. The linked GA4 destination receives its
+    // page view through the Google tag configuration in Google Analytics.
+    gtag('config', googleTagId, { send_page_view: true });
 
     const script = document.createElement('script');
     script.async = true;
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(googleTagId)}`;
     document.head.append(script);
   }
 
   function track(name: string, parameters: Record<string, string | number> = {}) {
-    if (!initialized || gaWindow[disabledKey]) return;
+    if (!initialized || googleWindow[disabledKey]) return;
     gtag('event', name, parameters);
   }
 
   function updateFromCookie(consent: { analytics?: boolean } | null) {
-    if (consent?.analytics) loadAnalytics();
+    if (consent?.analytics) loadGoogleTag();
     else updateConsent(false);
   }
 

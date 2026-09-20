@@ -14,22 +14,23 @@ Tento checklist je určený pro přechod na ostrou doménu `www.autoskolabubu.cz
 
 Nastavte je v **Settings → Environment Variables** pro prostředí **Production**. Hodnoty nikdy neposílejte do chatu, GitHubu ani do klientského kódu.
 
-| Proměnná | Účel |
-| --- | --- |
-| `APP_ORIGIN` | `https://www.autoskolabubu.cz` |
-| `SUPABASE_URL` | URL projektu Supabase |
-| `SUPABASE_SERVICE_ROLE_KEY` | serverový service role klíč Supabase |
-| `RATE_LIMIT_SECRET` | nový náhodný řetězec alespoň 32 znaků |
-| `LETTERMINT_PROJECT_TOKEN` | token pro transakční e-maily |
-| `ORDER_NOTIFICATION_EMAIL` | `objednavky@autoskolabubu.cz` |
-| `GENERAL_CONTACT_EMAIL` | schránka pro obecné dotazy |
-| `REPORT_EMAIL` | příjemce denních a měsíčních přehledů |
-| `CRON_SECRET` | nový náhodný řetězec alespoň 32 znaků |
-| `RECAPTCHA_SECRET_KEY` | tajný klíč Google reCAPTCHA v3 |
-| `PUBLIC_RECAPTCHA_SITE_KEY` | veřejný site key Google reCAPTCHA v3 |
-| `RECAPTCHA_MIN_SCORE` | doporučeně `0.5`; při falešných zamítnutích lze po vyhodnocení snížit na `0.4` |
-| `GOOGLE_PLACES_API_KEY` | serverový klíč pro aktuální Google recenze, omezený na Places API |
-| `GOOGLE_PLACE_ID_STRIZKOV` | doporučeně pevné Place ID pobočky Střížkov, aby se vyhledávání profilu nemohlo změnit |
+| Proměnná                    | Účel                                                                                  |
+| --------------------------- | ------------------------------------------------------------------------------------- |
+| `APP_ORIGIN`                | `https://www.autoskolabubu.cz`                                                        |
+| `SUPABASE_URL`              | URL projektu Supabase                                                                 |
+| `SUPABASE_SERVICE_ROLE_KEY` | serverový service role klíč Supabase                                                  |
+| `RATE_LIMIT_SECRET`         | nový náhodný řetězec alespoň 32 znaků                                                 |
+| `LETTERMINT_PROJECT_TOKEN`  | token pro transakční e-maily                                                          |
+| `ORDER_NOTIFICATION_EMAIL`  | `objednavky@autoskolabubu.cz`                                                         |
+| `GENERAL_CONTACT_EMAIL`     | schránka pro obecné dotazy                                                            |
+| `REPORT_EMAIL`              | příjemce denních a měsíčních přehledů                                                 |
+| `CRON_SECRET`               | nový náhodný řetězec alespoň 32 znaků                                                 |
+| `RECAPTCHA_SECRET_KEY`      | tajný klíč Google reCAPTCHA v3                                                        |
+| `PUBLIC_RECAPTCHA_SITE_KEY` | veřejný site key Google reCAPTCHA v3                                                  |
+| `RECAPTCHA_MIN_SCORE`       | doporučeně `0.5`; při falešných zamítnutích lze po vyhodnocení snížit na `0.4`        |
+| `GOOGLE_PLACES_API_KEY`     | serverový klíč pro aktuální Google recenze, omezený na Places API                     |
+| `GOOGLE_PLACE_ID_STRIZKOV`  | doporučeně pevné Place ID pobočky Střížkov, aby se vyhledávání profilu nemohlo změnit |
+| `PUBLIC_GOOGLE_TAG_ID`      | Google tag loader ID: `AW-17619012335`                                                |
 
 Produkční build bez kritických proměnných skončí chybou. Je to ochrana proti spuštění objednávek, které by se neuložily nebo neposlaly e-mail.
 
@@ -72,7 +73,7 @@ reCAPTCHA se načítá až při odeslání objednávky. V zásadách cookies a i
 
 ## 7. Měření a souhlasy
 
-- [ ] Přidejte `PUBLIC_GA_MEASUREMENT_ID` až po implementaci a ověření Google Analytics 4.
+- [ ] Nastavte `PUBLIC_GOOGLE_TAG_ID=AW-17619012335`. GA4 destination `G-H896QC6DG3` zůstává připojená v Google tagu, ale nepoužívá se jako loader skriptu.
 - [ ] Přidejte `PUBLIC_META_PIXEL_ID` až po implementaci a ověření Meta Pixelu.
 - [ ] V Google Ads vytvořte dvě konverze: začátek objednávky (krok 2) a dokončená objednávka se zápisem.
 - [ ] V Tag Assistantu ověřte, že GA/Ads/Meta se před souhlasem nenačtou a po odmítnutí zůstanou zablokované.
