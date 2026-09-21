@@ -12,6 +12,7 @@ const requestSchema = z
   .object({
     slotId: z.uuid().optional(),
     contact: contactSchema,
+    note: z.string().trim().max(1000).optional().default(''),
     selection: selectionSchema,
     captchaToken: z.string().max(4096).optional(),
     priceVersion: z.string().min(1).max(80),
@@ -152,6 +153,7 @@ export class CreateOrderService {
       orderId: saved.orderId,
       publicCode: saved.publicCode,
       contact: parsed.data.contact,
+      note: parsed.data.note,
       selection: parsed.data.selection,
       price: serverQuote,
       addons: serverQuote.addons,

@@ -109,7 +109,11 @@ test('order workflow fails closed while legal texts are not approved', async () 
 test('order workflow recalculates price, stores a hash, then sends customer and internal order messages', async () => {
   const f = fixture();
   const captchaToken = f.captcha.issue('order', now);
-  const result = await f.execute({ ...baseBody, captchaToken });
+  const result = await f.execute({
+    ...baseBody,
+    note: 'Prosím o zápis po 16. hodině.',
+    captchaToken,
+  });
   assert.equal(result.ok, true);
   assert.equal(f.repository.calls.length, 1);
   assert.equal(f.repository.calls[0]?.price.amount, 25900);
@@ -126,6 +130,8 @@ test('order workflow recalculates price, stores a hash, then sends customer and 
   assert.ok(customer);
   assert.ok(internal);
   assert.equal(internal.replyTo, 'fixture@example.invalid');
+  assert.match(customer.text, /Prosím o zápis po 16\. hodině\./);
+  assert.match(internal.text, /Prosím o zápis po 16\. hodině\./);
   const message = customer;
   assert.match(message?.text ?? '', /BUBU-TEST1234/);
   assert.match(message?.text ?? '', /\/dekujeme\?kod=BUBU-TEST1234/);
@@ -175,6 +181,14 @@ test('invalid contact, honeypot and failed captcha never reach storage', async (
   assert.equal(
     (await f.execute({ ...baseBody, contact: { ...baseBody.contact, website: 'bot' } })).ok,
     false,
+  );
+  assert.deepEqual(
+    await f.execute({
+      ...baseBody,
+      note: 'x'.repeat(1001),
+      captchaToken: f.captcha.issue('order', now),
+    }),
+    { ok: false, code: 'INVALID_REQUEST' },
   );
   assert.deepEqual(await f.execute(), { ok: false, code: 'CAPTCHA_FAILED' });
   assert.equal(f.repository.calls.length, 0);

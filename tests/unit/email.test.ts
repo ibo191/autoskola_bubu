@@ -1,6 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { contactFormEmail, internalNewOrderEmail } from '../../src/lib/server/email/templates';
+import {
+  contactFormEmail,
+  internalNewOrderEmail,
+  orderConfirmationEmail,
+} from '../../src/lib/server/email/templates';
 import {
   addDaysToLocalDate,
   eventKey,
@@ -21,6 +25,7 @@ const orderInput = {
   orderId: '22222222-2222-4222-8222-222222222222',
   publicCode: 'BUBU-TEST1234',
   contact,
+  note: 'Prosím o zápis po 16. hodině.',
   selection: {
     course: 'b' as const,
     branch: 'strizkov' as const,
@@ -82,6 +87,15 @@ test('internal order notification replies directly to the customer', () => {
   assert.equal(email.to, 'orders@example.invalid');
   assert.equal(email.replyTo, 'jan@example.invalid');
   assert.equal(email.eventType, 'internal_new_order');
+  assert.match(email.text, /Poznámka k objednávce/);
+  assert.match(email.text, /Prosím o zápis po 16\. hodině\./);
+});
+
+test('order confirmation includes the customer note', () => {
+  const email = orderConfirmationEmail(orderInput);
+  assert.match(email.text, /Poznámka k objednávce/);
+  assert.match(email.text, /Prosím o zápis po 16\. hodině\./);
+  assert.match(email.html, /Prosím o zápis po 16\. hodině\./);
 });
 
 test('idempotency keys are stable and unique by logical event', () => {

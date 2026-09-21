@@ -41,11 +41,13 @@ const { recaptchaSiteKey = '', captchaRequired = false } = Astro.props;
           <label
             >Kurz<select name="course" required
               ><option value="">Vyberte kurz</option>{
-                courses.filter((c) => c.category !== 'moto').map((c) => (
-                  <option value={c.id}>
-                    {c.label} – {c.name}
-                  </option>
-                ))
+                courses
+                  .filter((c) => c.category !== 'moto')
+                  .map((c) => (
+                    <option value={c.id}>
+                      {c.label} – {c.name}
+                    </option>
+                  ))
               }</select
             ></label
           >
@@ -129,6 +131,14 @@ const { recaptchaSiteKey = '', captchaRequired = false } = Astro.props;
               required
               maxlength="20"
             /></label
+          >
+          <label class="form-note"
+            >Poznámka k objednávce<textarea
+              name="note"
+              rows="4"
+              maxlength="1000"
+              placeholder="Například kdy vám nejlépe vyhovuje zápis nebo co potřebujete vědět."
+            ></textarea></label
           >
         </div><p class="small">Doklady, adresu ani zdravotní údaje online nevyplňujete.</p>
       </fieldset>
@@ -267,6 +277,9 @@ const { recaptchaSiteKey = '', captchaRequired = false } = Astro.props;
     gap: 18px;
     margin: 20px 0;
   }
+  .form-note {
+    grid-column: 1 / -1;
+  }
   label {
     display: flex;
     flex-direction: column;
@@ -275,7 +288,8 @@ const { recaptchaSiteKey = '', captchaRequired = false } = Astro.props;
     gap: 8px;
   }
   input,
-  select {
+  select,
+  textarea {
     padding: 12px;
     border: 1px solid #9aada5;
     border-radius: 6px;
@@ -285,6 +299,11 @@ const { recaptchaSiteKey = '', captchaRequired = false } = Astro.props;
     width: 100%;
     min-width: 0;
     font-size: 0.85rem;
+  }
+  textarea {
+    min-height: 108px;
+    resize: vertical;
+    line-height: 1.5;
   }
   .checkbox {
     flex-direction: row;

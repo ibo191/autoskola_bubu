@@ -155,12 +155,19 @@ const checklist =
           'Pomůžeme ověřit, zda potřebujete B96 nebo B+E.',
           'Jasný postup od zápisu po zkoušku.',
         ]
-      : [
-          'Jasný plán od zápisu po zkoušku.',
-          'Teorie propojená s reálným provozem.',
-          'Řidičák skupiny B – manuál nebo automat a možnost absolvovat kurz v režimu L17.',
-          'Vstřícný a trpělivý přístup.',
-        ];
+      : course.id === 'b-automat'
+        ? [
+            'Jasný plán od zápisu po zkoušku.',
+            'Teorie propojená s reálným provozem.',
+            'Výcvik probíhá výhradně s automatickou převodovkou.',
+            'Vstřícný a trpělivý přístup.',
+          ]
+        : [
+            'Jasný plán od zápisu po zkoušku.',
+            'Teorie propojená s reálným provozem.',
+            'Řidičák skupiny B – manuál nebo automat a možnost absolvovat kurz v režimu L17.',
+            'Vstřícný a trpělivý přístup.',
+          ];
 const valueCards = [
   [
     'graduation',

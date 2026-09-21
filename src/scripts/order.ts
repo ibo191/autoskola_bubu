@@ -8,7 +8,7 @@ type Slot = { id: string; branch: string; startsAt: string; endsAt: string; rema
 const dialog = document.querySelector<HTMLDialogElement>('#order-dialog')!;
 const form = document.querySelector<HTMLFormElement>('#order-form')!;
 const field = (name: string) =>
-  form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement;
+  form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 const error = document.querySelector<HTMLElement>('#order-error')!;
 const next = document.querySelector<HTMLButtonElement>('#order-next')!;
 const back = document.querySelector<HTMLButtonElement>('#order-back')!;
@@ -316,7 +316,7 @@ next.addEventListener('click', () => {
     return;
   }
   const fields = form.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
-    `[data-step="${step}"] input,[data-step="${step}"] select`,
+    `[data-step="${step}"] input,[data-step="${step}"] select,[data-step="${step}"] textarea`,
   );
   for (const el of fields) {
     if (el.closest('[hidden]')) continue;
@@ -568,6 +568,7 @@ async function submitOrder() {
       email: field('email').value,
       phone: field('phone').value,
     },
+    note: field('note').value,
     selection: selectionWithAddons(),
     priceVersion: validQuote.priceVersion,
     captchaToken,
