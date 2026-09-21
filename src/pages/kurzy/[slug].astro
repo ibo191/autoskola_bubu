@@ -158,7 +158,7 @@ const checklist =
       : [
           'Jasný plán od zápisu po zkoušku.',
           'Teorie propojená s reálným provozem.',
-          'Výběr manuálu, automatu nebo L17 podle vašich potřeb.',
+          'Řidičák skupiny B – manuál nebo automat a možnost absolvovat kurz v režimu L17.',
           'Vstřícný a trpělivý přístup.',
         ];
 const valueCards = [
@@ -437,7 +437,7 @@ const faqSchema = {
                   </p>
                   {isMoto && motoEnrollmentPaused ? (
                     <span class="moto-pause" role="status">
-                      Přihlašování je pozastavené.
+                      {motoEnrollmentPausedMessage}
                     </span>
                   ) : (
                     <button
@@ -485,7 +485,11 @@ const faqSchema = {
                 </button>
               )
             }<a class="btn secondary" href="/kontakt">Zeptat se</a>
-          </div><p class="next-contact">☎ 725 717 251 <i>·</i> ✉ info@autoskolabubu.cz</p>
+          </div><p class="next-contact">
+            ☎ <a href="tel:+420725717755">725 717 755</a>
+            <i>·</i> ✉
+            <a href="mailto:info@autoskolabubu.cz">info@autoskolabubu.cz</a>
+          </p>
         </div>
       </div>
     </section>

@@ -1,7 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { quote } from '../../src/lib/pricing/quote';
-import { courses, branches, availableAt } from '../../src/lib/catalog';
+import {
+  courses,
+  branches,
+  availableAt,
+  fees,
+  motoEnrollmentPausedMessage,
+} from '../../src/lib/catalog';
 for (const branch of branches)
   for (const course of ['b', 'b-automat', 'l17'])
     for (const transmission of ['manual', 'automatic']) {
@@ -29,7 +35,7 @@ for (const course of ['am', 'a1', 'a2', 'a'])
     assert.equal(result.ok, false);
     if (!result.ok) {
       assert.equal(result.code, 'UNAVAILABLE');
-      assert.match(result.message, /Přihlašování do motocyklových kurzů je momentálně pozastavené/);
+      assert.equal(result.message, motoEnrollmentPausedMessage);
     }
   });
 test('Moto enrollment pause applies before a direct selection can create an offer', () => {
@@ -42,7 +48,8 @@ test('Moto enrollment pause applies before a direct selection can create an offe
   });
   assert.equal(result.ok, false);
   if (!result.ok) assert.equal(result.code, 'UNAVAILABLE');
-});for (const [course, price] of [
+});
+for (const [course, price] of [
   ['b96', 8000],
   ['be', 10500],
 ] as const)
@@ -58,4 +65,8 @@ test('No combined course or invented B package; client price rejected', () => {
   assert.equal(quote({ course: 'b', branch: 'strizkov', amount: 1 }).ok, false);
   assert.ok(courses.every((c) => !c.id.includes('+')));
   assert.ok(courses.filter((c) => availableAt(c, 'kladno')).every((c) => c.category === 'auto'));
+});
+test('Published exam fees distinguish the first and repeated exam term', () => {
+  assert.equal(fees.schoolOrganization, 1000);
+  assert.equal(fees.schoolRepeatExam, 800);
 });

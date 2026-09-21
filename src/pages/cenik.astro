@@ -2,7 +2,15 @@
 export const prerender = true;
 import Base from '../layouts/Base.astro';
 import FinalCta from '../components/FinalCta.astro';
-import { branches, courses, fees, money, priceSource, examAuthorities } from '../lib/catalog';
+import {
+  branches,
+  courses,
+  fees,
+  money,
+  priceSource,
+  examAuthorities,
+  motoEnrollmentPausedMessage,
+} from '../lib/catalog';
 ---
 
 <Base
@@ -77,7 +85,14 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
           </div>
         </fieldset>
 
-        <div id="availability-message" class="notice next-question" hidden role="status"></div>
+        <div
+          id="availability-message"
+          class="notice next-question"
+          data-moto-message={motoEnrollmentPausedMessage}
+          hidden
+          role="status"
+        >
+        </div>
 
         <fieldset class="question next-question" id="transmission-question" hidden>
           <legend><span>03</span> Jak chcete jezdit?</legend><div class="choice-grid compact">
@@ -267,9 +282,9 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
               width="192"
               height="192"
               loading="lazy"
-            /><h3>Autoškole za organizaci zkoušky</h3><strong
+            /><h3>Autoškole za organizaci první zkoušky</h3><strong
               >{money(fees.schoolOrganization)}</strong
-            ><p>Poplatek za administrativu a zajištění závěrečné zkoušky.</p>
+            ><p>Poplatek za administrativu a zajištění prvního termínu závěrečné zkoušky.</p>
           </article>
           <article class="authority-fees">
             <img
@@ -298,8 +313,10 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
               width="192"
               height="192"
               loading="lazy"
-            /><h3>Opakované části zkoušky</h3><p>
-              Pokud některou část zkoušky opakujete, hradí se příslušný poplatek znovu.
+            /><h3>Autoškole za opakovanou zkoušku</h3><strong>{money(fees.schoolRepeatExam)}</strong
+            ><p>
+              Za každý opakovaný termín zkoušky se autoškole hradí tento poplatek. K tomu se hradí i
+              příslušný úřední poplatek podle opakované části zkoušky.
             </p><p>Test z předpisů <strong>100 Kč</strong></p><p>
               Ovládání a údržba <strong>200 Kč</strong>
             </p><p>Praktická jízda <strong>400 Kč</strong></p>
@@ -430,8 +447,7 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
     if (!state.category) return;
     if (state.category === 'moto') {
       const message = document.querySelector('#availability-message')!;
-      message.textContent =
-        'Přihlašování do motocyklových kurzů je momentálně pozastavené. Otevřeme ho v průběhu zimy pro příští rok.';
+      message.textContent = message.dataset.motoMessage ?? '';
       reveal('#availability-message');
       return;
     }

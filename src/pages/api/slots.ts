@@ -3,6 +3,7 @@ import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { branchId, branches } from '../../lib/catalog';
 import { generateSlots } from '../../lib/booking/slots';
+import { isEnrollmentSlotOpen } from '../../lib/booking/enrollment-window';
 import { assertSameOrigin, requireLiveRepository } from '../../lib/server/live-order';
 
 export const prerender = false;
@@ -109,9 +110,10 @@ export const GET: APIRoute = async ({ request }) => {
         { status: 503, headers: { 'Cache-Control': 'no-store' } },
       );
     }
-    const slots = configured
+    const sourceSlots = configured
       ? await requireLiveRepository(process.env).listAvailableSlots(parsed.data)
       : previewSlots(parsed.data.branch, parsed.data.from, parsed.data.to);
+    const slots = sourceSlots.filter((slot) => isEnrollmentSlotOpen(slot.branch, slot.startsAt));
     return Response.json(
       {
         ok: true,

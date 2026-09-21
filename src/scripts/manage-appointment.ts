@@ -1,5 +1,6 @@
 type Slot = { id: string; branch: string; startsAt: string; endsAt: string; remaining: number };
 import { getRecaptchaToken } from './recaptcha';
+import { firstBookingMonth } from '../lib/booking/enrollment-window';
 const root = document.querySelector<HTMLElement>('[data-manage-order]');
 if (root) {
   const code = root.dataset.manageOrder!;
@@ -9,8 +10,8 @@ if (root) {
   const slotsEl = document.querySelector<HTMLElement>('#manage-slots')!;
   const message = document.querySelector<HTMLElement>('#manage-message')!;
   const selectedLabel = document.querySelector<HTMLElement>('#manage-selected-slot');
-  let cursor = new Date();
-  cursor.setDate(1);
+  const minimumMonth = () => firstBookingMonth(branch);
+  let cursor = minimumMonth();
   let loaded: Slot[] = [];
   let selected = '';
   let selectedSlot = '';
@@ -120,7 +121,9 @@ if (root) {
   }
 
   document.querySelector('#manage-prev')!.addEventListener('click', () => {
-    cursor.setMonth(cursor.getMonth() - 1);
+    const previous = new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1);
+    if (previous < minimumMonth()) return;
+    cursor = previous;
     void load();
   });
   document.querySelector('#manage-next')!.addEventListener('click', () => {

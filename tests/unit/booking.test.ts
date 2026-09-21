@@ -1,6 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { generateSlots, pragueToUtc, holdExpired, reminderPlan } from '../../src/lib/booking/slots';
+import {
+  firstBookingMonth,
+  isEnrollmentSlotOpen,
+  strizkovEnrollmentStartDate,
+} from '../../src/lib/booking/enrollment-window';
 const fixture = {
   date: '2026-08-31',
   open: '15:00',
@@ -38,6 +43,17 @@ test('Prague summer and winter time and DST boundaries', () => {
 test('Hold expires exactly at boundary', () => {
   assert.equal(holdExpired('2026-08-31T13:00:00Z', new Date('2026-08-31T13:00:00Z')), true);
   assert.equal(holdExpired('2026-08-31T13:00:00Z', new Date('2026-08-31T12:59:59Z')), false);
+});
+test('Střížkov enrollment starts on 1 October 2026', () => {
+  assert.equal(strizkovEnrollmentStartDate, '2026-10-01');
+  assert.equal(isEnrollmentSlotOpen('strizkov', '2026-09-30T16:00:00.000Z'), false);
+  assert.equal(isEnrollmentSlotOpen('strizkov', '2026-10-01T13:00:00.000Z'), true);
+  assert.equal(isEnrollmentSlotOpen('statenice', '2026-09-24T13:00:00.000Z'), true);
+  const firstMonth = firstBookingMonth('strizkov', new Date('2026-09-21T10:00:00Z'));
+  assert.deepEqual(
+    [firstMonth.getFullYear(), firstMonth.getMonth(), firstMonth.getDate()],
+    [2026, 9, 1],
+  );
 });
 test('Reminders are stable and never schedule a late 24-hour message', () => {
   const early = reminderPlan('o', 'a', '2026-08-31T13:00:00Z', '2026-08-29T13:00:00Z');

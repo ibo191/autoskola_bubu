@@ -134,7 +134,7 @@ export type Course = (typeof courses)[number];
 export const getCourse = (id: CourseId) => courses.find((c) => c.id === id)!;
 export const motoEnrollmentPaused = true;
 export const motoEnrollmentPausedMessage =
-  'Přihlašování do motocyklových kurzů je momentálně pozastavené. Otevřeme ho v průběhu zimy pro příští rok.';
+  'Přihlašování do motocyklových kurzů je nyní pozastavené. Kurzy pro sezonu 2027 otevřeme během zimy.';
 export const priceSource = {
   url: 'https://www.autoskolabubu.cz/cenik-autoskolabubu',
   checkedAt: '2026-08-28',
@@ -149,7 +149,11 @@ export const prices = z
     be: z.number().int(),
   })
   .parse({ motoBasic: 24900, motoConfidence: 31900, supplement: 7500, b96: 8000, be: 10500 });
-export const fees = { schoolOrganization: 1000, authorityFirstExam: 700 } as const;
+export const fees = {
+  schoolOrganization: 1000,
+  schoolRepeatExam: 800,
+  authorityFirstExam: 700,
+} as const;
 export const examAuthorities = [
   { branch: 'strizkov', office: 'Magistrát hl. m. Prahy', firstExam: 700 },
   { branch: 'statenice', office: 'Městský úřad Černošice', firstExam: 700 },

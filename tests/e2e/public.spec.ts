@@ -41,7 +41,7 @@ test('Moto enrollment is paused in the price guide while trailer courses remain 
   await page.goto('/cenik');
   await page.getByRole('button', { name: /^Motorku/ }).click();
   await expect(page.locator('#availability-message')).toContainText(
-    'Přihlašování do motocyklových kurzů je momentálně pozastavené',
+    'Přihlašování do motocyklových kurzů je nyní pozastavené. Kurzy pro sezonu 2027 otevřeme během zimy.',
   );
   await expect(page.locator('#pricing-results')).toBeHidden();
   await page.getByRole('button', { name: /^Auto s přívěsem/ }).click();

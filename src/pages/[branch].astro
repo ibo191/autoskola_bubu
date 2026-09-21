@@ -55,7 +55,7 @@ const strizkovFaq = [
   },
   {
     q: 'Kolik stojí řidičák skupiny B na Střížkově?',
-    a: 'Cena kurzu skupiny B je 25 900 Kč za výuku a výcvik v autoškole. Před zkouškou se zvlášť hradí poplatek autoškole za organizaci zkoušky 1 000 Kč a úřední poplatek za zkoušku podle aktuálního ceníku příslušného úřadu.',
+    a: 'Cena kurzu skupiny B je 25 900 Kč za výuku a výcvik v autoškole. Před první zkouškou se zvlášť hradí poplatek autoškole za organizaci zkoušky 1 000 Kč a úřední poplatek podle aktuálního ceníku příslušného úřadu. Za každý opakovaný termín zkoušky se autoškole hradí 800 Kč; případný úřední poplatek se řídí opakovanou částí zkoušky.',
   },
   {
     q: 'Pro koho je pobočka Střížkov vhodná?',
@@ -123,7 +123,7 @@ const breadcrumbSchema = {
           ><h1>
             {
               isStrizkov
-                ? 'Autoškola Praha 8 – Střížkov'
+                ? 'Autoškola Praha 8 – Střížkov. Řidičák bez stresu.'
                 : isKladno
                   ? 'Autoškola Kladno'
                   : isStatenice
@@ -133,7 +133,7 @@ const breadcrumbSchema = {
           </h1><p class="lead">
             {
               isStrizkov
-                ? 'Řidičák sk. B s jasným plánem výcviku a přípravou na reálný pražský provoz. Bez křiku, bez chaosu a lidsky.'
+                ? 'Řidičák skupiny B – manuál nebo automat a možnost absolvovat kurz v režimu L17. Výcvik má jasný plán, přípravu na reálný pražský provoz a lidský přístup bez křiku.'
                 : isKladno
                   ? 'Výuku i praktický výcvik stavíme postupně – od prvního seznámení s autem až po jízdu v běžném městském provozu, mimo obec, po dálnici nebo v Praze. Učíme klidně, lidsky a bez zbytečného stresu.'
                   : isStatenice
@@ -198,7 +198,8 @@ const breadcrumbSchema = {
   </section>
   <div class="local-trust">
     <div class="container">
-      <span>✓ Manuál{branch.id === 'strizkov' ? ' i automat' : ''}</span><span>✓ Kurz L17</span
+      <span>✓ Skupina B – manuál{branch.id === 'strizkov' ? ' i automat' : ''}</span><span
+        >✓ Možnost kurzu v režimu L17</span
       ><span>✓ Osobní zápis na pobočce</span>{isStrizkov && <span>✓ Motorky pouze Praha</span>}
     </div>
   </div>

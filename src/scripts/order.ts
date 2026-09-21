@@ -1,6 +1,7 @@
 import { money } from '../lib/format';
 import type { Quote, Selection } from '../lib/pricing/quote';
 import { getRecaptchaToken } from './recaptcha';
+import { firstBookingMonth } from '../lib/booking/enrollment-window';
 
 type Slot = { id: string; branch: string; startsAt: string; endsAt: string; remaining: number };
 
@@ -205,8 +206,7 @@ function setStep(value: number) {
       selectedSlotId = '';
       selectedDate = '';
       selectedSlotLabel.textContent = 'Termín zatím není vybraný.';
-      monthCursor = new Date();
-      monthCursor.setDate(1);
+      monthCursor = firstBookingMonth(field('branch').value);
       void loadSlots();
     }
   }
