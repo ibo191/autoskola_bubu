@@ -95,7 +95,12 @@ test('order confirmation includes the customer note', () => {
   const email = orderConfirmationEmail(orderInput);
   assert.match(email.text, /Poznámka k objednávce/);
   assert.match(email.text, /Prosím o zápis po 16\. hodině\./);
+  assert.match(email.text, /Posudek nesmí být ke dni zápisu do autoškoly starší než 3 měsíce/);
+  assert.match(email.text, /první splátka 8 700 Kč, druhá splátka 8 600 Kč/);
+  assert.doesNotMatch(email.text, /pošlete odpovědí na tento e-mail/);
+  assert.doesNotMatch(email.text, /PDF z EZKarty zaslaným e-mailem/);
   assert.match(email.html ?? '', /Prosím o zápis po 16\. hodině\./);
+  assert.match(email.html ?? '', /<strong>oboustranně<\/strong>/);
 });
 
 test('idempotency keys are stable and unique by logical event', () => {

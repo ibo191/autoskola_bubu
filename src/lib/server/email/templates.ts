@@ -60,6 +60,41 @@ function noteHtml(note: string) {
   return `<section style="background:#f4faf9;border:1px solid #dcebea;border-radius:18px;padding:18px;margin:22px 0;"><h2 style="font-size:19px;margin:0 0 8px;color:#17345d;">Poznámka k objednávce</h2><p style="margin:0;white-space:pre-wrap;font-size:15px;line-height:1.6;color:#17345d;">${escapeHtml(note)}</p></section>`;
 }
 
+function paymentDetails(amount: number) {
+  const splitHtml =
+    amount === 25900
+      ? '<li>ve třech splátkách: první splátka <strong>8 700 Kč</strong>, druhá splátka <strong>8 600 Kč</strong> a třetí splátka <strong>8 600 Kč</strong>.</li>'
+      : '<li>ve splátkách: konkrétní výši jednotlivých splátek s vámi potvrdíme při zápisu.</li>';
+  const splitText =
+    amount === 25900
+      ? 've třech splátkách: první splátka 8 700 Kč, druhá splátka 8 600 Kč a třetí splátka 8 600 Kč.'
+      : 've splátkách: konkrétní výši jednotlivých splátek s vámi potvrdíme při zápisu.';
+  return {
+    html: `<li style="margin-top:12px;"><strong>Rozmyslete si platbu kurzu.</strong> Před zápisem si rozmyslete, jak chcete kurz uhradit. Na zápise nám vybranou možnost řeknete a společně domluvíme další postup.<ul style="margin:10px 0 0;padding-left:22px;"><li>v hotovosti při zápisu,</li><li>bankovním převodem nejpozději do 5 dnů od zápisu,</li>${splitHtml}</ul>Bez uhrazení ceny kurzu není možné přistoupit k závěrečné zkoušce.</li>`,
+    text: [
+      '3. Rozmyslete si platbu kurzu. Před zápisem si rozmyslete, jak chcete kurz uhradit. Na zápise nám vybranou možnost řeknete a společně domluvíme další postup.',
+      'Možnosti platby:',
+      '- v hotovosti při zápisu,',
+      '- bankovním převodem nejpozději do 5 dnů od zápisu,',
+      `- ${splitText}`,
+      'Bez uhrazení ceny kurzu není možné přistoupit k závěrečné zkoušce.',
+    ],
+  };
+}
+
+function preparationDetails(applicationFormUrl: string, amount: number) {
+  const payment = paymentDetails(amount);
+  return {
+    html: `<section style="background:#f4faf9;border:1px solid #dcebea;border-radius:18px;padding:18px;margin:22px 0;"><h2 style="font-size:19px;margin:0 0 12px;color:#17345d;">Co připravit před zápisem</h2><ol style="padding-left:22px;margin:0;color:#17345d;font-size:15px;line-height:1.7;"><li><strong>Vyplňte přihlášku.</strong> Přihlášku najdete v příloze tohoto e-mailu i na odkazu: <a href="${escapeHtml(applicationFormUrl)}" style="color:#17345d;font-weight:700;">přihláška k výcviku</a>. Vyplňte první část „Vyplňuje žadatel“, přihlášku vytiskněte <strong>oboustranně</strong>, vyplňte, podepište a přineste s sebou k zápisu. Pokud vám ještě není 18 let, přihlášku podepisuje také zákonný zástupce.</li><li style="margin-top:12px;"><strong>Vyřiďte zdravotní posudek.</strong> Zdravotní posudek přineste k zápisu do autoškoly společně s přihláškou. Od 1. 1. 2026 ho vydává pouze váš registrující ošetřující lékař. Pokud máte posudek v EZKartě, vytiskněte PDF a přineste ho k zápisu. Posudek nesmí být ke dni zápisu do autoškoly starší než 3 měsíce.</li>${payment.html}</ol></section>`,
+    text: [
+      'Co připravit před zápisem:',
+      `1. Vyplňte přihlášku. Přihlášku najdete v příloze tohoto e-mailu i zde: ${applicationFormUrl}. Vyplňte první část „Vyplňuje žadatel“, přihlášku vytiskněte oboustranně, vyplňte, podepište a přineste s sebou k zápisu. Pokud vám ještě není 18 let, přihlášku podepisuje také zákonný zástupce.`,
+      '2. Vyřiďte zdravotní posudek. Zdravotní posudek přineste k zápisu do autoškoly společně s přihláškou. Od 1. 1. 2026 ho vydává pouze váš registrující ošetřující lékař. Pokud máte posudek v EZKartě, vytiskněte PDF a přineste ho k zápisu. Posudek nesmí být ke dni zápisu do autoškoly starší než 3 měsíce.',
+      ...payment.text,
+    ],
+  };
+}
+
 export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMessage {
   const isKladno = input.selection.branch === 'kladno';
   const appointmentText = input.appointment
@@ -67,8 +102,13 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
     : isKladno
       ? 'Vedoucí pobočky vás kontaktuje a domluví termín individuálně'
       : 'Termín zápisu zatím není vybraný';
-  const body = `<p style="font-size:17px;line-height:1.65;margin:0 0 16px;">Dobrý den, ${escapeHtml(input.contact.firstName)}, děkujeme za objednávku. Níže najdete přehled a co je potřeba připravit před zápisem.</p>${rows(
-    [
+  const preparation = preparationDetails(input.applicationFormUrl, input.price.amount);
+  const manageLink = input.appointment
+    ? ` <a href="${escapeHtml(input.manageUrl)}" style="display:inline-block;color:#17345d;text-decoration:underline;margin-left:12px;font-weight:700;">Změnit termín zápisu</a>`
+    : '';
+  const body = [
+    `<p style="font-size:17px;line-height:1.65;margin:0 0 16px;">Dobrý den, ${escapeHtml(input.contact.firstName)}, děkujeme za objednávku. Níže najdete přehled a co je potřeba připravit před zápisem.</p>`,
+    rows([
       ['Číslo objednávky', input.publicCode],
       ['Kurz', courseLabel(input.selection.course)],
       ['Pobočka', branchLabel(input.selection.branch)],
@@ -77,8 +117,12 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
       ['Celková hodnota objednávky', money(input.price.amount)],
       ['Termín zápisu', appointmentText],
       ['Adresa zápisu', branchAddress(input.selection.branch)],
-    ],
-  )}${noteHtml(input.note)}<section style="background:#f4faf9;border:1px solid #dcebea;border-radius:18px;padding:18px;margin:22px 0;"><h2 style="font-size:19px;margin:0 0 12px;color:#17345d;">Co připravit před zápisem</h2><ol style="padding-left:22px;margin:0;color:#17345d;font-size:15px;line-height:1.7;"><li><strong>Vyplňte přihlášku.</strong> Odkaz ke stažení najdete zde: <a href="${escapeHtml(input.applicationFormUrl)}" style="color:#17345d;font-weight:700;">přihláška k výcviku</a>. Přihlášku přikládáme také jako PDF přílohu. Vyplňte první část „Vyplňuje žadatel“, vytiskněte ji oboustranně a podepište. Vyplněnou první stranu nám pošlete odpovědí na tento e-mail. Originál si uschovejte pro zahájení výuky. Pokud vám ještě není 18 let, přihlášku podepisuje také zákonný zástupce; k zápisu s vámi osobně chodit nemusí.</li><li style="margin-top:12px;"><strong>Vyřiďte zdravotní posudek.</strong> Od 1. 1. 2026 ho vydává pouze váš registrující ošetřující lékař: praktický lékař pro děti a dorost, všeobecný praktický lékař nebo lékař pracovnělékařských služeb. Posudek může být elektronický v EZKartě v databázi NZIP, do které autoškola nemá přístup. Doložte nám proto písemné potvrzení od lékaře, PDF z EZKarty e-mailem nebo vytištěné PDF spolu s přihláškou. <a href="https://www.nzip.cz/ezkarta" style="color:#17345d;font-weight:700;">Informace k EZKartě</a>.</li><li style="margin-top:12px;"><strong>Domluvte si platbu kurzu.</strong> Kurz lze uhradit v hotovosti při zápisu nebo převodem na účet do 5 dnů od zápisu. Platbu lze rozdělit do tří přibližně stejných částí: první při zápisu nebo do 5 dnů, druhou během kurzu po vyčerpání předplacené části a třetí nejpozději při poslední jízdě nebo před závěrečnou zkouškou. Bez uhrazení ceny kurzu není možné přistoupit k závěrečné zkoušce.</li></ol><p style="font-size:15px;line-height:1.6;color:#17345d;margin:14px 0 0;"><strong>Pozor:</strong> zdravotní posudek nesmí být starší než 3 měsíce.</p></section><p style="margin:24px 0;"><a href="${escapeHtml(input.thankYouUrl)}" style="display:inline-block;background:#4daeb6;color:#ffffff;text-decoration:none;padding:13px 18px;border-radius:999px;font-weight:700;">Zobrazit objednávku</a>${input.appointment ? ` <a href="${escapeHtml(input.manageUrl)}" style="display:inline-block;color:#17345d;text-decoration:underline;margin-left:12px;font-weight:700;">Změnit termín zápisu</a>` : ''}</p><p style="font-size:15px;line-height:1.6;color:#667998;margin:0;">Na zápis si prosím vezměte občanský průkaz, originál přihlášky a zdravotní posudek.</p>`;
+    ]),
+    noteHtml(input.note),
+    preparation.html,
+    `<p style="margin:24px 0;"><a href="${escapeHtml(input.thankYouUrl)}" style="display:inline-block;background:#4daeb6;color:#ffffff;text-decoration:none;padding:13px 18px;border-radius:999px;font-weight:700;">Zobrazit objednávku</a>${manageLink}</p>`,
+    `<p style="font-size:15px;line-height:1.6;color:#667998;margin:0;">Na zápis si prosím vezměte občanský průkaz, originál přihlášky a zdravotní posudek.</p>`,
+  ].join('');
   const text = [
     `Dobrý den, ${input.contact.firstName}, děkujeme za objednávku v Autoškole BuBu.`,
     '',
@@ -92,11 +136,7 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
     `Adresa zápisu: ${branchAddress(input.selection.branch)}`,
     ...(input.note ? ['', 'Poznámka k objednávce:', input.note] : []),
     '',
-    'Co připravit před zápisem:',
-    `1. Vyplňte první část přihlášky označenou „Vyplňuje žadatel“. Přihlášku stáhnete zde: ${input.applicationFormUrl}. PDF přikládáme také jako přílohu. Přihlášku vytiskněte oboustranně a podepište. Vyplněnou první stranu nám pošlete odpovědí na tento e-mail. Pokud vám ještě není 18 let, přihlášku podepisuje také zákonný zástupce; k zápisu s vámi osobně chodit nemusí.`,
-    '2. Zdravotní posudek od 1. 1. 2026 vydává pouze registrující ošetřující lékař. Autoškola nemá přístup do EZKarty ani databáze NZIP. Zdravotní způsobilost doložte písemným potvrzením od lékaře, PDF z EZKarty zaslaným e-mailem, nebo vytištěným PDF z EZKarty přineseným spolu s přihláškou. Informace: https://www.nzip.cz/ezkarta',
-    '3. Kurz lze uhradit v hotovosti při zápisu nebo převodem na účet do 5 dnů od zápisu. Platbu lze rozdělit do tří přibližně stejných částí: první při zápisu nebo do 5 dnů, druhou během kurzu po vyčerpání předplacené části a třetí nejpozději při poslední jízdě nebo před závěrečnou zkouškou. Bez uhrazení ceny kurzu není možné přistoupit k závěrečné zkoušce.',
-    'Pozor: zdravotní posudek nesmí být starší než 3 měsíce.',
+    ...preparation.text,
     '',
     `Přehled objednávky: ${input.thankYouUrl}`,
     ...(input.appointment ? [`Změna nebo zrušení termínu zápisu: ${input.manageUrl}`] : []),
