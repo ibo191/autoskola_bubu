@@ -95,7 +95,7 @@ test('order confirmation includes the customer note', () => {
   const email = orderConfirmationEmail(orderInput);
   assert.match(email.text, /Poznámka k objednávce/);
   assert.match(email.text, /Prosím o zápis po 16\. hodině\./);
-  assert.match(email.html, /Prosím o zápis po 16\. hodině\./);
+  assert.match(email.html ?? '', /Prosím o zápis po 16\. hodině\./);
 });
 
 test('idempotency keys are stable and unique by logical event', () => {
