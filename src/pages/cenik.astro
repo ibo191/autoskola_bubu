@@ -446,7 +446,7 @@ import {
     press('[data-trailer]', state.trailer);
     if (!state.category) return;
     if (state.category === 'moto') {
-      const message = document.querySelector('#availability-message')!;
+      const message = document.querySelector<HTMLElement>('#availability-message')!;
       message.textContent = message.dataset.motoMessage ?? '';
       reveal('#availability-message');
       return;
