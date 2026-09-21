@@ -93,6 +93,53 @@ const details = {
   ],
 }[course.id];
 const [headline, lead, fit] = details;
+const seo = {
+  b: {
+    title: 'Řidičák skupiny B – cena a průběh kurzu',
+    description:
+      'Řidičák skupiny B s jasným plánem výuky, klidným přístupem a přípravou na běžný provoz v Praze, Kladně i okolí Statenic.',
+  },
+  'b-automat': {
+    title: 'Řidičák na automat – skupina B',
+    description:
+      'Kurz skupiny B na automat na Střížkově. Soustřeďte se na provoz, přednosti a bezpečnou jízdu bez řazení.',
+  },
+  l17: {
+    title: 'L17 – řidičák od 17 let',
+    description:
+      'Kurz L17 pro budoucí řidiče od 17 let. Získejte skupinu B a do osmnácti jezděte se zapsaným mentorem.',
+  },
+  am: {
+    title: 'Řidičák skupiny AM',
+    description:
+      'Kurz skupiny AM pro první kilometry na motorce. Informace o výcviku na pobočce Praha 8 – Střížkov.',
+  },
+  a1: {
+    title: 'Řidičák skupiny A1',
+    description:
+      'Kurz skupiny A1 s důrazem na bezpečné ovládání motorky, cvičiště a jistotu v provozu na Praze 8 – Střížkov.',
+  },
+  a2: {
+    title: 'Řidičák skupiny A2',
+    description:
+      'Kurz nebo rozšíření řidičského oprávnění skupiny A2. Pomůžeme určit postup podle vašeho současného oprávnění.',
+  },
+  a: {
+    title: 'Řidičák skupiny A',
+    description:
+      'Kurz nebo rozšíření řidičského oprávnění skupiny A pro velké motocykly na pobočce Praha 8 – Střížkov.',
+  },
+  b96: {
+    title: 'Rozšíření B96 – kurz s přívěsem',
+    description:
+      'Rozšíření B96 pro větší jízdní soupravu. Praktický výcvik s jasným postupem na pobočce Praha 8 – Střížkov.',
+  },
+  be: {
+    title: 'Řidičák skupiny B+E – auto s přívěsem',
+    description:
+      'Kurz skupiny B+E pro řízení soupravy s těžším přívěsem, vozíkem nebo karavanem na pobočce Praha 8 – Střížkov.',
+  },
+}[course.id];
 const checklist =
   course.category === 'moto'
     ? [
@@ -181,23 +228,20 @@ const breadcrumbSchema = {
     { '@type': 'ListItem', position: 3, name: course.name, item: courseUrl },
   ],
 };
-const faqSchema =
-  course.id === 'b' || course.id === 'b-automat'
-    ? {
-        '@type': 'FAQPage',
-        mainEntity: courseFaqs(course).map(([question, answer]) => ({
-          '@type': 'Question',
-          name: question,
-          acceptedAnswer: { '@type': 'Answer', text: answer },
-        })),
-      }
-    : null;
+const faqSchema = {
+  '@type': 'FAQPage',
+  mainEntity: courseFaqs(course).map(([question, answer]) => ({
+    '@type': 'Question',
+    name: question,
+    acceptedAnswer: { '@type': 'Answer', text: answer },
+  })),
+};
 ---
 
 <Base
-  title={`${course.label} – ${course.name}`}
-  description={`${headline} ${lead}`}
-  schema={[courseSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : [])]}
+  title={seo.title}
+  description={seo.description}
+  schema={[courseSchema, breadcrumbSchema, faqSchema]}
 >
   <main class="course-page">
     <section class="product-hero">
@@ -206,13 +250,17 @@ const faqSchema =
           <span class="eyebrow">{category} · {course.label}</span>
           <h1>{headline}</h1><p class="lead">{lead}</p>
           <div class="actions">
-            {isMoto && motoEnrollmentPaused ? (
-              <span class="moto-pause" role="status">{motoEnrollmentPausedMessage}</span>
-            ) : (
-              <button class="btn primary" data-order disabled data-course={course.id}
-                >Přihlásit se do kurzu ↗</button
-              >
-            )}<a class="btn secondary" href="#cena">Zobrazit cenu</a>
+            {
+              isMoto && motoEnrollmentPaused ? (
+                <span class="moto-pause" role="status">
+                  {motoEnrollmentPausedMessage}
+                </span>
+              ) : (
+                <button class="btn primary" data-order disabled data-course={course.id}>
+                  Přihlásit se do kurzu ↗
+                </button>
+              )
+            }<a class="btn secondary" href="#cena">Zobrazit cenu</a>
           </div>
           <div class="hero-signals">
             <span>♧ Už 10+ let pomáháme řidičům</span><span>♡ Individuální a klidný přístup</span
@@ -387,21 +435,24 @@ const faqSchema =
                         ? 'Cena kurzu nezahrnuje poplatky za zkoušku.'
                         : 'Jedna cena kurzu na zvolené pobočce. Bez matoucích balíčků.'}
                   </p>
-                  {
-                    isMoto && motoEnrollmentPaused ? (
-                      <span class="moto-pause" role="status">Přihlašování je pozastavené.</span>
-                    ) : (
-                      <button
-                        class="btn primary"
-                        data-order
-                        disabled
-                        data-course={course.id}
-                        data-branch={branch.id}
-                      >
-                        Vybrat {branch.name} ↗
-                      </button>
-                    )
-                  }
+                  {isMoto && motoEnrollmentPaused ? (
+                    <span class="moto-pause" role="status">
+                      Přihlašování je pozastavené.
+                    </span>
+                  ) : (
+                    <button
+                      class="btn primary"
+                      data-order
+                      disabled
+                      data-course={course.id}
+                      data-branch={branch.id}
+                    >
+                      Vybrat {branch.name} ↗
+                    </button>
+                  )}
+                  <a class="text-link branch-page-link" href={`/${branch.id}`}>
+                    Autoškola {branch.name} →
+                  </a>
                 </>
               </article>
             ))
@@ -425,18 +476,20 @@ const faqSchema =
           <div class="actions">
             {
               isMoto && motoEnrollmentPaused ? (
-                <span class="moto-pause" role="status">{motoEnrollmentPausedMessage}</span>
+                <span class="moto-pause" role="status">
+                  {motoEnrollmentPausedMessage}
+                </span>
               ) : (
-                <button class="btn primary" data-order disabled data-course={course.id}
-                  >Přihlásit se ↗</button
-                >
+                <button class="btn primary" data-order disabled data-course={course.id}>
+                  Přihlásit se ↗
+                </button>
               )
             }<a class="btn secondary" href="/kontakt">Zeptat se</a>
           </div><p class="next-contact">☎ 725 717 251 <i>·</i> ✉ info@autoskolabubu.cz</p>
         </div>
       </div>
     </section>
-    {(course.id === 'b' || course.id === 'b-automat') && <CourseFaq course={course} />}
+    <CourseFaq course={course} />
   </main>
 </Base>
 
@@ -821,6 +874,11 @@ const faqSchema =
     margin-top: 12px;
     padding: 10px 14px;
     font-size: 0.73rem;
+  }
+  .branch-page-link {
+    display: inline-flex;
+    margin-top: 13px;
+    font-size: 0.74rem;
   }
   .fee-note {
     margin-top: 13px;

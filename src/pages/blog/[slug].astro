@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import FinalCta from '../../components/FinalCta.astro';
 import { getArticles, type ArticleEntry } from '../../lib/articles';
+import { branches, courses } from '../../lib/catalog';
 import manualCar from '../../assets/courses/b-manual-fabia.png';
 export const prerender = true;
 export async function getStaticPaths() {
@@ -16,6 +17,10 @@ const a = article.data;
 const related = getArticles()
   .filter((item) => item.id !== article.id)
   .slice(0, 3);
+const relatedCourses = a.relatedCourses
+  .map((courseId) => courses.find((course) => course.id === courseId))
+  .filter((course): course is (typeof courses)[number] => Boolean(course));
+const relatedBranch = branches.find((branch) => branch.id === a.branch);
 const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
@@ -92,7 +97,29 @@ const breadcrumbSchema = {
           <section class="article-cta" id="article-cta">
             <span>Jste připravení začít?</span><h2>Řidičák bez zbytečného stresu.</h2><p>
               Vyberte si kurz a pobočku. Se zbytkem vám pomůžeme při zápisu.
-            </p><a class="btn primary" href="/kurzy">Prohlédnout kurzy →</a>
+            </p><div class="article-cta-links">
+              {
+                relatedCourses.map((course) => (
+                  <a class="btn primary" href={`/kurzy/${course.slug}`}>
+                    {course.label} – zjistit více →
+                  </a>
+                ))
+              }
+              {
+                relatedBranch && (
+                  <a class="btn secondary" href={`/${relatedBranch.id}`}>
+                    Autoškola {relatedBranch.name} →
+                  </a>
+                )
+              }
+              {
+                !relatedCourses.length && (
+                  <a class="btn primary" href="/kurzy">
+                    Prohlédnout kurzy →
+                  </a>
+                )
+              }
+            </div>
           </section>
           <p class="source small">
             Text článku je převzat v původním znění z archivu Autoškoly BuBu.
@@ -345,6 +372,16 @@ const breadcrumbSchema = {
   .article-cta .btn {
     background: white;
     color: var(--brand-dark);
+  }
+  .article-cta-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .article-cta .btn.secondary {
+    border-color: #d7efeb;
+    color: white;
+    background: transparent;
   }
   .source {
     margin-top: 30px !important;

@@ -409,7 +409,7 @@ p {
   letter-spacing: 0.04em;
   padding: 5px 16px;
 }
-.js body {
+.js main {
   animation: page-enter 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .js [data-reveal] {

@@ -12,6 +12,9 @@ test('cookie consent starts with optional categories disabled and can be reopene
   const banner = page.locator('[data-cookie-banner]');
   await expect(banner).toBeVisible();
   await expect(page.locator('[data-cookie-panel]')).toBeHidden();
+  const box = await banner.boundingBox();
+  expect(box).not.toBeNull();
+  expect((box?.y ?? 0) + (box?.height ?? 0)).toBeLessThanOrEqual(page.viewportSize()!.height);
 
   await page.getByRole('button', { name: 'Nastavit cookies' }).click();
   const panel = page.locator('[data-cookie-panel]');

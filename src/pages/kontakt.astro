@@ -46,7 +46,9 @@ const phoneLabel = (phone: string) => phone.replace('+420', '+420 ');
           branches.map((branch) => (
             <article class="contact-card">
               <span class="eyebrow">{branch.locality}</span>
-              <h3>{branch.name}</h3>
+              <h3>
+                <a href={`/${branch.id}`}>Autoškola {branch.name}</a>
+              </h3>
               <dl>
                 <div>
                   <dt>Adresa</dt>
@@ -138,6 +140,9 @@ const phoneLabel = (phone: string) => phone.replace('+420', '+420 ');
   }
   .contact-card h3 {
     font-size: 1.8rem;
+  }
+  .contact-card h3 a {
+    text-decoration: none;
   }
   .contact-card dl {
     display: grid;

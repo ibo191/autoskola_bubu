@@ -6,12 +6,13 @@ interface Props {
 }
 const { course } = Astro.props;
 const questions = courseFaqs(course);
+const heading = `${course.label} bez nejasností.`;
 ---
 
 <section class="section course-faq" id="faq">
   <div class="container">
     <div class="faq-head">
-      <div><span class="eyebrow">Časté otázky</span><h2>Skupina B bez nejasností.</h2></div><p>
+      <div><span class="eyebrow">Časté otázky</span><h2>{heading}</h2></div><p>
         Praktické odpovědi před objednávkou. Pokud zde něco chybí, napište nám nebo zavolejte.
       </p>
     </div><div class="faq-list">
