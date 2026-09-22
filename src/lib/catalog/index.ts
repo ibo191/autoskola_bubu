@@ -31,7 +31,7 @@ export const branches = z.array(branchSchema).parse([
     phone: '+420725857884',
     email: 'kladno@autoskolabubu.cz',
     hours: null,
-    bPrice: 21000,
+    bPrice: 20000,
   },
   {
     id: 'statenice',

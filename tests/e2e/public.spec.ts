@@ -10,7 +10,7 @@ test('B pricing asks for transmission and L17, with manual only outside Prague',
   await expect(page.getByRole('button', { name: /Automat/ })).toBeDisabled();
   await page.getByRole('button', { name: 'Manuál', exact: true }).click();
   await page.getByRole('button', { name: /Kurz skupiny B/ }).click();
-  await expect(page.locator('#offer-price')).toHaveText('21 000 Kč');
+  await expect(page.locator('#offer-price')).toHaveText('20 000 Kč');
   await expect(page.locator('#offer-variant')).toHaveText('Manuál');
   await expect(page.locator('.offer-price')).toContainText('Nezahrnuje poplatky za zkoušku.');
 });

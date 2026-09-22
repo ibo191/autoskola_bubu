@@ -85,51 +85,49 @@ const displayedGroups = compact ? [{ title: 'Nejčastější dotazy', items: hom
   }
   .faq-groups {
     display: grid;
-    gap: 34px;
+    gap: 28px;
   }
   .faq-group {
-    background: rgba(255, 255, 255, 0.58);
-    border: 1px solid rgba(207, 223, 226, 0.8);
-    border-radius: 18px;
-    padding: 23px 25px 5px;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
   }
   .faq-group h3 {
-    align-items: center;
     color: var(--brand-dark);
-    display: flex;
-    font-size: clamp(1.35rem, 2.3vw, 1.72rem);
-    font-weight: 800;
-    gap: 14px;
-    letter-spacing: -0.025em;
-    margin: 0 0 8px;
-  }
-  .faq-group h3::before {
-    background: var(--teal);
-    border-radius: 99px;
-    content: '';
-    height: 9px;
-    width: 9px;
+    font-size: clamp(1.25rem, 2vw, 1.55rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0 0 4px;
   }
   details {
     border-bottom: 1px solid var(--line);
   }
+  details:first-of-type {
+    border-top: 1px solid var(--line);
+  }
   summary {
+    align-items: center;
+    color: var(--brand-dark);
     cursor: pointer;
-    display: flex;
-    font-size: 0.95rem;
-    font-weight: 650;
+    display: grid;
+    font-size: clamp(1rem, 1.45vw, 1.12rem);
+    font-weight: 500;
     gap: 20px;
-    justify-content: space-between;
+    grid-template-columns: minmax(0, 1fr) auto;
+    line-height: 1.45;
     list-style: none;
-    padding: 19px 0;
+    padding: 21px 0;
   }
   summary::-webkit-details-marker {
     display: none;
   }
   summary span {
     color: var(--brand-dark);
+    display: block;
     font-size: 1.35rem;
     line-height: 0.8;
+    margin-left: auto;
   }
   details[open] summary span {
     transform: rotate(45deg);
@@ -148,51 +146,21 @@ const displayedGroups = compact ? [{ title: 'Nejčastější dotazy', items: hom
     padding-left: 22px;
   }
   .faq-answer {
+    color: var(--brand-dark);
+    font-weight: 400;
     padding: 0 34px 10px 0;
   }
   .faq-group.compact {
-    background: transparent;
-    border: 0;
-    border-radius: 0;
     padding: 0;
-  }
-  .faq-group.compact details:first-of-type {
-    border-top: 1px solid var(--line);
-  }
-  .faq-group.compact summary {
-    font-size: 1rem;
   }
   .faq-layout.quiet {
     gap: 58px;
   }
   .faq-group.quiet {
-    background: transparent;
-    border: 0;
-    border-radius: 0;
     padding: 0;
   }
   .faq-group.quiet h3 {
     color: var(--brand-dark);
-    font-size: clamp(1.25rem, 2vw, 1.55rem);
-    font-weight: 650;
-    margin: 0 0 4px;
-  }
-  .faq-group.quiet h3::before {
-    height: 7px;
-    width: 7px;
-  }
-  .faq-group.quiet details:first-of-type {
-    border-top: 1px solid var(--line);
-  }
-  .faq-group.quiet summary {
-    font-size: clamp(1rem, 1.45vw, 1.12rem);
-    font-weight: 500;
-    line-height: 1.45;
-    padding: 21px 0;
-  }
-  .faq-group.quiet summary span {
-    color: var(--teal);
-    font-size: 1.25rem;
   }
   .faq-group.quiet .faq-answer {
     max-width: 780px;
