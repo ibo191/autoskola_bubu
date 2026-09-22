@@ -24,7 +24,7 @@ const getArticleVisual = (entry: ArticleEntry, fallbackIndex = 0) => {
   if (/cen|kolik|nejlevn|platb|praha/.test(topic)) return automaticCar;
   if (/prvn|výuk|vyuk|stres|chyby|zkouš|zkous|proces/.test(topic)) return drivingLesson;
 
-  return articleVisuals[fallbackIndex % articleVisuals.length];
+  return articleVisuals[fallbackIndex % articleVisuals.length] ?? manualCar;
 };
 
 const heroVisual = getArticleVisual(article);
