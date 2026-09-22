@@ -94,7 +94,7 @@ const displayedGroups = compact ? [{ title: 'Nejčastější dotazy', items: hom
     padding: 0;
   }
   .faq-group h3 {
-    color: var(--brand-dark);
+    color: var(--ink);
     font-size: clamp(1.25rem, 2vw, 1.55rem);
     font-weight: 600;
     letter-spacing: -0.02em;
@@ -108,7 +108,7 @@ const displayedGroups = compact ? [{ title: 'Nejčastější dotazy', items: hom
   }
   summary {
     align-items: center;
-    color: var(--brand-dark);
+    color: var(--ink);
     cursor: pointer;
     display: grid;
     font-size: clamp(1rem, 1.45vw, 1.12rem);
@@ -123,7 +123,7 @@ const displayedGroups = compact ? [{ title: 'Nejčastější dotazy', items: hom
     display: none;
   }
   summary span {
-    color: var(--brand-dark);
+    color: var(--ink);
     display: block;
     font-size: 1.35rem;
     line-height: 0.8;
@@ -135,7 +135,11 @@ const displayedGroups = compact ? [{ title: 'Nejčastější dotazy', items: hom
   .faq-answer :global(p),
   .faq-answer :global(li) {
     font-size: 0.91rem;
+    font-weight: 400;
     line-height: 1.6;
+  }
+  .faq-answer :global(strong) {
+    font-weight: inherit;
   }
   .faq-answer :global(p) {
     margin: 0 0 14px;
@@ -146,7 +150,7 @@ const displayedGroups = compact ? [{ title: 'Nejčastější dotazy', items: hom
     padding-left: 22px;
   }
   .faq-answer {
-    color: var(--brand-dark);
+    color: var(--muted);
     font-weight: 400;
     padding: 0 34px 10px 0;
   }
@@ -160,7 +164,7 @@ const displayedGroups = compact ? [{ title: 'Nejčastější dotazy', items: hom
     padding: 0;
   }
   .faq-group.quiet h3 {
-    color: var(--brand-dark);
+    color: var(--ink);
   }
   .faq-group.quiet .faq-answer {
     max-width: 780px;
