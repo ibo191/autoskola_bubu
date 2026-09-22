@@ -8,6 +8,15 @@ import redirects from './src/redirects.json' with { type: 'json' };
 // Vercel previews stay isolated; production gets its environment from the deployment target.
 const isVercelBuild = process.env.VERCEL === '1';
 const productionOrigin = 'https://www.autoskolabubu.cz';
+const scriptSources = [
+  "'self'",
+  "'unsafe-inline'",
+  'https://www.google.com',
+  'https://www.gstatic.com',
+  'https://www.recaptcha.net',
+  'https://www.googletagmanager.com',
+  'https://www.googleadservices.com',
+];
 const indexableStaticPaths = new Set([
   '/',
   '/cenik',
@@ -63,23 +72,19 @@ export default defineConfig({
     csp: {
       scriptDirective: {
         resources: [
-          "'self'",
-          "'unsafe-inline'",
-          'https://www.google.com',
-          'https://www.gstatic.com',
-          'https://www.recaptcha.net',
-          'https://www.googletagmanager.com',
+          ...scriptSources,
+          ...scriptSources.map((resource) => ({ resource, kind: 'element' })),
         ],
       },
       directives: [
         "default-src 'self'",
-        "img-src 'self' data: https://www.google.com https://www.gstatic.com https://www.recaptcha.net https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com",
-        "connect-src 'self' https://www.google.com https://www.gstatic.com https://www.recaptcha.net https://www.googletagmanager.com https://www.google-analytics.com https://region1.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com",
+        "img-src 'self' data: https://www.google.com https://*.google.com https://www.gstatic.com https://www.recaptcha.net https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.g.doubleclick.net https://googleads.g.doubleclick.net https://www.googleadservices.com https://pagead2.googlesyndication.com",
+        "connect-src 'self' https://www.google.com https://*.google.com https://www.gstatic.com https://www.recaptcha.net https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://region1.google-analytics.com https://*.g.doubleclick.net https://googleads.g.doubleclick.net https://www.googleadservices.com https://pagead2.googlesyndication.com https://ad.doubleclick.net",
         "font-src 'self'",
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
-        'frame-src https://www.google.com https://www.gstatic.com https://www.recaptcha.net https://maps.google.com',
+        'frame-src https://www.google.com https://www.gstatic.com https://www.recaptcha.net https://maps.google.com https://www.googletagmanager.com',
       ],
     },
   },

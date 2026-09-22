@@ -4,6 +4,8 @@ import FinalCta from '../../components/FinalCta.astro';
 import { getArticles, type ArticleEntry } from '../../lib/articles';
 import { branches, courses } from '../../lib/catalog';
 import manualCar from '../../assets/courses/b-manual-fabia.png';
+import automaticCar from '../../assets/courses/b-automatic-scala.png';
+import drivingLesson from '../../assets/about-story-driving.png';
 export const prerender = true;
 export async function getStaticPaths() {
   return getArticles().map((article) => ({ params: { slug: article.id }, props: { article } }));
@@ -14,8 +16,31 @@ interface Props {
 const { article } = Astro.props;
 const Content = article.Content;
 const a = article.data;
+
+const articleVisuals = [manualCar, automaticCar, drivingLesson];
+const getArticleVisual = (entry: ArticleEntry, fallbackIndex = 0) => {
+  const topic = `${entry.id} ${entry.data.category} ${entry.data.title}`.toLocaleLowerCase('cs-CZ');
+
+  if (/cen|kolik|nejlevn|platb|praha/.test(topic)) return automaticCar;
+  if (/prvn|výuk|vyuk|stres|chyby|zkouš|zkous|proces/.test(topic)) return drivingLesson;
+
+  return articleVisuals[fallbackIndex % articleVisuals.length];
+};
+
+const heroVisual = getArticleVisual(article);
 const related = getArticles()
   .filter((item) => item.id !== article.id)
+  .sort((left, right) => {
+    const categoryDifference =
+      Number(right.data.category === a.category) - Number(left.data.category === a.category);
+    if (categoryDifference) return categoryDifference;
+
+    const branchDifference =
+      Number(right.data.branch === a.branch) - Number(left.data.branch === a.branch);
+    if (branchDifference) return branchDifference;
+
+    return right.data.publishedAt.getTime() - left.data.publishedAt.getTime();
+  })
   .slice(0, 3);
 const relatedCourses = a.relatedCourses
   .map((courseId) => courses.find((course) => course.id === courseId))
@@ -31,7 +56,7 @@ const articleSchema = {
   articleSection: a.category,
   inLanguage: 'cs-CZ',
   mainEntityOfPage: a.canonical,
-  image: `https://www.autoskolabubu.cz${manualCar.src}`,
+  image: new URL(heroVisual.src, 'https://www.autoskolabubu.cz').href,
   author: { '@type': 'Organization', name: a.author },
   publisher: {
     '@type': 'Organization',
@@ -81,7 +106,12 @@ const breadcrumbSchema = {
             ><i aria-hidden="true">·</i>{a.readingTime ?? 5} min čtení
           </p>
         </div><figure class="article-cover">
-          <img src={manualCar.src} alt="Výcvikový vůz Autoškoly BuBu" />
+          <img
+            src={heroVisual.src}
+            alt={`Autoškola BuBu – ${a.title}`}
+            width={heroVisual.width}
+            height={heroVisual.height}
+          />
         </figure>
       </div>
     </header>
@@ -147,13 +177,27 @@ const breadcrumbSchema = {
               </>
             </div>
             <div class="related-grid">
-              {related.map((item) => (
-                <a href={`/blog/${item.id}`}>
-                  <span>{item.data.category}</span>
-                  <strong>{item.data.title}</strong>
-                  <small>{item.data.readingTime ?? 5} min čtení</small>
-                </a>
-              ))}
+              {related.map((item, index) => {
+                const visual = getArticleVisual(item, index + 1);
+                return (
+                  <a href={`/blog/${item.id}`}>
+                    <span class="related-image">
+                      <img
+                        src={visual.src}
+                        alt=""
+                        width={visual.width}
+                        height={visual.height}
+                        loading="lazy"
+                      />
+                    </span>
+                    <span class="related-card-content">
+                      <span>{item.data.category}</span>
+                      <strong>{item.data.title}</strong>
+                      <small>{item.data.readingTime ?? 5} min čtení</small>
+                    </span>
+                  </a>
+                );
+              })}
             </div>
           </>
         </div>
@@ -167,10 +211,38 @@ const breadcrumbSchema = {
   const toc = document.querySelector('[data-article-toc]');
   if (content && toc) {
     const articleTitle = document.querySelector('h1')?.textContent?.trim();
-    const headings = Array.from(content.querySelectorAll('h2')).filter((heading) => {
-      const label = heading.textContent?.trim() ?? '';
-      return label.length > 3 && label !== articleTitle && !/^\d+[.)]\s/.test(label);
+    const normalize = (value = '') =>
+      value
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLocaleLowerCase('cs-CZ')
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .split(/\s+/)
+        .filter((word) => word.length > 2);
+
+    const firstHeading = content.querySelector(':scope > h2');
+    if (firstHeading && articleTitle) {
+      const titleWords = new Set(normalize(articleTitle));
+      const headingWords = new Set(normalize(firstHeading.textContent ?? ''));
+      const sharedWords = [...headingWords].filter((word) => titleWords.has(word)).length;
+      const similarity = sharedWords / Math.max(headingWords.size, titleWords.size, 1);
+
+      if (sharedWords >= 4 && similarity >= 0.65) firstHeading.remove();
+    }
+
+    content.querySelectorAll('table').forEach((table) => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'article-table-scroll';
+      wrapper.tabIndex = 0;
+      wrapper.setAttribute('role', 'region');
+      wrapper.setAttribute('aria-label', 'Tabulka – celý obsah zobrazíte posunutím do stran');
+      table.before(wrapper);
+      wrapper.append(table);
     });
+
+    const headings = Array.from(content.querySelectorAll(':scope > h2')).filter(
+      (heading) => (heading.textContent?.trim().length ?? 0) > 3,
+    );
     headings.forEach((heading, index) => {
       const id = heading.id || `sekce-${index + 1}`;
       heading.id = id;
@@ -239,6 +311,7 @@ const breadcrumbSchema = {
     box-shadow: 0 20px 44px #17335f24;
   }
   .article-cover img {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -261,6 +334,10 @@ const breadcrumbSchema = {
     border-radius: 14px;
     padding: 19px;
     font-size: 0.74rem;
+    max-height: calc(100vh - 44px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #8dcfc5 transparent;
   }
   .article-aside > p {
     color: var(--ink);
@@ -281,7 +358,7 @@ const breadcrumbSchema = {
     display: block;
     padding: 6px 0;
     color: var(--brand-dark);
-    font-weight: 650;
+    font-weight: 560;
     line-height: 1.35;
     text-decoration: none !important;
   }
@@ -302,29 +379,79 @@ const breadcrumbSchema = {
   .article-body :global(h2) {
     color: var(--ink);
     font-size: clamp(1.45rem, 2.2vw, 2rem);
-    margin-top: 45px;
+    margin-top: 50px;
+    margin-bottom: 17px;
+    line-height: 1.18;
     scroll-margin-top: 24px;
+    text-wrap: balance;
   }
   .article-body :global(h3) {
     color: var(--ink);
     font-size: 1.22rem;
     margin-top: 30px;
+    line-height: 1.3;
+    text-wrap: balance;
   }
   .article-body :global(p),
   .article-body :global(li) {
     font-size: 0.98rem;
     line-height: 1.78;
   }
-  .article-body :global(table) {
-    display: block;
-    max-width: 100%;
+  .article-body > :global(p:first-child) {
+    color: var(--ink);
+    font-size: 1.08rem;
+    line-height: 1.72;
+  }
+  .article-body :global(a:not(.btn)) {
+    color: var(--brand-dark);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .article-body :global(ul),
+  .article-body :global(ol) {
+    margin-block: 18px 28px;
+    padding-left: 1.35rem;
+  }
+  .article-body :global(li) {
+    padding-left: 0.22rem;
+    margin-bottom: 8px;
+  }
+  .article-body :global(li::marker) {
+    color: var(--brand-dark);
+    font-weight: 750;
+  }
+  .article-body :global(strong) {
+    color: var(--ink);
+  }
+  .article-body :global(blockquote) {
+    margin: 32px 0;
+    padding: 22px 26px;
+    border-left: 4px solid var(--brand);
+    border-radius: 0 14px 14px 0;
+    background: #f1faf8;
+    color: var(--ink);
+  }
+  .article-body :global(.article-table-scroll) {
     overflow-x: auto;
-    border-collapse: collapse;
-    margin: 26px 0 32px;
+    margin: 28px 0 36px;
     border: 1px solid #cce6e1;
-    border-radius: 12px;
+    border-radius: 16px;
     background: white;
-    box-shadow: 0 8px 24px #17335f0a;
+    box-shadow: 0 12px 30px #17335f0d;
+    scrollbar-width: thin;
+    scrollbar-color: #72c6ba #edf8f6;
+  }
+  .article-body :global(.article-table-scroll:focus-visible) {
+    outline: 3px solid #7fd4c8;
+    outline-offset: 3px;
+  }
+  .article-body :global(table) {
+    display: table;
+    width: 100%;
+    min-width: 620px;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0;
     font-size: 0.85rem;
   }
   .article-body :global(th),
@@ -345,6 +472,12 @@ const breadcrumbSchema = {
     color: white;
     border-bottom: 0;
     font-weight: 750;
+  }
+  .article-body :global(th:first-child) {
+    border-top-left-radius: 15px;
+  }
+  .article-body :global(th:last-child) {
+    border-top-right-radius: 15px;
   }
   .article-cta {
     margin-top: 48px;
@@ -397,7 +530,7 @@ const breadcrumbSchema = {
     gap: 16px;
   }
   .related-grid a {
-    padding: 22px;
+    overflow: hidden;
     border-radius: 14px;
     background: white;
     border: 1px solid var(--line);
@@ -410,7 +543,27 @@ const breadcrumbSchema = {
     transform: translateY(-3px);
     box-shadow: var(--shadow);
   }
-  .related-grid span,
+  .related-image {
+    display: block;
+    height: 155px;
+    overflow: hidden;
+    background: #e8f6f3;
+  }
+  .related-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--ease);
+  }
+  .related-grid a:hover .related-image img {
+    transform: scale(1.035);
+  }
+  .related-card-content {
+    display: block;
+    padding: 20px 22px 22px;
+  }
+  .related-card-content > span,
   .related-grid small {
     display: block;
     color: var(--brand-dark);
@@ -441,6 +594,8 @@ const breadcrumbSchema = {
     }
     .article-aside {
       position: static;
+      max-height: none;
+      overflow-y: visible;
     }
     .article-aside ul {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -456,6 +611,7 @@ const breadcrumbSchema = {
     }
     .article-body :global(table) {
       font-size: 0.79rem;
+      min-width: 580px;
     }
     .article-body :global(th),
     .article-body :global(td) {
