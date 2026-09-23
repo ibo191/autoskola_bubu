@@ -12,6 +12,9 @@ import {
   toPragueDate,
 } from '../../src/lib/server/email/utils';
 import { assertCronAuthorized } from '../../src/lib/server/email/workflows';
+import { OrderEmailOutbox } from '../../src/lib/server/email/order-outbox';
+import type { EmailAdapter, EmailMessage } from '../../src/lib/integrations/contracts';
+import type { EmailEventRow, SupabaseEmailEventStore } from '../../src/lib/server/email/events';
 
 const contact = {
   firstName: 'Jan',
@@ -112,6 +115,123 @@ test('idempotency keys are stable and unique by logical event', () => {
     eventKey('order-confirmation', 'order-1'),
     eventKey('order-confirmation', 'order-2'),
   );
+});
+
+test('order outbox returns after queueing and later sends the original confirmation with PDF', async () => {
+  const message = orderConfirmationEmail(orderInput);
+  let queued: EmailMessage | undefined;
+  let scheduled: Promise<unknown> | undefined;
+  let providerMessage: EmailMessage | undefined;
+  let releaseProvider: (() => void) | undefined;
+  let providerStarted: (() => void) | undefined;
+  const started = new Promise<void>((resolve) => {
+    providerStarted = resolve;
+  });
+  let sent = false;
+  const event: EmailEventRow = {
+    id: '44444444-4444-4444-8444-444444444444',
+    idempotency_key: message.idempotencyKey,
+    status: 'pending',
+    metadata: {},
+  };
+  const store = {
+    async createPending(value: EmailMessage) {
+      queued = value;
+      event.metadata = value.metadata ?? {};
+      return event;
+    },
+    async claimDue() {
+      return event;
+    },
+    async markSent() {
+      sent = true;
+    },
+    async markFailed() {},
+    async retryLater() {},
+    async listDue() {
+      return [event];
+    },
+  } as unknown as SupabaseEmailEventStore;
+  const provider: EmailAdapter = {
+    async send(value) {
+      providerMessage = value;
+      providerStarted?.();
+      await new Promise<void>((resolve) => {
+        releaseProvider = resolve;
+      });
+      return { providerMessageId: 'provider-id', status: 'pending' };
+    },
+  };
+  const outbox = new OrderEmailOutbox(provider, store, (task) => {
+    scheduled = task;
+  });
+
+  assert.deepEqual(await outbox.send(message), { status: 'queued' });
+  assert.equal(sent, false);
+  assert.equal(queued?.attachments, undefined);
+  assert.equal((queued?.metadata?.outboxMessage as EmailMessage).text, message.text);
+  assert.ok(scheduled);
+  await started;
+  assert.equal(providerMessage?.attachments?.[0]?.contentType, 'application/pdf');
+  assert.ok(releaseProvider);
+  releaseProvider();
+  await scheduled;
+  assert.equal(sent, true);
+});
+
+test('order outbox retries a failed send and ignores legacy pending events without a payload', async () => {
+  const message = internalNewOrderEmail(orderInput);
+  assert.ok(message);
+  let providerAttempts = 0;
+  let retryAttempts = 0;
+  let sent = false;
+  const event: EmailEventRow = {
+    id: '44444444-4444-4444-8444-444444444445',
+    idempotency_key: message.idempotencyKey,
+    status: 'pending',
+    metadata: {},
+  };
+  const legacyEvent: EmailEventRow = {
+    id: '44444444-4444-4444-8444-444444444446',
+    idempotency_key: 'legacy-order-confirmation',
+    status: 'pending',
+    metadata: {},
+  };
+  const store = {
+    async createPending(value: EmailMessage) {
+      event.metadata = value.metadata ?? {};
+      return event;
+    },
+    async listDue() {
+      return [legacyEvent, event];
+    },
+    async claimDue(id: string) {
+      assert.equal(id, event.id);
+      return event;
+    },
+    async retryLater() {
+      retryAttempts++;
+    },
+    async markSent() {
+      sent = true;
+    },
+    async markFailed() {},
+  } as unknown as SupabaseEmailEventStore;
+  const provider: EmailAdapter = {
+    async send() {
+      providerAttempts++;
+      if (providerAttempts === 1) throw new Error('Temporary provider timeout');
+      return { providerMessageId: 'provider-id', status: 'accepted' };
+    },
+  };
+  const outbox = new OrderEmailOutbox(provider, store);
+  assert.deepEqual(await outbox.send(message), { status: 'queued' });
+  assert.deepEqual(await outbox.drainDue(), { checked: 1, sent: 0, retry: 1, errors: 0 });
+  assert.equal(retryAttempts, 1);
+  assert.equal(sent, false);
+  assert.deepEqual(await outbox.drainDue(), { checked: 1, sent: 1, retry: 0, errors: 0 });
+  assert.equal(providerAttempts, 2);
+  assert.equal(sent, true);
 });
 
 test('Prague local date helpers handle calendar day arithmetic for reminders', () => {

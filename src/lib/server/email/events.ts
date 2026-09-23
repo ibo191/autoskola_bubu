@@ -4,6 +4,7 @@ export type EmailEventRow = {
   id: string;
   idempotency_key: string;
   status: 'pending' | 'sent' | 'failed' | 'skipped';
+  metadata: Record<string, unknown>;
 };
 
 export class SupabaseEmailEventStore {
@@ -66,6 +67,62 @@ export class SupabaseEmailEventStore {
       status: 'failed',
       error: error instanceof Error ? error.message.slice(0, 500) : 'Unknown email failure',
     });
+  }
+
+  async listDue(now: Date, limit = 20): Promise<EmailEventRow[]> {
+    const params = new URLSearchParams({
+      select: 'id,idempotency_key,status,metadata',
+      status: 'eq.pending',
+      scheduled_for: `lte.${now.toISOString()}`,
+      order: 'scheduled_for.asc',
+      limit: String(limit),
+    });
+    const response = await fetch(`${this.restBase}email_events?${params}`, {
+      headers: this.headers(),
+      signal: AbortSignal.timeout(10000),
+      redirect: 'error',
+    });
+    if (!response.ok) throw new Error(`Email event list failed: ${response.status}`);
+    return (await response.json()) as EmailEventRow[];
+  }
+
+  async claimDue(id: string, now: Date): Promise<EmailEventRow | null> {
+    const params = new URLSearchParams({
+      id: `eq.${id}`,
+      status: 'eq.pending',
+      scheduled_for: `lte.${now.toISOString()}`,
+      select: 'id,idempotency_key,status,metadata',
+    });
+    const response = await fetch(`${this.restBase}email_events?${params}`, {
+      method: 'PATCH',
+      headers: this.headers({ Prefer: 'return=representation' }),
+      body: JSON.stringify({ scheduled_for: new Date(now.getTime() + 60_000).toISOString() }),
+      signal: AbortSignal.timeout(10000),
+      redirect: 'error',
+    });
+    if (!response.ok) throw new Error(`Email event claim failed: ${response.status}`);
+    const rows = (await response.json()) as EmailEventRow[];
+    return rows[0] ?? null;
+  }
+
+  async retryLater(event: EmailEventRow, error: unknown, now: Date) {
+    const attempts = Number(event.metadata.outboxAttempts ?? 0) + 1;
+    const message = error instanceof Error ? error.message.slice(0, 500) : 'Unknown email failure';
+    const status = attempts >= 5 ? 'failed' : 'pending';
+    const params = new URLSearchParams({ id: `eq.${event.id}`, status: 'eq.pending' });
+    const response = await fetch(`${this.restBase}email_events?${params}`, {
+      method: 'PATCH',
+      headers: this.headers({ Prefer: 'return=minimal' }),
+      body: JSON.stringify({
+        status,
+        scheduled_for: new Date(now.getTime() + 5 * 60_000).toISOString(),
+        metadata: { ...event.metadata, outboxAttempts: attempts },
+        error: message,
+      }),
+      signal: AbortSignal.timeout(10000),
+      redirect: 'error',
+    });
+    if (!response.ok) throw new Error(`Email event retry update failed: ${response.status}`);
   }
 
   private async patch(id: string, body: Record<string, unknown>) {

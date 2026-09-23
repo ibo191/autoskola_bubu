@@ -23,6 +23,7 @@
     "@astrojs/node": "11.1.4",
     "@astrojs/sitemap": "^3.7.4",
     "@astrojs/vercel": "^11.0.8",
+    "@vercel/functions": "3.9.5",
     "astro": "7.2.9",
     "zod": "4.4.3"
   },

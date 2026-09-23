@@ -4,7 +4,12 @@ import { SupabaseBookingRepository, SupabaseRateLimiter } from '../supabase/book
 import { requestFingerprint } from '../security/rate-limit';
 import type { CaptchaAdapter } from '../integrations/contracts';
 import { RecaptchaV3 } from '../integrations/recaptcha';
-import { createTransactionalEmailAdapter, orderNotificationEmail } from './email';
+import {
+  createTransactionalEmailAdapter,
+  isTransactionalEmailConfigured,
+  orderNotificationEmail,
+} from './email';
+import { createOrderEmailOutbox } from './email/order-outbox';
 
 const termsWording = 'Seznámil/a jsem se s Všeobecnými obchodními podmínkami a souhlasím s nimi.';
 const marketingWording =
@@ -27,12 +32,19 @@ export function requireLiveRepository(env: Record<string, string | undefined>) {
   return new SupabaseBookingRepository(env);
 }
 
-export function createLiveOrderService(env: Record<string, string | undefined>) {
+export function createLiveOrderService(
+  env: Record<string, string | undefined>,
+  schedule?: (task: Promise<unknown>) => void,
+) {
   const config = readConfig(env);
+  if (env.VERCEL_ENV === 'production' && !isTransactionalEmailConfigured(env))
+    throw new Error('Order email delivery is not configured');
   return new CreateOrderService({
     repository: new SupabaseBookingRepository(env),
     captcha: config.RECAPTCHA_ADAPTER === 'recaptcha' ? new RecaptchaV3(env) : new PreviewCaptcha(),
-    email: createTransactionalEmailAdapter(env),
+    email: isTransactionalEmailConfigured(env)
+      ? createOrderEmailOutbox(env, schedule)
+      : createTransactionalEmailAdapter(env),
     rateLimiter: new SupabaseRateLimiter(env),
     legal: legalSettings,
     origin: publicAppOrigin(env),

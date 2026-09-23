@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { waitUntil } from '@vercel/functions';
 import {
   createLiveOrderService,
   fingerprintRequest,
@@ -50,7 +51,7 @@ export const POST: APIRoute = async ({ request }) => {
     const url = new URL(request.url);
     const isProduction =
       process.env.VERCEL_ENV === 'production' || process.env.APP_ENV === 'production';
-    const result = await createLiveOrderService(process.env).execute({
+    const result = await createLiveOrderService(process.env, (task) => waitUntil(task)).execute({
       body: isProduction ? body : { ...body, captchaToken: 'preview-order-submission' },
       hostname: url.hostname,
       clientFingerprint: fingerprintRequest(request, process.env),
