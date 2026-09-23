@@ -9,8 +9,8 @@
       "schedule": "0 5-8 * * *"
     },
     {
-      "path": "/api/cron/daily-report",
-      "schedule": "0 5-8 * * *"
+      "path": "/api/cron/weekly-report",
+      "schedule": "0 5-8 * * 1"
     },
     {
       "path": "/api/cron/monthly-report",

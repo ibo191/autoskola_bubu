@@ -347,7 +347,7 @@ export function appointmentReminderEmail(input: {
 
 export function reportEmail(input: {
   to: string;
-  eventType: 'daily_order_report' | 'monthly_order_report';
+  eventType: 'weekly_order_report' | 'monthly_order_report';
   title: string;
   reportKey: string;
   summary: Record<string, unknown>;
@@ -366,7 +366,7 @@ export function reportEmail(input: {
     text: [input.title, '', ...summaryRows.map(([key, value]) => `${key}: ${value}`)].join('\n'),
     tag: input.eventType,
     metadata: { reportKey: input.reportKey },
-    reportDate: input.eventType === 'daily_order_report' ? input.reportKey : undefined,
+    reportDate: input.eventType !== 'monthly_order_report' ? input.reportKey : undefined,
     reportMonth: input.eventType === 'monthly_order_report' ? input.reportKey : undefined,
   };
 }

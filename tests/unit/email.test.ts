@@ -4,6 +4,7 @@ import {
   contactFormEmail,
   internalNewOrderEmail,
   orderConfirmationEmail,
+  reportEmail,
 } from '../../src/lib/server/email/templates';
 import {
   addDaysToLocalDate,
@@ -11,7 +12,7 @@ import {
   stripHeader,
   toPragueDate,
 } from '../../src/lib/server/email/utils';
-import { assertCronAuthorized } from '../../src/lib/server/email/workflows';
+import { assertCronAuthorized, previousPragueWeek } from '../../src/lib/server/email/workflows';
 import { OrderEmailOutbox } from '../../src/lib/server/email/order-outbox';
 import type { EmailAdapter, EmailMessage } from '../../src/lib/integrations/contracts';
 import type { EmailEventRow, SupabaseEmailEventStore } from '../../src/lib/server/email/events';
@@ -115,6 +116,39 @@ test('idempotency keys are stable and unique by logical event', () => {
     eventKey('order-confirmation', 'order-1'),
     eventKey('order-confirmation', 'order-2'),
   );
+});
+
+test('Monday weekly report covers the previous Prague Monday through Sunday', () => {
+  assert.deepEqual(previousPragueWeek(new Date('2026-09-28T05:00:00Z')), {
+    from: '2026-09-21',
+    to: '2026-09-28',
+    lastDay: '2026-09-27',
+  });
+  assert.deepEqual(previousPragueWeek(new Date('2026-10-26T06:00:00Z')), {
+    from: '2026-10-19',
+    to: '2026-10-26',
+    lastDay: '2026-10-25',
+  });
+  assert.deepEqual(previousPragueWeek(new Date('2027-01-04T06:00:00Z')), {
+    from: '2026-12-28',
+    to: '2027-01-04',
+    lastDay: '2027-01-03',
+  });
+  assert.equal(previousPragueWeek(new Date('2026-09-27T05:00:00Z')), null);
+});
+
+test('weekly report has its own event type and idempotency key', () => {
+  const email = reportEmail({
+    to: 'reports@example.invalid',
+    eventType: 'weekly_order_report',
+    title: 'Týdenní report objednávek – 21. až 27. září 2026',
+    reportKey: '2026-09-21',
+    summary: { 'Objednávky celkem': 3 },
+  });
+  assert.equal(email.eventType, 'weekly_order_report');
+  assert.equal(email.reportDate, '2026-09-21');
+  assert.equal(email.reportMonth, undefined);
+  assert.equal(email.idempotencyKey, eventKey('weekly_order_report', '2026-09-21'));
 });
 
 test('order outbox returns after queueing and later sends the original confirmation with PDF', async () => {

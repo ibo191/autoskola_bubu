@@ -193,27 +193,33 @@ function reportSummaryText(summary: Awaited<ReturnType<SupabaseEmailRepository['
   };
 }
 
-export async function processDailyReport(
+export function previousPragueWeek(now: Date) {
+  const to = toPragueDate(now);
+  if (new Date(`${to}T12:00:00Z`).getUTCDay() !== 1) return null;
+  return { from: addDaysToLocalDate(to, -7), to, lastDay: addDaysToLocalDate(to, -1) };
+}
+
+export async function processWeeklyReport(
   env: Record<string, string | undefined>,
   now = new Date(),
 ) {
   if (!isTransactionalEmailConfigured(env)) return { ok: false, code: 'EMAIL_NOT_CONFIGURED' };
-  const today = toPragueDate(now);
-  const reportDate = addDaysToLocalDate(today, -1);
+  const week = previousPragueWeek(now);
+  if (!week) return { ok: true, skipped: 'not-monday' };
   const summary = await new SupabaseEmailRepository(env).report({
-    from: reportDate,
-    to: today,
-    days: 1,
+    from: week.from,
+    to: week.to,
+    days: 7,
   });
   const message = reportEmail({
     to: reportEmailAddress(env),
-    eventType: 'daily_order_report',
-    title: `Denní report objednávek – ${formatEmailDate(`${reportDate}T12:00:00Z`)}`,
-    reportKey: reportDate,
+    eventType: 'weekly_order_report',
+    title: `Týdenní report objednávek – ${formatEmailDate(`${week.from}T12:00:00Z`)} až ${formatEmailDate(`${week.lastDay}T12:00:00Z`)}`,
+    reportKey: week.from,
     summary: reportSummaryText(summary),
   });
   await createTransactionalEmailAdapter(env).send(message);
-  return { ok: true, reportDate };
+  return { ok: true, from: week.from, to: week.to };
 }
 
 export async function processMonthlyReport(

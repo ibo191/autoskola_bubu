@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { assertCronAuthorized, processDailyReport } from '../../../lib/server/email/workflows';
+import { assertCronAuthorized, processWeeklyReport } from '../../../lib/server/email/workflows';
 import { pragueHour } from '../../../lib/server/email/utils';
 
 export const prerender = false;
@@ -15,6 +15,6 @@ export const GET: APIRoute = async ({ request }) => {
       { headers: { 'Cache-Control': 'no-store' } },
     );
   }
-  const result = await processDailyReport(process.env, now);
+  const result = await processWeeklyReport(process.env, now);
   return Response.json(result, { headers: { 'Cache-Control': 'no-store' } });
 };
