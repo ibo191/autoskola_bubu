@@ -320,7 +320,7 @@ export function appointmentReminderEmail(input: {
       ['Pobočka', branchLabel(input.order.appointment.branch)],
       ['Adresa', branchAddress(input.order.appointment.branch)],
     ],
-  )}<p style="font-size:16px;line-height:1.65;margin:18px 0;"><strong>Při zápisu se platí nevratná záloha 5&nbsp;000 Kč</strong> ideálně v hotovosti, případně okamžitým převodem.</p><p style="margin:24px 0;"><a href="${escapeHtml(input.manageUrl)}" style="display:inline-block;background:#4daeb6;color:#ffffff;text-decoration:none;padding:13px 18px;border-radius:999px;font-weight:700;">Spravovat termín</a></p>`;
+  )}<div style="font-size:16px;line-height:1.65;margin:18px 0;"><strong>Co si nezapomenout vzít k zápisu:</strong><ul style="margin:8px 0 0;padding-left:22px;"><li>oboustranně vytištěnou, vyplněnou a podepsanou přihlášku k výcviku,</li><li>zdravotní posudek,</li><li>občanský průkaz.</li></ul></div><p style="margin:24px 0;"><a href="${escapeHtml(input.manageUrl)}" style="display:inline-block;background:#4daeb6;color:#ffffff;text-decoration:none;padding:13px 18px;border-radius:999px;font-weight:700;">Spravovat termín</a></p>`;
   return {
     idempotencyKey: eventKey(
       input.kind,
@@ -336,7 +336,7 @@ export function appointmentReminderEmail(input: {
     to: input.order.contact.email,
     subject: title,
     html: layout(title, body),
-    text: `${title}\n\nObjednávka: ${input.order.publicCode}\nTermín: ${formatEmailDateTime(input.order.appointment.startsAt)}\nPobočka: ${branchLabel(input.order.appointment.branch)}\nAdresa: ${branchAddress(input.order.appointment.branch)}\n\nPři zápisu se platí nevratná záloha 5 000 Kč ideálně v hotovosti, případně okamžitým převodem.\n\nSpráva termínu: ${input.manageUrl}`,
+    text: `${title}\n\nObjednávka: ${input.order.publicCode}\nTermín: ${formatEmailDateTime(input.order.appointment.startsAt)}\nPobočka: ${branchLabel(input.order.appointment.branch)}\nAdresa: ${branchAddress(input.order.appointment.branch)}\n\nCo si nezapomenout vzít k zápisu:\n- oboustranně vytištěnou, vyplněnou a podepsanou přihlášku k výcviku,\n- zdravotní posudek,\n- občanský průkaz.\n\nSpráva termínu: ${input.manageUrl}`,
     tag: input.kind,
     metadata: {
       publicCode: input.order.publicCode,

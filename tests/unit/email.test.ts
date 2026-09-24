@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  appointmentReminderEmail,
   contactFormEmail,
   internalNewOrderEmail,
   orderConfirmationEmail,
@@ -16,6 +17,7 @@ import { assertCronAuthorized, previousPragueWeek } from '../../src/lib/server/e
 import { OrderEmailOutbox } from '../../src/lib/server/email/order-outbox';
 import type { EmailAdapter, EmailMessage } from '../../src/lib/integrations/contracts';
 import type { EmailEventRow, SupabaseEmailEventStore } from '../../src/lib/server/email/events';
+import type { PublicOrderOverview } from '../../src/lib/booking/repository';
 
 const contact = {
   firstName: 'Jan',
@@ -105,6 +107,30 @@ test('order confirmation includes the customer note', () => {
   assert.doesNotMatch(email.text, /PDF z EZKarty zaslaným e-mailem/);
   assert.match(email.html ?? '', /Prosím o zápis po 16\. hodině\./);
   assert.match(email.html ?? '', /<strong>oboustranně<\/strong>/);
+});
+
+test('appointment reminders include the document checklist without a deposit request', () => {
+  const order: PublicOrderOverview = {
+    orderId: orderInput.orderId,
+    publicCode: orderInput.publicCode,
+    status: 'confirmed',
+    contact: orderInput.contact,
+    selection: orderInput.selection,
+    price: orderInput.price,
+    addons: [],
+    appointment: { ...orderInput.appointment, branch: 'strizkov', status: 'reserved' },
+    createdAt: orderInput.createdAt.toISOString(),
+  };
+  for (const kind of ['appointment_reminder_3d', 'appointment_reminder_same_day'] as const) {
+    const email = appointmentReminderEmail({ order, kind, manageUrl: orderInput.manageUrl });
+    assert.ok(email);
+    for (const content of [email.text, email.html ?? '']) {
+      assert.match(content, /oboustranně vytištěnou, vyplněnou a podepsanou přihlášku/);
+      assert.match(content, /zdravotní posudek/);
+      assert.match(content, /občanský průkaz/);
+      assert.doesNotMatch(content, /záloh|5&nbsp;000|5 000 Kč/i);
+    }
+  }
 });
 
 test('idempotency keys are stable and unique by logical event', () => {
