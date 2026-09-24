@@ -183,6 +183,15 @@ test('Contact schema normalizes and rejects extra PII and honeypot', () => {
   assert.equal(parsed.firstName, 'Fiktivní');
   assert.equal(parsed.email, 'fixture@example.invalid');
   assert.equal(parsed.phone, '+420000000000');
+  assert.equal(contactSchema.parse({ ...data, phone: '725 717 755' }).phone, '+420725717755');
+  assert.equal(contactSchema.parse({ ...data, phone: '725-717-755' }).phone, '+420725717755');
+  assert.equal(contactSchema.parse({ ...data, phone: '420725717755' }).phone, '+420725717755');
+  assert.equal(contactSchema.parse({ ...data, phone: '00420725717755' }).phone, '+420725717755');
+  assert.equal(
+    contactSchema.parse({ ...data, email: '  TEST@example.invalid  ' }).email,
+    'test@example.invalid',
+  );
+  assert.equal(contactSchema.safeParse({ ...data, phone: '123' }).success, false);
   assert.equal(contactSchema.safeParse({ ...data, birthNumber: '123' }).success, false);
   assert.equal(contactSchema.safeParse({ ...data, website: 'spam' }).success, false);
 });

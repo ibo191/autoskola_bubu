@@ -194,6 +194,22 @@ test('invalid contact, honeypot and failed captcha never reach storage', async (
   assert.equal(f.repository.calls.length, 0);
 });
 
+test('order accepts Czech mobile autofill and normalizes contact before storage', async () => {
+  const f = fixture();
+  const result = await f.execute({
+    ...baseBody,
+    contact: {
+      ...baseBody.contact,
+      email: '  FIXTURE@example.invalid  ',
+      phone: '725 717 755',
+    },
+    captchaToken: f.captcha.issue('order', now),
+  });
+  assert.equal(result.ok, true);
+  assert.equal(f.repository.calls[0]?.contact.phone, '+420725717755');
+  assert.equal(f.repository.calls[0]?.contact.email, 'fixture@example.invalid');
+});
+
 test('storage failure sends no verification message', async () => {
   const f = fixture();
   f.repository.shouldFail = true;

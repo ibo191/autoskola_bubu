@@ -594,7 +594,11 @@ async function submitOrder() {
           ? 'Odeslali jste příliš mnoho pokusů. Zkuste to prosím později.'
           : result.code === 'BOOKING_NOT_CONFIGURED'
             ? 'Objednávky jsou v rozhraní spuštěné, ale server ještě nemá nastavenou databázi Supabase.'
-            : 'Objednávku se nepodařilo uložit. Zkontrolujte výběr a zkuste to znovu.';
+            : result.code === 'INVALID_REQUEST'
+              ? 'Zkontrolujte prosím kontaktní údaje, zejména e-mail a telefonní číslo, a zkuste to znovu.'
+              : result.code === 'CAPTCHA_FAILED'
+                ? 'Bezpečnostní ověření se nepodařilo. Zkuste objednávku odeslat znovu.'
+                : 'Objednávku se nepodařilo uložit. Zkontrolujte výběr a zkuste to znovu.';
       submit.disabled = false;
       submit.textContent = 'Odeslat objednávku';
       return;

@@ -86,7 +86,12 @@ export class CreateOrderService {
     if (!this.dependencies.legal.approved) return { ok: false, code: 'ORDERS_DISABLED' };
 
     const parsed = requestSchema.safeParse(context.body);
-    if (!parsed.success) return { ok: false, code: 'INVALID_REQUEST' };
+    if (!parsed.success) {
+      console.warn('order_invalid_request', {
+        fields: [...new Set(parsed.error.issues.map((issue) => issue.path.join('.')))],
+      });
+      return { ok: false, code: 'INVALID_REQUEST' };
+    }
 
     if (!parsed.data.captchaToken) return { ok: false, code: 'CAPTCHA_FAILED' };
 
