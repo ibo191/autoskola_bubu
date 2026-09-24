@@ -60,7 +60,18 @@ function noteHtml(note: string) {
   return `<section style="background:#f4faf9;border:1px solid #dcebea;border-radius:18px;padding:18px;margin:22px 0;"><h2 style="font-size:19px;margin:0 0 8px;color:#17345d;">Poznámka k objednávce</h2><p style="margin:0;white-space:pre-wrap;font-size:15px;line-height:1.6;color:#17345d;">${escapeHtml(note)}</p></section>`;
 }
 
-function paymentDetails(amount: number) {
+function paymentDetails(amount: number, isKladno: boolean) {
+  if (isKladno) {
+    const paymentText =
+      'Odpovědí na tento e-mail nám napište, zda chcete kurz uhradit v hotovosti, bankovním převodem, nebo ve třech splátkách. Platební údaje, výši splátek a termíny úhrady vám potvrdíme e-mailem.';
+    return {
+      html: `<li style="margin-top:12px;"><strong>Zvolte způsob platby.</strong> ${paymentText} Bez uhrazení ceny kurzu není možné přistoupit k závěrečné zkoušce.</li>`,
+      text: [
+        `3. Zvolte způsob platby. ${paymentText}`,
+        'Bez uhrazení ceny kurzu není možné přistoupit k závěrečné zkoušce.',
+      ],
+    };
+  }
   const splitHtml =
     amount === 25900
       ? '<li>ve třech splátkách: první splátka <strong>8 700 Kč</strong>, druhá splátka <strong>8 600 Kč</strong> a třetí splátka <strong>8 600 Kč</strong>.</li>'
@@ -83,25 +94,30 @@ function paymentDetails(amount: number) {
 }
 
 function preparationDetails(applicationFormUrl: string, amount: number, isKladno: boolean) {
-  const payment = paymentDetails(amount);
-  const medicalText =
-    'Zdravotní posudek vydává váš registrující ošetřující lékař, který ho zapíše do EZKarty. Jako autoškola k němu nemáme přístup, proto si ho prosím stáhněte a vytiskněte. Posudek nesmí být ke dni zápisu do autoškoly starší než 3 měsíce.';
+  const payment = paymentDetails(amount, isKladno);
+  const medicalText = `Zdravotní posudek vydává váš registrující ošetřující lékař, který ho zapíše do EZKarty. Jako autoškola k němu nemáme přístup, proto si ho prosím stáhněte a vytiskněte. Posudek nesmí být ke dni ${isKladno ? 'zahájení výuky' : 'zápisu do autoškoly'} starší než 3 měsíce.`;
   const applicationHtml = isKladno
-    ? `Vyplňte první část „Vyplňuje žadatel“ a přihlášku podepište. Originál vytiskněte <strong>oboustranně</strong> a přineste k zápisu. Pokud vám ještě není 18 let, přihlášku podepisuje také zákonný zástupce.`
+    ? `Vyplňte první část „Vyplňuje žadatel“ a přihlášku podepište. Kopii nám pošlete odpovědí na tento e-mail. Originál vytiskněte <strong>oboustranně</strong> a vezměte s sebou na první hodinu teorie. Pokud vám ještě není 18 let, přihlášku podepisuje také zákonný zástupce.`
     : `Vyplňte první část „Vyplňuje žadatel“, přihlášku vytiskněte <strong>oboustranně</strong>, vyplňte, podepište a přineste s sebou k zápisu. Pokud vám ještě není 18 let, přihlášku podepisuje také zákonný zástupce.`;
   const applicationText = isKladno
-    ? 'Vyplňte první část „Vyplňuje žadatel“ a přihlášku podepište. Originál vytiskněte oboustranně a přineste k zápisu. Pokud vám ještě není 18 let, přihlášku podepisuje také zákonný zástupce.'
+    ? 'Vyplňte první část „Vyplňuje žadatel“ a přihlášku podepište. Kopii nám pošlete odpovědí na tento e-mail. Originál vytiskněte oboustranně a vezměte s sebou na první hodinu teorie. Pokud vám ještě není 18 let, přihlášku podepisuje také zákonný zástupce.'
     : 'Vyplňte první část „Vyplňuje žadatel“, přihlášku vytiskněte oboustranně, vyplňte, podepište a přineste s sebou k zápisu. Pokud vám ještě není 18 let, přihlášku podepisuje také zákonný zástupce.';
   const medicalDelivery = isKladno
-    ? 'Vyplněnou přihlášku a zdravotní posudek nám prosím pošlete odpovědí na tento e-mail. Originály přineste k zápisu.'
+    ? 'Posudek nám pošlete odpovědí na tento e-mail a vytištěný originál vezměte na první hodinu teorie.'
     : 'Vytištěný zdravotní posudek přineste společně s přihláškou k zápisu.';
+  const preparationTitle = isKladno ? 'Co je potřeba udělat' : 'Co připravit před zápisem';
   return {
-    html: `<section style="background:#f4faf9;border:1px solid #dcebea;border-radius:18px;padding:18px;margin:22px 0;"><h2 style="font-size:19px;margin:0 0 12px;color:#17345d;">Co připravit před zápisem</h2><ol style="padding-left:22px;margin:0;color:#17345d;font-size:15px;line-height:1.7;"><li><strong>Vyplňte přihlášku.</strong> Přihlášku najdete v příloze tohoto e-mailu i na odkazu: <a href="${escapeHtml(applicationFormUrl)}" style="color:#17345d;font-weight:700;">přihláška k výcviku</a>. ${applicationHtml}</li><li style="margin-top:12px;"><strong>Vyřiďte zdravotní posudek.</strong> ${medicalText} ${medicalDelivery}</li>${payment.html}</ol></section>`,
+    html: `<section style="background:#f4faf9;border:1px solid #dcebea;border-radius:18px;padding:18px;margin:22px 0;"><h2 style="font-size:19px;margin:0 0 12px;color:#17345d;">${preparationTitle}</h2><ol style="padding-left:22px;margin:0;color:#17345d;font-size:15px;line-height:1.7;"><li><strong>Vyplňte přihlášku.</strong> Přihlášku najdete v příloze tohoto e-mailu i na odkazu: <a href="${escapeHtml(applicationFormUrl)}" style="color:#17345d;font-weight:700;">přihláška k výcviku</a>. ${applicationHtml}</li><li style="margin-top:12px;"><strong>Vyřiďte zdravotní posudek.</strong> ${medicalText} ${medicalDelivery}</li>${payment.html}</ol>${isKladno ? '<p style="margin:16px 0 0;font-size:15px;line-height:1.6;color:#17345d;"><strong>Nezapomeňte:</strong> Bez originálu oboustranně vytištěné a podepsané přihlášky a zdravotního posudku není možné zahájit výuku a výcvik.</p>' : ''}</section>`,
     text: [
-      'Co připravit před zápisem:',
+      `${preparationTitle}:`,
       `1. Vyplňte přihlášku. Přihlášku najdete v příloze tohoto e-mailu i zde: ${applicationFormUrl}. ${applicationText}`,
       `2. Vyřiďte zdravotní posudek. ${medicalText} ${medicalDelivery}`,
       ...payment.text,
+      ...(isKladno
+        ? [
+            'Nezapomeňte: Bez originálu oboustranně vytištěné a podepsané přihlášky a zdravotního posudku není možné zahájit výuku a výcvik.',
+          ]
+        : []),
     ],
   };
 }
@@ -110,15 +126,13 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
   const isKladno = input.selection.branch === 'kladno';
   const appointmentText = input.appointment
     ? formatEmailDateTime(input.appointment.startsAt)
-    : isKladno
-      ? 'Vedoucí pobočky vás kontaktuje a domluví termín individuálně'
-      : 'Termín zápisu zatím není vybraný';
+    : 'Termín zápisu zatím není vybraný';
   const preparation = preparationDetails(input.applicationFormUrl, input.price.amount, isKladno);
   const manageLink = input.appointment
     ? ` <a href="${escapeHtml(input.manageUrl)}" style="display:inline-block;color:#17345d;text-decoration:underline;margin-left:12px;font-weight:700;">Změnit termín zápisu</a>`
     : '';
   const body = [
-    `<p style="font-size:17px;line-height:1.65;margin:0 0 16px;">Dobrý den, ${escapeHtml(input.contact.firstName)}, děkujeme za objednávku. Níže najdete přehled a co je potřeba připravit před zápisem.</p>`,
+    `<p style="font-size:17px;line-height:1.65;margin:0 0 16px;">Dobrý den, ${escapeHtml(input.contact.firstName)}, děkujeme za objednávku. Níže najdete přehled a ${isKladno ? 'pokyny k zahájení výuky' : 'co je potřeba připravit před zápisem'}.</p>`,
     rows([
       ['Číslo objednávky', input.publicCode],
       ['Kurz', courseLabel(input.selection.course)],
@@ -126,13 +140,21 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
       ['Balíček', packageLabel(input.selection.package)],
       ['Doplňky', addonText(input.addons)],
       ['Celková hodnota objednávky', money(input.price.amount)],
-      ['Termín zápisu', appointmentText],
-      ['Adresa zápisu', branchAddress(input.selection.branch)],
+      ...(isKladno
+        ? ([['Zahájení výuky', 'Podrobnosti vám zašleme e-mailem.']] as Array<[string, string]>)
+        : ([
+            ['Termín zápisu', appointmentText],
+            ['Adresa zápisu', branchAddress(input.selection.branch)],
+          ] as Array<[string, string]>)),
     ]),
     noteHtml(input.note),
     preparation.html,
     `<p style="margin:24px 0;"><a href="${escapeHtml(input.thankYouUrl)}" style="display:inline-block;background:#4daeb6;color:#ffffff;text-decoration:none;padding:13px 18px;border-radius:999px;font-weight:700;">Zobrazit objednávku</a>${manageLink}</p>`,
-    `<p style="font-size:15px;line-height:1.6;color:#667998;margin:0;">Na zápis si prosím vezměte občanský průkaz, originál přihlášky a zdravotní posudek.</p>`,
+    ...(isKladno
+      ? []
+      : [
+          `<p style="font-size:15px;line-height:1.6;color:#667998;margin:0;">Na zápis si prosím vezměte občanský průkaz, originál přihlášky a zdravotní posudek.</p>`,
+        ]),
   ].join('');
   const text = [
     `Dobrý den, ${input.contact.firstName}, děkujeme za objednávku v Autoškole BuBu.`,
@@ -143,8 +165,12 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
     `Balíček: ${packageLabel(input.selection.package)}`,
     `Doplňky: ${addonText(input.addons)}`,
     `Celková hodnota objednávky: ${money(input.price.amount)}`,
-    `Termín zápisu: ${appointmentText}`,
-    `Adresa zápisu: ${branchAddress(input.selection.branch)}`,
+    ...(isKladno
+      ? ['Zahájení výuky: Podrobnosti vám zašleme e-mailem.']
+      : [
+          `Termín zápisu: ${appointmentText}`,
+          `Adresa zápisu: ${branchAddress(input.selection.branch)}`,
+        ]),
     ...(input.note ? ['', 'Poznámka k objednávce:', input.note] : []),
     '',
     ...preparation.text,

@@ -119,17 +119,19 @@ test('order confirmation includes the customer note', () => {
 test('Kladno confirmation asks for documents by email and replies to the branch', () => {
   const email = orderConfirmationEmail({
     ...orderInput,
+    note: '',
     selection: { ...orderInput.selection, branch: 'kladno' },
     appointment: null,
   });
   assert.equal(email.replyTo, 'kladno@autoskolabubu.cz');
   for (const content of [email.text, email.html ?? '']) {
-    assert.match(
-      content,
-      /Vyplněnou přihlášku a zdravotní posudek nám prosím pošlete odpovědí na tento e-mail/,
-    );
-    assert.match(content, /Posudek nesmí být ke dni zápisu do autoškoly starší než 3 měsíce/);
-    assert.doesNotMatch(content, /Termín si můžete vybrat zde/);
+    assert.match(content, /Kopii nám pošlete odpovědí na tento e-mail/);
+    assert.match(content, /Posudek nám pošlete odpovědí na tento e-mail/);
+    assert.match(content, /první hodinu teorie/);
+    assert.match(content, /ve třech splátkách/);
+    assert.match(content, /Zahájení výuky/);
+    assert.match(content, /není možné zahájit výuku a výcvik/);
+    assert.doesNotMatch(content, /zápis/i);
   }
 });
 
