@@ -82,14 +82,25 @@ function paymentDetails(amount: number) {
   };
 }
 
-function preparationDetails(applicationFormUrl: string, amount: number) {
+function preparationDetails(applicationFormUrl: string, amount: number, isKladno: boolean) {
   const payment = paymentDetails(amount);
+  const medicalText =
+    'Zdravotní posudek vydává váš registrující ošetřující lékař, který ho zapíše do EZKarty. Jako autoškola k němu nemáme přístup, proto si ho prosím stáhněte a vytiskněte. Posudek nesmí být ke dni zápisu do autoškoly starší než 3 měsíce.';
+  const applicationHtml = isKladno
+    ? `Vyplňte první část „Vyplňuje žadatel“ a přihlášku podepište. Originál vytiskněte <strong>oboustranně</strong> a přineste k zápisu. Pokud vám ještě není 18 let, přihlášku podepisuje také zákonný zástupce.`
+    : `Vyplňte první část „Vyplňuje žadatel“, přihlášku vytiskněte <strong>oboustranně</strong>, vyplňte, podepište a přineste s sebou k zápisu. Pokud vám ještě není 18 let, přihlášku podepisuje také zákonný zástupce.`;
+  const applicationText = isKladno
+    ? 'Vyplňte první část „Vyplňuje žadatel“ a přihlášku podepište. Originál vytiskněte oboustranně a přineste k zápisu. Pokud vám ještě není 18 let, přihlášku podepisuje také zákonný zástupce.'
+    : 'Vyplňte první část „Vyplňuje žadatel“, přihlášku vytiskněte oboustranně, vyplňte, podepište a přineste s sebou k zápisu. Pokud vám ještě není 18 let, přihlášku podepisuje také zákonný zástupce.';
+  const medicalDelivery = isKladno
+    ? 'Vyplněnou přihlášku a zdravotní posudek nám prosím pošlete odpovědí na tento e-mail. Originály přineste k zápisu.'
+    : 'Vytištěný zdravotní posudek přineste společně s přihláškou k zápisu.';
   return {
-    html: `<section style="background:#f4faf9;border:1px solid #dcebea;border-radius:18px;padding:18px;margin:22px 0;"><h2 style="font-size:19px;margin:0 0 12px;color:#17345d;">Co připravit před zápisem</h2><ol style="padding-left:22px;margin:0;color:#17345d;font-size:15px;line-height:1.7;"><li><strong>Vyplňte přihlášku.</strong> Přihlášku najdete v příloze tohoto e-mailu i na odkazu: <a href="${escapeHtml(applicationFormUrl)}" style="color:#17345d;font-weight:700;">přihláška k výcviku</a>. Vyplňte první část „Vyplňuje žadatel“, přihlášku vytiskněte <strong>oboustranně</strong>, vyplňte, podepište a přineste s sebou k zápisu. Pokud vám ještě není 18 let, přihlášku podepisuje také zákonný zástupce.</li><li style="margin-top:12px;"><strong>Vyřiďte zdravotní posudek.</strong> Zdravotní posudek přineste k zápisu do autoškoly společně s přihláškou. Od 1. 1. 2026 ho vydává pouze váš registrující ošetřující lékař. Pokud máte posudek v EZKartě, vytiskněte PDF a přineste ho k zápisu. Posudek nesmí být ke dni zápisu do autoškoly starší než 3 měsíce.</li>${payment.html}</ol></section>`,
+    html: `<section style="background:#f4faf9;border:1px solid #dcebea;border-radius:18px;padding:18px;margin:22px 0;"><h2 style="font-size:19px;margin:0 0 12px;color:#17345d;">Co připravit před zápisem</h2><ol style="padding-left:22px;margin:0;color:#17345d;font-size:15px;line-height:1.7;"><li><strong>Vyplňte přihlášku.</strong> Přihlášku najdete v příloze tohoto e-mailu i na odkazu: <a href="${escapeHtml(applicationFormUrl)}" style="color:#17345d;font-weight:700;">přihláška k výcviku</a>. ${applicationHtml}</li><li style="margin-top:12px;"><strong>Vyřiďte zdravotní posudek.</strong> ${medicalText} ${medicalDelivery}</li>${payment.html}</ol></section>`,
     text: [
       'Co připravit před zápisem:',
-      `1. Vyplňte přihlášku. Přihlášku najdete v příloze tohoto e-mailu i zde: ${applicationFormUrl}. Vyplňte první část „Vyplňuje žadatel“, přihlášku vytiskněte oboustranně, vyplňte, podepište a přineste s sebou k zápisu. Pokud vám ještě není 18 let, přihlášku podepisuje také zákonný zástupce.`,
-      '2. Vyřiďte zdravotní posudek. Zdravotní posudek přineste k zápisu do autoškoly společně s přihláškou. Od 1. 1. 2026 ho vydává pouze váš registrující ošetřující lékař. Pokud máte posudek v EZKartě, vytiskněte PDF a přineste ho k zápisu. Posudek nesmí být ke dni zápisu do autoškoly starší než 3 měsíce.',
+      `1. Vyplňte přihlášku. Přihlášku najdete v příloze tohoto e-mailu i zde: ${applicationFormUrl}. ${applicationText}`,
+      `2. Vyřiďte zdravotní posudek. ${medicalText} ${medicalDelivery}`,
       ...payment.text,
     ],
   };
@@ -102,7 +113,7 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
     : isKladno
       ? 'Vedoucí pobočky vás kontaktuje a domluví termín individuálně'
       : 'Termín zápisu zatím není vybraný';
-  const preparation = preparationDetails(input.applicationFormUrl, input.price.amount);
+  const preparation = preparationDetails(input.applicationFormUrl, input.price.amount, isKladno);
   const manageLink = input.appointment
     ? ` <a href="${escapeHtml(input.manageUrl)}" style="display:inline-block;color:#17345d;text-decoration:underline;margin-left:12px;font-weight:700;">Změnit termín zápisu</a>`
     : '';
@@ -148,7 +159,7 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
     orderId: input.orderId,
     appointmentId: input.appointment?.id,
     from: ORDER_FROM,
-    replyTo: ORDER_REPLY_TO,
+    replyTo: isKladno ? 'kladno@autoskolabubu.cz' : ORDER_REPLY_TO,
     to: input.contact.email,
     subject: `Potvrzení objednávky ${input.publicCode} – Autoškola BuBu`,
     html: layout('Potvrzení objednávky', body),

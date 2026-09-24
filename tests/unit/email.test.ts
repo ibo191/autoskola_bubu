@@ -13,7 +13,11 @@ import {
   stripHeader,
   toPragueDate,
 } from '../../src/lib/server/email/utils';
-import { assertCronAuthorized, previousPragueWeek } from '../../src/lib/server/email/workflows';
+import {
+  assertCronAuthorized,
+  needsBookingReminder,
+  previousPragueWeek,
+} from '../../src/lib/server/email/workflows';
 import { OrderEmailOutbox } from '../../src/lib/server/email/order-outbox';
 import type { EmailAdapter, EmailMessage } from '../../src/lib/integrations/contracts';
 import type { EmailEventRow, SupabaseEmailEventStore } from '../../src/lib/server/email/events';
@@ -102,11 +106,47 @@ test('order confirmation includes the customer note', () => {
   assert.match(email.text, /Poznámka k objednávce/);
   assert.match(email.text, /Prosím o zápis po 16\. hodině\./);
   assert.match(email.text, /Posudek nesmí být ke dni zápisu do autoškoly starší než 3 měsíce/);
+  assert.match(email.text, /který ho zapíše do EZKarty/);
+  assert.match(email.text, /Jako autoškola k němu nemáme přístup/);
+  assert.match(email.html ?? '', /který ho zapíše do EZKarty/);
   assert.match(email.text, /první splátka 8 700 Kč, druhá splátka 8 600 Kč/);
   assert.doesNotMatch(email.text, /pošlete odpovědí na tento e-mail/);
   assert.doesNotMatch(email.text, /PDF z EZKarty zaslaným e-mailem/);
   assert.match(email.html ?? '', /Prosím o zápis po 16\. hodině\./);
   assert.match(email.html ?? '', /<strong>oboustranně<\/strong>/);
+});
+
+test('Kladno confirmation asks for documents by email and replies to the branch', () => {
+  const email = orderConfirmationEmail({
+    ...orderInput,
+    selection: { ...orderInput.selection, branch: 'kladno' },
+    appointment: null,
+  });
+  assert.equal(email.replyTo, 'kladno@autoskolabubu.cz');
+  for (const content of [email.text, email.html ?? '']) {
+    assert.match(
+      content,
+      /Vyplněnou přihlášku a zdravotní posudek nám prosím pošlete odpovědí na tento e-mail/,
+    );
+    assert.match(content, /Posudek nesmí být ke dni zápisu do autoškoly starší než 3 měsíce/);
+    assert.doesNotMatch(content, /Termín si můžete vybrat zde/);
+  }
+});
+
+test('Kladno unbooked orders are not eligible for booking reminders', () => {
+  const order: PublicOrderOverview = {
+    orderId: orderInput.orderId,
+    publicCode: orderInput.publicCode,
+    status: 'confirmed',
+    contact: orderInput.contact,
+    selection: { ...orderInput.selection, branch: 'kladno' },
+    price: orderInput.price,
+    addons: [],
+    appointment: null,
+    createdAt: orderInput.createdAt.toISOString(),
+  };
+  assert.equal(needsBookingReminder(order), false);
+  assert.equal(needsBookingReminder({ ...order, selection: orderInput.selection }), true);
 });
 
 test('appointment reminders include the document checklist without a deposit request', () => {

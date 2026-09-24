@@ -31,6 +31,10 @@ export function assertCronAuthorized(request: Request, env: Record<string, strin
   return request.headers.get('authorization') === `Bearer ${secret}`;
 }
 
+export function needsBookingReminder(order: PublicOrderOverview) {
+  return order.selection.branch !== 'kladno';
+}
+
 function manageUrl(origin: string, code: string) {
   const url = new URL('/spravovat-termin', origin);
   url.searchParams.set('kod', code);
@@ -137,6 +141,7 @@ export async function processEmailReminders(
   }
 
   for (const order of await repository.unbookedOrderCandidates({ localDate: today })) {
+    if (!needsBookingReminder(order)) continue;
     const createdDay = toPragueDate(order.createdAt);
     if (today === addDaysToLocalDate(createdDay, 3))
       messages.push(unbookedReminderMessage({ order, days: 3, origin }));
