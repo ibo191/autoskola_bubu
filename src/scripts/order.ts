@@ -243,6 +243,8 @@ document.querySelectorAll<HTMLElement>('[data-order]').forEach((button) => {
     reset();
     field('course').value = button.dataset.course ?? '';
     field('branch').value = button.dataset.branch ?? '';
+    if (button.dataset.transmission) field('transmission').value = button.dataset.transmission;
+    if (button.dataset.drivingBlocks) field('drivingBlocks').value = button.dataset.drivingBlocks;
     dialog.showModal();
     document.body.classList.add('dialog-open');
     void updateQuote();

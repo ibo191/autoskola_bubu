@@ -36,6 +36,34 @@ test('Course overview renders crawlable links for every course detail', async ({
     );
 });
 
+test('Price guide transfers refresher quantity, branch and transmission to the order dialog', async ({
+  page,
+}) => {
+  for (const branch of ['Střížkov', 'Kladno', 'Statenice']) {
+    await page.goto('/cenik');
+    await page.getByRole('button', { name: /^Kondiční jízdy/ }).click();
+    await page.getByRole('button', { name: new RegExp('^' + branch) }).click();
+    await page
+      .getByRole('button', {
+        name: branch === 'Střížkov' ? /Automat/ : 'Manuál',
+        exact: branch !== 'Střížkov',
+      })
+      .click();
+    await page.locator('#pricing-driving-blocks').selectOption('2');
+    await expect(page.locator('#offer-price')).toHaveText('3 200 Kč');
+    await expect(page.locator('#offer-price-note')).not.toContainText('zkoušku');
+    await expect(page.locator('.fees')).toBeHidden();
+    await page.locator('.offer-card [data-order]').click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog.locator('[name="course"]')).toHaveValue('kondicni');
+    await expect(dialog.locator('[name="drivingBlocks"]')).toHaveValue('2');
+    await expect(dialog.locator('[name="transmission"]')).toHaveValue(
+      branch === 'Střížkov' ? 'automatic' : 'manual',
+    );
+    await expect(dialog.locator('#quote-amount')).toHaveText('3 200 Kč');
+  }
+});
+
 test('Moto enrollment is paused in the price guide while trailer courses remain Prague-only', async ({
   page,
 }) => {

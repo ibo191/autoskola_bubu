@@ -17,7 +17,8 @@ import { branches, getCourse } from '../../lib/catalog';
       <div>
         <nav class="breadcrumbs" aria-label="Drobečková navigace">
           <a href="/">Domů</a><span>/</span><a href="/kurzy">Kurzy</a><span>/</span><span
-            >Kondiční jízdy</span>
+            >Kondiční jízdy</span
+          >
         </nav>
         <span class="eyebrow">Kondiční jízdy pro držitele skupiny B</span>
         <h1>Zpátky za volant.<br />S klidem a jistotou.</h1>
@@ -42,14 +43,39 @@ import { branches, getCourse } from '../../lib/catalog';
   </section>
   <section class="section" id="cena">
     <div class="container">
-      <span class="eyebrow">Jasná cena a rozsah</span><h2>
-        800 Kč za 45 minut. Vždy jezdíme 90 minut.
-      </h2>
-      <p class="lead">
-        V objednávce zvolíte počet 90minutových bloků. Jeden blok stojí 1 600 Kč a obsahuje dvě
-        vyučovací hodiny. Dva bloky stojí 3 200 Kč a obsahují čtyři vyučovací hodiny, tedy 180
-        minut.
-      </p>
+      <div class="price-panel">
+        <div>
+          <span class="eyebrow">Víc jistoty. Vaše tempo.</span>
+          <h2>Věnujte 90 minut tomu,<br />co Vám za volantem chybí.</h2>
+          <p class="lead">
+            Žádný nový řidičák. Prostor pro Vás, instruktora a situace, které si chcete osvojit.
+            Začněte jednou jízdou a vyberte si rozsah, který Vám sedne.
+          </p>
+          <ul class="price-benefits">
+            <li>Parkování, křižovatky i běžný provoz</li><li>
+              Klidný přístup a náplň podle Vašich potřeb
+            </li><li>Manuál nebo automat podle pobočky</li>
+          </ul>
+        </div>
+        <div class="price-highlight">
+          <span class="eyebrow">Váš první krok zpátky za volant</span>
+          <strong class="price-main">1 600 Kč</strong>
+          <p class="price-duration">90 minut s instruktorem</p>
+          <p>
+            800 Kč za vyučovací hodinu (45 minut). Každá jízda má dvě vyučovací hodiny — dost času
+            vyzkoušet si věci v klidu.
+          </p>
+          <button class="btn primary" data-order data-course="kondicni" disabled
+            >Vybrat rozsah jízd ↗</button
+          >
+          <a class="text-link" href="/cenik">Spočítat cenu v ceníku →</a>
+        </div>
+      </div>
+      <div class="branch-heading">
+        <span class="eyebrow">Blízko Vás</span><h2>Kde se vrátíte za volant?</h2><p>
+          Stejná cena na všech pobočkách. Vyberte si tu svou.
+        </p>
+      </div>
       <div class="branch-grid">
         {
           branches.map((branch) => (
@@ -57,7 +83,9 @@ import { branches, getCourse } from '../../lib/catalog';
               <>
                 <h3>{branch.name}</h3>
                 <p>{branch.id === 'strizkov' ? 'Manuál i automat' : 'Pouze manuál'}</p>
-                <p>1 600 Kč / 90 minut</p>
+                <p class="branch-price">
+                  <strong>1 600 Kč</strong> / 90 minut
+                </p>
                 <button
                   class="btn primary"
                   data-order
@@ -78,10 +106,104 @@ import { branches, getCourse } from '../../lib/catalog';
       </p>
     </div>
   </section>
+  <section class="section section-soft">
+    <div class="container">
+      <div class="booking-cta">
+        <div>
+          <span class="eyebrow">Další jízda může být začátek</span><h2>
+            Řidičák máte.<br />Teď si vraťte jistotu.
+          </h2><p>
+            Vyberte pobočku, převodovku a počet jízd. Termíny samotných jízd domluvíme společně.
+          </p>
+        </div>
+        <div class="booking-actions">
+          <button class="btn primary" data-order data-course="kondicni" disabled
+            >Chci znovu řídit s jistotou ↗</button
+          ><a href="tel:+420725717755">Raději se nejdřív zeptám: 725 717 755</a>
+        </div>
+      </div>
+    </div>
+  </section>
   <GoogleReviewsBanner />
   <CourseFaq course={getCourse('kondicni')} />
 </Base>
 <style>
+  .price-panel {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .price-benefits {
+    padding-left: 22px;
+    line-height: 1.9;
+    margin-top: 24px;
+  }
+  .price-highlight {
+    background: var(--brand-soft);
+    border: 1px solid #c8e5dc;
+    padding: 36px;
+    border-radius: var(--radius-lg);
+  }
+  .price-main {
+    display: block;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    color: var(--ink);
+    margin-top: 20px;
+    line-height: 1.2;
+  }
+  .price-duration {
+    font-size: 1.25rem;
+    color: var(--ink);
+    font-weight: 600;
+    margin-bottom: 18px;
+  }
+  .price-highlight .btn {
+    margin-top: 24px;
+  }
+  .price-highlight .text-link {
+    display: block;
+    margin-top: 16px;
+  }
+  .branch-heading {
+    margin-top: 64px;
+  }
+  .branch-price strong {
+    font-size: 1.8rem;
+    color: var(--ink);
+  }
+  .booking-cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 36px;
+    background: linear-gradient(120deg, #173b71, #102b54);
+    color: #fff;
+    padding: 44px;
+    border-radius: var(--radius-lg);
+  }
+  .booking-cta h2 {
+    color: #fff;
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+  }
+  .booking-cta p {
+    color: #d7e4f5;
+    max-width: 580px;
+    margin-top: 18px;
+  }
+  .booking-cta .eyebrow {
+    color: #a1e5db;
+  }
+  .booking-actions {
+    flex-shrink: 0;
+    max-width: 320px;
+  }
+  .booking-actions a {
+    display: block;
+    color: #fff;
+    margin-top: 20px;
+    font-size: 0.9rem;
+  }
   .hero-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -107,8 +229,16 @@ import { branches, getCourse } from '../../lib/catalog';
   }
   @media (max-width: 800px) {
     .hero-grid,
-    .branch-grid {
+    .branch-grid,
+    .price-panel {
       grid-template-columns: 1fr;
+    }
+    .booking-cta {
+      display: block;
+      padding: 28px;
+    }
+    .booking-actions {
+      margin-top: 28px;
     }
   }
 </style>

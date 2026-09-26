@@ -62,6 +62,14 @@ import {
               ><img src="/icons/ui/blue-hands-wheel.webp" alt="" width="192" height="192" />Auto s
               přívěsem <small>B96 nebo B+E podle toho, co potřebujete táhnout.</small></button
             >
+            <button type="button" data-category="kondicni" aria-pressed="false">
+              <img src="/icons/ui/blue-hands-wheel.webp" alt="" width="192" height="192" />
+              <span
+                ><strong>Kondiční jízdy</strong><small
+                  >Řidičák už máte. Teď zpátky za volant s jistotou.</small
+                ></span
+              >
+            </button>
           </div>
         </fieldset>
 
@@ -105,6 +113,25 @@ import {
           </p><p class="question-note" id="transmission-note"></p>
         </fieldset>
 
+        <fieldset class="question next-question" id="driving-blocks-question" hidden>
+          <legend><span>04</span> Kolik času chcete za volantem?</legend>
+          <p class="question-note">
+            Dopřejte si čas na návrat do provozu. Jeden 90minutový blok stojí 1 600 Kč (2 × 45 minut
+            za 800 Kč).
+          </p>
+          <label
+            >Počet 90minutových bloků
+            <select id="pricing-driving-blocks">
+              {
+                Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
+                  <option value={n}>
+                    {n} × 90 minut · {(n * 1600).toLocaleString('cs-CZ')} Kč
+                  </option>
+                ))
+              }
+            </select>
+          </label>
+        </fieldset>
         <fieldset class="question next-question offer-picker" id="mode-question" hidden>
           <legend>Chcete začít už v 17 letech?</legend><p class="picker-intro">
             S L17 můžete získat řidičák skupiny B už v 17 letech a do osmnácti jezdit se zapsaným
@@ -244,7 +271,8 @@ import {
             </p>
           </div>
           <div class="offer-price">
-            <strong id="offer-price"></strong><span>*</span><small
+            <strong id="offer-price"></strong><span id="offer-price-asterisk">*</span><small
+              id="offer-price-note"
               >Cena odpovídá zvolené pobočce a variantě kurzu. * Nezahrnuje poplatky za zkoušku.</small
             >
           </div>
@@ -380,6 +408,7 @@ import {
     period: '',
     package: '',
     trailer: '',
+    drivingBlocks: 1,
   };
   const branchParam = new URLSearchParams(location.search).get('branch');
   if (branchParam && ['strizkov', 'kladno', 'statenice'].includes(branchParam))
@@ -421,6 +450,8 @@ import {
     state.period = '';
     state.package = '';
     state.trailer = '';
+    state.drivingBlocks = 1;
+    document.querySelector<HTMLSelectElement>('#pricing-driving-blocks')!.value = '1';
     document
       .querySelectorAll<HTMLInputElement>('input[name="held-licence"]')
       .forEach((input) => (input.checked = false));
@@ -430,8 +461,10 @@ import {
   function render() {
     requestSequence += 1;
     clearResults();
+    show('.fees', state.category !== 'kondicni');
     for (const selector of [
       '#transmission-question',
+      '#driving-blocks-question',
       '#mode-question',
       '#moto-target-question',
       '#licence-status-question',
@@ -469,17 +502,33 @@ import {
       reveal('#availability-message');
       return;
     }
-    if (state.category === 'auto') {
+    if (state.category === 'auto' || state.category === 'kondicni') {
       reveal('#transmission-question');
       const automatic = document.querySelector<HTMLButtonElement>(
         '[data-transmission="automatic"]',
       )!;
       automatic.disabled = state.branch !== 'strizkov';
+      automatic.hidden = state.category === 'kondicni' && state.branch !== 'strizkov';
       document.querySelector('#transmission-note')!.textContent =
-        state.branch === 'strizkov'
-          ? 'Manuál i automat jsou dostupné pro klasický kurz i L17.'
-          : 'Na této pobočce poskytujeme pouze výcvik s manuální převodovkou.';
+        state.category === 'kondicni'
+          ? state.branch === 'strizkov'
+            ? 'Kondiční jízdy na manuálu i automatu.'
+            : 'Kondiční jízdy na této pobočce probíhají pouze na manuálu.'
+          : state.branch === 'strizkov'
+            ? 'Manuál i automat jsou dostupné pro klasický kurz i L17.'
+            : 'Na této pobočce poskytujeme pouze výcvik s manuální převodovkou.';
       if (!state.transmission) return;
+      if (state.category === 'kondicni') {
+        reveal('#driving-blocks-question');
+        void requestQuote({
+          course: 'kondicni',
+          branch: state.branch,
+          transmission: state.transmission,
+          drivingBlocks: state.drivingBlocks,
+          package: 'single',
+        });
+        return;
+      }
       const selectedBranch = document.querySelector<HTMLButtonElement>(
         `[data-branch="${state.branch}"]`,
       );
@@ -581,8 +630,14 @@ import {
     document.querySelector('#offer-title')!.textContent = course.name;
     document.querySelector('#offer-description')!.textContent = course.description;
     document.querySelector('#offer-price')!.textContent = money(result.amount);
-    const packageLabel =
-      result.training === 'supplement'
+    const isRefresher = selection.course === 'kondicni';
+    document.querySelector('#offer-price-note')!.textContent = isRefresher
+      ? 'Celková cena vybraných kondičních jízd. 800 Kč / 45 minut; vždy jezdíme v 90minutových blocích.'
+      : 'Cena odpovídá zvolené pobočce a variantě kurzu. * Nezahrnuje poplatky za zkoušku.';
+    show('#offer-price-asterisk', !isRefresher);
+    const packageLabel = isRefresher
+      ? `${state.drivingBlocks} × 90 minut · ${state.drivingBlocks * 2} vyučovacích hodin · ${state.transmission === 'automatic' ? 'automat' : 'manuál'}`
+      : result.training === 'supplement'
         ? 'Doplňovací zkouška · 4 hodiny jízd'
         : result.package === 'moto-basic'
           ? 'Moto Základ · 13 hodin jízd'
@@ -600,6 +655,9 @@ import {
     const order = document.querySelector<HTMLButtonElement>('.offer-card [data-order]')!;
     order.dataset.course = String(selection.course);
     order.dataset.branch = state.branch;
+    order.dataset.transmission = state.transmission;
+    order.dataset.drivingBlocks = isRefresher ? String(state.drivingBlocks) : '';
+    order.textContent = isRefresher ? 'Objednat kondiční jízdy ↗' : 'Chci se přihlásit ↗';
     const detail = document.querySelector<HTMLAnchorElement>('#offer-detail')!;
     detail.href = `/kurzy/${course.slug}`;
     reveal('#pricing-results');
@@ -607,6 +665,12 @@ import {
       .querySelector('#pricing-results')
       ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
+  document
+    .querySelector<HTMLSelectElement>('#pricing-driving-blocks')!
+    .addEventListener('change', (event) => {
+      state.drivingBlocks = Number((event.target as HTMLSelectElement).value);
+      render();
+    });
   document.querySelectorAll<HTMLButtonElement>('[data-category]').forEach((button) =>
     button.addEventListener('click', () => {
       state.category = button.dataset.category!;
@@ -701,6 +765,9 @@ import {
     margin-top: 16px;
   }
   .choice-grid.compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .choice-grid.category-choices {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .choice-grid.four {
@@ -1009,7 +1076,8 @@ import {
   }
   @media (max-width: 760px) {
     .choice-grid,
-    .choice-grid.compact {
+    .choice-grid.compact,
+    .choice-grid.category-choices {
       grid-template-columns: 1fr;
     }
     .choice-grid.four {
