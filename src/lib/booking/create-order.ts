@@ -174,7 +174,8 @@ export class CreateOrderService {
     };
     const customerMessage = orderConfirmationEmail(emailInput);
     try {
-      customerMessage.attachments = [await applicationFormAttachment()];
+      if (parsed.data.selection.course !== 'kondicni')
+        customerMessage.attachments = [await applicationFormAttachment()];
     } catch (error) {
       console.warn('email_attachment_missing', {
         workflow: 'new_order',

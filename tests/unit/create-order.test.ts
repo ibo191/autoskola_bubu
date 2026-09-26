@@ -106,6 +106,32 @@ test('order workflow fails closed while legal texts are not approved', async () 
   assert.equal(f.repository.calls.length, 0);
 });
 
+test('Refresher order stores quantity and sends relevant instructions and price', async () => {
+  const f = fixture();
+  const result = await f.execute({
+    ...baseBody,
+    captchaToken: f.captcha.issue('order', now),
+    selection: {
+      course: 'kondicni',
+      branch: 'strizkov',
+      transmission: 'automatic',
+      drivingBlocks: 2,
+    },
+  });
+  assert.ok(result.ok);
+  assert.equal(f.repository.calls[0]?.selection.drivingBlocks, 2);
+  assert.equal(f.repository.calls[0]?.price.amount, 3200);
+  for (const message of f.email.messages.values()) {
+    assert.match(message.text, /automat.*2 × 90 minut/);
+  }
+  const customer = [...f.email.messages.values()].find(
+    (item) => item.to === baseBody.contact.email,
+  )!;
+  assert.equal(customer.attachments, undefined);
+  assert.doesNotMatch(customer.text, /zdravotní posudek|Vyplňte přihlášku/i);
+  assert.match(customer.text, /platný řidičský průkaz/);
+});
+
 test('order workflow recalculates price, stores a hash, then sends customer and internal order messages', async () => {
   const f = fixture();
   const captchaToken = f.captcha.issue('order', now);

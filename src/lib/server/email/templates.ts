@@ -3,7 +3,7 @@ import type { PublicOrderOverview, OrderAddon, Contact } from '../../booking/rep
 import type { Selection, Quote } from '../../pricing/quote';
 import { branches } from '../../catalog';
 import { money } from '../../format';
-import { branchLabel, courseLabel, packageLabel } from '../../order-display';
+import { branchLabel, selectionLabel, packageLabel } from '../../order-display';
 import {
   escapeHtml,
   eventKey,
@@ -127,7 +127,15 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
   const appointmentText = input.appointment
     ? formatEmailDateTime(input.appointment.startsAt)
     : 'Termín zápisu zatím není vybraný';
-  const preparation = preparationDetails(input.applicationFormUrl, input.price.amount, isKladno);
+  const isRefresher = input.selection.course === 'kondicni';
+  const preparation = isRefresher
+    ? {
+        html: '<h2>Co připravit</h2><p>Na zápis si vezměte občanský průkaz a platný řidičský průkaz skupiny B. Domluvíme s Vámi platbu a termíny kondičních jízd. Zvolený termín je termín zápisu, nikoli samotné jízdy. Na Kladně Vás pobočka kontaktuje a domluví termín individuálně.</p>',
+        text: [
+          'Co připravit: občanský průkaz a platný řidičský průkaz skupiny B. Domluvíme s Vámi platbu a termíny kondičních jízd. Zvolený termín je termín zápisu, nikoli samotné jízdy. Na Kladně Vás pobočka kontaktuje a domluví termín individuálně.',
+        ],
+      }
+    : preparationDetails(input.applicationFormUrl, input.price.amount, isKladno);
   const manageLink = input.appointment
     ? ` <a href="${escapeHtml(input.manageUrl)}" style="display:inline-block;color:#17345d;text-decoration:underline;margin-left:12px;font-weight:700;">Změnit termín zápisu</a>`
     : '';
@@ -135,7 +143,7 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
     `<p style="font-size:17px;line-height:1.65;margin:0 0 16px;">Dobrý den, ${escapeHtml(input.contact.firstName)}, děkujeme za objednávku. Níže najdete přehled a ${isKladno ? 'pokyny k zahájení výuky' : 'co je potřeba připravit před zápisem'}.</p>`,
     rows([
       ['Číslo objednávky', input.publicCode],
-      ['Kurz', courseLabel(input.selection.course)],
+      ['Kurz', selectionLabel(input.selection)],
       ['Pobočka', branchLabel(input.selection.branch)],
       ['Balíček', packageLabel(input.selection.package)],
       ['Doplňky', addonText(input.addons)],
@@ -150,7 +158,7 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
     noteHtml(input.note),
     preparation.html,
     `<p style="margin:24px 0;"><a href="${escapeHtml(input.thankYouUrl)}" style="display:inline-block;background:#4daeb6;color:#ffffff;text-decoration:none;padding:13px 18px;border-radius:999px;font-weight:700;">Zobrazit objednávku</a>${manageLink}</p>`,
-    ...(isKladno
+    ...(isKladno || isRefresher
       ? []
       : [
           `<p style="font-size:15px;line-height:1.6;color:#667998;margin:0;">Na zápis si prosím vezměte občanský průkaz, originál přihlášky a zdravotní posudek.</p>`,
@@ -160,7 +168,7 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
     `Dobrý den, ${input.contact.firstName}, děkujeme za objednávku v Autoškole BuBu.`,
     '',
     `Číslo objednávky: ${input.publicCode}`,
-    `Kurz: ${courseLabel(input.selection.course)}`,
+    `Kurz: ${selectionLabel(input.selection)}`,
     `Pobočka: ${branchLabel(input.selection.branch)}`,
     `Balíček: ${packageLabel(input.selection.package)}`,
     `Doplňky: ${addonText(input.addons)}`,
@@ -213,7 +221,7 @@ export function internalNewOrderEmail(input: CreatedOrderEmailInput): EmailMessa
     ['E-mail', input.contact.email],
     ['Telefon', input.contact.phone],
     ['Objednávka', input.publicCode],
-    ['Kurz', courseLabel(input.selection.course)],
+    ['Kurz', selectionLabel(input.selection)],
     ['Pobočka', branchLabel(input.selection.branch)],
     ['Balíček', packageLabel(input.selection.package)],
     ['Doplňky', addonText(input.addons)],
@@ -230,7 +238,7 @@ export function internalNewOrderEmail(input: CreatedOrderEmailInput): EmailMessa
     `E-mail: ${input.contact.email}`,
     `Telefon: ${input.contact.phone}`,
     `Objednávka: ${input.publicCode}`,
-    `Kurz: ${courseLabel(input.selection.course)}`,
+    `Kurz: ${selectionLabel(input.selection)}`,
     `Pobočka: ${branchLabel(input.selection.branch)}`,
     `Balíček: ${packageLabel(input.selection.package)}`,
     `Doplňky: ${addonText(input.addons)}`,
@@ -248,7 +256,7 @@ export function internalNewOrderEmail(input: CreatedOrderEmailInput): EmailMessa
     replyTo: input.contact.email,
     to: input.notificationEmail,
     subject: stripHeader(
-      `Nová objednávka – ${courseLabel(input.selection.course)} – ${branchLabel(input.selection.branch)} – ${name}`,
+      `Nová objednávka – ${selectionLabel(input.selection)} – ${branchLabel(input.selection.branch)} – ${name}`,
     ),
     html: layout('Nová objednávka z webu', body),
     text,
@@ -314,7 +322,7 @@ export function appointmentChangedEmail(input: {
   const body = `<p style="font-size:17px;line-height:1.65;margin:0 0 16px;">Dobrý den, ${escapeHtml(input.order.contact.firstName)}, ${isCancelled ? 'potvrzujeme zrušení termínu zápisu.' : 'potvrzujeme změnu termínu zápisu.'}</p>${rows(
     [
       ['Objednávka', input.order.publicCode],
-      ['Kurz', courseLabel(input.order.selection.course)],
+      ['Kurz', selectionLabel(input.order.selection)],
       ['Pobočka', branchLabel(input.order.selection.branch)],
       ['Aktuální termín', isCancelled ? 'zrušený' : appointmentText],
     ],
@@ -334,7 +342,7 @@ export function appointmentChangedEmail(input: {
     to: input.order.contact.email,
     subject: `${title} – Autoškola BuBu`,
     html: layout(title, body),
-    text: `${title}\n\nObjednávka: ${input.order.publicCode}\nKurz: ${courseLabel(input.order.selection.course)}\nPobočka: ${branchLabel(input.order.selection.branch)}\nAktuální termín: ${isCancelled ? 'zrušený' : appointmentText}\n\nSpráva termínu: ${input.manageUrl}`,
+    text: `${title}\n\nObjednávka: ${input.order.publicCode}\nKurz: ${selectionLabel(input.order.selection)}\nPobočka: ${branchLabel(input.order.selection.branch)}\nAktuální termín: ${isCancelled ? 'zrušený' : appointmentText}\n\nSpráva termínu: ${input.manageUrl}`,
     tag: `appointment-${input.kind}`,
     metadata: { publicCode: input.order.publicCode },
   };
@@ -350,6 +358,14 @@ export function appointmentReminderEmail(input: {
   const title = sameDay
     ? 'Dnes vás čeká zápis do Autoškoly BuBu'
     : `Připomínka zápisu do Autoškoly BuBu – ${formatEmailDate(input.order.appointment.startsAt)}`;
+  const checklist =
+    input.order.selection.course === 'kondicni'
+      ? ['občanský průkaz', 'platný řidičský průkaz skupiny B']
+      : [
+          'oboustranně vytištěnou, vyplněnou a podepsanou přihlášku k výcviku',
+          'zdravotní posudek',
+          'občanský průkaz',
+        ];
   const body = `<p style="font-size:17px;line-height:1.65;margin:0 0 16px;">Dobrý den, ${escapeHtml(input.order.contact.firstName)}, připomínáme váš termín zápisu.</p>${rows(
     [
       ['Objednávka', input.order.publicCode],
@@ -357,7 +373,7 @@ export function appointmentReminderEmail(input: {
       ['Pobočka', branchLabel(input.order.appointment.branch)],
       ['Adresa', branchAddress(input.order.appointment.branch)],
     ],
-  )}<div style="font-size:16px;line-height:1.65;margin:18px 0;"><strong>Co si nezapomenout vzít k zápisu:</strong><ul style="margin:8px 0 0;padding-left:22px;"><li>oboustranně vytištěnou, vyplněnou a podepsanou přihlášku k výcviku,</li><li>zdravotní posudek,</li><li>občanský průkaz.</li></ul></div><p style="margin:24px 0;"><a href="${escapeHtml(input.manageUrl)}" style="display:inline-block;background:#4daeb6;color:#ffffff;text-decoration:none;padding:13px 18px;border-radius:999px;font-weight:700;">Spravovat termín</a></p>`;
+  )}<div style="font-size:16px;line-height:1.65;margin:18px 0;"><strong>Co si nezapomenout vzít k zápisu:</strong><ul style="margin:8px 0 0;padding-left:22px;">${checklist.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></div><p style="margin:24px 0;"><a href="${escapeHtml(input.manageUrl)}" style="display:inline-block;background:#4daeb6;color:#ffffff;text-decoration:none;padding:13px 18px;border-radius:999px;font-weight:700;">Spravovat termín</a></p>`;
   return {
     idempotencyKey: eventKey(
       input.kind,
@@ -373,7 +389,7 @@ export function appointmentReminderEmail(input: {
     to: input.order.contact.email,
     subject: title,
     html: layout(title, body),
-    text: `${title}\n\nObjednávka: ${input.order.publicCode}\nTermín: ${formatEmailDateTime(input.order.appointment.startsAt)}\nPobočka: ${branchLabel(input.order.appointment.branch)}\nAdresa: ${branchAddress(input.order.appointment.branch)}\n\nCo si nezapomenout vzít k zápisu:\n- oboustranně vytištěnou, vyplněnou a podepsanou přihlášku k výcviku,\n- zdravotní posudek,\n- občanský průkaz.\n\nSpráva termínu: ${input.manageUrl}`,
+    text: `${title}\n\nObjednávka: ${input.order.publicCode}\nTermín: ${formatEmailDateTime(input.order.appointment.startsAt)}\nPobočka: ${branchLabel(input.order.appointment.branch)}\nAdresa: ${branchAddress(input.order.appointment.branch)}\n\nCo si nezapomenout vzít k zápisu:\n${checklist.map((item) => '- ' + item).join('\n')}\n\nSpráva termínu: ${input.manageUrl}`,
     tag: input.kind,
     metadata: {
       publicCode: input.order.publicCode,

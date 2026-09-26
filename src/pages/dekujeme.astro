@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { requireLiveRepository } from '../lib/server/live-order';
-import { branchLabel, courseLabel, formatDateTime, orderTotal } from '../lib/order-display';
+import { branchLabel, selectionLabel, formatDateTime, orderTotal } from '../lib/order-display';
 
 export const prerender = false;
 const code = Astro.url.searchParams.get('kod')?.trim() ?? '';
@@ -60,7 +60,7 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
               <div>
                 <>
                   <dt>Kurz</dt>
-                  <dd>{courseLabel(order.selection.course)}</dd>
+                  <dd>{selectionLabel(order.selection)}</dd>
                 </>
               </div>
               <div>

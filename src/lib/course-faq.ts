@@ -3,6 +3,26 @@ import { motoEnrollmentPausedMessage, type Course } from './catalog';
 export type CourseFaq = readonly [question: string, answer: string];
 
 export function courseFaqs(course: Course): CourseFaq[] {
+  if (course.id === 'kondicni') {
+    return [
+      [
+        'Pro koho jsou kondiční jízdy?',
+        'Pro držitele platného řidičského průkazu skupiny B, kteří chtějí obnovit jistotu za volantem nebo procvičit konkrétní situace.',
+      ],
+      [
+        'Kolik trvá jedna jízda a kolik stojí?',
+        'Jedna vyučovací hodina trvá 45 minut a stojí 800 Kč. Jezdíme vždy v 90minutových blocích za 1 600 Kč. Dva bloky znamenají 180 minut, tedy čtyři vyučovací hodiny.',
+      ],
+      [
+        'Mohu si vybrat manuál nebo automat?',
+        'Na Střížkově nabízíme manuál i automat. V Kladně a Statenicích pouze manuál. Pro manuál potřebujete odpovídající řidičské oprávnění bez omezení na automat.',
+      ],
+      [
+        'Rezervuji si rovnou termín jízdy?',
+        'V objednávce vybíráte termín osobního zápisu. Samotné jízdy s Vámi domluvíme individuálně. Na Kladně Vás kontaktuje pobočka a dohodne také termín zápisu.',
+      ],
+    ];
+  }
   if (course.id === 'b') {
     return [
       [

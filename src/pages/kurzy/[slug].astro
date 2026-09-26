@@ -22,12 +22,14 @@ import trailer from '../../assets/trailer.jpeg';
 
 export const prerender = true;
 export function getStaticPaths() {
-  return courses.map((course) => ({ params: { slug: course.slug }, props: { course } }));
+  return courses
+    .filter((course) => course.id !== 'kondicni')
+    .map((course) => ({ params: { slug: course.slug }, props: { course } }));
 }
 interface Props {
-  course: Course;
+  course: Course & { id: Exclude<Course['id'], 'kondicni'> };
 }
-const { course } = Astro.props;
+const { course } = Astro.props as Props;
 const isMoto = course.category === 'moto';
 const photo =
   course.id === 'b-automat'

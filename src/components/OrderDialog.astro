@@ -58,6 +58,19 @@ const { recaptchaSiteKey = '', captchaRequired = false } = Astro.props;
               ></select
             ></label
           >
+          <label id="driving-blocks-field" hidden>
+            Počet 90minutových bloků<select name="drivingBlocks">
+              {
+                Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
+                  <option value={n}>
+                    {n} {n === 1 ? 'blok' : n < 5 ? 'bloky' : 'bloků'} · {n * 2} × 45 minut ·{' '}
+                    {(n * 1600).toLocaleString('cs-CZ')} Kč
+                  </option>
+                ))
+              }
+            </select>
+            <small>1 vyučovací hodina = 45 minut za 800 Kč. Jezdíme vždy 90 minut v kuse.</small>
+          </label>
           <label id="licence-field" hidden
             >Jaké oprávnění už máte?<select name="heldLicence"
               ><option value="">Zatím žádné</option><option value="B">B</option><option value="A1"

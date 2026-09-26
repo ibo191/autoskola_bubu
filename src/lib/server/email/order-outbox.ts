@@ -63,7 +63,7 @@ export class OrderEmailOutbox implements EmailAdapter {
     }
     const message: EmailMessage = parsed.data;
     try {
-      if (message.eventType === 'order_confirmation') {
+      if (message.eventType === 'order_confirmation' && message.metadata?.course !== 'kondicni') {
         message.attachments = [await applicationFormAttachment()];
       }
       const result = await this.provider.send(message);

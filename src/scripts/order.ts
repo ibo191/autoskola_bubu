@@ -21,7 +21,7 @@ const selectedSlotLabel = document.querySelector<HTMLElement>('#selected-slot-la
 const motoPackageCards = document.querySelector<HTMLElement>('#moto-package-cards')!;
 const motoPackageOptions = document.querySelector<HTMLElement>('#moto-package-options')!;
 const restrictedBranches = new Set(['kladno', 'statenice']);
-const limitedBranchCourses = new Set(['b', 'l17']);
+const limitedBranchCourses = new Set(['b', 'l17', 'kondicni']);
 
 async function getCaptchaToken() {
   if (dialog.dataset.captchaRequired !== 'true') return 'preview-order-submission';
@@ -134,9 +134,10 @@ function selectionWithAddons() {
     transmission:
       course === 'b-automat'
         ? 'automatic'
-        : course === 'l17'
+        : course === 'l17' || course === 'kondicni'
           ? field('transmission').value
           : 'manual',
+    ...(course === 'kondicni' ? { drivingBlocks: Number(field('drivingBlocks').value) } : {}),
     package: moto ? field('package').value : 'single',
     heldLicences: moto && heldLicence ? [heldLicence] : [],
     ...(moto && direct ? { holdingPeriod: field('holdingPeriod').value } : {}),
@@ -304,7 +305,9 @@ form.addEventListener('submit', (event) => {
 form.addEventListener('input', () => {
   dirty = true;
 });
-form.addEventListener('change', () => {
+form.addEventListener('change', (event) => {
+  if (!(event.target instanceof HTMLSelectElement) || !event.target.closest('[data-step="0"]'))
+    return;
   syncAvailableCourses();
   updateOrderStepCopy();
   void updateQuote();
@@ -352,7 +355,17 @@ async function updateQuote(retry = false) {
   document.querySelector<HTMLElement>('#period-field')!.hidden = !moto || !direct;
   document.querySelector<HTMLElement>('#package-field')!.hidden = !moto;
   motoPackageCards.hidden = !moto;
-  document.querySelector<HTMLElement>('#transmission-field')!.hidden = course !== 'l17';
+  document.querySelector<HTMLElement>('#transmission-field')!.hidden = ![
+    'l17',
+    'kondicni',
+  ].includes(course);
+  document.querySelector<HTMLElement>('#driving-blocks-field')!.hidden = course !== 'kondicni';
+  const automaticOption = (
+    field('transmission') as HTMLSelectElement
+  ).querySelector<HTMLOptionElement>('option[value=automatic]')!;
+  automaticOption.hidden = branch !== 'strizkov';
+  automaticOption.disabled = branch !== 'strizkov';
+  if (branch !== 'strizkov') field('transmission').value = 'manual';
   const amount = document.querySelector<HTMLElement>('#quote-amount')!;
   const note = document.querySelector<HTMLElement>('#quote-note')!;
   if (!course || !branch) {
@@ -404,7 +417,10 @@ async function updateQuote(retry = false) {
     validQuote = result;
     amount.textContent = money(result.amount);
     const addonsNote = result.addonsAmount ? ` Doplňky: ${money(result.addonsAmount)}.` : '';
-    note.textContent = `Kurz: ${money(result.baseAmount)}.${addonsNote} Samostatně: organizace zkoušky ${money(result.schoolFee)}, úřední poplatek za první zkoušku ${money(result.authorityFee)}.${result.extraTheoryHours ? ' Součástí jsou také 2 hodiny teorie navíc.' : ''}`;
+    note.textContent =
+      course === 'kondicni'
+        ? `${selection.drivingBlocks} × 90 minut (${(selection.drivingBlocks ?? 1) * 2} vyučovacích hodin). 800 Kč / 45 minut. Termíny jízd domluvíme při zápisu.`
+        : `Kurz: ${money(result.baseAmount)}.${addonsNote} Samostatně: organizace zkoušky ${money(result.schoolFee)}, úřední poplatek za první zkoušku ${money(result.authorityFee)}.${result.extraTheoryHours ? ' Součástí jsou také 2 hodiny teorie navíc.' : ''}`;
     next.disabled = false;
   } catch {
     if (seq !== requestSequence) return;

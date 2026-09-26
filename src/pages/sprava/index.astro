@@ -1,6 +1,8 @@
 ---
 export const prerender = false;
 Astro.response.headers.set('Cache-Control', 'no-store');
+import { selectionSchema } from '../../lib/pricing/quote';
+import { selectionLabel } from '../../lib/order-display';
 import Base from '../../layouts/Base.astro';
 import { branches, courses, money } from '../../lib/catalog';
 import { requireLiveRepository } from '../../lib/server/live-order';
@@ -122,6 +124,10 @@ const appointmentDays =
     : [];
 const appointmentDayMap = new Map(appointmentDays.map((item) => [item.date, item.count]));
 
+const orderCourseLabel = (order: { course: string; selection: unknown }) => {
+  const parsed = selectionSchema.safeParse(order.selection);
+  return parsed.success ? selectionLabel(parsed.data) : courseLabel(order.course);
+};
 const courseLabel = (id: string) => courses.find((item) => item.id === id)?.label ?? id;
 const branchLabel = (id: string) => branches.find((item) => item.id === id)?.name ?? id;
 const packageLabel = (id: string) =>
@@ -365,7 +371,7 @@ const calendarDays = calendarDates.map((item) => ({
                             <br />
                             <a href={`tel:${order.contact.phone}`}>{order.contact.phone}</a>
                           </td>
-                          <td>{courseLabel(order.course)}</td>
+                          <td>{orderCourseLabel(order)}</td>
                           <td>{branchLabel(order.branch)}</td>
                           <td>{packageLabel(order.package)}</td>
                           <td>
@@ -410,7 +416,7 @@ const calendarDays = calendarDates.map((item) => ({
                         {order.contact.firstName} {order.contact.lastName}
                       </h3>
                       <p>
-                        {courseLabel(order.course)} · {branchLabel(order.branch)} ·{' '}
+                        {orderCourseLabel(order)} · {branchLabel(order.branch)} ·{' '}
                         {packageLabel(order.package)}
                       </p>
                       <dl>

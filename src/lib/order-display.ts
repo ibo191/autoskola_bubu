@@ -1,3 +1,4 @@
+import type { Selection } from './pricing/quote';
 import { money } from './format';
 import { branches, courses } from './catalog';
 import type { PublicOrderOverview } from './booking/repository';
@@ -18,6 +19,20 @@ export function formatDateTime(value?: string) {
 export function courseLabel(id: string) {
   const course = courses.find((item) => item.id === id);
   return course ? `${course.label} – ${course.name}` : id;
+}
+
+export function selectionLabel(selection: Selection) {
+  if (selection.course !== 'kondicni') return courseLabel(selection.course);
+  const blocks = selection.drivingBlocks ?? 1;
+  return (
+    'Kondiční jízdy · ' +
+    (selection.transmission === 'automatic' ? 'automat' : 'manuál') +
+    ' · ' +
+    blocks +
+    ' × 90 minut (' +
+    blocks * 2 +
+    ' vyučovacích hodin)'
+  );
 }
 
 export function branchLabel(id: string) {
@@ -48,5 +63,5 @@ export function orderSummaryText(order: PublicOrderOverview) {
   const appointment = order.appointment
     ? formatDateTime(order.appointment.startsAt)
     : 'bez termínu';
-  return `${courseLabel(order.selection.course)} · ${branchLabel(order.selection.branch)} · ${orderTotal(order)} · ${appointment}`;
+  return `${selectionLabel(order.selection)} · ${branchLabel(order.selection.branch)} · ${orderTotal(order)} · ${appointment}`;
 }

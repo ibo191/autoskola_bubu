@@ -15,6 +15,7 @@ import {
 export const selectionSchema = z
   .object({
     course: courseId,
+    drivingBlocks: z.number().int().min(1).max(20).optional(),
     branch: branchId,
     transmission: z.enum(['manual', 'automatic']).optional(),
     package: z.enum(['single', 'moto-basic', 'moto-confidence', 'supplement']).default('single'),
@@ -60,6 +61,15 @@ export function quote(input: unknown): Quote {
       code: 'INVALID_SELECTION',
       message: 'Zkontrolujte vybraný kurz a pobočku.',
     };
+  if (
+    (parsed.data.course === 'kondicni' && !parsed.data.drivingBlocks) ||
+    (parsed.data.course !== 'kondicni' && parsed.data.drivingBlocks !== undefined)
+  )
+    return {
+      ok: false,
+      code: 'INVALID_SELECTION',
+      message: 'Vyberte počet 90minutových bloků kondičních jízd.',
+    };
   const s = parsed.data,
     course = getCourse(s.course);
   if (
@@ -75,7 +85,13 @@ export function quote(input: unknown): Quote {
     };
   if (course.category === 'moto' && motoEnrollmentPaused)
     return { ok: false, code: 'UNAVAILABLE', message: motoEnrollmentPausedMessage };
-  const selectedAddons: { id: string; title: string; quantity: number; unitPrice: number; total: number }[] = [];
+  const selectedAddons: {
+    id: string;
+    title: string;
+    quantity: number;
+    unitPrice: number;
+    total: number;
+  }[] = [];
   const addonsAmount = selectedAddons.reduce((sum, item) => sum + item.total, 0);
   const result = (
     baseAmount: number,
@@ -91,8 +107,8 @@ export function quote(input: unknown): Quote {
     package: s.package,
     training,
     extraTheoryHours,
-    schoolFee: fees.schoolOrganization,
-    authorityFee: fees.authorityFirstExam,
+    schoolFee: s.course === 'kondicni' ? 0 : fees.schoolOrganization,
+    authorityFee: s.course === 'kondicni' ? 0 : fees.authorityFirstExam,
     priceVersion: priceSource.version,
   });
   const choose = (allowed: Selection['package'][]): Quote => ({
@@ -103,6 +119,7 @@ export function quote(input: unknown): Quote {
   });
   if (course.category !== 'moto') {
     if (s.package !== 'single') return choose(['single']);
+    if (s.course === 'kondicni') return result(s.drivingBlocks! * 1600);
     if (course.category === 'auto') return result(getBranch(s.branch).bPrice);
     return result(s.course === 'b96' ? prices.b96 : prices.be, 'extension');
   }

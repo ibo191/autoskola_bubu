@@ -1,0 +1,114 @@
+---
+export const prerender = true;
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import CourseFaq from '../../components/CourseFaq.astro';
+import GoogleReviewsBanner from '../../components/GoogleReviewsBanner.astro';
+import car from '../../assets/courses/b-manual-fabia.png';
+import { branches, getCourse } from '../../lib/catalog';
+---
+
+<Base
+  title="Kondiční jízdy Praha 8, Kladno a Statenice – manuál i automat"
+  description="Získejte zpět jistotu za volantem s Autoškolou BuBu. Kondiční jízdy za 800 Kč / 45 minut, vždy v 90minutových blocích. Manuál i automat na Střížkově."
+>
+  <section class="page-hero">
+    <div class="container hero-grid">
+      <div>
+        <nav class="breadcrumbs" aria-label="Drobečková navigace">
+          <a href="/">Domů</a><span>/</span><a href="/kurzy">Kurzy</a><span>/</span><span
+            >Kondiční jízdy</span>
+        </nav>
+        <span class="eyebrow">Kondiční jízdy pro držitele skupiny B</span>
+        <h1>Zpátky za volant.<br />S klidem a jistotou.</h1>
+        <p class="lead">
+          Dlouho jste neřídili nebo si chcete procvičit parkování, křižovatky či jízdu v provozu?
+          Tempo a náplň přizpůsobíme Vašim zkušenostem.
+        </p>
+        <div class="actions">
+          <button class="btn primary" data-order data-course="kondicni" disabled
+            >Objednat kondiční jízdy ↗</button
+          ><a class="btn secondary" href="#cena">Cena a pobočky</a>
+        </div>
+      </div>
+      <Image
+        src={car}
+        alt="Škoda Fabia Autoškoly BuBu pro kondiční jízdy"
+        width={720}
+        height={540}
+        loading="eager"
+      />
+    </div>
+  </section>
+  <section class="section" id="cena">
+    <div class="container">
+      <span class="eyebrow">Jasná cena a rozsah</span><h2>
+        800 Kč za 45 minut. Vždy jezdíme 90 minut.
+      </h2>
+      <p class="lead">
+        V objednávce zvolíte počet 90minutových bloků. Jeden blok stojí 1 600 Kč a obsahuje dvě
+        vyučovací hodiny. Dva bloky stojí 3 200 Kč a obsahují čtyři vyučovací hodiny, tedy 180
+        minut.
+      </p>
+      <div class="branch-grid">
+        {
+          branches.map((branch) => (
+            <article class="branch-card">
+              <>
+                <h3>{branch.name}</h3>
+                <p>{branch.id === 'strizkov' ? 'Manuál i automat' : 'Pouze manuál'}</p>
+                <p>1 600 Kč / 90 minut</p>
+                <button
+                  class="btn primary"
+                  data-order
+                  data-course="kondicni"
+                  data-branch={branch.id}
+                  disabled
+                >
+                  Vybrat {branch.name} ↗
+                </button>
+              </>
+            </article>
+          ))
+        }
+      </div>
+      <p>
+        Potřebujete platný řidičský průkaz skupiny B. Zápis a termíny jízd jsou dvě různé věci: při
+        zápisu spolu domluvíme samotné jízdy i platbu.
+      </p>
+    </div>
+  </section>
+  <GoogleReviewsBanner />
+  <CourseFaq course={getCourse('kondicni')} />
+</Base>
+<style>
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .hero-grid img {
+    width: 100%;
+    height: auto;
+    border-radius: 24px;
+  }
+  .branch-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin: 32px 0;
+  }
+  .branch-card {
+    padding: 28px;
+    border: 1px solid var(--line, #dcebea);
+    border-radius: 18px;
+    background: white;
+  }
+  @media (max-width: 800px) {
+    .hero-grid,
+    .branch-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

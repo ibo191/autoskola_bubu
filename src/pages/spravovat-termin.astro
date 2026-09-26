@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { requireLiveRepository } from '../lib/server/live-order';
-import { branchLabel, courseLabel, formatDateTime } from '../lib/order-display';
+import { branchLabel, selectionLabel, formatDateTime } from '../lib/order-display';
 
 export const prerender = false;
 const code = Astro.url.searchParams.get('kod')?.trim() ?? '';
@@ -41,7 +41,7 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
             data-manage-order={order.publicCode}
             data-branch={order.selection.branch}
           >
-            <h2>{courseLabel(order.selection.course)}</h2>
+            <h2>{selectionLabel(order.selection)}</h2>
             <p>
               <strong>Pobočka:</strong> {branchLabel(order.selection.branch)}
             </p>

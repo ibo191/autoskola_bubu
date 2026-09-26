@@ -70,3 +70,26 @@ test('Published exam fees distinguish the first and repeated exam term', () => {
   assert.equal(fees.schoolOrganization, 1000);
   assert.equal(fees.schoolRepeatExam, 800);
 });
+
+test('Refresher blocks are priced server-side and automatic is restricted to Střížkov', () => {
+  for (const branch of branches)
+    for (const drivingBlocks of [1, 2, 20]) {
+      const result = quote({ course: 'kondicni', branch: branch.id, drivingBlocks });
+      assert.ok(result.ok);
+      assert.equal(result.amount, drivingBlocks * 1600);
+      assert.equal(result.schoolFee, 0);
+      assert.equal(result.authorityFee, 0);
+      assert.equal(
+        quote({ course: 'kondicni', branch: branch.id, drivingBlocks, transmission: 'automatic' })
+          .ok,
+        branch.id === 'strizkov',
+      );
+    }
+  for (const drivingBlocks of [undefined, 0, -1, 1.5, 21, '2'])
+    assert.equal(quote({ course: 'kondicni', branch: 'strizkov', drivingBlocks }).ok, false);
+  assert.equal(quote({ course: 'b', branch: 'strizkov', drivingBlocks: 2 }).ok, false);
+  assert.equal(
+    quote({ course: 'kondicni', branch: 'strizkov', drivingBlocks: 2, amount: 1 }).ok,
+    false,
+  );
+});

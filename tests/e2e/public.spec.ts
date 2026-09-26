@@ -18,7 +18,7 @@ test('B pricing asks for transmission and L17, with manual only outside Prague',
 test('Course overview renders crawlable links for every course detail', async ({ page }) => {
   await page.goto('/kurzy');
   const courseLinks = page.locator('.course-tile > a.course-tile-overlay[href^="/kurzy/"]');
-  await expect(courseLinks).toHaveCount(9);
+  await expect(courseLinks).toHaveCount(10);
   for (const href of [
     '/kurzy/ridicak-skupina-b',
     '/kurzy/ridicak-skupina-b-automat',
@@ -29,6 +29,7 @@ test('Course overview renders crawlable links for every course detail', async ({
     '/kurzy/ridicak-skupina-am',
     '/kurzy/b96',
     '/kurzy/be',
+    '/kurzy/kondicni-jizdy',
   ])
     await expect(page.locator(`.course-tile > a.course-tile-overlay[href="${href}"]`)).toHaveCount(
       1,
@@ -89,7 +90,7 @@ test('Five-step journey reveals the selected detail', async ({ page }) => {
     'false',
   );
 });
-test('Order dialog excludes moto and limits Kladno and Statenice to B and L17', async ({
+test('Order dialog excludes moto and limits Kladno and Statenice to B, L17 and refresher driving', async ({
   page,
 }) => {
   await page.goto('/');
@@ -102,6 +103,43 @@ test('Order dialog excludes moto and limits Kladno and Statenice to B and L17', 
   await expect(course.locator('option[value="b96"]')).toHaveJSProperty('hidden', true);
   await expect(course.locator('option[value="b"]')).toHaveJSProperty('hidden', false);
   await expect(course.locator('option[value="l17"]')).toHaveJSProperty('hidden', false);
+  await expect(course.locator('option[value="kondicni"]')).toHaveJSProperty('hidden', false);
+});
+
+test('Refresher driving uses 90-minute blocks and only offers automatic in Střížkov', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/kurzy/kondicni-jizdy');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+    true,
+  );
+  await page.getByRole('button', { name: 'Vybrat Střížkov ↗', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.locator('#quote-amount')).toHaveText('1 600 Kč');
+  await dialog.locator('[name="drivingBlocks"]').selectOption('2');
+  await expect(dialog.locator('#quote-amount')).toHaveText('3 200 Kč');
+  await dialog.locator('[name="transmission"]').selectOption('automatic');
+  await expect(dialog.locator('#quote-amount')).toHaveText('3 200 Kč');
+  for (const branch of ['kladno', 'statenice']) {
+    await dialog.locator('[name="branch"]').selectOption(branch);
+    await expect(dialog.locator('[name="course"]')).toHaveValue('kondicni');
+    await expect(dialog.locator('[name="transmission"]')).toHaveValue('manual');
+    await expect(
+      dialog.locator('[name="transmission"] option[value="automatic"]'),
+    ).toHaveJSProperty('disabled', true);
+    await expect(
+      dialog.locator('[name="transmission"] option[value="automatic"]'),
+    ).toHaveJSProperty('hidden', true);
+    await expect(dialog.locator('#quote-amount')).toHaveText('3 200 Kč');
+  }
+  await dialog.getByRole('button', { name: 'Pokračovat →', exact: true }).click();
+  await dialog.getByLabel('Jméno', { exact: true }).fill('Fiktivní');
+  await dialog.getByLabel('Příjmení', { exact: true }).fill('Test');
+  await dialog.getByLabel('E-mail', { exact: true }).fill('fixture@example.invalid');
+  await dialog.getByLabel('Telefon', { exact: true }).fill('777111222');
+  await dialog.getByRole('button', { name: 'Pokračovat →', exact: true }).click();
+  await expect(dialog.locator('#booking-calendar')).toBeVisible();
 });
 test('Dialog keyboard confinement, safe discard and focus restoration', async ({ page }) => {
   await page.goto('/');
@@ -133,7 +171,14 @@ test('Reject price tampering and foreign origin', async ({ request }) => {
   });
   expect(foreign.status()).toBe(403);
 });
-for (const path of ['/', '/cenik', '/strizkov', '/kurzy/ridicak-skupina-b', '/blog'])
+for (const path of [
+  '/',
+  '/cenik',
+  '/strizkov',
+  '/kurzy/ridicak-skupina-b',
+  '/kurzy/kondicni-jizdy',
+  '/blog',
+])
   test(`WCAG automated checks ${path}`, async ({ page }) => {
     await page.goto(path);
     const result = await new AxeBuilder({ page })
