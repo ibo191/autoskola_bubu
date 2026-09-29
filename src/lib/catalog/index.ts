@@ -40,7 +40,7 @@ export const branches = z.array(branchSchema).parse([
     address: 'Statenická 23, Statenice',
     phone: '+420725703171',
     email: 'statenice@autoskolabubu.cz',
-    hours: 'Středa 15:00–18:00',
+    hours: 'Středa 15:45–18:30',
     bPrice: 25900,
   },
 ]);

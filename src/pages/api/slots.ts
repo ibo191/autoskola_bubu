@@ -31,7 +31,7 @@ function previewSlots(branch: string, from: string, to: string) {
       { weekday: 1, open: '15:00', close: '18:00' },
       { weekday: 4, open: '15:00', close: '18:00' },
     ],
-    statenice: [{ weekday: 3, open: '15:00', close: '18:00' }],
+    statenice: [{ weekday: 3, open: '15:45', close: '18:30' }],
     kladno: [],
   };
   const end = Date.parse(`${to}T00:00:00Z`);

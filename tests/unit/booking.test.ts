@@ -33,6 +33,28 @@ test('Blocked intervals remove affected starts without inventing replacements', 
   });
   assert.equal(slots.length, 11);
 });
+test('Statenice Wednesday appointments start at 15:45 and fit within 18:30', () => {
+  const slots = generateSlots({
+    date: '2026-09-30',
+    open: '15:45',
+    close: '18:30',
+    durationMinutes: 20,
+    capacity: 1,
+  });
+  assert.equal(slots.length, 8);
+  assert.deepEqual(
+    slots.map((slot) =>
+      new Intl.DateTimeFormat('cs-CZ', {
+        timeZone: 'Europe/Prague',
+        hour: '2-digit',
+        minute: '2-digit',
+        hourCycle: 'h23',
+      }).format(new Date(slot.start)),
+    ),
+    ['15:45', '16:05', '16:25', '16:45', '17:05', '17:25', '17:45', '18:05'],
+  );
+  assert.equal(slots.at(-1)!.end, '2026-09-30T16:25:00.000Z');
+});
 test('Prague summer and winter time and DST boundaries', () => {
   assert.equal(pragueToUtc('2026-01-15', '15:00').toISOString(), '2026-01-15T14:00:00.000Z');
   assert.equal(pragueToUtc('2026-07-15', '15:00').toISOString(), '2026-07-15T13:00:00.000Z');
