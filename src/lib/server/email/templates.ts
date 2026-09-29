@@ -311,6 +311,60 @@ export function contactFormEmail(input: {
   };
 }
 
+export function examQuestionNotificationEmail(input: {
+  submissionId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  branch: string;
+  message: string;
+}): EmailMessage {
+  const name = `${input.firstName} ${input.lastName}`;
+  const subject = stripHeader(`Dotaz ke zkoušce – ${name} – ${branchLabel(input.branch)}`);
+  return {
+    idempotencyKey: eventKey('exam-question-internal', input.submissionId),
+    eventType: 'exam_question_notification',
+    from: CONTACT_FROM,
+    replyTo: input.email,
+    to: 'zkousky@autoskolabubu.cz',
+    subject,
+    html: layout(
+      'Nový dotaz ke zkoušce',
+      `${rows([
+        ['Jméno', input.firstName],
+        ['Příjmení', input.lastName],
+        ['E-mail', input.email],
+        ['Telefon', input.phone],
+        ['Pobočka', branchLabel(input.branch)],
+      ])}<p style="white-space:pre-wrap;">${escapeHtml(input.message)}</p>`,
+    ),
+    text: `${subject}\nJméno: ${name}\nE-mail: ${input.email}\nTelefon: ${input.phone}\nPobočka: ${branchLabel(input.branch)}\n\n${input.message}`,
+    tag: 'exam-question',
+    metadata: { branch: input.branch },
+  };
+}
+
+export function examQuestionConfirmationEmail(input: {
+  submissionId: string;
+  to: string;
+}): EmailMessage {
+  const title = 'Přijali jsme váš dotaz ke zkoušce | Autoškola BuBu';
+  const body =
+    '<p>Dobrý den,</p><p>váš dotaz ke zkoušce jsme přijali. Jakmile ho zpracujeme, odpovíme vám na e-mail, který jste uvedli ve formuláři.</p><p>Prosíme, neposílejte stejný dotaz opakovaně ani svému instruktorovi.</p><p>Autoškola BuBu</p>';
+  return {
+    idempotencyKey: eventKey('exam-question-confirmation', input.submissionId),
+    eventType: 'exam_question_confirmation',
+    from: CONTACT_FROM,
+    replyTo: ORDER_REPLY_TO,
+    to: input.to,
+    subject: title,
+    html: layout(title, body),
+    text: 'Dobrý den,\n\nváš dotaz ke zkoušce jsme přijali.\n\nJakmile ho zpracujeme, odpovíme vám na e-mail, který jste uvedli ve formuláři.\n\nProsíme, neposílejte stejný dotaz opakovaně ani svému instruktorovi.\n\nAutoškola BuBu',
+    tag: 'exam-question-confirmation',
+  };
+}
+
 export function appointmentChangedEmail(input: {
   order: PublicOrderOverview;
   manageUrl: string;

@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import {
   appointmentReminderEmail,
   appointmentDayReportEmail,
+  examQuestionConfirmationEmail,
+  examQuestionNotificationEmail,
   contactFormEmail,
   internalNewOrderEmail,
   orderConfirmationEmail,
@@ -25,6 +27,28 @@ import type { EmailAdapter, EmailMessage } from '../../src/lib/integrations/cont
 import type { EmailEventRow, SupabaseEmailEventStore } from '../../src/lib/server/email/events';
 import type { PublicOrderOverview } from '../../src/lib/booking/repository';
 import type { AdminAppointment } from '../../src/lib/supabase/booking-repository';
+
+test('exam question email goes centrally and replies to the student', () => {
+  const internal = examQuestionNotificationEmail({
+    submissionId: 'exam-test-1',
+    firstName: 'Jan',
+    lastName: 'Novák',
+    email: 'jan@example.invalid',
+    phone: '+420725717755',
+    branch: 'kladno',
+    message: '<Potřebuji termín>',
+  });
+  const confirmation = examQuestionConfirmationEmail({
+    submissionId: 'exam-test-1',
+    to: 'jan@example.invalid',
+  });
+  assert.equal(internal.to, 'zkousky@autoskolabubu.cz');
+  assert.equal(internal.replyTo, 'jan@example.invalid');
+  assert.match(internal.subject, /Jan Novák.*Kladno/);
+  assert.match(internal.html ?? '', /&lt;Potřebuji termín&gt;/);
+  assert.equal(confirmation.to, 'jan@example.invalid');
+  assert.equal(confirmation.eventType, 'exam_question_confirmation');
+});
 
 test('appointment day reports use the branch schedule and Prague local day', () => {
   assert.deepEqual(appointmentReportBranches(new Date('2026-09-30T05:00:00Z')), ['statenice']);

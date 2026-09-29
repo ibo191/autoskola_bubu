@@ -2,7 +2,7 @@ import { createHmac } from 'node:crypto';
 
 export interface RateLimiter {
   consume(input: {
-    scope: 'create_order';
+    scope: 'create_order' | 'exam_contact';
     key: string;
     now: Date;
     limit: number;
@@ -21,7 +21,7 @@ export class LocalRateLimiter implements RateLimiter {
   private readonly windows = new Map<string, { startsAt: number; count: number }>();
 
   async consume(input: {
-    scope: 'create_order';
+    scope: 'create_order' | 'exam_contact';
     key: string;
     now: Date;
     limit: number;

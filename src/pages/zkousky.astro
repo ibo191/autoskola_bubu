@@ -1,0 +1,391 @@
+---
+export const prerender = false;
+import Base from '../layouts/Base.astro';
+import { examFaq } from '../lib/exam-faq';
+
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+---
+
+<Base
+  title="Vše ke zkoušce na jednom místě"
+  description="Informace pro studenty Autoškoly BuBu k závěrečným a opravným zkouškám."
+  noindex
+>
+  <section class="exam-hero">
+    <div class="container exam-hero-inner">
+      <span class="eyebrow">Pro studenty Autoškoly BuBu</span>
+      <h1>Vše ke zkoušce na jednom místě</h1>
+      <p class="lead">
+        Dokončili jste výuku a výcvik? Tady najdete odpovědi na nejčastější otázky k závěrečné
+        zkoušce, termínům, opravným zkouškám i tomu, co si vzít s sebou.
+      </p>
+      <div class="exam-notice notice">
+        Dotazy týkající se termínů a organizace zkoušek prosím neřešte se svým instruktorem. Pokud
+        odpověď nenajdete níže, můžete nám poslat dotaz prostřednictvím formuláře.
+      </div>
+    </div>
+  </section>
+
+  <section class="section exam-process" aria-labelledby="exam-process-title">
+    <div class="container">
+      <span class="eyebrow">Jak to jde za sebou</span>
+      <h2 id="exam-process-title">Od výcviku k výsledku</h2>
+      <ol>
+        {
+          [
+            'Výcvik dokončen',
+            'Přihlášení ke zkoušce',
+            'Přidělení termínu úřadem',
+            'Zkouška',
+            'Výsledek',
+          ].map((step, index) => (
+            <li>
+              <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+              {step}
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section tinted exam-faq" aria-labelledby="exam-faq-title">
+    <div class="container exam-narrow">
+      <span class="eyebrow">Rychlé odpovědi</span>
+      <h2 id="exam-faq-title">Co potřebujete vědět ke zkoušce?</h2>
+      <label for="exam-search">Hledat v častých otázkách</label>
+      <input
+        id="exam-search"
+        data-exam-search
+        type="search"
+        autocomplete="off"
+        placeholder="Např. termín zkoušky, opravná zkouška, doklady…"
+      />
+      <div class="exam-chips" aria-label="Častá témata">
+        {
+          ['Termín zkoušky', 'Opravná zkouška', 'Co s sebou', 'Průběh zkoušky', 'Další jízda'].map(
+            (topic) => (
+              <button type="button" data-exam-chip={topic}>
+                {topic}
+              </button>
+            ),
+          )
+        }
+      </div>
+      <p class="exam-count" data-exam-count role="status">Zobrazeno {examFaq.length} otázek</p>
+      <div class="exam-list" data-exam-list>
+        {
+          examFaq.map((item) => (
+            <details data-exam-id={item.id}>
+              <summary aria-expanded="false">
+                {item.question}
+                <span aria-hidden="true">+</span>
+              </summary>
+              <p class="exam-answer">{item.answer}</p>
+            </details>
+          ))
+        }
+      </div>
+      <div class="exam-empty" data-exam-empty hidden>
+        <h3>Nenašli jsme odpověď na váš dotaz.</h3>
+        <p>Pošlete nám ho prostřednictvím formuláře a ozveme se vám.</p>
+        <a class="btn primary" href="#exam-form">Položit dotaz</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section exam-contact" id="exam-form" aria-labelledby="exam-contact-title">
+    <div class="container exam-narrow">
+      <span class="eyebrow">Jsme tu pro vás</span>
+      <h2 id="exam-contact-title">Nenašli jste odpověď?</h2>
+      <p class="lead">
+        Pošlete nám svůj dotaz. Dotazy ke zkouškám řešíme centrálně, aby se k vám dostala správná
+        informace co nejrychleji.
+      </p>
+      <form class="exam-form" data-exam-form>
+        <div class="exam-fields">
+          <label
+            >Jméno *<input
+              name="firstName"
+              autocomplete="given-name"
+              required
+              maxlength="80"
+            /></label
+          >
+          <label
+            >Příjmení *<input
+              name="lastName"
+              autocomplete="family-name"
+              required
+              maxlength="80"
+            /></label
+          >
+          <label
+            >E-mail *<input
+              name="email"
+              type="email"
+              autocomplete="email"
+              required
+              maxlength="254"
+            /></label
+          >
+          <label
+            >Telefon *<input
+              name="phone"
+              type="tel"
+              autocomplete="tel"
+              required
+              maxlength="30"
+            /></label
+          >
+          <label
+            >Pobočka *
+            <select name="branch" required>
+              <option value="">Vyberte pobočku</option>
+              <option value="strizkov">Praha – Střížkov</option>
+              <option value="kladno">Kladno</option>
+              <option value="statenice">Statenice</option>
+            </select>
+          </label>
+        </div>
+        <label
+          >Váš dotaz *<textarea name="message" rows="6" required maxlength="2500"></textarea></label
+        >
+        <label class="exam-hp">Web<input name="website" tabindex="-1" autocomplete="off" /></label>
+        <button class="btn primary" type="submit">Odeslat dotaz</button>
+        <p data-exam-form-error role="alert" hidden>
+          Dotaz se nepodařilo odeslat. Zkuste to prosím znovu.
+        </p>
+      </form>
+      <div class="exam-success" data-exam-success role="status" hidden>
+        <h3>✓ Dotaz jsme přijali</h3>
+        <p>Potvrzení jsme poslali také na váš e-mail. Jakmile dotaz zpracujeme, odpovíme vám.</p>
+      </div>
+    </div>
+  </section>
+  <script src="../scripts/exam-page.ts"></script>
+</Base>
+
+<style>
+  .exam-hero {
+    background: linear-gradient(135deg, var(--canvas), #e0f6f2);
+    padding: clamp(3rem, 8vw, 6rem) 0;
+  }
+  .exam-hero-inner,
+  .exam-narrow {
+    max-width: 900px;
+  }
+  .exam-hero h1 {
+    max-width: 750px;
+  }
+  .exam-hero .lead {
+    margin-top: 1.5rem;
+    max-width: 730px;
+  }
+  .exam-notice {
+    margin-top: 2rem;
+    max-width: 760px;
+  }
+  .exam-process h2 {
+    margin-bottom: 1.8rem;
+  }
+  .exam-process ol {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .exam-process li {
+    min-width: 0;
+    padding: 1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: white;
+    font-weight: 650;
+    line-height: 1.4;
+  }
+  .exam-process li span {
+    display: block;
+    color: var(--brand-dark);
+    font-size: 0.8rem;
+    margin-bottom: 0.6rem;
+  }
+  .exam-faq h2 {
+    margin-bottom: 1.5rem;
+  }
+  .exam-faq label {
+    display: block;
+    font-weight: 650;
+    margin-bottom: 0.5rem;
+  }
+  .exam-faq input {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1rem 1.15rem;
+    background: white;
+    color: var(--ink);
+    font: inherit;
+  }
+  .exam-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin: 1rem 0;
+  }
+  .exam-chips button {
+    min-height: 44px;
+    padding: 0.55rem 0.9rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: white;
+    color: var(--ink);
+    font: inherit;
+    font-size: 0.86rem;
+    font-weight: 650;
+  }
+  .exam-chips button[aria-pressed='true'] {
+    background: var(--brand-dark);
+    color: white;
+    border-color: var(--brand-dark);
+  }
+  .exam-count {
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+  .exam-list {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .exam-list details + details {
+    border-top: 1px solid var(--line);
+  }
+  .exam-list summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    min-height: 64px;
+    padding: 1rem 1.25rem;
+    list-style: none;
+    cursor: pointer;
+    color: var(--ink);
+    font-weight: 650;
+  }
+  .exam-list summary::-webkit-details-marker {
+    display: none;
+  }
+  .exam-list summary span {
+    color: var(--brand-dark);
+    font-size: 1.3rem;
+    line-height: 1;
+  }
+  .exam-list details[open] summary span {
+    transform: rotate(45deg);
+  }
+  .exam-answer {
+    padding: 0 1.25rem 1.25rem;
+    white-space: pre-line;
+  }
+  .exam-empty {
+    padding: 2rem;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+  }
+  .exam-empty p {
+    margin: 0.75rem 0 1.25rem;
+  }
+  .exam-contact .lead {
+    margin: 1rem 0 1.5rem;
+  }
+  .exam-form,
+  .exam-success {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: clamp(1.2rem, 5vw, 2rem);
+  }
+  .exam-form {
+    display: grid;
+    gap: 1.1rem;
+  }
+  .exam-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.1rem;
+  }
+  .exam-form label {
+    display: grid;
+    gap: 0.4rem;
+    font-weight: 650;
+  }
+  .exam-form input,
+  .exam-form select,
+  .exam-form textarea {
+    width: 100%;
+    min-width: 0;
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    padding: 0.85rem 1rem;
+    background: white;
+    color: var(--ink);
+    font: inherit;
+  }
+  .exam-form textarea {
+    resize: vertical;
+  }
+  .exam-form .exam-hp {
+    position: absolute;
+    left: -10000px;
+  }
+  .exam-form button {
+    justify-self: start;
+  }
+  .exam-form [role='alert'] {
+    color: var(--danger);
+  }
+  .exam-success {
+    background: var(--brand-soft);
+  }
+  .exam-success h3 {
+    color: var(--brand-dark);
+    margin-bottom: 0.7rem;
+  }
+  @media (max-width: 720px) {
+    .exam-process ol {
+      grid-template-columns: 1fr;
+    }
+    .exam-process li {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .exam-process li span {
+      margin: 0;
+    }
+  }
+  @media (max-width: 560px) {
+    .exam-fields {
+      grid-template-columns: 1fr;
+    }
+    .exam-form button {
+      width: 100%;
+    }
+    .exam-hero,
+    .section {
+      padding-block: 3rem;
+    }
+    .exam-list summary {
+      padding-inline: 1rem;
+    }
+    .exam-answer {
+      padding-inline: 1rem;
+    }
+  }
+</style>

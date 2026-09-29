@@ -1,4 +1,5 @@
-export type CaptchaAction = 'order' | 'reservation' | 'contact' | 'campaign_request';
+export type CaptchaAction =
+  'order' | 'reservation' | 'contact' | 'exam_contact' | 'campaign_request';
 export interface CaptchaAdapter {
   verify(input: {
     token: string;
@@ -11,6 +12,8 @@ export type EmailEventType =
   | 'order_confirmation'
   | 'internal_new_order'
   | 'contact_form_notification'
+  | 'exam_question_notification'
+  | 'exam_question_confirmation'
   | 'unbooked_reminder_3d'
   | 'unbooked_reminder_7d'
   | 'unbooked_reminder_14d'

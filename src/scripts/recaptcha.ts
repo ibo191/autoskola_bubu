@@ -1,4 +1,5 @@
-export type PublicRecaptchaAction = 'order' | 'reservation' | 'contact' | 'campaign_request';
+export type PublicRecaptchaAction =
+  'order' | 'reservation' | 'contact' | 'exam_contact' | 'campaign_request';
 
 declare global {
   interface Window {
