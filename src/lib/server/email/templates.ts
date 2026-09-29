@@ -1,9 +1,10 @@
 import type { EmailMessage } from '../../integrations/contracts';
+import type { AdminAppointment } from '../../supabase/booking-repository';
 import type { PublicOrderOverview, OrderAddon, Contact } from '../../booking/repository';
 import type { Selection, Quote } from '../../pricing/quote';
 import { branches } from '../../catalog';
 import { money } from '../../format';
-import { branchLabel, selectionLabel, packageLabel } from '../../order-display';
+import { branchLabel, courseLabel, selectionLabel, packageLabel } from '../../order-display';
 import {
   escapeHtml,
   eventKey,
@@ -421,6 +422,53 @@ export function reportEmail(input: {
     metadata: { reportKey: input.reportKey },
     reportDate: input.eventType !== 'monthly_order_report' ? input.reportKey : undefined,
     reportMonth: input.eventType === 'monthly_order_report' ? input.reportKey : undefined,
+  };
+}
+
+export function appointmentDayReportEmail(input: {
+  branch: 'strizkov' | 'statenice';
+  date: string;
+  to: string;
+  appointments: AdminAppointment[];
+}): EmailMessage {
+  const title = `Zápisy ${branchLabel(input.branch)} – ${formatEmailDate(`${input.date}T12:00:00Z`)}`;
+  const time = new Intl.DateTimeFormat('cs-CZ', {
+    timeZone: 'Europe/Prague',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+  const entries = input.appointments.map((appointment) => ({
+    ...appointment,
+    localTime: time.format(new Date(appointment.startsAt)),
+  }));
+  const html = entries.length
+    ? `<table role="presentation" style="width:100%;border-collapse:collapse;"><thead><tr><th style="text-align:left;padding:8px;">Čas</th><th style="text-align:left;padding:8px;">Zákazník a kurz</th><th style="text-align:left;padding:8px;">Kontakt</th></tr></thead><tbody>${entries
+        .map(
+          (entry) =>
+            `<tr><td style="padding:8px;border-top:1px solid #dcebea;">${escapeHtml(entry.localTime)}</td><td style="padding:8px;border-top:1px solid #dcebea;">${escapeHtml(`${entry.contact.firstName} ${entry.contact.lastName}`)}<br>${escapeHtml(courseLabel(entry.course))}<br>${escapeHtml(entry.publicCode)}</td><td style="padding:8px;border-top:1px solid #dcebea;">${escapeHtml(entry.contact.phone)}<br>${escapeHtml(entry.contact.email)}</td></tr>`,
+        )
+        .join('')}</tbody></table>`
+    : '<p>Na dnešní zápis není nikdo objednaný.</p>';
+  const text = entries.length
+    ? entries
+        .map(
+          (entry) =>
+            `${entry.localTime} — ${entry.contact.firstName} ${entry.contact.lastName} — ${courseLabel(entry.course)} — ${entry.contact.phone} — ${entry.contact.email} — ${entry.publicCode}`,
+        )
+        .join('\n')
+    : 'Na dnešní zápis není nikdo objednaný.';
+  return {
+    idempotencyKey: eventKey('appointment-day-report', input.branch, input.date, input.to),
+    eventType: 'appointment_day_report',
+    from: ORDER_FROM,
+    replyTo: ORDER_REPLY_TO,
+    to: input.to,
+    subject: title,
+    html: layout(title, `<p>Počet objednaných: <strong>${entries.length}</strong></p>${html}`),
+    text: `${title}\nPočet objednaných: ${entries.length}\n\n${text}`,
+    tag: 'appointment-day-report',
+    reportDate: input.date,
+    metadata: { branch: input.branch, reportDate: input.date, count: entries.length },
   };
 }
 

@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   appointmentReminderEmail,
+  appointmentDayReportEmail,
   contactFormEmail,
   internalNewOrderEmail,
   orderConfirmationEmail,
@@ -15,6 +16,7 @@ import {
 } from '../../src/lib/server/email/utils';
 import {
   assertCronAuthorized,
+  appointmentReportBranches,
   needsBookingReminder,
   previousPragueWeek,
 } from '../../src/lib/server/email/workflows';
@@ -22,6 +24,48 @@ import { OrderEmailOutbox } from '../../src/lib/server/email/order-outbox';
 import type { EmailAdapter, EmailMessage } from '../../src/lib/integrations/contracts';
 import type { EmailEventRow, SupabaseEmailEventStore } from '../../src/lib/server/email/events';
 import type { PublicOrderOverview } from '../../src/lib/booking/repository';
+import type { AdminAppointment } from '../../src/lib/supabase/booking-repository';
+
+test('appointment day reports use the branch schedule and Prague local day', () => {
+  assert.deepEqual(appointmentReportBranches(new Date('2026-09-30T05:00:00Z')), ['statenice']);
+  assert.deepEqual(appointmentReportBranches(new Date('2026-10-01T05:00:00Z')), ['strizkov']);
+  assert.deepEqual(appointmentReportBranches(new Date('2026-10-04T05:00:00Z')), []);
+});
+
+test('appointment day report lists customers and is idempotent per recipient', () => {
+  const appointment = {
+    appointmentId: '11111111-1111-4111-8111-111111111111',
+    status: 'confirmed',
+    branch: 'statenice',
+    startsAt: '2026-09-30T13:00:00Z',
+    endsAt: '2026-09-30T13:20:00Z',
+    publicCode: 'BUBU-TEST',
+    course: 'b',
+    package: 'single',
+    totalCzk: 25900,
+    contact: {
+      firstName: '<Jan>',
+      lastName: 'Novák',
+      phone: '+420777111222',
+      email: 'jan@example.invalid',
+    },
+  } satisfies AdminAppointment;
+  const input = {
+    branch: 'statenice' as const,
+    date: '2026-09-30',
+    to: 'statenice@autoskolabubu.cz',
+    appointments: [appointment],
+  };
+  const email = appointmentDayReportEmail(input);
+  assert.match(email.text, /15:00.*BUBU-TEST/);
+  assert.match(email.html ?? '', /&lt;Jan&gt;/);
+  assert.doesNotMatch(email.html ?? '', /<Jan>/);
+  assert.equal(email.idempotencyKey, appointmentDayReportEmail(input).idempotencyKey);
+  assert.notEqual(
+    email.idempotencyKey,
+    appointmentDayReportEmail({ ...input, to: 'jakub.abraham@autoskolabubu.cz' }).idempotencyKey,
+  );
+});
 
 const contact = {
   firstName: 'Jan',

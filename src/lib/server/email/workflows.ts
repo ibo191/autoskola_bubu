@@ -1,4 +1,5 @@
 import type { PublicOrderOverview } from '../../booking/repository';
+import { SupabaseBookingRepository } from '../../supabase/booking-repository';
 import { money } from '../../format';
 import { branchLabel, courseLabel, packageLabel } from '../../order-display';
 import {
@@ -10,6 +11,7 @@ import {
 import { SupabaseEmailRepository } from './repository';
 import {
   appointmentReminderEmail,
+  appointmentDayReportEmail,
   reportEmail,
   monthLabel,
   ORDER_FROM,
@@ -20,6 +22,7 @@ import {
   eventKey,
   formatEmailDate,
   formatEmailDateTime,
+  pragueHour,
   toPragueDate,
 } from './utils';
 import type { EmailMessage } from '../../integrations/contracts';
@@ -251,4 +254,44 @@ export async function processMonthlyReport(
   });
   await createTransactionalEmailAdapter(env).send(message);
   return { ok: true, month };
+}
+
+export function appointmentReportBranches(now: Date): Array<'strizkov' | 'statenice'> {
+  const weekday = new Date(`${toPragueDate(now)}T12:00:00Z`).getUTCDay();
+  if (weekday === 1 || weekday === 4) return ['strizkov'];
+  if (weekday === 3) return ['statenice'];
+  return [];
+}
+
+export async function processAppointmentDayReports(
+  env: Record<string, string | undefined>,
+  now = new Date(),
+) {
+  if (!isTransactionalEmailConfigured(env)) return { ok: false, code: 'EMAIL_NOT_CONFIGURED' };
+  if (pragueHour(now) !== 7) return { ok: true, skipped: 'outside-prague-7am' };
+  const branches = appointmentReportBranches(now);
+  if (!branches.length) return { ok: true, skipped: 'no-enrollment-today' };
+
+  const date = toPragueDate(now);
+  const repository = new SupabaseBookingRepository(env);
+  const email = createTransactionalEmailAdapter(env);
+  const recipients = {
+    strizkov: ['jakub.abraham@autoskolabubu.cz', 'objednavky@autoskolabubu.cz'],
+    statenice: ['statenice@autoskolabubu.cz'],
+  } as const;
+  const messages: EmailMessage[] = [];
+  for (const branch of branches) {
+    const appointments = await repository.adminAppointments({ date, branch });
+    for (const to of recipients[branch]) {
+      messages.push(appointmentDayReportEmail({ branch, date, to, appointments }));
+    }
+  }
+  const results = await Promise.allSettled(messages.map((message) => email.send(message)));
+  return {
+    ok: results.every((result) => result.status === 'fulfilled'),
+    date,
+    attempted: messages.length,
+    sentOrSkipped: results.filter((result) => result.status === 'fulfilled').length,
+    failed: results.filter((result) => result.status === 'rejected').length,
+  };
 }

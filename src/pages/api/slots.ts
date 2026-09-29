@@ -52,8 +52,8 @@ function previewSlots(branch: string, from: string, to: string) {
         open: window.open,
         close: window.close,
         durationMinutes: 20,
-        capacity: 1,
-      }).slice(0, 9)) {
+        capacity: branch === 'statenice' ? 5 : 1,
+      }).slice(0, branch === 'statenice' ? 1 : 9)) {
         output.push({
           id: stableSlotId(branch, slot.start),
           branch,
