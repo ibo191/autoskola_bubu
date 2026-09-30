@@ -59,6 +59,7 @@ test('appointment day reports use the branch schedule and Prague local day', () 
 test('appointment day report lists customers and is idempotent per recipient', () => {
   const appointment = {
     appointmentId: '11111111-1111-4111-8111-111111111111',
+    orderId: '22222222-2222-4222-8222-222222222222',
     status: 'confirmed',
     branch: 'statenice',
     startsAt: '2026-09-30T13:00:00Z',

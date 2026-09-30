@@ -97,6 +97,8 @@ const adminOrderSchema = z.object({
   course: z.string(),
   package: z.string(),
   totalCzk: z.number().int(),
+  conversionConfirmedAt: z.iso.datetime({ offset: true }).nullable(),
+  conversionValueCzk: z.number().int().positive().nullable(),
   contact: z.object({
     firstName: z.string(),
     lastName: z.string(),
@@ -126,6 +128,7 @@ const adminOrderSchema = z.object({
 });
 const adminAppointmentSchema = z.object({
   appointmentId: z.uuid(),
+  orderId: z.uuid(),
   status: z.string(),
   branch: z.string(),
   startsAt: z.iso.datetime({ offset: true }),
@@ -175,6 +178,8 @@ export class SupabaseBookingRepository implements BookingRepository {
       | 'bubu_admin_logout'
       | 'bubu_admin_orders'
       | 'bubu_admin_appointments'
+      | 'bubu_admin_appointment_days'
+      | 'bubu_admin_order_action'
       | 'bubu_admin_next_appointment_day',
     body: unknown,
   ) {
@@ -334,6 +339,23 @@ export class SupabaseBookingRepository implements BookingRepository {
       await this.rpc('bubu_admin_appointments', {
         p_local_date: input.date,
         p_branch: input.branch || null,
+      }),
+    );
+  }
+  async adminAppointmentDays(input: { month: string; branch?: string | null }) {
+    return z.array(z.object({ date: z.string(), count: z.number().int().nonnegative() })).parse(
+      await this.rpc('bubu_admin_appointment_days', {
+        p_month: `${input.month}-01`,
+        p_branch: input.branch || null,
+      }),
+    );
+  }
+  async adminOrderAction(token: string, orderId: string, action: 'attend' | 'cancel') {
+    return z.object({ ok: z.boolean(), status: z.string().optional() }).parse(
+      await this.rpc('bubu_admin_order_action', {
+        p_token: token,
+        p_order_id: orderId,
+        p_action: action,
       }),
     );
   }

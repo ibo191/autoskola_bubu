@@ -6,24 +6,48 @@ import { selectionLabel } from '../../lib/order-display';
 import Base from '../../layouts/Base.astro';
 import { branches, courses, money } from '../../lib/catalog';
 import { requireLiveRepository } from '../../lib/server/live-order';
+import {
+  isDate,
+  orderPeriodRange,
+  pragueDayStartUtc,
+  pragueToday,
+  type OrderPeriod,
+} from '../../lib/admin-dates';
 
 const repositoryReady = Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
 const repository = repositoryReady ? requireLiveRepository(process.env) : null;
 const url = new URL(Astro.request.url);
-const today = new Date().toISOString().slice(0, 10);
-const from = url.searchParams.get('from') ?? today;
-const to =
-  url.searchParams.get('to') ?? new Date(Date.now() + 31 * 86400000).toISOString().slice(0, 10);
+const today = pragueToday();
+const requestedPeriod = url.searchParams.get('period');
+const period: OrderPeriod | 'custom' =
+  requestedPeriod === 'last-month' ||
+  requestedPeriod === 'last-three-months' ||
+  requestedPeriod === 'this-month'
+    ? requestedPeriod
+    : !url.searchParams.has('from') && !url.searchParams.has('to')
+      ? 'this-month'
+      : 'custom';
+const preset = orderPeriodRange(period === 'custom' ? 'this-month' : period, today);
+const from = isDate(url.searchParams.get('from') ?? '')
+  ? url.searchParams.get('from')!
+  : preset.from;
+const to = isDate(url.searchParams.get('to') ?? '') ? url.searchParams.get('to')! : preset.to;
 const course = url.searchParams.get('course') || '';
 const branch = url.searchParams.get('branch') || '';
 const status = url.searchParams.get('status') || '';
 const query = url.searchParams.get('q') || '';
-const appointmentDate = url.searchParams.get('appointmentDate') || today;
+const appointmentDate = isDate(url.searchParams.get('appointmentDate') ?? '')
+  ? url.searchParams.get('appointmentDate')!
+  : today;
 const rawAppointmentMonth = url.searchParams.get('appointmentMonth') || appointmentDate.slice(0, 7);
-const appointmentMonth = /^\d{4}-\d{2}$/.test(rawAppointmentMonth)
+const appointmentMonth = /^\d{4}-(0[1-9]|1[0-2])$/.test(rawAppointmentMonth)
   ? rawAppointmentMonth
   : today.slice(0, 7);
 const appointmentBranch = url.searchParams.get('appointmentBranch') || branch || '';
+const nextMonth = new Date(Date.UTC(Number(today.slice(0, 4)), Number(today.slice(5, 7)), 1))
+  .toISOString()
+  .slice(0, 7);
+const actionResult = url.searchParams.get('actionResult');
 const calendarParts = appointmentMonth.split('-').map(Number);
 const calendarYear = calendarParts[0] ?? Number(today.slice(0, 4));
 const calendarMonth = calendarParts[1] ?? Number(today.slice(5, 7));
@@ -70,58 +94,40 @@ if (repository && Astro.request.method === 'POST') {
   loginFailed = true;
 }
 
-const summary =
+const queryFrom = pragueDayStartUtc(from);
+const nextDay = new Date(Date.parse(`${to}T00:00:00.000Z`) + 86400000).toISOString().slice(0, 10);
+const queryTo = pragueDayStartUtc(nextDay);
+const adminData =
   repository && currentUser
-    ? await repository.adminSummary({
-        from: `${from}T00:00:00.000Z`,
-        to: `${to}T23:59:59.999Z`,
-        course: course || null,
-      })
+    ? await Promise.all([
+        repository.adminSummary({ from: queryFrom, to: queryTo, course: course || null }),
+        repository.adminOrders({
+          from: queryFrom,
+          to: queryTo,
+          course: course || null,
+          branch: branch || null,
+          status: status || null,
+          query: query || null,
+          limit: 250,
+        }),
+        repository.adminAppointments({ date: appointmentDate, branch: appointmentBranch || null }),
+        repository.adminNextAppointmentDay({ from: today, branch: appointmentBranch || null }),
+        repository.adminAppointmentDays({
+          month: appointmentMonth,
+          branch: appointmentBranch || null,
+        }),
+      ])
     : null;
-const orders =
-  repository && currentUser
-    ? await repository.adminOrders({
-        from: `${from}T00:00:00.000Z`,
-        to: `${to}T23:59:59.999Z`,
-        course: course || null,
-        branch: branch || null,
-        status: status || null,
-        query: query || null,
-        limit: 250,
-      })
-    : [];
-const appointments =
-  repository && currentUser
-    ? await repository.adminAppointments({
-        date: appointmentDate,
-        branch: appointmentBranch || null,
-      })
-    : [];
-const nextAppointmentDay =
-  repository && currentUser
-    ? await repository.adminNextAppointmentDay({ from: today, branch: appointmentBranch || null })
-    : null;
+const summary = adminData?.[0] ?? null;
+const orders = adminData?.[1] ?? [];
+const appointments = adminData?.[2] ?? [];
+const nextAppointmentDay = adminData?.[3] ?? null;
 const calendarDates = Array.from({ length: daysInMonth }, (_, index) => {
   const day = index + 1;
   const date = `${appointmentMonth}-${String(day).padStart(2, '0')}`;
   return { day, date };
 });
-const appointmentDays =
-  repository && currentUser
-    ? (
-        await Promise.all(
-          calendarDates.map(async (item) => ({
-            ...item,
-            count: (
-              await repository.adminAppointments({
-                date: item.date,
-                branch: appointmentBranch || null,
-              })
-            ).length,
-          })),
-        )
-      ).filter((item) => item.count > 0)
-    : [];
+const appointmentDays = adminData?.[4] ?? [];
 const appointmentDayMap = new Map(appointmentDays.map((item) => [item.date, item.count]));
 
 const orderCourseLabel = (order: { course: string; selection: unknown }) => {
@@ -175,6 +181,7 @@ const buildAdminUrl = (updates: Record<string, string>) => {
   const current = {
     from,
     to,
+    period,
     branch,
     course,
     status,
@@ -236,9 +243,50 @@ const calendarDays = calendarDates.map((item) => ({
           </form>
         ) : (
           <>
+            {actionResult === 'attended' && (
+              <div class="notice">
+                Nástup byl potvrzen. Hodnota objednávky se eviduje jako očekávaná konverze, nikoli
+                přijatá platba.
+              </div>
+            )}
+            {actionResult === 'cancelled' && (
+              <div class="notice">
+                Objednávka byla zrušena a skryta z běžného přehledu. Záznam zůstává v historii.
+              </div>
+            )}
             <section class="admin-panel">
               <h2>Přehled</h2>
+              <nav class="admin-shortcuts" aria-label="Období objednávek">
+                <a
+                  class:list={[period === 'this-month' && 'active']}
+                  href={buildAdminUrl({
+                    ...orderPeriodRange('this-month', today),
+                    period: 'this-month',
+                  })}
+                >
+                  Tento měsíc
+                </a>
+                <a
+                  class:list={[period === 'last-month' && 'active']}
+                  href={buildAdminUrl({
+                    ...orderPeriodRange('last-month', today),
+                    period: 'last-month',
+                  })}
+                >
+                  Minulý měsíc
+                </a>
+                <a
+                  class:list={[period === 'last-three-months' && 'active']}
+                  href={buildAdminUrl({
+                    ...orderPeriodRange('last-three-months', today),
+                    period: 'last-three-months',
+                  })}
+                >
+                  Poslední 3 měsíce
+                </a>
+              </nav>
               <form class="admin-filters" method="get">
+                <input type="hidden" name="period" value="custom" />
                 <label>
                   Od
                   <input type="date" name="from" value={from} />
@@ -272,7 +320,10 @@ const calendarDays = calendarDates.map((item) => ({
                 <label>
                   Stav
                   <select name="status">
-                    <option value="">Všechny stavy</option>
+                    <option value="">Aktivní objednávky</option>
+                    <option value="all" selected={status === 'all'}>
+                      Včetně zrušených
+                    </option>
                     {statuses.map((item) => (
                       <option value={item} selected={status === item}>
                         {statusLabel(item)}
@@ -353,6 +404,7 @@ const calendarDays = calendarDates.map((item) => ({
                         <th>Termín zápisu</th>
                         <th>Stav</th>
                         <th>Cena</th>
+                        <th>Akce</th>
                       </>
                     </tr>
                   </thead>
@@ -391,12 +443,50 @@ const calendarDays = calendarDates.map((item) => ({
                               {statusLabel(order.status)}
                             </span>
                           </td>
-                          <td>{money(order.totalCzk)}</td>
+                          <td>
+                            {money(order.totalCzk)}
+                            {order.conversionConfirmedAt && (
+                              <small class="conversion-note">
+                                Očekávaná konverze:{' '}
+                                {money(order.conversionValueCzk ?? order.totalCzk)}
+                              </small>
+                            )}
+                          </td>
+                          <td>
+                            <div class="admin-actions">
+                              {['confirmed', 'rescheduled', 'attended'].includes(order.status) && (
+                                <form method="post" action="/sprava/action">
+                                  <input type="hidden" name="orderId" value={order.orderId} />
+                                  <input type="hidden" name="intent" value="attend" />
+                                  <input
+                                    type="hidden"
+                                    name="returnTo"
+                                    value={Astro.url.pathname + Astro.url.search}
+                                  />
+                                  <button type="submit">Potvrdit nástup</button>
+                                </form>
+                              )}
+                              {!['cancelled', 'expired'].includes(order.status) && (
+                                <form method="post" action="/sprava/action" data-cancel-order>
+                                  <input type="hidden" name="orderId" value={order.orderId} />
+                                  <input type="hidden" name="intent" value="cancel" />
+                                  <input
+                                    type="hidden"
+                                    name="returnTo"
+                                    value={Astro.url.pathname + Astro.url.search}
+                                  />
+                                  <button type="submit" class="danger">
+                                    Zrušit
+                                  </button>
+                                </form>
+                              )}
+                            </div>
+                          </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colspan="10">Zvoleným filtrům neodpovídá žádná objednávka.</td>
+                        <td colspan="11">Zvoleným filtrům neodpovídá žádná objednávka.</td>
                       </tr>
                     )}
                   </tbody>
@@ -455,6 +545,40 @@ const calendarDays = calendarDates.map((item) => ({
                           </dd>
                         </div>
                       </dl>
+                      {order.conversionConfirmedAt && (
+                        <p class="conversion-note">
+                          Očekávaná konverze: {money(order.conversionValueCzk ?? order.totalCzk)} ·
+                          platba se tím nepotvrzuje
+                        </p>
+                      )}
+                      <div class="admin-actions">
+                        {['confirmed', 'rescheduled', 'attended'].includes(order.status) && (
+                          <form method="post" action="/sprava/action">
+                            <input type="hidden" name="orderId" value={order.orderId} />
+                            <input type="hidden" name="intent" value="attend" />
+                            <input
+                              type="hidden"
+                              name="returnTo"
+                              value={Astro.url.pathname + Astro.url.search}
+                            />
+                            <button type="submit">Potvrdit nástup</button>
+                          </form>
+                        )}
+                        {!['cancelled', 'expired'].includes(order.status) && (
+                          <form method="post" action="/sprava/action" data-cancel-order>
+                            <input type="hidden" name="orderId" value={order.orderId} />
+                            <input type="hidden" name="intent" value="cancel" />
+                            <input
+                              type="hidden"
+                              name="returnTo"
+                              value={Astro.url.pathname + Astro.url.search}
+                            />
+                            <button type="submit" class="danger">
+                              Zrušit
+                            </button>
+                          </form>
+                        )}
+                      </div>
                     </article>
                   ))
                 ) : (
@@ -465,9 +589,30 @@ const calendarDays = calendarDates.map((item) => ({
 
             <section class="admin-panel">
               <h2>Zápisy podle kalendáře</h2>
+              <nav class="admin-shortcuts" aria-label="Měsíc zápisů">
+                <a
+                  class:list={[appointmentMonth === today.slice(0, 7) && 'active']}
+                  href={buildAdminUrl({
+                    appointmentMonth: today.slice(0, 7),
+                    appointmentDate: today,
+                  })}
+                >
+                  Tento měsíc
+                </a>
+                <a
+                  class:list={[appointmentMonth === nextMonth && 'active']}
+                  href={buildAdminUrl({
+                    appointmentMonth: nextMonth,
+                    appointmentDate: `${nextMonth}-01`,
+                  })}
+                >
+                  Příští měsíc
+                </a>
+              </nav>
               <form class="admin-filters calendar-filter" method="get">
                 <input type="hidden" name="from" value={from} />
                 <input type="hidden" name="to" value={to} />
+                <input type="hidden" name="period" value={period} />
                 <input type="hidden" name="branch" value={branch} />
                 <input type="hidden" name="course" value={course} />
                 <input type="hidden" name="status" value={status} />
@@ -580,6 +725,32 @@ const calendarDays = calendarDates.map((item) => ({
                       <span class={`status-chip status-${item.status}`}>
                         {statusLabel(item.status)}
                       </span>
+                      <div class="admin-actions">
+                        {['confirmed', 'rescheduled'].includes(item.status) && (
+                          <form method="post" action="/sprava/action">
+                            <input type="hidden" name="orderId" value={item.orderId} />
+                            <input type="hidden" name="intent" value="attend" />
+                            <input
+                              type="hidden"
+                              name="returnTo"
+                              value={Astro.url.pathname + Astro.url.search}
+                            />
+                            <button type="submit">Potvrdit nástup</button>
+                          </form>
+                        )}
+                        <form method="post" action="/sprava/action" data-cancel-order>
+                          <input type="hidden" name="orderId" value={item.orderId} />
+                          <input type="hidden" name="intent" value="cancel" />
+                          <input
+                            type="hidden"
+                            name="returnTo"
+                            value={Astro.url.pathname + Astro.url.search}
+                          />
+                          <button type="submit" class="danger">
+                            Zrušit
+                          </button>
+                        </form>
+                      </div>
                     </article>
                   ))
                 ) : (
@@ -595,7 +766,57 @@ const calendarDays = calendarDates.map((item) => ({
   </section>
 </Base>
 
+<script>
+  document.querySelectorAll<HTMLFormElement>('form[data-cancel-order]').forEach((form) => {
+    form.addEventListener('submit', (event) => {
+      if (
+        !window.confirm('Opravdu zrušit objednávku? Zmizí z běžného přehledu a termín se uvolní. Zákazníkovi se automaticky neodešle e-mail.')
+      ) {
+        event.preventDefault();
+      }
+    });
+  });
+</script>
+
 <style>
+  .admin-shortcuts,
+  .admin-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .admin-shortcuts {
+    margin: 0 0 18px;
+  }
+  .admin-shortcuts a,
+  .admin-actions button {
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 8px 12px;
+    color: var(--ink);
+    background: white;
+    text-decoration: none;
+    font: inherit;
+    cursor: pointer;
+  }
+  .admin-shortcuts a.active {
+    background: var(--ink);
+    color: white;
+  }
+  .admin-actions button.danger {
+    color: #8b2828;
+    border-color: #d8aaaa;
+  }
+  .admin-actions button:hover,
+  .admin-shortcuts a:hover {
+    border-color: var(--brand, #08756d);
+  }
+  .conversion-note {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.78rem;
+    color: #455d71;
+  }
   .admin-section {
     background: var(--canvas);
   }
