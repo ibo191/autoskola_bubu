@@ -54,8 +54,8 @@ export const examFaq: ExamFaqItem[] = [
     id: 'exam-08',
     question: 'Kde se zkouška koná?',
     answer:
-      'Místo závisí na pobočce a úřadu, pod který jste přihlášeni.\n\nPraha: teoretická část se koná podle přiděleného úřadu.\n\nStatenice: zkoušky mohou probíhat prostřednictvím úřadu Černošice nebo Kladno podle konkrétního přihlášení.\n\nKladno: zkoušky probíhají na Kladně.\n\nPraktická jízda může začínat na jiném místě než teoretická část. Přesné místo vám vždy sdělíme společně s informacemi ke konkrétnímu termínu.',
-    keywords: ['kde', 'místo', 'Praha', 'Kladno', 'Statenice', 'Černošice'],
+      'Přesné místo konání zkoušky vám vždy sdělíme v SMS, kterou vás informujeme o přiděleném termínu. Řiďte se údaji v této zprávě.',
+    keywords: ['kde', 'místo', 'adresa', 'SMS', 'termín', 'zkouška'],
   },
   {
     id: 'exam-09',
@@ -86,10 +86,10 @@ export const examFaq: ExamFaqItem[] = [
   },
   {
     id: 'exam-13',
-    question: 'Jak celý den zkoušky probíhá?',
+    question: 'Jak probíhá závěrečná zkouška?',
     answer:
-      'Po příchodu nejprve proběhne potřebná administrativa.\n\nZkouška začíná testem z pravidel silničního provozu. Po úspěšném absolvování testu následují další části zkoušky podle skupiny řidičského oprávnění.\n\nPraktické jízdy jsou následně organizovány podle pořadí stanoveného zkušebním komisařem a autoškolou.\n\nCelý proces může trvat několik hodin, proto si na den zkoušky doporučujeme neplánovat další časově náročné povinnosti.',
-    keywords: ['průběh', 'celý den', 'test', 'jízda', 'čekání'],
+      'Teoretická část probíhá na příslušném úřadě formou zákonem stanoveného testu na počítači. Po jejím úspěšném absolvování následuje praktická zkouška.\n\nMísto praktické zkoušky přiděluje úřad: může začínat u autoškoly nebo v okolí úřadu. Konkrétní místo se dozvíte v SMS s informacemi k vašemu termínu.',
+    keywords: ['průběh', 'teorie', 'test', 'počítač', 'praktická jízda', 'úřad', 'místo'],
   },
   {
     id: 'exam-14',

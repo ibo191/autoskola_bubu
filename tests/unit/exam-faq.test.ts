@@ -13,6 +13,14 @@ test('exam FAQ has stable unique IDs and finds words without accents', () => {
   assert.equal(filterExamFaq(examFaq, 'nenaleznutelnydotaz').length, 0);
 });
 
+test('exam location and process direct students to the SMS and assigned exam venue', () => {
+  const location = examFaq.find((item) => item.id === 'exam-08');
+  const process = examFaq.find((item) => item.id === 'exam-13');
+  assert.match(location?.answer ?? '', /místo konání zkoušky.*SMS/);
+  assert.match(process?.answer ?? '', /testu na počítači/);
+  assert.match(process?.answer ?? '', /Místo praktické zkoušky přiděluje úřad/);
+});
+
 test('exam question requires validated contact and normalizes Czech phone variants', () => {
   const valid = {
     firstName: ' Jan ',
