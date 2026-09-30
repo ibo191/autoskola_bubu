@@ -1,6 +1,22 @@
 import { examFaq, filterExamFaq } from '../lib/exam-faq';
 import { getRecaptchaToken } from './recaptcha';
 
+const steps = document.querySelector<HTMLOListElement>('.exam-steps');
+const stepButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-exam-step]'));
+const stepDetails = Array.from(document.querySelectorAll<HTMLElement>('[data-exam-step-detail]'));
+stepButtons.forEach((button, index) => {
+  button.addEventListener('click', () => {
+    stepButtons.forEach((step, stepIndex) => {
+      const active = stepIndex === index;
+      step.setAttribute('aria-pressed', String(active));
+      step.setAttribute('aria-expanded', String(active));
+      step.closest('li')?.classList.toggle('active', active);
+    });
+    stepDetails.forEach((detail, detailIndex) => (detail.hidden = detailIndex !== index));
+    if (steps) steps.dataset.examProgress = String(index);
+  });
+});
+
 const search = document.querySelector<HTMLInputElement>('[data-exam-search]');
 const count = document.querySelector<HTMLElement>('[data-exam-count]');
 const empty = document.querySelector<HTMLElement>('[data-exam-empty]');

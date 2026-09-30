@@ -10,9 +10,20 @@ test('private exam hub supports direct mobile access, search and a validated que
   expect(response?.status()).toBe(200);
   expect(response?.headers()['x-robots-tag']).toBe('noindex, nofollow');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow');
-  await expect(page.getByRole('heading', { name: 'Vše ke zkoušce na jednom místě' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Vše ke zkoušce na jednom místě.' }),
+  ).toBeVisible();
   await expect(page.locator('header a[href="/zkousky"], footer a[href="/zkousky"]')).toHaveCount(0);
   expect(await (await request.get('/sitemap-0.xml')).text()).not.toContain('/zkousky');
+
+  await expect(
+    page.getByRole('heading', { name: 'Jak to vypadá po dokončení výuky a výcviku?' }),
+  ).toBeVisible();
+  const termStep = page.getByRole('button', { name: /Přidělený termín/ });
+  await termStep.click();
+  await expect(termStep).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('[data-exam-step-detail="2"]')).toBeVisible();
+  await expect(page.locator('[data-exam-step-detail="0"]')).toBeHidden();
 
   const search = page.getByRole('searchbox', { name: 'Hledat v častých otázkách' });
   await search.fill('opravna zkouska');

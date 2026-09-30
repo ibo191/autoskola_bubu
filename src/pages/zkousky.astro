@@ -3,6 +3,44 @@ export const prerender = false;
 import Base from '../layouts/Base.astro';
 import { examFaq } from '../lib/exam-faq';
 
+const examSteps = [
+  {
+    title: 'Výuka a výcvik dokončeny',
+    summary: 'Máte odježděno. Teď přichází zkouška.',
+    detail:
+      'Právě jste dokončili výuku a výcvik a máte odježděné jízdy v rámci kurzu. Pokud si před zkouškou chcete přikoupit další jízdy, obraťte se na svého instruktora. Ten vám je objedná.',
+    icon: 'car',
+  },
+  {
+    title: 'Žádost o termín zkoušky',
+    summary: 'O termín požádáme příslušný úřad.',
+    detail:
+      'Autoškola požádá příslušný úřad o termín závěrečné zkoušky. Konkrétní datum neurčujeme my; čekáme, až nám ho úřad přidělí.',
+    icon: 'pencil',
+  },
+  {
+    title: 'Přidělený termín',
+    summary: 'Jakmile ho známe, dáme vám vědět.',
+    detail:
+      'Jakmile nám úřad termín oznámí, ihned vás informujeme o datu, čase a dalších důležitých pokynech. Termín si můžete zkontrolovat také v systému Moje Autoškola.',
+    icon: 'calendar',
+  },
+  {
+    title: 'Závěrečná zkouška',
+    summary: 'Čeká vás teorie a praktická jízda.',
+    detail:
+      'Závěrečná zkouška má teoretickou a praktickou část. Přesné místo a čas se dozvíte v pokynech ke svému termínu. Vezměte si platný doklad totožnosti a řidičský průkaz, pokud už nějaký máte.',
+    icon: 'graduation',
+  },
+  {
+    title: 'Výsledek a další krok',
+    summary: 'Po zkoušce víte, jak jste dopadli.',
+    detail:
+      'Výsledek jednotlivých částí se dozvíte po jejich skončení. Pokud zkoušku úspěšně složíte, můžete požádat o vydání řidičského průkazu. Když některá část nevyjde, informace o opravném termínu najdete v častých otázkách níže.',
+    icon: 'thumbs-up',
+  },
+];
+
 Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
 ---
 
@@ -12,40 +50,80 @@ Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
   noindex
 >
   <section class="exam-hero">
+    <div class="exam-hero-shape exam-hero-shape-left" aria-hidden="true"></div>
+    <div class="exam-hero-shape exam-hero-shape-right" aria-hidden="true"></div>
     <div class="container exam-hero-inner">
-      <span class="eyebrow">Pro studenty Autoškoly BuBu</span>
-      <h1>Vše ke zkoušce na jednom místě</h1>
-      <p class="lead">
-        Dokončili jste výuku a výcvik? Tady najdete odpovědi na nejčastější otázky k závěrečné
-        zkoušce, termínům, opravným zkouškám i tomu, co si vzít s sebou.
-      </p>
-      <div class="exam-notice notice">
-        Dotazy týkající se termínů a organizace zkoušek prosím neřešte se svým instruktorem. Pokud
-        odpověď nenajdete níže, můžete nám poslat dotaz prostřednictvím formuláře.
+      <div class="exam-hero-copy">
+        <span class="eyebrow">Pro studenty Autoškoly BuBu</span>
+        <h1>Vše ke zkoušce<br />na jednom místě.</h1>
+        <p class="lead">
+          Výuka a výcvik jsou za vámi. Teď vás čeká závěrečná zkouška – a tady zjistíte, co se bude
+          dít dál.
+        </p>
+        <a class="btn primary" href="#exam-process-title">Podívat se na další kroky ↗</a>
+        <p class="exam-hero-hint">Termíny, průběh zkoušky i odpovědi na vaše otázky.</p>
       </div>
+      <img class="exam-hero-bubak" src="/brand/bubak.webp" alt="" aria-hidden="true" />
+      <p class="exam-hero-note" aria-hidden="true">V klidu až<br />ke zkoušce.</p>
     </div>
   </section>
 
   <section class="section exam-process" aria-labelledby="exam-process-title">
     <div class="container">
-      <span class="eyebrow">Jak to jde za sebou</span>
-      <h2 id="exam-process-title">Od výcviku k výsledku</h2>
-      <ol>
+      <div class="exam-process-heading">
+        <span class="eyebrow">Co vás teď čeká</span>
+        <h2 id="exam-process-title">Jak to vypadá po dokončení výuky a výcviku?</h2>
+        <p>Vyberte krok a podívejte se, co se v něm děje.</p>
+      </div>
+      <ol class="exam-steps" data-exam-progress="0">
         {
-          [
-            'Výcvik dokončen',
-            'Přihlášení ke zkoušce',
-            'Přidělení termínu úřadem',
-            'Zkouška',
-            'Výsledek',
-          ].map((step, index) => (
-            <li>
-              <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-              {step}
+          examSteps.map((step, index) => (
+            <li class:list={{ active: index === 0 }}>
+              <button
+                type="button"
+                data-exam-step={index}
+                aria-pressed={index === 0 ? 'true' : 'false'}
+                aria-expanded={index === 0 ? 'true' : 'false'}
+                aria-controls={`exam-step-detail-${index}`}
+              >
+                <span class="exam-step-top">
+                  <img
+                    src={`/icons/ui/blue-${step.icon}.webp`}
+                    alt=""
+                    width="40"
+                    height="40"
+                    loading="lazy"
+                  />
+                  <span>0{index + 1}</span>
+                </span>
+                <strong>{step.title}</strong>
+                <small>{step.summary}</small>
+              </button>
             </li>
           ))
         }
       </ol>
+      <div class="exam-step-details" aria-live="polite">
+        {
+          examSteps.map((step, index) => (
+            <article
+              id={`exam-step-detail-${index}`}
+              data-exam-step-detail={index}
+              hidden={index !== 0}
+            >
+              <span class="exam-detail-number">0{index + 1}</span>
+              <div>
+                <h3>{step.title}</h3>
+                <p>{step.detail}</p>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+      <div class="exam-notice notice">
+        Máte otázku k termínu nebo organizaci zkoušky? Neřešte ji prosím se svým instruktorem.
+        Podívejte se do častých otázek níže, případně nám napište přes formulář.
+      </div>
     </div>
   </section>
 
@@ -168,28 +246,98 @@ Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
 
 <style>
   .exam-hero {
-    background: linear-gradient(135deg, var(--canvas), #e0f6f2);
-    padding: clamp(3rem, 8vw, 6rem) 0;
+    position: relative;
+    overflow: hidden;
+    background: var(--canvas);
   }
-  .exam-hero-inner,
+  .exam-hero::after {
+    position: absolute;
+    inset: 0;
+    content: '';
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent 45%, rgba(72, 190, 178, 0.12));
+  }
+  .exam-hero-inner {
+    position: relative;
+    z-index: 1;
+    min-height: 450px;
+    display: flex;
+    align-items: center;
+  }
   .exam-narrow {
     max-width: 900px;
   }
+  .exam-hero-copy {
+    position: relative;
+    z-index: 3;
+    max-width: 760px;
+    padding: 4.5rem 0;
+  }
   .exam-hero h1 {
-    max-width: 750px;
-  }
-  .exam-hero .lead {
-    margin-top: 1.5rem;
-    max-width: 730px;
-  }
-  .exam-notice {
-    margin-top: 2rem;
     max-width: 760px;
   }
-  .exam-process h2 {
-    margin-bottom: 1.8rem;
+  .exam-hero .lead {
+    margin: 1.5rem 0 1.8rem;
+    max-width: 570px;
   }
-  .exam-process ol {
+  .exam-hero-hint {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .exam-hero-shape {
+    position: absolute;
+    bottom: -150px;
+    border-radius: 48% 52% 0 0;
+    background: #d9f3ef;
+  }
+  .exam-hero-shape-left {
+    right: 22%;
+    width: 380px;
+    height: 350px;
+    transform: rotate(-15deg);
+  }
+  .exam-hero-shape-right {
+    right: -7%;
+    width: 550px;
+    height: 450px;
+    transform: rotate(18deg);
+  }
+  .exam-hero-bubak {
+    position: absolute;
+    z-index: 2;
+    right: 12%;
+    bottom: 0;
+    width: auto;
+    height: 285px;
+    object-fit: contain;
+    transform: rotate(-4deg);
+  }
+  .exam-hero-note {
+    position: absolute;
+    z-index: 3;
+    top: 80px;
+    right: 3%;
+    color: var(--teal);
+    font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+    font-weight: 700;
+    line-height: 1.15;
+    text-align: center;
+    transform: rotate(-8deg);
+  }
+  .exam-notice {
+    margin-top: 1.8rem;
+  }
+  .exam-process-heading {
+    max-width: 750px;
+    margin-bottom: 2rem;
+  }
+  .exam-process-heading p {
+    margin-top: 0.75rem;
+  }
+  .exam-steps {
+    --progress: 0%;
+    position: relative;
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 0.75rem;
@@ -197,20 +345,126 @@ Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
     padding: 0;
     list-style: none;
   }
-  .exam-process li {
-    min-width: 0;
-    padding: 1rem;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    background: white;
-    font-weight: 650;
-    line-height: 1.4;
+  .exam-steps::before,
+  .exam-steps::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 3px;
+    border-radius: 3px;
+    content: '';
   }
-  .exam-process li span {
-    display: block;
+  .exam-steps::before {
+    width: 100%;
+    background: var(--line);
+  }
+  .exam-steps::after {
+    width: var(--progress);
+    background: linear-gradient(90deg, var(--brand), var(--blue));
+    transition: width 400ms ease;
+  }
+  .exam-steps[data-exam-progress='1'] {
+    --progress: 25%;
+  }
+  .exam-steps[data-exam-progress='2'] {
+    --progress: 50%;
+  }
+  .exam-steps[data-exam-progress='3'] {
+    --progress: 75%;
+  }
+  .exam-steps[data-exam-progress='4'] {
+    --progress: 100%;
+  }
+  .exam-steps li {
+    min-width: 0;
+    padding-top: 18px;
+  }
+  .exam-steps button {
+    width: 100%;
+    height: 100%;
+    padding: 1rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      background 250ms ease,
+      border-color 250ms ease,
+      transform 250ms ease;
+  }
+  .exam-steps button:hover {
+    transform: translateY(-3px);
+    background: var(--brand-soft);
+  }
+  .exam-steps li.active button {
+    border-color: #a5d9d1;
+    background: var(--brand-soft);
+    box-shadow: inset 0 3px 0 var(--brand);
+  }
+  .exam-step-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
     color: var(--brand-dark);
     font-size: 0.8rem;
-    margin-bottom: 0.6rem;
+    font-weight: 750;
+  }
+  .exam-step-top img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+  }
+  .exam-steps strong,
+  .exam-steps small {
+    display: block;
+  }
+  .exam-steps strong {
+    font-size: 0.92rem;
+    line-height: 1.35;
+  }
+  .exam-steps small {
+    margin-top: 0.65rem;
+    color: var(--muted);
+    font-size: 0.76rem;
+    line-height: 1.5;
+  }
+  .exam-step-details {
+    margin-top: 1.5rem;
+  }
+  .exam-step-details article {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.4rem;
+    padding: 2rem;
+    border: 1px solid #a5d9d1;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, var(--brand-soft), white 74%);
+  }
+  .exam-step-details article[hidden] {
+    display: none;
+  }
+  .exam-detail-number {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #21457f;
+    color: white;
+    font-weight: 800;
+  }
+  .exam-step-details h3 {
+    font-size: clamp(1.25rem, 2vw, 1.55rem);
+  }
+  .exam-step-details p {
+    max-width: 900px;
+    margin-top: 0.55rem;
+    line-height: 1.7;
   }
   .exam-faq h2 {
     margin-bottom: 1.5rem;
@@ -357,27 +611,73 @@ Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
     color: var(--brand-dark);
     margin-bottom: 0.7rem;
   }
-  @media (max-width: 720px) {
-    .exam-process ol {
+  @media (max-width: 1050px) {
+    .exam-steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .exam-steps::before,
+    .exam-steps::after {
+      display: none;
+    }
+  }
+  @media (max-width: 760px) {
+    .exam-hero-inner {
+      min-height: 380px;
+    }
+    .exam-hero-copy {
+      max-width: 76%;
+      padding: 3rem 0;
+    }
+    .exam-hero-bubak {
+      right: 1%;
+      height: 160px;
+    }
+    .exam-hero-note {
+      display: none;
+    }
+    .exam-hero-shape-left {
+      right: 1%;
+    }
+    .exam-hero-shape-right {
+      right: -45%;
+    }
+    .exam-steps {
       grid-template-columns: 1fr;
     }
-    .exam-process li {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
+    .exam-steps li {
+      padding-top: 0;
     }
-    .exam-process li span {
-      margin: 0;
+    .exam-steps button {
+      padding: 1rem 1.15rem;
+    }
+    .exam-step-top {
+      margin-bottom: 0.35rem;
+    }
+    .exam-step-details article {
+      grid-template-columns: 1fr;
+      gap: 0.8rem;
+      padding: 1.4rem;
     }
   }
   @media (max-width: 560px) {
+    .exam-hero-copy {
+      max-width: 100%;
+      padding: 3rem 0;
+    }
+    .exam-hero-bubak {
+      opacity: 0.22;
+      right: -2%;
+      height: 175px;
+    }
+    .exam-hero .lead {
+      max-width: 27rem;
+    }
     .exam-fields {
       grid-template-columns: 1fr;
     }
     .exam-form button {
       width: 100%;
     }
-    .exam-hero,
     .section {
       padding-block: 3rem;
     }
