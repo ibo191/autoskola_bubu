@@ -7,6 +7,7 @@ import {
   pragueToday,
 } from '../../src/lib/admin-dates';
 import { POST as adminAction } from '../../src/pages/sprava/action';
+import { POST as scheduleAction } from '../../src/pages/sprava/schedule';
 import type { APIContext } from 'astro';
 
 test('admin order presets use Prague calendar months across the year boundary', () => {
@@ -46,4 +47,19 @@ test('admin order action rejects unauthenticated and cross-origin requests', asy
     }) as unknown as APIContext;
   assert.equal((await adminAction(context()))?.status, 401);
   assert.equal((await adminAction(context('https://example.invalid')))?.status, 403);
+});
+
+test('schedule changes reject unauthenticated and cross-origin requests', async () => {
+  const body = new URLSearchParams({ branch: 'strizkov', date: '2026-10-05', action: 'close_day' });
+  const context = (origin?: string) =>
+    ({
+      request: new Request('https://www.autoskolabubu.cz/sprava/schedule', {
+        method: 'POST',
+        body,
+        headers: origin ? { origin } : undefined,
+      }),
+      cookies: { get: () => undefined },
+    }) as unknown as APIContext;
+  assert.equal((await scheduleAction(context()))?.status, 401);
+  assert.equal((await scheduleAction(context('https://example.invalid')))?.status, 403);
 });

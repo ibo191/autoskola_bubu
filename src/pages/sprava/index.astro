@@ -44,6 +44,11 @@ const appointmentMonth = /^\d{4}-(0[1-9]|1[0-2])$/.test(rawAppointmentMonth)
   ? rawAppointmentMonth
   : today.slice(0, 7);
 const appointmentBranch = url.searchParams.get('appointmentBranch') || branch || '';
+const scheduleBranch =
+  url.searchParams.get('scheduleBranch') === 'statenice'
+    ? ('statenice' as const)
+    : ('strizkov' as const);
+const scheduleResult = url.searchParams.get('scheduleResult');
 const nextMonth = new Date(Date.UTC(Number(today.slice(0, 4)), Number(today.slice(5, 7)), 1))
   .toISOString()
   .slice(0, 7);
@@ -116,6 +121,7 @@ const adminData =
           month: appointmentMonth,
           branch: appointmentBranch || null,
         }),
+        repository.adminScheduleDay(scheduleBranch, appointmentDate),
       ])
     : null;
 const summary = adminData?.[0] ?? null;
@@ -128,6 +134,7 @@ const calendarDates = Array.from({ length: daysInMonth }, (_, index) => {
   return { day, date };
 });
 const appointmentDays = adminData?.[4] ?? [];
+const scheduleDay = adminData?.[5] ?? null;
 const appointmentDayMap = new Map(appointmentDays.map((item) => [item.date, item.count]));
 
 const orderCourseLabel = (order: { course: string; selection: unknown }) => {
@@ -189,6 +196,7 @@ const buildAdminUrl = (updates: Record<string, string>) => {
     appointmentDate,
     appointmentMonth,
     appointmentBranch,
+    scheduleBranch,
     ...updates,
   };
   Object.entries(current).forEach(([key, value]) => {
@@ -757,6 +765,193 @@ const calendarDays = calendarDates.map((item) => ({
                   <div class="notice">Na tento den není rezervovaný žádný zápis.</div>
                 )}
               </div>
+              <div class="schedule-manager" id="sprava-terminu">
+                <h3>Správa termínů zápisu</h3>
+                <p>
+                  Termíny můžete vypsat nebo vypnout pro nové objednávky. Již rezervované zápisy
+                  zůstávají platné a jsou uvedené výše.
+                </p>
+                <form method="get" class="schedule-branch-form">
+                  <input type="hidden" name="appointmentDate" value={appointmentDate} />
+                  <input type="hidden" name="appointmentMonth" value={appointmentMonth} />
+                  <label>
+                    Pobočka
+                    <select name="scheduleBranch">
+                      <option value="strizkov" selected={scheduleBranch === 'strizkov'}>
+                        Praha 8 · Střížkov
+                      </option>
+                      <option value="statenice" selected={scheduleBranch === 'statenice'}>
+                        Statenice
+                      </option>
+                    </select>
+                  </label>
+                  <button class="btn secondary" type="submit">
+                    Zobrazit termíny
+                  </button>
+                </form>
+                {scheduleResult && (
+                  <div
+                    class:list={[
+                      'notice',
+                      ![
+                        'close_day',
+                        'open_day',
+                        'add_slot',
+                        'remove_slot',
+                        'restore_slot',
+                      ].includes(scheduleResult) && 'schedule-error',
+                    ]}
+                    role="status"
+                  >
+                    {{
+                      close_day:
+                        'Den byl uzavřen pro nové zápisy. Existující rezervace zůstávají platné.',
+                      open_day: 'Den je znovu otevřený pro zápisy.',
+                      add_slot: 'Termín byl vypsán.',
+                      remove_slot: 'Termín byl vypnutý pro nové objednávky.',
+                      restore_slot: 'Termín byl znovu zpřístupněn.',
+                      ALREADY_CLOSED: 'Den je již uzavřený jiným pravidlem.',
+                      DAY_CLOSED: 'Nejprve otevřete uzavřený den.',
+                      STATENICE_FIXED_TIME: 'Ve Statenicích lze vypsat pouze středu v 15:45.',
+                      OVERLAP: 'Nový čas se překrývá s jiným termínem.',
+                      OTHER_BLOCK: 'Tento čas je zablokovaný jiným pravidlem.',
+                      ALREADY_EXISTS: 'Termín již existuje.',
+                    }[scheduleResult] ??
+                      'Změnu se nepodařilo uložit. Obnovte stránku a zkuste to znovu.'}
+                  </div>
+                )}
+                <p>
+                  <strong>
+                    {appointmentDate} · {branchLabel(scheduleBranch)}
+                  </strong>
+                </p>
+                {scheduleDay?.closed ? (
+                  <div class="schedule-closed">
+                    <strong>Den je uzavřený pro nové zápisy.</strong>
+                    {scheduleDay.managedClosure && (
+                      <form method="post" action="/sprava/schedule">
+                        <input type="hidden" name="branch" value={scheduleBranch} />
+                        <input type="hidden" name="date" value={appointmentDate} />
+                        <input type="hidden" name="action" value="open_day" />
+                        <input
+                          type="hidden"
+                          name="returnTo"
+                          value={Astro.url.pathname + Astro.url.search}
+                        />
+                        <button class="btn secondary" type="submit">
+                          Znovu otevřít den
+                        </button>
+                      </form>
+                    )}
+                  </div>
+                ) : (
+                  <form
+                    method="post"
+                    action="/sprava/schedule"
+                    data-schedule-confirm="Opravdu uzavřít celý den pro nové zápisy? Existující rezervace zůstanou platné."
+                  >
+                    <input type="hidden" name="branch" value={scheduleBranch} />
+                    <input type="hidden" name="date" value={appointmentDate} />
+                    <input type="hidden" name="action" value="close_day" />
+                    <input
+                      type="hidden"
+                      name="returnTo"
+                      value={Astro.url.pathname + Astro.url.search}
+                    />
+                    <label>
+                      Důvod (volitelně){' '}
+                      <input
+                        type="text"
+                        name="reason"
+                        maxlength="200"
+                        placeholder="Dovolená, svátek…"
+                      />
+                    </label>
+                    <button class="btn secondary" type="submit" disabled={appointmentDate < today}>
+                      Uzavřít celý den
+                    </button>
+                  </form>
+                )}
+                {scheduleDay?.slots.length ? (
+                  <div class="schedule-slots">
+                    {scheduleDay.slots.map((slot) => (
+                      <div class="schedule-slot">
+                        <span>
+                          <strong>
+                            {formatTime(slot.startsAt)}–{formatTime(slot.endsAt)}
+                          </strong>{' '}
+                          · {slot.booked}/{slot.capacity} rezervací ·{' '}
+                          {slot.blocked ? 'vypnuto' : 'otevřeno'}
+                        </span>
+                        {!scheduleDay.closed && slot.startsAt > new Date().toISOString() && (
+                          <form
+                            method="post"
+                            action="/sprava/schedule"
+                            data-schedule-confirm={
+                              slot.blocked
+                                ? undefined
+                                : slot.booked
+                                  ? `Termín má ${slot.booked} rezervací. Vypnutím zachováte rezervace, ale nepřijmete nové. Pokračovat?`
+                                  : 'Opravdu vypnout termín pro nové objednávky?'
+                            }
+                          >
+                            <input type="hidden" name="branch" value={scheduleBranch} />
+                            <input type="hidden" name="date" value={appointmentDate} />
+                            <input type="hidden" name="slotId" value={slot.id} />
+                            <input
+                              type="hidden"
+                              name="action"
+                              value={slot.blocked ? 'restore_slot' : 'remove_slot'}
+                            />
+                            <input
+                              type="hidden"
+                              name="returnTo"
+                              value={Astro.url.pathname + Astro.url.search}
+                            />
+                            {(!slot.blocked || slot.managedBlock) && (
+                              <button type="submit">
+                                {slot.blocked ? 'Znovu vypsat' : 'Vypnout'}
+                              </button>
+                            )}
+                          </form>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div class="notice">Na tento den zatím nejsou vypsané žádné termíny.</div>
+                )}
+                {!scheduleDay?.closed && appointmentDate >= today && (
+                  <form method="post" action="/sprava/schedule" class="schedule-add">
+                    <input type="hidden" name="branch" value={scheduleBranch} />
+                    <input type="hidden" name="date" value={appointmentDate} />
+                    <input type="hidden" name="action" value="add_slot" />
+                    <input
+                      type="hidden"
+                      name="returnTo"
+                      value={Astro.url.pathname + Astro.url.search}
+                    />
+                    <label>
+                      Čas nového termínu{' '}
+                      <input
+                        type="time"
+                        name="start"
+                        required
+                        value={scheduleBranch === 'statenice' ? '15:45' : undefined}
+                      />
+                    </label>
+                    <button class="btn primary" type="submit">
+                      Vypsat termín
+                    </button>
+                    {scheduleBranch === 'statenice' && (
+                      <small>
+                        Ve Statenicích je dostupný jeden společný termín ve středu v 15:45, nejvýše
+                        pro 5 lidí.
+                      </small>
+                    )}
+                  </form>
+                )}
+              </div>
             </section>
           </>
         )
@@ -770,15 +965,75 @@ const calendarDays = calendarDates.map((item) => ({
   document.querySelectorAll<HTMLFormElement>('form[data-cancel-order]').forEach((form) => {
     form.addEventListener('submit', (event) => {
       if (
-        !window.confirm('Opravdu zrušit objednávku? Zmizí z běžného přehledu a termín se uvolní. Zákazníkovi se automaticky neodešle e-mail.')
+        !window.confirm(
+          'Opravdu zrušit objednávku? Zmizí z běžného přehledu a termín se uvolní. Zákazníkovi se automaticky neodešle e-mail.',
+        )
       ) {
         event.preventDefault();
       }
     });
   });
+  document.querySelectorAll<HTMLFormElement>('form[data-schedule-confirm]').forEach((form) => {
+    form.addEventListener('submit', (event) => {
+      if (!window.confirm(form.dataset.scheduleConfirm ?? 'Potvrdit změnu termínu?'))
+        event.preventDefault();
+    });
+  });
 </script>
 
 <style>
+  .schedule-manager {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    display: grid;
+    gap: 16px;
+  }
+  .schedule-manager h3,
+  .schedule-manager p {
+    margin: 0;
+  }
+  .schedule-manager form,
+  .schedule-closed,
+  .schedule-slot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 12px;
+  }
+  .schedule-manager label {
+    display: grid;
+    gap: 6px;
+  }
+  .schedule-manager input,
+  .schedule-manager select {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px;
+    color: var(--ink);
+    background: white;
+  }
+  .schedule-slots {
+    display: grid;
+    gap: 8px;
+  }
+  .schedule-slot {
+    justify-content: space-between;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 16px;
+  }
+  .schedule-slot button {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: white;
+    color: var(--ink);
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+  .schedule-error {
+    color: var(--danger);
+  }
   .admin-shortcuts,
   .admin-actions {
     display: flex;

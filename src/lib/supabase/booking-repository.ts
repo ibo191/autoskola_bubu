@@ -147,6 +147,21 @@ const adminAppointmentSchema = z.object({
 const nextAppointmentDaySchema = z
   .object({ date: z.string(), count: z.number().int().nonnegative() })
   .nullable();
+const adminScheduleDaySchema = z.object({
+  closed: z.boolean(),
+  managedClosure: z.boolean().default(false),
+  slots: z.array(
+    z.object({
+      id: z.uuid(),
+      startsAt: z.iso.datetime({ offset: true }),
+      endsAt: z.iso.datetime({ offset: true }),
+      capacity: z.number().int().positive(),
+      booked: z.number().int().nonnegative(),
+      blocked: z.boolean(),
+      managedBlock: z.boolean(),
+    }),
+  ),
+});
 export type AdminUser = z.infer<typeof adminUserSchema>;
 export type AdminOrder = z.infer<typeof adminOrderSchema>;
 export type AdminAppointment = z.infer<typeof adminAppointmentSchema>;
@@ -180,7 +195,9 @@ export class SupabaseBookingRepository implements BookingRepository {
       | 'bubu_admin_appointments'
       | 'bubu_admin_appointment_days'
       | 'bubu_admin_order_action'
-      | 'bubu_admin_next_appointment_day',
+      | 'bubu_admin_next_appointment_day'
+      | 'bubu_admin_schedule_day'
+      | 'bubu_admin_schedule_action',
     body: unknown,
   ) {
     const response = await fetch(this.base + name, {
@@ -366,6 +383,37 @@ export class SupabaseBookingRepository implements BookingRepository {
         p_branch: input.branch || null,
       }),
     );
+  }
+  async adminScheduleDay(branch: 'strizkov' | 'statenice', date: string) {
+    return adminScheduleDaySchema.parse(
+      await this.rpc('bubu_admin_schedule_day', {
+        p_branch: branch,
+        p_local_date: date,
+      }),
+    );
+  }
+  async adminScheduleAction(input: {
+    token: string;
+    branch: 'strizkov' | 'statenice';
+    date: string;
+    action: 'close_day' | 'open_day' | 'add_slot' | 'remove_slot' | 'restore_slot';
+    start?: string;
+    slotId?: string;
+    reason?: string;
+  }) {
+    return z
+      .object({ ok: z.boolean(), code: z.string().optional(), booked: z.number().optional() })
+      .parse(
+        await this.rpc('bubu_admin_schedule_action', {
+          p_token: input.token,
+          p_branch: input.branch,
+          p_local_date: input.date,
+          p_action: input.action,
+          p_start: input.start || null,
+          p_slot_id: input.slotId || null,
+          p_reason: input.reason || null,
+        }),
+      );
   }
 }
 
