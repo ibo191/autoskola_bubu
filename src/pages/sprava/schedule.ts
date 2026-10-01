@@ -62,5 +62,8 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
     'scheduleResult',
     result.ok ? parsed.data.action : (result.code ?? 'SERVER_ERROR'),
   );
-  return redirect(url.pathname + url.search + '#sprava-terminu', 303);
+  const destinationPath = url.pathname + url.search + '#sprava-terminu';
+  return request.headers.get('x-admin-async') === '1'
+    ? Response.json({ redirectTo: destinationPath })
+    : redirect(destinationPath, 303);
 };

@@ -81,5 +81,8 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
           : 'cancelled'
       : 'email_failed',
   );
-  return redirect(url.pathname + url.search, 303);
+  const destinationPath = url.pathname + url.search;
+  return request.headers.get('x-admin-async') === '1'
+    ? Response.json({ redirectTo: destinationPath })
+    : redirect(destinationPath, 303);
 };

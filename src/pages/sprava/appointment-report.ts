@@ -31,5 +31,8 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   url.searchParams.set('appointmentDate', pragueToday(now));
   url.searchParams.set('appointmentMonth', pragueToday(now).slice(0, 7));
   url.searchParams.set('reportResult', result.ok ? 'sent' : 'failed');
-  return redirect(url.pathname + url.search + '#sprava-terminu', 303);
+  const destinationPath = url.pathname + url.search + '#sprava-terminu';
+  return request.headers.get('x-admin-async') === '1'
+    ? Response.json({ redirectTo: destinationPath })
+    : redirect(destinationPath, 303);
 };

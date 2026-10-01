@@ -214,7 +214,7 @@ const calendarDays = calendarDates.map((item) => ({
 ---
 
 <Base title="Interní správa" description="Interní správa Autoškoly BuBu." noindex>
-  <section class="section admin-section">
+  <section class="section admin-section" data-admin-enhance={Boolean(currentUser)}>
     <div class="container content">
       <div class="admin-topline">
         <div>
@@ -277,7 +277,7 @@ const calendarDays = calendarDates.map((item) => ({
                 e-mailové události a kontaktujte zákazníka.
               </div>
             )}
-            <section class="admin-panel">
+            <section class="admin-panel" data-admin-panel="overview">
               <h2>Přehled</h2>
               <nav class="admin-shortcuts" aria-label="Období objednávek">
                 <a
@@ -410,7 +410,7 @@ const calendarDays = calendarDates.map((item) => ({
               </div>
             </section>
 
-            <section class="admin-panel">
+            <section class="admin-panel" data-admin-panel="orders">
               <h2>Objednávky</h2>
               <div class="table-wrap orders-desktop">
                 <table>
@@ -642,7 +642,7 @@ const calendarDays = calendarDates.map((item) => ({
               </div>
             </section>
 
-            <section class="admin-panel">
+            <section class="admin-panel" data-admin-panel="calendar">
               <h2>Zápisy podle kalendáře</h2>
               <nav class="admin-shortcuts" aria-label="Měsíc zápisů">
                 <a
@@ -846,6 +846,7 @@ const calendarDays = calendarDates.map((item) => ({
                 )}
                 {reportResult && (
                   <div
+                    data-report-result
                     class:list={['notice', reportResult === 'failed' && 'schedule-error']}
                     role="status"
                   >
@@ -878,6 +879,7 @@ const calendarDays = calendarDates.map((item) => ({
                 </form>
                 {scheduleResult && (
                   <div
+                    data-schedule-result
                     class:list={[
                       'notice',
                       ![
@@ -1048,37 +1050,27 @@ const calendarDays = calendarDates.map((item) => ({
   </section>
 </Base>
 
-<script>
-  document.querySelectorAll<HTMLFormElement>('form[data-cancel-order]').forEach((form) => {
-    form.addEventListener('submit', (event) => {
-      if (
-        !window.confirm(
-          'Opravdu zrušit objednávku? Zmizí z běžného přehledu a termín se uvolní. Zákazníkovi odejde neutrální potvrzení o zrušení.',
-        )
-      ) {
-        event.preventDefault();
-      }
-    });
-  });
-  document.querySelectorAll<HTMLFormElement>('form[data-no-show-order]').forEach((form) => {
-    form.addEventListener('submit', (event) => {
-      if (
-        !window.confirm(
-          'Potvrdit, že zákazník nedorazil na zápis? Odešleme mu e-mail s možností zvolit nový termín.',
-        )
-      )
-        event.preventDefault();
-    });
-  });
-  document.querySelectorAll<HTMLFormElement>('form[data-schedule-confirm]').forEach((form) => {
-    form.addEventListener('submit', (event) => {
-      if (!window.confirm(form.dataset.scheduleConfirm ?? 'Potvrdit změnu termínu?'))
-        event.preventDefault();
-    });
-  });
-</script>
+<script src="../../scripts/admin-portal.ts"></script>
 
 <style>
+  :global(.admin-ajax-status) {
+    position: fixed;
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
+    z-index: 1000;
+    max-width: min(420px, calc(100vw - 32px));
+    padding: 12px 18px;
+    border-radius: 10px;
+    color: white;
+    background: var(--navy, #183764);
+    box-shadow: 0 10px 30px rgb(0 0 0 / 18%);
+  }
+  :global(.admin-ajax-status[hidden]) {
+    display: none;
+  }
+  :global(.admin-ajax-status[data-error='true']) {
+    background: #9b2c2c;
+  }
   .schedule-manager {
     margin-top: 32px;
     padding-top: 24px;
