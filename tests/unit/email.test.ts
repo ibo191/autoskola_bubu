@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   appointmentReminderEmail,
   appointmentDayReportEmail,
+  adminEnrollmentEmail,
   examQuestionConfirmationEmail,
   examQuestionNotificationEmail,
   contactFormEmail,
@@ -91,6 +92,35 @@ test('appointment day report lists customers and is idempotent per recipient', (
   assert.notEqual(
     email.idempotencyKey,
     appointmentDayReportEmail({ ...input, to: 'jakub.abraham@autoskolabubu.cz' }).idempotencyKey,
+  );
+});
+
+test('admin enrollment actions produce distinct customer emails without duplicate keys', () => {
+  const base = {
+    orderId: '22222222-2222-4222-8222-222222222222',
+    appointmentId: '11111111-1111-4111-8111-111111111111',
+    publicCode: 'BUBU-TEST',
+    to: 'student@example.invalid',
+    origin: 'https://www.autoskolabubu.cz',
+  };
+  const welcome = adminEnrollmentEmail({ ...base, action: 'attend' });
+  const noShow = adminEnrollmentEmail({ ...base, action: 'no_show' });
+  const cancelled = adminEnrollmentEmail({ ...base, action: 'cancel' });
+  assert.equal(welcome.eventType, 'enrollment_welcome');
+  assert.match(welcome.text, /třetí přednášce.*připouštěcí test/);
+  assert.match(welcome.text, /dohody o splátkách/);
+  assert.equal(noShow.eventType, 'appointment_no_show');
+  assert.match(noShow.text, /nedostavil\/a/);
+  assert.match(noShow.text, /https:\/\/www\.autoskolabubu\.cz\/kurzy/);
+  assert.equal(cancelled.eventType, 'admin_order_cancelled');
+  assert.doesNotMatch(cancelled.text, /nedostavil\/a/);
+  assert.doesNotMatch(
+    adminEnrollmentEmail({ ...base, appointmentId: null, action: 'cancel' }).text,
+    /rezervovaný termín/,
+  );
+  assert.equal(
+    new Set([welcome.idempotencyKey, noShow.idempotencyKey, cancelled.idempotencyKey]).size,
+    3,
   );
 });
 
@@ -463,6 +493,51 @@ test('order outbox retries a failed send and ignores legacy pending events witho
   assert.deepEqual(await outbox.drainDue(), { checked: 1, sent: 1, retry: 0, errors: 0 });
   assert.equal(providerAttempts, 2);
   assert.equal(sent, true);
+});
+
+test('admin action mail uses the existing retryable outbox without application attachment', async () => {
+  const message = adminEnrollmentEmail({
+    orderId: '22222222-2222-4222-8222-222222222222',
+    publicCode: 'BUBU-TEST',
+    to: 'student@example.invalid',
+    action: 'attend',
+    origin: 'https://www.autoskolabubu.cz',
+  });
+  const event: EmailEventRow = {
+    id: '44444444-4444-4444-8444-444444444447',
+    idempotency_key: message.idempotencyKey,
+    status: 'pending',
+    metadata: {},
+  };
+  let delivered: EmailMessage | undefined;
+  const store = {
+    async createPending(value: EmailMessage) {
+      event.metadata = value.metadata ?? {};
+      return event;
+    },
+    async claimDue() {
+      return event;
+    },
+    async markSent() {},
+    async markFailed() {},
+    async retryLater() {},
+    async listDue() {
+      return [event];
+    },
+  } as unknown as SupabaseEmailEventStore;
+  const outbox = new OrderEmailOutbox(
+    {
+      async send(value) {
+        delivered = value;
+        return { status: 'pending' };
+      },
+    },
+    store,
+  );
+  assert.equal((await outbox.send(message)).status, 'queued');
+  assert.equal((await outbox.drainDue()).sent, 1);
+  assert.equal(delivered?.eventType, 'enrollment_welcome');
+  assert.equal(delivered?.attachments, undefined);
 });
 
 test('Prague local date helpers handle calendar day arithmetic for reminders', () => {

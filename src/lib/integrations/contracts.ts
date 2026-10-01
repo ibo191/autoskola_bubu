@@ -24,6 +24,9 @@ export type EmailEventType =
   | 'appointment_reminder_3d'
   | 'appointment_reminder_same_day'
   | 'appointment_day_report'
+  | 'enrollment_welcome'
+  | 'appointment_no_show'
+  | 'admin_order_cancelled'
   | 'weekly_order_report'
   | 'monthly_order_report';
 export interface EmailMessage {

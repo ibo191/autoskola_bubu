@@ -367,14 +367,22 @@ export class SupabaseBookingRepository implements BookingRepository {
       }),
     );
   }
-  async adminOrderAction(token: string, orderId: string, action: 'attend' | 'cancel') {
-    return z.object({ ok: z.boolean(), status: z.string().optional() }).parse(
-      await this.rpc('bubu_admin_order_action', {
-        p_token: token,
-        p_order_id: orderId,
-        p_action: action,
-      }),
-    );
+  async adminOrderAction(token: string, orderId: string, action: 'attend' | 'cancel' | 'no_show') {
+    return z
+      .object({
+        ok: z.boolean(),
+        status: z.string().optional(),
+        recipient: z.email().optional(),
+        publicCode: z.string().optional(),
+        appointmentId: z.uuid().nullable().optional(),
+      })
+      .parse(
+        await this.rpc('bubu_admin_order_action', {
+          p_token: token,
+          p_order_id: orderId,
+          p_action: action,
+        }),
+      );
   }
   async adminNextAppointmentDay(input: { from: string; branch?: string | null }) {
     return nextAppointmentDaySchema.parse(

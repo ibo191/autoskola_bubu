@@ -257,12 +257,24 @@ const calendarDays = calendarDates.map((item) => ({
             {actionResult === 'attended' && (
               <div class="notice">
                 Nástup byl potvrzen. Hodnota objednávky se eviduje jako očekávaná konverze, nikoli
-                přijatá platba.
+                přijatá platba. Organizační e-mail byl zařazen k odeslání.
+              </div>
+            )}
+            {actionResult === 'no_show' && (
+              <div class="notice">
+                Nedostavení bylo zaznamenáno a e-mail byl zařazen k odeslání.
               </div>
             )}
             {actionResult === 'cancelled' && (
               <div class="notice">
                 Objednávka byla zrušena a skryta z běžného přehledu. Záznam zůstává v historii.
+                Neutrální e-mail byl zařazen k odeslání.
+              </div>
+            )}
+            {actionResult === 'email_failed' && (
+              <div class="notice schedule-error" role="alert">
+                Změna byla uložená, ale e-mail se nepodařilo zařadit k odeslání. Zkontrolujte
+                e-mailové události a kontaktujte zákazníka.
               </div>
             )}
             <section class="admin-panel">
@@ -477,7 +489,23 @@ const calendarDays = calendarDates.map((item) => ({
                                   <button type="submit">Potvrdit nástup</button>
                                 </form>
                               )}
-                              {!['cancelled', 'expired'].includes(order.status) && (
+                              {['confirmed', 'rescheduled'].includes(order.status) &&
+                                order.appointment &&
+                                new Date(order.appointment.endsAt).getTime() <= Date.now() && (
+                                  <form method="post" action="/sprava/action" data-no-show-order>
+                                    <input type="hidden" name="orderId" value={order.orderId} />
+                                    <input type="hidden" name="intent" value="no_show" />
+                                    <input
+                                      type="hidden"
+                                      name="returnTo"
+                                      value={Astro.url.pathname + Astro.url.search}
+                                    />
+                                    <button type="submit" class="danger">
+                                      Nedorazil/a
+                                    </button>
+                                  </form>
+                                )}
+                              {!['cancelled', 'expired', 'no_show'].includes(order.status) && (
                                 <form method="post" action="/sprava/action" data-cancel-order>
                                   <input type="hidden" name="orderId" value={order.orderId} />
                                   <input type="hidden" name="intent" value="cancel" />
@@ -575,7 +603,23 @@ const calendarDays = calendarDates.map((item) => ({
                             <button type="submit">Potvrdit nástup</button>
                           </form>
                         )}
-                        {!['cancelled', 'expired'].includes(order.status) && (
+                        {['confirmed', 'rescheduled'].includes(order.status) &&
+                          order.appointment &&
+                          new Date(order.appointment.endsAt).getTime() <= Date.now() && (
+                            <form method="post" action="/sprava/action" data-no-show-order>
+                              <input type="hidden" name="orderId" value={order.orderId} />
+                              <input type="hidden" name="intent" value="no_show" />
+                              <input
+                                type="hidden"
+                                name="returnTo"
+                                value={Astro.url.pathname + Astro.url.search}
+                              />
+                              <button type="submit" class="danger">
+                                Nedorazil/a
+                              </button>
+                            </form>
+                          )}
+                        {!['cancelled', 'expired', 'no_show'].includes(order.status) && (
                           <form method="post" action="/sprava/action" data-cancel-order>
                             <input type="hidden" name="orderId" value={order.orderId} />
                             <input type="hidden" name="intent" value="cancel" />
@@ -749,18 +793,35 @@ const calendarDays = calendarDates.map((item) => ({
                             <button type="submit">Potvrdit nástup</button>
                           </form>
                         )}
-                        <form method="post" action="/sprava/action" data-cancel-order>
-                          <input type="hidden" name="orderId" value={item.orderId} />
-                          <input type="hidden" name="intent" value="cancel" />
-                          <input
-                            type="hidden"
-                            name="returnTo"
-                            value={Astro.url.pathname + Astro.url.search}
-                          />
-                          <button type="submit" class="danger">
-                            Zrušit
-                          </button>
-                        </form>
+                        {['confirmed', 'rescheduled'].includes(item.status) &&
+                          new Date(item.endsAt).getTime() <= Date.now() && (
+                            <form method="post" action="/sprava/action" data-no-show-order>
+                              <input type="hidden" name="orderId" value={item.orderId} />
+                              <input type="hidden" name="intent" value="no_show" />
+                              <input
+                                type="hidden"
+                                name="returnTo"
+                                value={Astro.url.pathname + Astro.url.search}
+                              />
+                              <button type="submit" class="danger">
+                                Nedorazil/a
+                              </button>
+                            </form>
+                          )}
+                        {!['cancelled', 'expired', 'no_show'].includes(item.status) && (
+                          <form method="post" action="/sprava/action" data-cancel-order>
+                            <input type="hidden" name="orderId" value={item.orderId} />
+                            <input type="hidden" name="intent" value="cancel" />
+                            <input
+                              type="hidden"
+                              name="returnTo"
+                              value={Astro.url.pathname + Astro.url.search}
+                            />
+                            <button type="submit" class="danger">
+                              Zrušit
+                            </button>
+                          </form>
+                        )}
                       </div>
                     </article>
                   ))
@@ -992,11 +1053,21 @@ const calendarDays = calendarDates.map((item) => ({
     form.addEventListener('submit', (event) => {
       if (
         !window.confirm(
-          'Opravdu zrušit objednávku? Zmizí z běžného přehledu a termín se uvolní. Zákazníkovi se automaticky neodešle e-mail.',
+          'Opravdu zrušit objednávku? Zmizí z běžného přehledu a termín se uvolní. Zákazníkovi odejde neutrální potvrzení o zrušení.',
         )
       ) {
         event.preventDefault();
       }
+    });
+  });
+  document.querySelectorAll<HTMLFormElement>('form[data-no-show-order]').forEach((form) => {
+    form.addEventListener('submit', (event) => {
+      if (
+        !window.confirm(
+          'Potvrdit, že zákazník nedorazil na zápis? Odešleme mu e-mail s možností zvolit nový termín.',
+        )
+      )
+        event.preventDefault();
     });
   });
   document.querySelectorAll<HTMLFormElement>('form[data-schedule-confirm]').forEach((form) => {

@@ -14,7 +14,13 @@ const storedMessageSchema = z.object({
   replyTo: z.string().optional(),
   tag: z.string().optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
-  eventType: z.enum(['order_confirmation', 'internal_new_order']),
+  eventType: z.enum([
+    'order_confirmation',
+    'internal_new_order',
+    'enrollment_welcome',
+    'appointment_no_show',
+    'admin_order_cancelled',
+  ]),
   orderId: z.uuid(),
   appointmentId: z.uuid().optional(),
 });
@@ -32,7 +38,13 @@ export class OrderEmailOutbox implements EmailAdapter {
   ) {}
 
   async send(message: EmailMessage): Promise<EmailSendResult> {
-    if (message.eventType !== 'order_confirmation' && message.eventType !== 'internal_new_order')
+    if (
+      message.eventType !== 'order_confirmation' &&
+      message.eventType !== 'internal_new_order' &&
+      message.eventType !== 'enrollment_welcome' &&
+      message.eventType !== 'appointment_no_show' &&
+      message.eventType !== 'admin_order_cancelled'
+    )
       throw new Error('Unsupported order outbox event');
     const { attachments: _attachments, scheduledFor: _scheduledFor, ...snapshot } = message;
     const event = await this.store.createPending({
