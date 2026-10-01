@@ -372,14 +372,20 @@ export function appointmentChangedEmail(input: {
 }): EmailMessage {
   const isCancelled = input.kind === 'cancelled';
   const appointment = input.order.appointment;
-  const title = isCancelled ? 'Termín zápisu byl zrušen' : 'Termín zápisu byl změněn';
+  const title = isCancelled ? 'Termín zápisu byl zrušen' : 'Potvrzení nového termínu zápisu';
   const appointmentText = appointment ? formatEmailDateTime(appointment.startsAt) : 'bez termínu';
   const body = `<p style="font-size:17px;line-height:1.65;margin:0 0 16px;">Dobrý den, ${escapeHtml(input.order.contact.firstName)}, ${isCancelled ? 'potvrzujeme zrušení termínu zápisu.' : 'potvrzujeme změnu termínu zápisu.'}</p>${rows(
     [
       ['Objednávka', input.order.publicCode],
       ['Kurz', selectionLabel(input.order.selection)],
       ['Pobočka', branchLabel(input.order.selection.branch)],
-      ['Aktuální termín', isCancelled ? 'zrušený' : appointmentText],
+      [
+        isCancelled ? 'Termín zápisu' : 'Nový termín zápisu',
+        isCancelled ? 'zrušený' : appointmentText,
+      ],
+      ...(!isCancelled && appointment
+        ? [['Adresa zápisu', branchAddress(appointment.branch)] as [string, string]]
+        : []),
     ],
   )}<p style="margin:24px 0;"><a href="${escapeHtml(input.manageUrl)}" style="display:inline-block;background:#4daeb6;color:#ffffff;text-decoration:none;padding:13px 18px;border-radius:999px;font-weight:700;">Spravovat termín</a></p>`;
   return {
@@ -397,7 +403,7 @@ export function appointmentChangedEmail(input: {
     to: input.order.contact.email,
     subject: `${title} – Autoškola BuBu`,
     html: layout(title, body),
-    text: `${title}\n\nObjednávka: ${input.order.publicCode}\nKurz: ${selectionLabel(input.order.selection)}\nPobočka: ${branchLabel(input.order.selection.branch)}\nAktuální termín: ${isCancelled ? 'zrušený' : appointmentText}\n\nSpráva termínu: ${input.manageUrl}`,
+    text: `${title}\n\nObjednávka: ${input.order.publicCode}\nKurz: ${selectionLabel(input.order.selection)}\nPobočka: ${branchLabel(input.order.selection.branch)}\n${isCancelled ? 'Termín zápisu: zrušený' : `Nový termín zápisu: ${appointmentText}${appointment ? `\nAdresa zápisu: ${branchAddress(appointment.branch)}` : ''}`}\n\nSpráva termínu: ${input.manageUrl}`,
     tag: `appointment-${input.kind}`,
     metadata: { publicCode: input.order.publicCode },
   };

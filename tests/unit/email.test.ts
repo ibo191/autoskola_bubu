@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   appointmentReminderEmail,
+  appointmentChangedEmail,
   appointmentDayReportEmail,
   adminEnrollmentEmail,
   examQuestionConfirmationEmail,
@@ -332,6 +333,66 @@ test('appointment reminders include the document checklist without a deposit req
       assert.doesNotMatch(content, /záloh|5&nbsp;000|5 000 Kč/i);
     }
   }
+});
+
+test('reschedule confirmation names the new appointment and can be retried from the outbox', async () => {
+  const order: PublicOrderOverview = {
+    orderId: orderInput.orderId,
+    publicCode: orderInput.publicCode,
+    status: 'rescheduled',
+    contact: orderInput.contact,
+    selection: orderInput.selection,
+    price: orderInput.price,
+    addons: [],
+    appointment: {
+      id: '33333333-3333-4333-8333-333333333333',
+      branch: 'strizkov',
+      status: 'rescheduled',
+      startsAt: '2026-10-05T15:40:00Z',
+      endsAt: '2026-10-05T16:00:00Z',
+    },
+    createdAt: orderInput.createdAt.toISOString(),
+  };
+  const email = appointmentChangedEmail({
+    order,
+    manageUrl: orderInput.manageUrl,
+    kind: 'rescheduled',
+  });
+  assert.equal(email.eventType, 'appointment_rescheduled');
+  assert.equal(email.to, order.contact.email);
+  assert.match(email.subject, /Potvrzení nového termínu zápisu/);
+  for (const content of [email.text, email.html ?? '']) {
+    assert.match(content, /Nový termín zápisu/);
+    assert.match(content, /5\. října 2026.*17:40/);
+    assert.match(content, /Adresa zápisu/);
+  }
+  const event: EmailEventRow = {
+    id: '44444444-4444-4444-8444-444444444444',
+    idempotency_key: email.idempotencyKey,
+    status: 'pending',
+    metadata: {},
+  };
+  let delivered: EmailMessage | undefined;
+  const store = {
+    async createPending(message: EmailMessage) {
+      event.metadata = { outboxMessage: message };
+      return event;
+    },
+    async claimDue() {
+      return event;
+    },
+    async markSent() {},
+  } as unknown as SupabaseEmailEventStore;
+  const outbox = new OrderEmailOutbox({
+    async send(message) {
+      delivered = message;
+      return { status: 'accepted' };
+    },
+  }, store);
+  assert.deepEqual(await outbox.send(email), { status: 'queued' });
+  assert.equal(await outbox.deliver(event.id), 'sent');
+  assert.equal(delivered?.eventType, 'appointment_rescheduled');
+  assert.match(delivered?.text ?? '', /Nový termín zápisu/);
 });
 
 test('idempotency keys are stable and unique by logical event', () => {

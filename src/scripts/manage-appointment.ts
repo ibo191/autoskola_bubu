@@ -55,6 +55,10 @@ if (root) {
           });
           const result = await response.json().catch(() => ({ ok: false }));
           if (response.ok && result.ok) {
+            if (result.emailQueued === false) {
+              message.textContent = `Termín zápisu byl změněn na ${new Intl.DateTimeFormat('cs-CZ', { dateStyle: 'long' }).format(new Date(slot.startsAt))} ${time(slot.startsAt, slot.endsAt)}, ale potvrzovací e-mail se nepodařilo zařadit k odeslání. Poznamenejte si nový termín a kontaktujte pobočku.`;
+              return;
+            }
             window.location.href = `/dekujeme?kod=${encodeURIComponent(code)}`;
             return;
           }
@@ -143,7 +147,9 @@ if (root) {
       const result = await response.json().catch(() => ({ ok: false }));
       message.textContent =
         response.ok && result.ok
-          ? 'Termín zápisu byl zrušen.'
+          ? result.emailQueued === false
+            ? 'Termín zápisu byl zrušen, ale potvrzovací e-mail se nepodařilo zařadit k odeslání.'
+            : 'Termín zápisu byl zrušen.'
           : result.code === 'CAPTCHA_FAILED'
             ? 'Odeslání se nepodařilo. Zkuste to prosím znovu.'
             : 'Termín se nepodařilo zrušit.';
