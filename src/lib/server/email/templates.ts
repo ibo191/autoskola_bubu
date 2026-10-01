@@ -522,7 +522,7 @@ export function appointmentDayReportEmail(input: {
     text: `${title}\nPočet objednaných: ${entries.length}\n\n${text}`,
     tag: 'appointment-day-report',
     reportDate: input.date,
-    metadata: { branch: input.branch, reportDate: input.date, count: entries.length },
+    metadata: { branch: input.branch, reportDate: input.date, count: String(entries.length) },
   };
 }
 

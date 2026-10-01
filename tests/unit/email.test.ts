@@ -24,7 +24,8 @@ import {
 } from '../../src/lib/server/email/workflows';
 import { OrderEmailOutbox } from '../../src/lib/server/email/order-outbox';
 import type { EmailAdapter, EmailMessage } from '../../src/lib/integrations/contracts';
-import type { EmailEventRow, SupabaseEmailEventStore } from '../../src/lib/server/email/events';
+import { SupabaseEmailEventStore, type EmailEventRow } from '../../src/lib/server/email/events';
+import { LettermintEmailAdapter } from '../../src/lib/server/email/lettermint';
 import type { PublicOrderOverview } from '../../src/lib/booking/repository';
 import type { AdminAppointment } from '../../src/lib/supabase/booking-repository';
 
@@ -82,6 +83,7 @@ test('appointment day report lists customers and is idempotent per recipient', (
     appointments: [appointment],
   };
   const email = appointmentDayReportEmail(input);
+  assert.equal(email.metadata?.count, '1');
   assert.match(email.text, /15:00.*BUBU-TEST/);
   assert.match(email.html ?? '', /&lt;Jan&gt;/);
   assert.doesNotMatch(email.html ?? '', /<Jan>/);
@@ -90,6 +92,64 @@ test('appointment day report lists customers and is idempotent per recipient', (
     email.idempotencyKey,
     appointmentDayReportEmail({ ...input, to: 'jakub.abraham@autoskolabubu.cz' }).idempotencyKey,
   );
+});
+
+test('Lettermint sends report metadata as strings', async () => {
+  const originalFetch = globalThis.fetch;
+  let payload: { metadata?: Record<string, unknown> } | undefined;
+  globalThis.fetch = async (_input, init) => {
+    payload = JSON.parse(String(init?.body));
+    return new Response(JSON.stringify({ message_id: 'test-message', status: 'accepted' }), {
+      status: 200,
+    });
+  };
+  try {
+    await new LettermintEmailAdapter('test-token').send({
+      idempotencyKey: 'test-report',
+      to: 'test@example.invalid',
+      subject: 'Test',
+      text: 'Test',
+      metadata: { count: 8, branch: 'strizkov' },
+    });
+    assert.deepEqual(payload?.metadata, { count: '8', branch: 'strizkov' });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('failed email event can be claimed for a safe retry with the same key', async () => {
+  const originalFetch = globalThis.fetch;
+  const calls: Array<{ method: string; url: string }> = [];
+  globalThis.fetch = async (input, init) => {
+    const url = String(input);
+    const method = init?.method ?? 'GET';
+    calls.push({ method, url });
+    if (method === 'POST') return Response.json([]);
+    assert.match(url, /status=eq\.failed/);
+    assert.equal(JSON.parse(String(init?.body)).status, 'pending');
+    return Response.json([
+      { id: 'event-1', idempotency_key: 'report-1', status: 'pending', metadata: {} },
+    ]);
+  };
+  try {
+    const store = new SupabaseEmailEventStore({
+      SUPABASE_URL: 'https://example.supabase.co',
+      SUPABASE_SERVICE_ROLE_KEY: 'test-key',
+    });
+    const event = await store.createPending({
+      idempotencyKey: 'report-1',
+      to: 'test@example.invalid',
+      subject: 'Test',
+      text: 'Test',
+    });
+    assert.equal(event?.id, 'event-1');
+    assert.deepEqual(
+      calls.map((call) => call.method),
+      ['POST', 'PATCH'],
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 const contact = {

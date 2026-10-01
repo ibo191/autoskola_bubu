@@ -266,9 +266,10 @@ export function appointmentReportBranches(now: Date): Array<'strizkov' | 'staten
 export async function processAppointmentDayReports(
   env: Record<string, string | undefined>,
   now = new Date(),
+  options: { manual?: boolean } = {},
 ) {
   if (!isTransactionalEmailConfigured(env)) return { ok: false, code: 'EMAIL_NOT_CONFIGURED' };
-  if (pragueHour(now) !== 7) return { ok: true, skipped: 'outside-prague-7am' };
+  if (!options.manual && pragueHour(now) !== 7) return { ok: true, skipped: 'outside-prague-7am' };
   const branches = appointmentReportBranches(now);
   if (!branches.length) return { ok: true, skipped: 'no-enrollment-today' };
 

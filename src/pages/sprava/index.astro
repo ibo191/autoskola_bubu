@@ -6,6 +6,7 @@ import { selectionLabel } from '../../lib/order-display';
 import Base from '../../layouts/Base.astro';
 import { branches, courses, money } from '../../lib/catalog';
 import { requireLiveRepository } from '../../lib/server/live-order';
+import { appointmentReportBranches } from '../../lib/server/email/workflows';
 import {
   isDate,
   orderPeriodRange,
@@ -49,6 +50,8 @@ const scheduleBranch =
     ? ('statenice' as const)
     : ('strizkov' as const);
 const scheduleResult = url.searchParams.get('scheduleResult');
+const reportResult = url.searchParams.get('reportResult');
+const reportBranchesToday = appointmentReportBranches(new Date());
 const nextMonth = new Date(Date.UTC(Number(today.slice(0, 4)), Number(today.slice(5, 7)), 1))
   .toISOString()
   .slice(0, 7);
@@ -767,6 +770,29 @@ const calendarDays = calendarDates.map((item) => ({
               </div>
               <div class="schedule-manager" id="sprava-terminu">
                 <h3>Správa termínů zápisu</h3>
+                {reportBranchesToday.length > 0 && (
+                  <div class="notice">
+                    <p>
+                      Ranní seznam dnešních zápisů můžete bezpečně odeslat znovu. Již odeslané
+                      zprávy se nezdvojí.
+                    </p>
+                    <form method="post" action="/sprava/appointment-report">
+                      <button class="btn secondary" type="submit">
+                        Odeslat dnešní report zápisů
+                      </button>
+                    </form>
+                  </div>
+                )}
+                {reportResult && (
+                  <div
+                    class:list={['notice', reportResult === 'failed' && 'schedule-error']}
+                    role="status"
+                  >
+                    {reportResult === 'sent'
+                      ? 'Report byl odeslán, nebo již byl dříve doručen poskytovateli.'
+                      : 'Report se nepodařilo odeslat. Zkontrolujte e-mailové události.'}
+                  </div>
+                )}
                 <p>
                   Termíny můžete vypsat nebo vypnout pro nové objednávky. Již rezervované zápisy
                   zůstávají platné a jsou uvedené výše.

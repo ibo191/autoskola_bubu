@@ -49,7 +49,27 @@ export class SupabaseEmailEventStore {
     });
     if (!response.ok) throw new Error(`Email event insert failed: ${response.status}`);
     const rows = (await response.json()) as EmailEventRow[];
-    return rows[0] ?? null;
+    if (rows[0]) return rows[0];
+    // A previous provider rejection can be retried with the same provider idempotency key.
+    // Sent and currently pending messages remain untouched.
+    const params = new URLSearchParams({
+      idempotency_key: `eq.${message.idempotencyKey}`,
+      status: 'eq.failed',
+      select: 'id,idempotency_key,status,metadata',
+    });
+    const retry = await fetch(`${this.restBase}email_events?${params}`, {
+      method: 'PATCH',
+      headers: this.headers({ Prefer: 'return=representation' }),
+      body: JSON.stringify({
+        status: 'pending',
+        error: null,
+        scheduled_for: new Date().toISOString(),
+      }),
+      signal: AbortSignal.timeout(10000),
+      redirect: 'error',
+    });
+    if (!retry.ok) throw new Error(`Email event retry claim failed: ${retry.status}`);
+    return ((await retry.json()) as EmailEventRow[])[0] ?? null;
   }
 
   async markSent(id: string, result: EmailSendResult) {

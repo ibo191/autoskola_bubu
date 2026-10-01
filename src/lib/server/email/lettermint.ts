@@ -31,7 +31,11 @@ export class LettermintEmailAdapter implements EmailAdapter {
         html: message.html,
         text: message.text,
         tag: message.tag,
-        metadata: message.metadata,
+        metadata: message.metadata
+          ? Object.fromEntries(
+              Object.entries(message.metadata).map(([key, value]) => [key, String(value)]),
+            )
+          : undefined,
         attachments: message.attachments?.map((attachment) => ({
           filename: stripHeader(attachment.filename),
           content: attachment.content,
