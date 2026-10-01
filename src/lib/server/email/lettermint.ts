@@ -46,7 +46,12 @@ export class LettermintEmailAdapter implements EmailAdapter {
       signal: AbortSignal.timeout(12000),
       redirect: 'error',
     });
-    if (!response.ok) throw new Error(`Lettermint send failed: ${response.status}`);
+    if (!response.ok) {
+      const detail = (await response.text().catch(() => ''))
+        .slice(0, 600)
+        .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[email]');
+      throw new Error(`Lettermint send failed: ${response.status}${detail ? ` ${detail}` : ''}`);
+    }
     const parsed = responseSchema.safeParse(await response.json().catch(() => ({})));
     if (!parsed.success) return { status: 'accepted' };
     return { providerMessageId: parsed.data.message_id, status: parsed.data.status ?? 'accepted' };
