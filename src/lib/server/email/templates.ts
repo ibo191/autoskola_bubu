@@ -512,7 +512,9 @@ export function appointmentDayReportEmail(input: {
         .join('\n')
     : 'Na dnešní zápis není nikdo objednaný.';
   return {
-    idempotencyKey: eventKey('appointment-day-report', input.branch, input.date, input.to),
+    // v2: the original request used an invalid metadata payload; the provider
+    // rejects a corrected payload under the original idempotency key.
+    idempotencyKey: eventKey('appointment-day-report-v2', input.branch, input.date, input.to),
     eventType: 'appointment_day_report',
     from: ORDER_FROM,
     replyTo: ORDER_REPLY_TO,
