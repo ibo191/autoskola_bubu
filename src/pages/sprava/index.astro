@@ -85,7 +85,7 @@ function cookieOptions() {
   };
 }
 
-if (repository && adminCookie) {
+if (repository && adminCookie && Astro.request.method === 'POST') {
   const session = await timeAdminQuery('session', () => repository.adminSession(adminCookie)).catch(
     () => ({ ok: false as const }),
   );
@@ -116,24 +116,31 @@ if (repository && Astro.request.method === 'POST') {
 const queryFrom = pragueDayStartUtc(from);
 const nextDay = new Date(Date.parse(`${to}T00:00:00.000Z`) + 86400000).toISOString().slice(0, 10);
 const queryTo = pragueDayStartUtc(nextDay);
-const adminData =
-  repository && currentUser
-    ? await timeAdminQuery('dashboard', () =>
-        repository.adminDashboard({
-          from: queryFrom,
-          to: queryTo,
-          course: course || null,
-          branch: branch || null,
-          status: status || null,
-          query: query || null,
-          limit: 250,
-          appointmentDate,
-          appointmentBranch: appointmentBranch || null,
-          appointmentMonth,
-          today,
-          scheduleBranch,
-        }),
+const dashboardInput = {
+  from: queryFrom,
+  to: queryTo,
+  course: course || null,
+  branch: branch || null,
+  status: status || null,
+  query: query || null,
+  limit: 250,
+  appointmentDate,
+  appointmentBranch: appointmentBranch || null,
+  appointmentMonth,
+  today,
+  scheduleBranch,
+};
+const authorizedDashboard =
+  repository && adminCookie && Astro.request.method === 'GET'
+    ? await timeAdminQuery('authorized-dashboard', () =>
+        repository.adminDashboardAuthorized(adminCookie, dashboardInput),
       )
+    : null;
+if (authorizedDashboard?.ok) currentUser = authorizedDashboard.user;
+const adminData = authorizedDashboard?.ok
+  ? authorizedDashboard.dashboard
+  : repository && currentUser && Astro.request.method === 'POST'
+    ? await timeAdminQuery('dashboard', () => repository.adminDashboard(dashboardInput))
     : null;
 if (currentUser && queryTimings.length) {
   Astro.response.headers.set(

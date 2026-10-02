@@ -119,3 +119,40 @@ test('private dashboard batches six views into one service-role request', async 
     globalThis.fetch = originalFetch;
   }
 });
+
+test('authorized dashboard rejects an invalid session without returning private data', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (input, init) => {
+    assert.equal(
+      String(input),
+      'https://example.supabase.co/rest/v1/rpc/bubu_admin_dashboard_authorized',
+    );
+    assert.equal(JSON.parse(String(init?.body)).p_token, 'expired-token');
+    return Response.json({ ok: false });
+  };
+  try {
+    const repository = new SupabaseBookingRepository({
+      APP_ENV: 'preview',
+      APP_ORIGIN: 'https://preview.example',
+      SUPABASE_URL: 'https://example.supabase.co',
+      SUPABASE_SERVICE_ROLE_KEY: 'test-service-key',
+    });
+    const result = await repository.adminDashboardAuthorized('expired-token', {
+      from: '2026-10-01T00:00:00Z',
+      to: '2026-11-01T00:00:00Z',
+      course: null,
+      branch: null,
+      status: null,
+      query: null,
+      limit: 250,
+      appointmentDate: '2026-10-05',
+      appointmentBranch: null,
+      appointmentMonth: '2026-10',
+      today: '2026-10-02',
+      scheduleBranch: 'strizkov',
+    });
+    assert.deepEqual(result, { ok: false });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});

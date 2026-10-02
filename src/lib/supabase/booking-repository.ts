@@ -170,6 +170,40 @@ const adminDashboardSchema = z.object({
   appointmentDays: z.array(z.object({ date: z.string(), count: z.number().int().nonnegative() })),
   scheduleDay: adminScheduleDaySchema,
 });
+const adminDashboardAuthorizedSchema = z.union([
+  z.object({ ok: z.literal(true), user: adminUserSchema, dashboard: adminDashboardSchema }),
+  z.object({ ok: z.literal(false) }),
+]);
+type AdminDashboardInput = {
+  from: string;
+  to: string;
+  course: string | null;
+  branch: string | null;
+  status: string | null;
+  query: string | null;
+  limit: number;
+  appointmentDate: string;
+  appointmentBranch: string | null;
+  appointmentMonth: string;
+  today: string;
+  scheduleBranch: 'strizkov' | 'statenice';
+};
+function adminDashboardPayload(input: AdminDashboardInput) {
+  return {
+    p_from: input.from,
+    p_to: input.to,
+    p_course: input.course,
+    p_order_branch: input.branch,
+    p_status: input.status,
+    p_query: input.query,
+    p_limit: input.limit,
+    p_appointment_date: input.appointmentDate,
+    p_appointment_branch: input.appointmentBranch,
+    p_month: `${input.appointmentMonth}-01`,
+    p_today: input.today,
+    p_schedule_branch: input.scheduleBranch,
+  };
+}
 export type AdminUser = z.infer<typeof adminUserSchema>;
 export type AdminOrder = z.infer<typeof adminOrderSchema>;
 export type AdminAppointment = z.infer<typeof adminAppointmentSchema>;
@@ -206,6 +240,7 @@ export class SupabaseBookingRepository implements BookingRepository {
       | 'bubu_admin_next_appointment_day'
       | 'bubu_admin_schedule_day'
       | 'bubu_admin_dashboard'
+      | 'bubu_admin_dashboard_authorized'
       | 'bubu_admin_schedule_action',
     body: unknown,
   ) {
@@ -326,34 +361,16 @@ export class SupabaseBookingRepository implements BookingRepository {
       }),
     ) as AdminSummary;
   }
-  async adminDashboard(input: {
-    from: string;
-    to: string;
-    course: string | null;
-    branch: string | null;
-    status: string | null;
-    query: string | null;
-    limit: number;
-    appointmentDate: string;
-    appointmentBranch: string | null;
-    appointmentMonth: string;
-    today: string;
-    scheduleBranch: 'strizkov' | 'statenice';
-  }) {
+  async adminDashboard(input: AdminDashboardInput) {
     return adminDashboardSchema.parse(
-      await this.rpc('bubu_admin_dashboard', {
-        p_from: input.from,
-        p_to: input.to,
-        p_course: input.course,
-        p_order_branch: input.branch,
-        p_status: input.status,
-        p_query: input.query,
-        p_limit: input.limit,
-        p_appointment_date: input.appointmentDate,
-        p_appointment_branch: input.appointmentBranch,
-        p_month: `${input.appointmentMonth}-01`,
-        p_today: input.today,
-        p_schedule_branch: input.scheduleBranch,
+      await this.rpc('bubu_admin_dashboard', adminDashboardPayload(input)),
+    );
+  }
+  async adminDashboardAuthorized(token: string, input: AdminDashboardInput) {
+    return adminDashboardAuthorizedSchema.parse(
+      await this.rpc('bubu_admin_dashboard_authorized', {
+        p_token: token,
+        ...adminDashboardPayload(input),
       }),
     );
   }
