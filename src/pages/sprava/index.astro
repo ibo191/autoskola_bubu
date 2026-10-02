@@ -65,6 +65,15 @@ const adminCookie = Astro.cookies.get('bubu_admin_session')?.value ?? '';
 let loginFailed = false;
 let currentUser: { email: string; name: string } | null = null;
 let configError = !repositoryReady;
+const queryTimings: Array<{ name: string; duration: number }> = [];
+async function timeAdminQuery<T>(name: string, query: () => Promise<T>): Promise<T> {
+  const started = performance.now();
+  try {
+    return await query();
+  } finally {
+    queryTimings.push({ name, duration: performance.now() - started });
+  }
+}
 
 function cookieOptions() {
   return {
@@ -77,7 +86,9 @@ function cookieOptions() {
 }
 
 if (repository && adminCookie) {
-  const session = await repository.adminSession(adminCookie).catch(() => ({ ok: false as const }));
+  const session = await timeAdminQuery('session', () => repository.adminSession(adminCookie)).catch(
+    () => ({ ok: false as const }),
+  );
   if (session.ok) currentUser = session.user;
 }
 
@@ -108,25 +119,46 @@ const queryTo = pragueDayStartUtc(nextDay);
 const adminData =
   repository && currentUser
     ? await Promise.all([
-        repository.adminSummary({ from: queryFrom, to: queryTo, course: course || null }),
-        repository.adminOrders({
-          from: queryFrom,
-          to: queryTo,
-          course: course || null,
-          branch: branch || null,
-          status: status || null,
-          query: query || null,
-          limit: 250,
-        }),
-        repository.adminAppointments({ date: appointmentDate, branch: appointmentBranch || null }),
-        repository.adminNextAppointmentDay({ from: today, branch: appointmentBranch || null }),
-        repository.adminAppointmentDays({
-          month: appointmentMonth,
-          branch: appointmentBranch || null,
-        }),
-        repository.adminScheduleDay(scheduleBranch, appointmentDate),
+        timeAdminQuery('summary', () =>
+          repository.adminSummary({ from: queryFrom, to: queryTo, course: course || null }),
+        ),
+        timeAdminQuery('orders', () =>
+          repository.adminOrders({
+            from: queryFrom,
+            to: queryTo,
+            course: course || null,
+            branch: branch || null,
+            status: status || null,
+            query: query || null,
+            limit: 250,
+          }),
+        ),
+        timeAdminQuery('appointments', () =>
+          repository.adminAppointments({
+            date: appointmentDate,
+            branch: appointmentBranch || null,
+          }),
+        ),
+        timeAdminQuery('next-day', () =>
+          repository.adminNextAppointmentDay({ from: today, branch: appointmentBranch || null }),
+        ),
+        timeAdminQuery('calendar-days', () =>
+          repository.adminAppointmentDays({
+            month: appointmentMonth,
+            branch: appointmentBranch || null,
+          }),
+        ),
+        timeAdminQuery('schedule-day', () =>
+          repository.adminScheduleDay(scheduleBranch, appointmentDate),
+        ),
       ])
     : null;
+if (currentUser && queryTimings.length) {
+  Astro.response.headers.set(
+    'Server-Timing',
+    queryTimings.map(({ name, duration }) => `admin-${name};dur=${duration.toFixed(1)}`).join(', '),
+  );
+}
 const summary = adminData?.[0] ?? null;
 const orders = adminData?.[1] ?? [];
 const appointments = adminData?.[2] ?? [];
@@ -214,7 +246,11 @@ const calendarDays = calendarDates.map((item) => ({
 ---
 
 <Base title="Interní správa" description="Interní správa Autoškoly BuBu." noindex>
-  <section class="section admin-section" data-admin-enhance={Boolean(currentUser)}>
+  <section
+    class="section admin-section"
+    data-admin-enhance={Boolean(currentUser)}
+    data-admin-query-timings={currentUser ? JSON.stringify(queryTimings) : undefined}
+  >
     <div class="container content">
       <div class="admin-topline">
         <div>
