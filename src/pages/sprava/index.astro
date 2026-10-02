@@ -118,40 +118,22 @@ const nextDay = new Date(Date.parse(`${to}T00:00:00.000Z`) + 86400000).toISOStri
 const queryTo = pragueDayStartUtc(nextDay);
 const adminData =
   repository && currentUser
-    ? await Promise.all([
-        timeAdminQuery('summary', () =>
-          repository.adminSummary({ from: queryFrom, to: queryTo, course: course || null }),
-        ),
-        timeAdminQuery('orders', () =>
-          repository.adminOrders({
-            from: queryFrom,
-            to: queryTo,
-            course: course || null,
-            branch: branch || null,
-            status: status || null,
-            query: query || null,
-            limit: 250,
-          }),
-        ),
-        timeAdminQuery('appointments', () =>
-          repository.adminAppointments({
-            date: appointmentDate,
-            branch: appointmentBranch || null,
-          }),
-        ),
-        timeAdminQuery('next-day', () =>
-          repository.adminNextAppointmentDay({ from: today, branch: appointmentBranch || null }),
-        ),
-        timeAdminQuery('calendar-days', () =>
-          repository.adminAppointmentDays({
-            month: appointmentMonth,
-            branch: appointmentBranch || null,
-          }),
-        ),
-        timeAdminQuery('schedule-day', () =>
-          repository.adminScheduleDay(scheduleBranch, appointmentDate),
-        ),
-      ])
+    ? await timeAdminQuery('dashboard', () =>
+        repository.adminDashboard({
+          from: queryFrom,
+          to: queryTo,
+          course: course || null,
+          branch: branch || null,
+          status: status || null,
+          query: query || null,
+          limit: 250,
+          appointmentDate,
+          appointmentBranch: appointmentBranch || null,
+          appointmentMonth,
+          today,
+          scheduleBranch,
+        }),
+      )
     : null;
 if (currentUser && queryTimings.length) {
   Astro.response.headers.set(
@@ -159,17 +141,17 @@ if (currentUser && queryTimings.length) {
     queryTimings.map(({ name, duration }) => `admin-${name};dur=${duration.toFixed(1)}`).join(', '),
   );
 }
-const summary = adminData?.[0] ?? null;
-const orders = adminData?.[1] ?? [];
-const appointments = adminData?.[2] ?? [];
-const nextAppointmentDay = adminData?.[3] ?? null;
+const summary = adminData?.summary ?? null;
+const orders = adminData?.orders ?? [];
+const appointments = adminData?.appointments ?? [];
+const nextAppointmentDay = adminData?.nextAppointmentDay ?? null;
 const calendarDates = Array.from({ length: daysInMonth }, (_, index) => {
   const day = index + 1;
   const date = `${appointmentMonth}-${String(day).padStart(2, '0')}`;
   return { day, date };
 });
-const appointmentDays = adminData?.[4] ?? [];
-const scheduleDay = adminData?.[5] ?? null;
+const appointmentDays = adminData?.appointmentDays ?? [];
+const scheduleDay = adminData?.scheduleDay ?? null;
 const appointmentDayMap = new Map(appointmentDays.map((item) => [item.date, item.count]));
 
 const orderCourseLabel = (order: { course: string; selection: unknown }) => {

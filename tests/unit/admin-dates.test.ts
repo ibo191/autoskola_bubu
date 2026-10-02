@@ -9,6 +9,7 @@ import {
 import { POST as adminAction } from '../../src/pages/sprava/action';
 import { POST as scheduleAction } from '../../src/pages/sprava/schedule';
 import type { APIContext } from 'astro';
+import { SupabaseBookingRepository } from '../../src/lib/supabase/booking-repository';
 
 test('admin order presets use Prague calendar months across the year boundary', () => {
   assert.deepEqual(orderPeriodRange('this-month', '2026-01-15'), {
@@ -62,4 +63,59 @@ test('schedule changes reject unauthenticated and cross-origin requests', async 
     }) as unknown as APIContext;
   assert.equal((await scheduleAction(context()))?.status, 401);
   assert.equal((await scheduleAction(context('https://example.invalid')))?.status, 403);
+});
+
+test('private dashboard batches six views into one service-role request', async () => {
+  const originalFetch = globalThis.fetch;
+  let called = 0;
+  globalThis.fetch = async (input, init) => {
+    called += 1;
+    assert.equal(String(input), 'https://example.supabase.co/rest/v1/rpc/bubu_admin_dashboard');
+    assert.equal(new Headers(init?.headers).get('Authorization'), 'Bearer test-service-key');
+    const body = JSON.parse(String(init?.body));
+    assert.equal(body.p_appointment_date, '2026-10-05');
+    assert.equal(body.p_month, '2026-10-01');
+    assert.equal(body.p_schedule_branch, 'strizkov');
+    return Response.json({
+      summary: {
+        ordersTotal: 0,
+        ordersConfirmed: 0,
+        appointmentsTotal: 0,
+        byCourse: [],
+        byDay: [],
+      },
+      orders: [],
+      appointments: [],
+      nextAppointmentDay: null,
+      appointmentDays: [],
+      scheduleDay: { closed: false, managedClosure: false, slots: [] },
+    });
+  };
+  try {
+    const repository = new SupabaseBookingRepository({
+      APP_ENV: 'preview',
+      APP_ORIGIN: 'https://preview.example',
+      SUPABASE_URL: 'https://example.supabase.co',
+      SUPABASE_SERVICE_ROLE_KEY: 'test-service-key',
+    });
+    const result = await repository.adminDashboard({
+      from: '2026-10-01T00:00:00Z',
+      to: '2026-11-01T00:00:00Z',
+      course: null,
+      branch: null,
+      status: null,
+      query: null,
+      limit: 250,
+      appointmentDate: '2026-10-05',
+      appointmentBranch: null,
+      appointmentMonth: '2026-10',
+      today: '2026-10-02',
+      scheduleBranch: 'strizkov',
+    });
+    assert.equal(called, 1);
+    assert.equal(result.summary.ordersTotal, 0);
+    assert.deepEqual(result.scheduleDay.slots, []);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });

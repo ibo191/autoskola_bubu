@@ -162,6 +162,14 @@ const adminScheduleDaySchema = z.object({
     }),
   ),
 });
+const adminDashboardSchema = z.object({
+  summary: adminSummarySchema,
+  orders: z.array(adminOrderSchema),
+  appointments: z.array(adminAppointmentSchema),
+  nextAppointmentDay: nextAppointmentDaySchema,
+  appointmentDays: z.array(z.object({ date: z.string(), count: z.number().int().nonnegative() })),
+  scheduleDay: adminScheduleDaySchema,
+});
 export type AdminUser = z.infer<typeof adminUserSchema>;
 export type AdminOrder = z.infer<typeof adminOrderSchema>;
 export type AdminAppointment = z.infer<typeof adminAppointmentSchema>;
@@ -197,6 +205,7 @@ export class SupabaseBookingRepository implements BookingRepository {
       | 'bubu_admin_order_action'
       | 'bubu_admin_next_appointment_day'
       | 'bubu_admin_schedule_day'
+      | 'bubu_admin_dashboard'
       | 'bubu_admin_schedule_action',
     body: unknown,
   ) {
@@ -316,6 +325,37 @@ export class SupabaseBookingRepository implements BookingRepository {
         p_course: input.course || null,
       }),
     ) as AdminSummary;
+  }
+  async adminDashboard(input: {
+    from: string;
+    to: string;
+    course: string | null;
+    branch: string | null;
+    status: string | null;
+    query: string | null;
+    limit: number;
+    appointmentDate: string;
+    appointmentBranch: string | null;
+    appointmentMonth: string;
+    today: string;
+    scheduleBranch: 'strizkov' | 'statenice';
+  }) {
+    return adminDashboardSchema.parse(
+      await this.rpc('bubu_admin_dashboard', {
+        p_from: input.from,
+        p_to: input.to,
+        p_course: input.course,
+        p_order_branch: input.branch,
+        p_status: input.status,
+        p_query: input.query,
+        p_limit: input.limit,
+        p_appointment_date: input.appointmentDate,
+        p_appointment_branch: input.appointmentBranch,
+        p_month: `${input.appointmentMonth}-01`,
+        p_today: input.today,
+        p_schedule_branch: input.scheduleBranch,
+      }),
+    );
   }
   async adminLogin(input: { email: string; password: string }) {
     return adminLoginSchema.parse(
