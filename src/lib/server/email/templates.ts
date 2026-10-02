@@ -194,7 +194,7 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
     orderId: input.orderId,
     appointmentId: input.appointment?.id,
     from: ORDER_FROM,
-    replyTo: isKladno ? 'kladno@autoskolabubu.cz' : ORDER_REPLY_TO,
+    replyTo: ORDER_REPLY_TO,
     to: input.contact.email,
     subject: `Potvrzení objednávky ${input.publicCode} – Autoškola BuBu`,
     html: layout('Potvrzení objednávky', body),

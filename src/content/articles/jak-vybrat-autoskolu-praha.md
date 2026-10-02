@@ -192,6 +192,6 @@ Kdy dává smysl vybrat Autoškolu BuBu? Autoškola BuBu dává největší smys
 - nechcete anonymní autoškolu,
 - chcete se naučit řídit v klidu a srozumitelně. Nejsme správná volba pro každého. Pokud hledáte jen nejnižší cenu a nic jiného vás nezajímá, pravděpodobně budete porovnávat hlavně čísla. Pokud ale chcete výcvik, po kterém se nebudete bát sednout za volant, cena by neměla být jediným kritériem.
 
-Pokud chcete řidičák bez stresu, přihlaste se do kurzu přes stránku řidičáku skupiny B. Nejste si jistí? Napište nám přes strizkov@autoskolabubu.cz nebo klidne volejte na: +420 725 717 755
+Pokud chcete řidičák bez stresu, přihlaste se do kurzu přes stránku řidičáku skupiny B. Nejste si jistí? Napište nám přes info@autoskolabubu.cz nebo klidně volejte na: +420 725 717 755
 
 Shrnutí: podle čeho vybrat autoškolu v Praze Před přihláškou si nepokládejte jen otázku, kolik autoškola stojí. Ptejte se, jak bude výcvik probíhat, kdo vás bude učit, jak rychle budete jezdit, jak autoškola komunikuje a jestli z ní máte důvěru. Řidičák není jen papír. Je to schopnost, která ovlivní vaši bezpečnost, sebevědomí i každodenní život. Chcete řidičák bez stresu? Podívejte se na kurz skupiny B v Autoškole BuBu a vyberte si výcvik, který vás naučí řídit v klidu, lidsky a srozumitelně.

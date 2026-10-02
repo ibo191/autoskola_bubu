@@ -283,7 +283,7 @@ test('Kladno confirmation asks for documents by email and replies to the branch'
     selection: { ...orderInput.selection, branch: 'kladno' },
     appointment: null,
   });
-  assert.equal(email.replyTo, 'kladno@autoskolabubu.cz');
+  assert.equal(email.replyTo, 'objednavky@autoskolabubu.cz');
   for (const content of [email.text, email.html ?? '']) {
     assert.match(content, /Kopii nám pošlete odpovědí na tento e-mail/);
     assert.match(content, /Posudek nám pošlete odpovědí na tento e-mail/);

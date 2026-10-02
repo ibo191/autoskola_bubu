@@ -20,7 +20,7 @@ export function createTransactionalEmailAdapter(
 }
 
 export function orderNotificationEmail(env: Record<string, string | undefined>) {
-  return env.ORDER_NOTIFICATION_EMAIL || env.GENERAL_CONTACT_EMAIL || 'info@autoskolabubu.cz';
+  return env.ORDER_NOTIFICATION_EMAIL || 'objednavky@autoskolabubu.cz';
 }
 
 export function reportEmailAddress(env: Record<string, string | undefined>) {
