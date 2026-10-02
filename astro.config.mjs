@@ -50,7 +50,7 @@ export default defineConfig({
   site: productionOrigin,
   output: 'server',
   adapter: isVercelBuild
-    ? vercel({ maxDuration: 60, imageService: true })
+    ? vercel({ maxDuration: 60, imageService: true, webAnalytics: { enabled: true } })
     : node({ mode: 'standalone', bodySizeLimit: 16384 }),
   session: false,
   devToolbar: { enabled: false },

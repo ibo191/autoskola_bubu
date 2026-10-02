@@ -4,6 +4,8 @@ import OrderDialog from '../components/OrderDialog.astro';
 import CookieConsent from '../components/CookieConsent.astro';
 import GoogleTag from '../components/GoogleTag.astro';
 import { branches } from '../lib/catalog';
+import { inject } from '@vercel/analytics';
+inject();
 interface Props {
   title: string;
   description: string;
