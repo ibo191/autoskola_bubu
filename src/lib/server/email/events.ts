@@ -63,7 +63,7 @@ export class SupabaseEmailEventStore {
       body: JSON.stringify({
         status: 'pending',
         error: null,
-        scheduled_for: new Date().toISOString(),
+        scheduled_for: message.scheduledFor ?? new Date().toISOString(),
       }),
       signal: AbortSignal.timeout(10000),
       redirect: 'error',
@@ -87,6 +87,26 @@ export class SupabaseEmailEventStore {
       status: 'failed',
       error: error instanceof Error ? error.message.slice(0, 500) : 'Unknown email failure',
     });
+  }
+
+  async isNoShowOrder(orderId: string): Promise<boolean> {
+    const params = new URLSearchParams({
+      id: `eq.${orderId}`,
+      select: 'status',
+      limit: '1',
+    });
+    const response = await fetch(`${this.restBase}orders?${params}`, {
+      headers: this.headers(),
+      signal: AbortSignal.timeout(10000),
+      redirect: 'error',
+    });
+    if (!response.ok) throw new Error(`No-show status lookup failed: ${response.status}`);
+    const rows = (await response.json()) as { status: string }[];
+    return rows[0]?.status === 'no_show';
+  }
+
+  async markSkipped(id: string) {
+    await this.patch(id, { status: 'skipped' });
   }
 
   async listDue(now: Date, limit = 20): Promise<EmailEventRow[]> {

@@ -5,7 +5,7 @@ import { publicAppOrigin } from '../../lib/config';
 import { assertSameOrigin, requireLiveRepository } from '../../lib/server/live-order';
 import { isTransactionalEmailConfigured } from '../../lib/server/email';
 import { createOrderEmailOutbox } from '../../lib/server/email/order-outbox';
-import { adminEnrollmentEmail } from '../../lib/server/email/templates';
+import { adminEnrollmentEmail, noShowFollowUpEmail } from '../../lib/server/email/templates';
 
 export const prerender = false;
 
@@ -55,7 +55,20 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
         action: parsed.data.intent,
         origin: publicAppOrigin(process.env),
       });
-      await createOrderEmailOutbox(process.env, (task) => waitUntil(task)).send(email);
+      const outbox = createOrderEmailOutbox(process.env, (task) => waitUntil(task));
+      await outbox.send(email);
+      if (parsed.data.intent === 'no_show') {
+        await outbox.send(
+          noShowFollowUpEmail({
+            orderId: parsed.data.orderId,
+            appointmentId: result.appointmentId,
+            publicCode: result.publicCode,
+            to: result.recipient,
+            origin: publicAppOrigin(process.env),
+            scheduledFor: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+          }),
+        );
+      }
       emailQueued = true;
     } catch (error) {
       console.error('admin_action_email_queue_failed', {

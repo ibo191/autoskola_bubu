@@ -5,6 +5,7 @@ import {
   appointmentChangedEmail,
   appointmentDayReportEmail,
   adminEnrollmentEmail,
+  noShowFollowUpEmail,
   examQuestionConfirmationEmail,
   examQuestionNotificationEmail,
   contactFormEmail,
@@ -110,9 +111,20 @@ test('admin enrollment actions produce distinct customer emails without duplicat
   assert.equal(welcome.eventType, 'enrollment_welcome');
   assert.match(welcome.text, /třetí přednášce.*připouštěcí test/);
   assert.match(welcome.text, /dohody o splátkách/);
+  assert.match(welcome.text, /Zbývající přednášky si naplánujte v aplikaci Moje Autoškola/);
+  assert.match(welcome.text, /nejpozději 24 hodin/);
+  assert.match(welcome.text, /info@autoskolabubu\.cz/);
+  assert.match(welcome.text, /K eTestům se dostanete také prostřednictvím aplikace/);
+  assert.match(welcome.text, /apps\.apple\.com\/cz\/app\/moje-auto%C5%A1kola\/id1449593403/);
+  assert.match(
+    welcome.text,
+    /play\.google\.com\/store\/apps\/details\?id=cz\.moje_autoskola&hl=cs/,
+  );
+  assert.match(welcome.html ?? '', /href="https:\/\/apps\.apple\.com/);
+  assert.match(welcome.html ?? '', /href="https:\/\/play\.google\.com/);
   assert.equal(noShow.eventType, 'appointment_no_show');
   assert.match(noShow.text, /nedostavil\/a/);
-  assert.match(noShow.text, /https:\/\/www\.autoskolabubu\.cz\/kurzy/);
+  assert.match(noShow.text, /https:\/\/www\.autoskolabubu\.cz\/spravovat-termin\?kod=BUBU-TEST/);
   assert.equal(cancelled.eventType, 'admin_order_cancelled');
   assert.doesNotMatch(cancelled.text, /nedostavil\/a/);
   assert.doesNotMatch(
@@ -123,6 +135,86 @@ test('admin enrollment actions produce distinct customer emails without duplicat
     new Set([welcome.idempotencyKey, noShow.idempotencyKey, cancelled.idempotencyKey]).size,
     3,
   );
+  const followUp = noShowFollowUpEmail({
+    ...base,
+    scheduledFor: '2026-10-08T12:00:00.000Z',
+  });
+  assert.equal(followUp.eventType, 'appointment_no_show');
+  assert.equal(followUp.scheduledFor, '2026-10-08T12:00:00.000Z');
+  assert.notEqual(followUp.idempotencyKey, noShow.idempotencyKey);
+  assert.match(followUp.text, /před třemi dny/);
+  assert.match(followUp.text, /spravovat-termin\?kod=BUBU-TEST/);
+});
+
+test('no-show follow-up stays queued until its scheduled time', async () => {
+  const scheduledFor = '2099-10-08T12:00:00.000Z';
+  const message = noShowFollowUpEmail({
+    orderId: '22222222-2222-4222-8222-222222222222',
+    publicCode: 'BUBU-TEST',
+    to: 'student@example.invalid',
+    origin: 'https://www.autoskolabubu.cz',
+    scheduledFor,
+  });
+  let queued: EmailMessage | undefined;
+  let deliveryScheduled = false;
+  const store = {
+    async createPending(value: EmailMessage) {
+      queued = value;
+      return { id: '44444444-4444-4444-8444-444444444444' };
+    },
+  } as unknown as SupabaseEmailEventStore;
+  const outbox = new OrderEmailOutbox(
+    {
+      async send() {
+        throw new Error('Future message must not be sent now');
+      },
+    },
+    store,
+    () => {
+      deliveryScheduled = true;
+    },
+  );
+  assert.equal((await outbox.send(message)).status, 'queued');
+  assert.equal(queued?.scheduledFor, scheduledFor);
+  assert.equal(deliveryScheduled, false);
+});
+
+test('no-show follow-up is skipped after the order is cancelled', async () => {
+  const message = noShowFollowUpEmail({
+    orderId: '22222222-2222-4222-8222-222222222222',
+    publicCode: 'BUBU-TEST',
+    to: 'student@example.invalid',
+    origin: 'https://www.autoskolabubu.cz',
+    scheduledFor: '2026-10-01T12:00:00.000Z',
+  });
+  const event: EmailEventRow = {
+    id: '44444444-4444-4444-8444-444444444444',
+    idempotency_key: message.idempotencyKey,
+    status: 'pending',
+    metadata: { outboxMessage: message },
+  };
+  let skipped = false;
+  const store = {
+    async claimDue() {
+      return event;
+    },
+    async isNoShowOrder() {
+      return false;
+    },
+    async markSkipped() {
+      skipped = true;
+    },
+  } as unknown as SupabaseEmailEventStore;
+  const outbox = new OrderEmailOutbox(
+    {
+      async send() {
+        throw new Error('Cancelled order must not receive a reminder');
+      },
+    },
+    store,
+  );
+  assert.equal(await outbox.deliver(event.id), 'skipped');
+  assert.equal(skipped, true);
 });
 
 test('Lettermint sends report metadata as strings', async () => {
@@ -383,12 +475,15 @@ test('reschedule confirmation names the new appointment and can be retried from 
     },
     async markSent() {},
   } as unknown as SupabaseEmailEventStore;
-  const outbox = new OrderEmailOutbox({
-    async send(message) {
-      delivered = message;
-      return { status: 'accepted' };
+  const outbox = new OrderEmailOutbox(
+    {
+      async send(message) {
+        delivered = message;
+        return { status: 'accepted' };
+      },
     },
-  }, store);
+    store,
+  );
   assert.deepEqual(await outbox.send(email), { status: 'queued' });
   assert.equal(await outbox.deliver(event.id), 'sent');
   assert.equal(delivered?.eventType, 'appointment_rescheduled');

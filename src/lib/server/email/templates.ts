@@ -554,10 +554,13 @@ export function adminEnrollmentEmail(input: {
   };
   if (input.action === 'attend') {
     const subject = 'Vítejte v Autoškole BuBu – informace po zápisu';
+    const appStoreUrl = 'https://apps.apple.com/cz/app/moje-auto%C5%A1kola/id1449593403';
+    const googlePlayUrl = 'https://play.google.com/store/apps/details?id=cz.moje_autoskola&hl=cs';
     const paragraphs = [
       'právě jste se zapsal/a do Autoškoly BuBu. Posíláme Vám několik organizačních informací, aby vše od začátku probíhalo hladce.',
-      'Při zápisu Vám byl sdělen termín zahájení Vašeho kurzu a zároveň jste byl/a přihlášen/a na první přednášku. Nezapomeňte si nyní naplánovat také zbývající přednášky podle svého výcviku.',
-      'Na třetí přednášce budete psát připouštěcí test do provozu, proto je důležité začít s přípravou co nejdříve. Během zápisu jsme Vám zpřístupnili online studovnu a eTesty, kde si můžete průběžně procvičovat otázky.',
+      'Při zápisu Vám byl sdělen termín zahájení Vašeho kurzu a zároveň jste byl/a přihlášen/a na první přednášku. Zbývající přednášky si naplánujte v aplikaci Moje Autoškola. Přihlaste se údaji, které Vám byly vygenerovány a zaslány ze systému.',
+      'Z přednášky se můžete odhlásit nejpozději 24 hodin před jejím začátkem. Myslete na to prosím při plánování. Pokud jste se nestihli odhlásit, pošlete omluvenku na info@autoskolabubu.cz.',
+      'Na třetí přednášce budete psát připouštěcí test do provozu, proto je důležité začít s přípravou co nejdříve. K eTestům se dostanete také prostřednictvím aplikace Moje Autoškola. Doporučujeme si aplikaci eTesty stáhnout přímo do mobilu a otázky pravidelně procvičovat.',
       'Doporučujeme se předem dobře seznámit zejména s dopravními značkami a dopravními situacemi. Připouštěcí test bude rovněž probíhat prostřednictvím eTestů. Pokud test napoprvé nezvládnete, budete mít možnost přijít si jej opravit.',
       'Instruktor pro praktické jízdy Vám bude přidělen po úspěšném absolvování připouštěcího testu do provozu. Následně si s ním budete moci začít plánovat své jízdy.',
       'Nezapomeňte také, že před Vaší první teoretickou výukou musí být kurz kompletně uhrazen, případně hrazen podle dohody o splátkách, kterou jste si sjednali při zápisu.',
@@ -570,12 +573,20 @@ export function adminEnrollmentEmail(input: {
       tag: 'enrollment-welcome',
       html: layout(
         subject,
-        `<p>Dobrý den,</p>${paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join('')}<p>S pozdravem<br>Autoškola BuBu</p>`,
+        `<p>Dobrý den,</p>${paragraphs.map((p, index) => `<p>${escapeHtml(p)}</p>${index === 1 ? `<p>Stáhnout aplikaci Moje Autoškola: <a href="${escapeHtml(appStoreUrl)}">App Store</a> · <a href="${escapeHtml(googlePlayUrl)}">Google Play</a></p>` : ''}`).join('')}<p>S pozdravem<br>Autoškola BuBu</p>`,
       ),
-      text: ['Dobrý den,', ...paragraphs, 'S pozdravem\nAutoškola BuBu'].join('\n\n'),
+      text: [
+        'Dobrý den,',
+        ...paragraphs.slice(0, 2),
+        `Stáhnout aplikaci Moje Autoškola:\nApp Store: ${appStoreUrl}\nGoogle Play: ${googlePlayUrl}`,
+        ...paragraphs.slice(2),
+        'S pozdravem\nAutoškola BuBu',
+      ].join('\n\n'),
     };
   }
   if (input.action === 'no_show') {
+    const manageUrl = new URL('/spravovat-termin', input.origin);
+    manageUrl.searchParams.set('kod', input.publicCode);
     const subject = 'Nedostavili jste se k zápisu – Autoškola BuBu';
     return {
       ...base,
@@ -584,9 +595,9 @@ export function adminEnrollmentEmail(input: {
       tag: 'appointment-no-show',
       html: layout(
         subject,
-        `<p>Dobrý den,</p><p>evidujeme, že jste se nedostavil/a na rezervovaný termín zápisu do Autoškoly BuBu.</p><p>Pokud máte o kurz stále zájem, prosíme o přeplánování zápisu na některý z dalších dostupných termínů. Nový termín si můžete zvolit prostřednictvím <a href="${courseUrl}">našeho webu</a>.</p><p>Pokud již o kurz zájem nemáte, není potřeba na tento e-mail reagovat.</p><p>Děkujeme.</p><p>S pozdravem<br>Autoškola BuBu</p>`,
+        `<p>Dobrý den,</p><p>evidujeme, že jste se nedostavil/a na rezervovaný termín zápisu do Autoškoly BuBu.</p><p>Pokud máte o kurz stále zájem, prosíme o přeplánování zápisu na některý z dalších dostupných termínů. Nový termín si můžete zvolit prostřednictvím <a href="${escapeHtml(manageUrl.href)}">našeho webu</a>.</p><p>Pokud již o kurz zájem nemáte, není potřeba na tento e-mail reagovat.</p><p>Děkujeme.</p><p>S pozdravem<br>Autoškola BuBu</p>`,
       ),
-      text: `Dobrý den,\n\nevidujeme, že jste se nedostavil/a na rezervovaný termín zápisu do Autoškoly BuBu.\n\nPokud máte o kurz stále zájem, prosíme o přeplánování zápisu na některý z dalších dostupných termínů. Nový termín si můžete zvolit prostřednictvím našeho webu: ${courseUrl}\n\nPokud již o kurz zájem nemáte, není potřeba na tento e-mail reagovat.\n\nDěkujeme.\n\nS pozdravem\nAutoškola BuBu`,
+      text: `Dobrý den,\n\nevidujeme, že jste se nedostavil/a na rezervovaný termín zápisu do Autoškoly BuBu.\n\nPokud máte o kurz stále zájem, prosíme o přeplánování zápisu na některý z dalších dostupných termínů. Nový termín si můžete zvolit prostřednictvím našeho webu: ${manageUrl.href}\n\nPokud již o kurz zájem nemáte, není potřeba na tento e-mail reagovat.\n\nDěkujeme.\n\nS pozdravem\nAutoškola BuBu`,
     };
   }
   const subject = 'Zrušení objednávky – Autoškola BuBu';
@@ -603,6 +614,37 @@ export function adminEnrollmentEmail(input: {
       `<p>Dobrý den,</p><p>${escapeHtml(cancellationText)}</p><p>Pokud máte o kurz stále zájem, můžete si zvolit nový kurz a termín prostřednictvím <a href="${courseUrl}">našeho webu</a>.</p><p>Pokud jste zrušení nepožadoval/a nebo máte dotaz, odpovězte prosím na tento e-mail.</p><p>S pozdravem<br>Autoškola BuBu</p>`,
     ),
     text: `Dobrý den,\n\n${cancellationText}\n\nPokud máte o kurz stále zájem, můžete si zvolit nový kurz a termín prostřednictvím našeho webu: ${courseUrl}\n\nPokud jste zrušení nepožadoval/a nebo máte dotaz, odpovězte prosím na tento e-mail.\n\nS pozdravem\nAutoškola BuBu`,
+  };
+}
+
+export function noShowFollowUpEmail(input: {
+  orderId: string;
+  appointmentId?: string | null;
+  publicCode: string;
+  to: string;
+  origin: string;
+  scheduledFor: string;
+}): EmailMessage {
+  const manageUrl = new URL('/spravovat-termin', input.origin);
+  manageUrl.searchParams.set('kod', input.publicCode);
+  const subject = 'Připomenutí možnosti nového termínu – Autoškola BuBu';
+  return {
+    idempotencyKey: eventKey('admin-no-show-follow-up-3d', input.orderId),
+    orderId: input.orderId,
+    appointmentId: input.appointmentId ?? undefined,
+    from: ORDER_FROM,
+    replyTo: ORDER_REPLY_TO,
+    to: input.to,
+    metadata: { publicCode: input.publicCode, noShowFollowUp: true },
+    scheduledFor: input.scheduledFor,
+    eventType: 'appointment_no_show',
+    subject,
+    tag: 'appointment-no-show-follow-up',
+    html: layout(
+      subject,
+      `<p>Dobrý den,</p><p>před třemi dny jsme Vám psali ohledně nevyužitého termínu zápisu do Autoškoly BuBu. Pokud máte o kurz stále zájem, můžete si vybrat nový termín prostřednictvím <a href="${escapeHtml(manageUrl.href)}">našeho webu</a>.</p><p>Pokud už o kurz zájem nemáte, nemusíte na tento e-mail odpovídat.</p><p>S pozdravem<br>Autoškola BuBu</p>`,
+    ),
+    text: `Dobrý den,\n\npřed třemi dny jsme Vám psali ohledně nevyužitého termínu zápisu do Autoškoly BuBu. Pokud máte o kurz stále zájem, můžete si vybrat nový termín prostřednictvím našeho webu: ${manageUrl.href}\n\nPokud už o kurz zájem nemáte, nemusíte na tento e-mail odpovídat.\n\nS pozdravem\nAutoškola BuBu`,
   };
 }
 

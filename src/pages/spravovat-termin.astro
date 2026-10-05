@@ -89,7 +89,7 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
                 Termín zápisu vám pro tuto objednávku domluví vedoucí pobočky individuálně.
               </div>
             )}
-            {order.appointment ? (
+            {order.appointment && order.status !== 'no_show' ? (
               <>
                 <p id="manage-message" class="error" role="alert" />
                 <div class="actions">
@@ -98,6 +98,8 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
                   </button>
                 </div>
               </>
+            ) : order.appointment ? (
+              <p id="manage-message" class="error" role="alert" />
             ) : null}
           </div>
         ) : code ? (

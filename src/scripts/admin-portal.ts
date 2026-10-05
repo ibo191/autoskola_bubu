@@ -49,7 +49,10 @@ function resultMessage(url: URL, next: HTMLElement, wasPost: boolean) {
   if (result === 'attended')
     return { text: 'Nástup potvrzen. E-mail byl zařazen k odeslání.', error: false };
   if (result === 'no_show')
-    return { text: 'Nedostavení zaznamenáno. E-mail byl zařazen k odeslání.', error: false };
+    return {
+      text: 'Nedostavení zaznamenáno. První e-mail byl zařazen k odeslání, druhá upomínka je naplánovaná za 3 dny.',
+      error: false,
+    };
   if (result === 'cancelled')
     return { text: 'Objednávka zrušena. E-mail byl zařazen k odeslání.', error: false };
   const scheduleResult = url.searchParams.get('scheduleResult');
@@ -186,7 +189,7 @@ async function updateDashboard(
 function confirmAction(form: HTMLFormElement) {
   if (form.matches('[data-cancel-order]'))
     return window.confirm(
-      'Opravdu zrušit objednávku? Zmizí z běžného přehledu a termín se uvolní. Zákazníkovi odejde neutrální potvrzení o zrušení.',
+      'Opravdu zrušit objednávku? Zmizí z běžného přehledu a termín se uvolní. Případná další upomínka se zruší. Zákazníkovi odejde neutrální potvrzení o zrušení.',
     );
   if (form.matches('[data-no-show-order]'))
     return window.confirm(

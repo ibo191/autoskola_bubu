@@ -287,7 +287,8 @@ const calendarDays = calendarDates.map((item) => ({
             )}
             {actionResult === 'no_show' && (
               <div class="notice">
-                Nedostavení bylo zaznamenáno a e-mail byl zařazen k odeslání.
+                Nedostavení bylo zaznamenáno. První e-mail byl zařazen k odeslání, druhá upomínka je
+                naplánovaná za 3 dny.
               </div>
             )}
             {actionResult === 'cancelled' && (
@@ -511,7 +512,7 @@ const calendarDays = calendarDates.map((item) => ({
                                     name="returnTo"
                                     value={Astro.url.pathname + Astro.url.search}
                                   />
-                                  <button type="submit">Potvrdit nástup</button>
+                                  <button type="submit">Dorazil/a – potvrdit nástup</button>
                                 </form>
                               )}
                               {['confirmed', 'rescheduled'].includes(order.status) &&
@@ -530,7 +531,7 @@ const calendarDays = calendarDates.map((item) => ({
                                     </button>
                                   </form>
                                 )}
-                              {!['cancelled', 'expired', 'no_show'].includes(order.status) && (
+                              {!['cancelled', 'expired'].includes(order.status) && (
                                 <form method="post" action="/sprava/action" data-cancel-order>
                                   <input type="hidden" name="orderId" value={order.orderId} />
                                   <input type="hidden" name="intent" value="cancel" />
@@ -540,7 +541,7 @@ const calendarDays = calendarDates.map((item) => ({
                                     value={Astro.url.pathname + Astro.url.search}
                                   />
                                   <button type="submit" class="danger">
-                                    Zrušit
+                                    Zrušit objednávku
                                   </button>
                                 </form>
                               )}
@@ -625,7 +626,7 @@ const calendarDays = calendarDates.map((item) => ({
                               name="returnTo"
                               value={Astro.url.pathname + Astro.url.search}
                             />
-                            <button type="submit">Potvrdit nástup</button>
+                            <button type="submit">Dorazil/a – potvrdit nástup</button>
                           </form>
                         )}
                         {['confirmed', 'rescheduled'].includes(order.status) &&
@@ -644,7 +645,7 @@ const calendarDays = calendarDates.map((item) => ({
                               </button>
                             </form>
                           )}
-                        {!['cancelled', 'expired', 'no_show'].includes(order.status) && (
+                        {!['cancelled', 'expired'].includes(order.status) && (
                           <form method="post" action="/sprava/action" data-cancel-order>
                             <input type="hidden" name="orderId" value={order.orderId} />
                             <input type="hidden" name="intent" value="cancel" />
@@ -654,7 +655,7 @@ const calendarDays = calendarDates.map((item) => ({
                               value={Astro.url.pathname + Astro.url.search}
                             />
                             <button type="submit" class="danger">
-                              Zrušit
+                              Zrušit objednávku
                             </button>
                           </form>
                         )}
@@ -815,7 +816,7 @@ const calendarDays = calendarDates.map((item) => ({
                               name="returnTo"
                               value={Astro.url.pathname + Astro.url.search}
                             />
-                            <button type="submit">Potvrdit nástup</button>
+                            <button type="submit">Dorazil/a – potvrdit nástup</button>
                           </form>
                         )}
                         {['confirmed', 'rescheduled'].includes(item.status) &&
@@ -833,7 +834,7 @@ const calendarDays = calendarDates.map((item) => ({
                               </button>
                             </form>
                           )}
-                        {!['cancelled', 'expired', 'no_show'].includes(item.status) && (
+                        {!['cancelled', 'expired'].includes(item.status) && (
                           <form method="post" action="/sprava/action" data-cancel-order>
                             <input type="hidden" name="orderId" value={item.orderId} />
                             <input type="hidden" name="intent" value="cancel" />
@@ -843,7 +844,7 @@ const calendarDays = calendarDates.map((item) => ({
                               value={Astro.url.pathname + Astro.url.search}
                             />
                             <button type="submit" class="danger">
-                              Zrušit
+                              Zrušit objednávku
                             </button>
                           </form>
                         )}

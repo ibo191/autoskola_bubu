@@ -29,7 +29,14 @@ const storedMessageSchema = z.object({
 
 type OutboxStore = Pick<
   SupabaseEmailEventStore,
-  'createPending' | 'listDue' | 'claimDue' | 'markSent' | 'markFailed' | 'retryLater'
+  | 'createPending'
+  | 'listDue'
+  | 'claimDue'
+  | 'markSent'
+  | 'markFailed'
+  | 'markSkipped'
+  | 'isNoShowOrder'
+  | 'retryLater'
 >;
 
 export class OrderEmailOutbox implements EmailAdapter {
@@ -54,7 +61,7 @@ export class OrderEmailOutbox implements EmailAdapter {
     const event = await this.store.createPending({
       ...message,
       attachments: undefined,
-      scheduledFor: new Date().toISOString(),
+      scheduledFor: message.scheduledFor ?? new Date().toISOString(),
       metadata: {
         ...message.metadata,
         outboxMessage: snapshot,
@@ -62,7 +69,7 @@ export class OrderEmailOutbox implements EmailAdapter {
       },
     });
     if (!event) return { status: 'duplicate-skipped' };
-    if (this.schedule) {
+    if (this.schedule && (!message.scheduledFor || new Date(message.scheduledFor) <= new Date())) {
       const task = this.deliver(event.id);
       this.schedule(task);
     }
@@ -79,6 +86,12 @@ export class OrderEmailOutbox implements EmailAdapter {
     }
     const message: EmailMessage = parsed.data;
     try {
+      if (message.metadata?.noShowFollowUp === true) {
+        if (!message.orderId || !(await this.store.isNoShowOrder(message.orderId))) {
+          await this.store.markSkipped(id);
+          return 'skipped';
+        }
+      }
       if (message.eventType === 'order_confirmation' && message.metadata?.course !== 'kondicni') {
         message.attachments = [await applicationFormAttachment()];
       }
