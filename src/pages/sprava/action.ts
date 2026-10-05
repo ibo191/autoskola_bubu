@@ -39,13 +39,14 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
       recipient: undefined,
       publicCode: undefined,
       appointmentId: undefined,
+      course: undefined,
     }));
   if (!result.ok)
     return new Response('Akci se nepodařilo provést. Obnovte stránku a zkuste to znovu.', {
       status: 409,
     });
   let emailQueued = false;
-  if (result.recipient && result.publicCode) {
+  if (result.recipient && result.publicCode && (parsed.data.intent !== 'attend' || result.course)) {
     try {
       const email = adminEnrollmentEmail({
         orderId: parsed.data.orderId,
@@ -53,6 +54,7 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
         publicCode: result.publicCode,
         to: result.recipient,
         action: parsed.data.intent,
+        course: result.course,
         origin: publicAppOrigin(process.env),
       });
       const outbox = createOrderEmailOutbox(process.env, (task) => waitUntil(task));

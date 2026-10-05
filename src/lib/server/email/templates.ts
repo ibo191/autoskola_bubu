@@ -540,6 +540,7 @@ export function adminEnrollmentEmail(input: {
   publicCode: string;
   to: string;
   action: 'attend' | 'no_show' | 'cancel';
+  course?: string;
   origin: string;
 }): EmailMessage {
   const courseUrl = new URL('/kurzy', input.origin).href;
@@ -553,6 +554,25 @@ export function adminEnrollmentEmail(input: {
     metadata: { publicCode: input.publicCode },
   };
   if (input.action === 'attend') {
+    if (input.course === 'kondicni') {
+      const subject = 'Vítejte na kondičních jízdách v Autoškole BuBu';
+      const paragraphs = [
+        'děkujeme, že jste si pro kondiční jízdy vybral/a Autoškolu BuBu.',
+        'Přidělíme Vám instruktora, se kterým si domluvíte termíny jízd. Jakmile od nás obdržíte jeho kontakt, napište mu prosím přes WhatsApp a společně si vyberte časy, které Vám budou vyhovovat.',
+        'Těšíme se na společné jízdy.',
+      ];
+      return {
+        ...base,
+        eventType: 'enrollment_welcome',
+        subject,
+        tag: 'enrollment-welcome',
+        html: layout(
+          subject,
+          `<p>Dobrý den,</p>${paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join('')}<p>S pozdravem<br>Autoškola BuBu</p>`,
+        ),
+        text: ['Dobrý den,', ...paragraphs, 'S pozdravem\nAutoškola BuBu'].join('\n\n'),
+      };
+    }
     const subject = 'Vítejte v Autoškole BuBu – informace po zápisu';
     const appStoreUrl = 'https://apps.apple.com/cz/app/moje-auto%C5%A1kola/id1449593403';
     const googlePlayUrl = 'https://play.google.com/store/apps/details?id=cz.moje_autoskola&hl=cs';

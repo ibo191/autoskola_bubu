@@ -432,6 +432,7 @@ export class SupabaseBookingRepository implements BookingRepository {
         recipient: z.email().optional(),
         publicCode: z.string().optional(),
         appointmentId: z.uuid().nullable().optional(),
+        course: z.string().optional(),
       })
       .parse(
         await this.rpc('bubu_admin_order_action', {

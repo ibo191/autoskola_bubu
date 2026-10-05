@@ -104,6 +104,7 @@ test('admin enrollment actions produce distinct customer emails without duplicat
     publicCode: 'BUBU-TEST',
     to: 'student@example.invalid',
     origin: 'https://www.autoskolabubu.cz',
+    course: 'b',
   };
   const welcome = adminEnrollmentEmail({ ...base, action: 'attend' });
   const noShow = adminEnrollmentEmail({ ...base, action: 'no_show' });
@@ -122,6 +123,10 @@ test('admin enrollment actions produce distinct customer emails without duplicat
   );
   assert.match(welcome.html ?? '', /href="https:\/\/apps\.apple\.com/);
   assert.match(welcome.html ?? '', /href="https:\/\/play\.google\.com/);
+  const refresher = adminEnrollmentEmail({ ...base, course: 'kondicni', action: 'attend' });
+  assert.equal(refresher.subject, 'Vítejte na kondičních jízdách v Autoškole BuBu');
+  assert.match(refresher.text, /napište mu prosím přes WhatsApp/);
+  assert.doesNotMatch(refresher.text, /přednášk|připouštěcí test|eTesty/);
   assert.equal(noShow.eventType, 'appointment_no_show');
   assert.match(noShow.text, /nedostavil\/a/);
   assert.match(noShow.text, /https:\/\/www\.autoskolabubu\.cz\/spravovat-termin\?kod=BUBU-TEST/);
