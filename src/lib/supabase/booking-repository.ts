@@ -71,6 +71,7 @@ const adminSummarySchema = z.object({
   ordersTotal: z.number().int().nonnegative(),
   ordersConfirmed: z.number().int().nonnegative(),
   appointmentsTotal: z.number().int().nonnegative(),
+  revenueCzk: z.number().int().nonnegative().optional(),
   byCourse: z.array(z.object({ course: z.string(), count: z.number().int().nonnegative() })),
   byDay: z.array(z.object({ date: z.string(), count: z.number().int().nonnegative() })),
 });

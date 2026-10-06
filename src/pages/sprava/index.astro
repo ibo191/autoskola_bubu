@@ -390,6 +390,14 @@ const calendarDays = calendarDates.map((item) => ({
               </form>
               <div class="admin-grid">
                 <article>
+                  <span>Tržba z potvrzených nástupů</span>
+                  <strong>{money(summary?.revenueCzk ?? 0)}</strong>
+                  <p>
+                    Očekávaná hodnota kurzů; nezahrnuje nepřijaté objednávky ani skutečně přijaté
+                    platby.
+                  </p>
+                </article>
+                <article>
                   <>
                     <span>Objednávky celkem</span>
                     <strong>{summary?.ordersTotal ?? 0}</strong>
@@ -1256,7 +1264,7 @@ const calendarDays = calendarDates.map((item) => ({
   }
   .admin-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 16px;
     margin: 24px 0 0;
   }
@@ -1277,7 +1285,7 @@ const calendarDays = calendarDates.map((item) => ({
     font-size: 2rem;
     margin-top: 8px;
   }
-  .next-day p {
+  .admin-grid article p {
     margin-top: 8px;
     font-size: 0.9rem;
   }

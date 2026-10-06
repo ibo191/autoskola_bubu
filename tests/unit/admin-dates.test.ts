@@ -81,6 +81,7 @@ test('private dashboard batches six views into one service-role request', async 
         ordersTotal: 0,
         ordersConfirmed: 0,
         appointmentsTotal: 0,
+        revenueCzk: 25900,
         byCourse: [],
         byDay: [],
       },
@@ -114,6 +115,7 @@ test('private dashboard batches six views into one service-role request', async 
     });
     assert.equal(called, 1);
     assert.equal(result.summary.ordersTotal, 0);
+    assert.equal(result.summary.revenueCzk, 25900);
     assert.deepEqual(result.scheduleDay.slots, []);
   } finally {
     globalThis.fetch = originalFetch;
