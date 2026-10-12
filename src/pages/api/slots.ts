@@ -84,7 +84,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           ok: true,
           slots: [],
-          message: 'V Kladně termín zápisu domlouvá vedoucí pobočky individuálně po objednávce.',
+          message: 'V Kladně se přihlásíte online bez výběru termínu osobního zápisu.',
         },
         { headers: { 'Cache-Control': 'no-store' } },
       );

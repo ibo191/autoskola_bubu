@@ -78,7 +78,9 @@ test('analytics consent loads one Google tag with the Ads loader ID', async ({ p
   expect(requestedUrls[0]).toBe(`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`);
 
   const commands = await page.evaluate(() =>
-    (window.dataLayer ?? []).map((entry) => Array.from(entry).map(String)),
+    (window.dataLayer ?? [])
+      .filter((entry): entry is IArguments => 'length' in entry)
+      .map((entry) => Array.from(entry).map(String)),
   );
   expect(commands).toContainEqual(['config', googleTagId, '[object Object]']);
   expect(commands).toContainEqual(['consent', 'default', '[object Object]']);
@@ -97,4 +99,138 @@ test('old consent version asks for a fresh choice', async ({ page }) => {
   ]);
   await page.goto('/');
   await expect(page.locator('[data-cookie-banner]')).toBeVisible();
+});
+
+test('marketing-only consent grants ads without enabling analytics storage', async ({ page }) => {
+  await page.context().clearCookies();
+  await page.goto('/kladno');
+  const configuredTagId = await page.locator('body').getAttribute('data-google-tag-id');
+  test.skip(configuredTagId !== googleTagId, 'Google tag environment variable is not configured.');
+  await page.route(`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`, (route) =>
+    route.fulfill({ status: 200, contentType: 'application/javascript', body: '' }),
+  );
+  await page.getByRole('button', { name: 'Nastavit cookies' }).click();
+  await page.locator('[data-cookie-category="marketing"]').check();
+  await page.getByRole('button', { name: 'Uložit nastavení' }).click();
+  const commands = await page.evaluate(() =>
+    (window.dataLayer ?? [])
+      .filter((entry): entry is IArguments => 'length' in entry)
+      .map((entry) => Array.from(entry)),
+  );
+  expect(commands).toContainEqual([
+    'consent',
+    'update',
+    {
+      analytics_storage: 'denied',
+      ad_storage: 'granted',
+      ad_user_data: 'granted',
+      ad_personalization: 'granted',
+    },
+  ]);
+  expect(commands.some((entry) => entry[0] === 'event' && entry[1] === 'page_view')).toBe(false);
+});
+
+test('lead tracking waits for consent and emits one deduplicated payload after confirmed order', async ({
+  page,
+}) => {
+  await page.context().clearCookies();
+  await page.goto('/kladno');
+  const configuredTagId = await page.locator('body').getAttribute('data-google-tag-id');
+  test.skip(configuredTagId !== googleTagId, 'Google tag environment variable is not configured.');
+  await page.route(`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`, (route) =>
+    route.fulfill({ status: 200, contentType: 'application/javascript', body: '' }),
+  );
+
+  const applicationId = '11111111-2222-4333-8444-555555555555';
+  await page.evaluate((id) => {
+    sessionStorage.setItem(
+      'bubu:pending-lead',
+      JSON.stringify({
+        publicCode: 'BUBU-TEST1234',
+        applicationId: id,
+        branch: 'kladno',
+        course: 'b',
+      }),
+    );
+    const summary = document.createElement('div');
+    summary.className = 'conversion-summary';
+    summary.dataset.publicCode = 'BUBU-TEST1234';
+    summary.dataset.branch = 'kladno';
+    summary.dataset.course = 'b';
+    document.body.append(summary);
+  }, applicationId);
+
+  const leads = () =>
+    page.evaluate(() =>
+      (window.dataLayer ?? []).filter(
+        (entry): entry is Record<string, string | number> =>
+          'event' in entry && entry.event === 'generate_lead',
+      ),
+    );
+  expect(await leads()).toHaveLength(0);
+  await page.getByRole('button', { name: 'Souhlasím se vším' }).click();
+  await expect.poll(async () => (await leads()).length).toBe(1);
+  expect(await leads()).toEqual([
+    {
+      event: 'generate_lead',
+      branch: 'kladno',
+      course: 'B',
+      application_id: applicationId,
+    },
+  ]);
+  await page.evaluate(() =>
+    document.dispatchEvent(
+      new CustomEvent('bubu:cookie-consent-updated', {
+        detail: { analytics: true, marketing: true },
+      }),
+    ),
+  );
+  expect(await leads()).toHaveLength(1);
+});
+
+test('failed Kladno submission never emits generate_lead', async ({ page }) => {
+  await page.context().clearCookies();
+  await page.goto('/kladno');
+  const configuredTagId = await page.locator('body').getAttribute('data-google-tag-id');
+  test.skip(configuredTagId !== googleTagId, 'Google tag environment variable is not configured.');
+  await page.route(`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`, (route) =>
+    route.fulfill({ status: 200, contentType: 'application/javascript', body: '' }),
+  );
+  await page.getByRole('button', { name: 'Souhlasím se vším' }).click();
+  await page.route('**/api/orders', (route) =>
+    route.fulfill({
+      status: 422,
+      contentType: 'application/json',
+      body: JSON.stringify({ ok: false, code: 'STORAGE_FAILED' }),
+    }),
+  );
+  await page
+    .getByRole('button', { name: /Přihlásit se do autoškoly/ })
+    .first()
+    .click();
+  const applicationEvents = await page.evaluate(() =>
+    (window.dataLayer ?? []).filter(
+      (entry) =>
+        'event' in entry && ['begin_application', 'select_course'].includes(String(entry.event)),
+    ),
+  );
+  expect(applicationEvents).toEqual([
+    { event: 'begin_application', branch: 'kladno', course: 'B' },
+    { event: 'select_course', branch: 'kladno', course: 'B' },
+  ]);
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('button', { name: 'Pokračovat →' }).click();
+  await dialog.getByLabel('Jméno', { exact: true }).fill('Test');
+  await dialog.getByLabel('Příjmení', { exact: true }).fill('Žák');
+  await dialog.getByLabel('E-mail', { exact: true }).fill('test@example.invalid');
+  await dialog.getByLabel('Telefon', { exact: true }).fill('+420777123456');
+  await dialog.getByRole('button', { name: 'Pokračovat →' }).click();
+  await dialog.locator('[name="terms"]').check();
+  await dialog.getByRole('button', { name: 'Odeslat objednávku' }).click();
+  await expect(dialog.locator('#order-error')).toContainText('Objednávku se nepodařilo uložit');
+  const leads = await page.evaluate(() =>
+    (window.dataLayer ?? []).filter((entry) => 'event' in entry && entry.event === 'generate_lead'),
+  );
+  expect(leads).toHaveLength(0);
+  expect(await page.evaluate(() => sessionStorage.getItem('bubu:pending-lead'))).toBeNull();
 });

@@ -1,5 +1,38 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+test('Kladno explains online enrollment and preselects B or L17 without appointment', async ({
+  page,
+}) => {
+  await page.goto('/kladno');
+  await expect(page.getByRole('heading', { name: 'Řidičák v Kladně bez stresu' })).toBeVisible();
+  await expect(page.locator('.branch-price')).toContainText('20 000 Kč');
+  await expect(page.locator('.local-trust')).toContainText('Přihlášení online');
+  await expect(page.locator('#faq')).toContainText('Na osobní zápis se v Kladně nyní nedochází.');
+
+  await page
+    .getByRole('button', { name: /Přihlásit se do autoškoly/ })
+    .first()
+    .click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.locator('[name="branch"]')).toHaveValue('kladno');
+  await expect(dialog.locator('[name="course"]')).toHaveValue('b');
+  await expect(dialog.locator('#order-intro')).toContainText('dokončíte online');
+  await dialog.getByRole('button', { name: 'Pokračovat →' }).click();
+  await dialog.getByLabel('Jméno', { exact: true }).fill('Test');
+  await dialog.getByLabel('Příjmení', { exact: true }).fill('Žák');
+  await dialog.getByLabel('E-mail', { exact: true }).fill('test@example.invalid');
+  await dialog.getByLabel('Telefon', { exact: true }).fill('+420777123456');
+  await dialog.getByRole('button', { name: 'Pokračovat →' }).click();
+  await expect(dialog.locator('#booking-calendar')).toBeHidden();
+  await expect(dialog.locator('#order-summary')).toContainText('Přihlášení online');
+
+  await dialog.getByRole('button', { name: 'Zavřít objednávku' }).click();
+  await dialog.getByRole('button', { name: 'Zahodit a zavřít' }).click();
+  await page.getByRole('button', { name: /Přihlásit se na L17/ }).click();
+  await expect(dialog.locator('[name="branch"]')).toHaveValue('kladno');
+  await expect(dialog.locator('[name="course"]')).toHaveValue('l17');
+  await expect(dialog.locator('[name="transmission"]')).toHaveValue('manual');
+});
 test('B pricing asks for transmission and L17, with manual only outside Prague', async ({
   page,
 }) => {

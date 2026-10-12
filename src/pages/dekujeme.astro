@@ -29,14 +29,26 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
     <div class="container narrow">
       <span class="eyebrow">Objednávka přijata</span>
       <h1>Děkujeme, máme vaši objednávku.</h1>
-      <p>Na této stránce najdete souhrn objednávky a další krok k osobnímu zápisu.</p>
+      <p>
+        {
+          order?.selection.branch === 'kladno'
+            ? 'Na této stránce najdete souhrn online přihlášky. Další pokyny vám pošleme e-mailem.'
+            : 'Na této stránce najdete souhrn objednávky a další krok k osobnímu zápisu.'
+        }
+      </p>
     </div>
   </section>
   <section class="section">
     <div class="container narrow">
       {
         order ? (
-          <div class="summary-card conversion-summary" data-conversion="order-thank-you">
+          <div
+            class="summary-card conversion-summary"
+            data-conversion="order-thank-you"
+            data-public-code={order.publicCode}
+            data-branch={order.selection.branch}
+            data-course={order.selection.course}
+          >
             <h2>Souhrn objednávky</h2>
             <p class="confirmation-email">
               Souhrn a potvrzení objednávky jsme odeslali na e-mail:{' '}
@@ -75,18 +87,16 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
                   <dd>{orderTotal(order)}</dd>
                 </>
               </div>
-              <div>
-                <>
+              {order.selection.branch === 'kladno' ? null : (
+                <div>
                   <dt>Termín zápisu</dt>
                   <dd>
                     {order.appointment
                       ? formatDateTime(order.appointment.startsAt)
-                      : order.selection.branch === 'kladno'
-                        ? 'Vedoucí pobočky vás kontaktuje a domluví termín individuálně.'
-                        : 'Termín není vybraný'}
+                      : 'Termín není vybraný'}
                   </dd>
-                </>
-              </div>
+                </div>
+              )}
             </dl>
             {order.addons.length ? (
               <div class="addons-list">
@@ -101,9 +111,9 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
               </div>
             ) : null}
             <div class="notice strong">
-              Kurz lze uhradit v hotovosti při zápisu nebo převodem na účet do 5 dnů od zápisu.
-              Platbu lze rozdělit do tří přibližně stejných částí; poslední část je potřeba uhradit
-              nejpozději při poslední jízdě nebo před závěrečnou zkouškou.
+              {order.selection.branch === 'kladno'
+                ? 'Přihlášení proběhlo online. Odpovědí na potvrzovací e-mail nám pošlete požadované dokumenty a zvolený způsob platby. Originály přineste na první hodinu teorie.'
+                : 'Kurz lze uhradit v hotovosti při zápisu nebo převodem na účet do 5 dnů od zápisu. Platbu lze rozdělit do tří přibližně stejných částí; poslední část je potřeba uhradit nejpozději při poslední jízdě nebo před závěrečnou zkouškou.'}
             </div>
             <div class="actions">
               {order.appointment ? (

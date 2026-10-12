@@ -63,6 +63,10 @@ const reasons = [
 
 const faqs = [
   [
+    'Jak se přihlásím do autoškoly v Kladně?',
+    'Vyplníte online přihlášku a vyberete pobočku Kladno. Po jejím odeslání vám e-mailem zašleme další pokyny k dokumentům a zahájení výcviku. Na osobní zápis se v Kladně nyní nedochází.',
+  ],
+  [
     'Kde probíhají první jízdy autoškoly v Kladně?',
     'První jízdy začínají v klidném prostředí na autocvičišti v Kladně, kde se nejprve seznámíte s vozidlem a jeho základním ovládáním.',
   ],
@@ -241,13 +245,15 @@ const faqs = [
       <span>Aktuální cena kurzu</span><strong>{money(branch.bPrice)}</strong><p>
         Poplatky spojené se závěrečnou zkouškou nejsou součástí ceny kurzu.
       </p><div class="actions">
-        <a class="btn primary" href="/kurzy/ridicak-skupina-b">Zobrazit kurz skupiny B ↗</a><a
-          class="btn secondary"
-          href="/cenik?branch=kladno">Zobrazit ceník</a
-        >
+        <button class="btn primary" data-order disabled data-branch="kladno" data-course="b"
+          >Přihlásit se do autoškoly ↗</button
+        ><a class="btn secondary" href="/cenik?branch=kladno">Zobrazit ceník</a>
       </div>
       <p class="small local-course-links">
-        <a href="/kurzy/l17">Řidičák L17 v Kladně</a> ·
+        <button type="button" data-order disabled data-branch="kladno" data-course="l17"
+          >Přihlásit se na L17 ↗</button
+        > ·
+        <a href="/kurzy/l17">Více o L17</a> ·
         <a href="/jak-probiha-vyuka">Jak probíhá výuka</a>
       </p>
     </div>
@@ -280,7 +286,7 @@ const faqs = [
 <section class="section tinted" id="faq">
   <div class="container faq-layout">
     <div>
-      <span class="eyebrow">FAQ Kladno</span><h2>Nejčastější otázky před zápisem.</h2><p>
+      <span class="eyebrow">FAQ Kladno</span><h2>Nejčastější otázky před přihlášením.</h2><p>
         Praktické odpovědi pro zájemce z Kladna i okolí.
       </p>
     </div>
@@ -310,7 +316,9 @@ const faqs = [
       >
         Pobočka je vhodná pro zájemce z Kladna, Unhoště, Buštěhradu, Vinařic, Libušína i dalších
         obcí v okolí.
-      </p><p>Přesné místo osobního zápisu vám potvrdí pobočka podle zvoleného termínu.</p>
+      </p><p>
+        Přihlášení vyřídíte online. Pokyny k dokumentům a zahájení výcviku vám zašleme e-mailem.
+      </p>
     </div>
     <div class="contact-panel">
       <dl>
@@ -320,7 +328,7 @@ const faqs = [
           >
         </dd><dt>E-mail</dt><dd><a href={`mailto:${branch.email}`}>{branch.email}</a></dd>
       </dl><button class="btn primary" data-order disabled data-branch="kladno" data-course="b"
-        >Chci začít řidičák ↗</button
+        >Přihlásit se do autoškoly ↗</button
       >
     </div>
   </div>
@@ -419,6 +427,15 @@ const faqs = [
   }
   .local-course-links {
     margin-top: 18px;
+  }
+  .local-course-links button {
+    border: 0;
+    padding: 0;
+    background: none;
+    color: var(--brand-dark);
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
   }
   .theory-grid h3 {
     margin: 15px 0 10px;

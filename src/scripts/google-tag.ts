@@ -2,27 +2,32 @@ export {};
 
 declare global {
   interface Window {
-    dataLayer?: IArguments[];
+    dataLayer?: Array<IArguments | Record<string, string | number>>;
   }
 }
 
 const cookieName = 'bubu_cookie_consent';
 const googleTagId = document.body.dataset.googleTagId?.trim() ?? '';
 
-// Basic Consent Mode: no Google script, storage or network request exists until
-// the visitor expressly grants analytics consent.
+// Basic Consent Mode: no Google script or request exists until the visitor
+// expressly grants analytics or marketing consent.
 if (/^AW-\d+$/i.test(googleTagId)) {
   const disabledKey = `ga-disable-${googleTagId}`;
   const googleWindow = window as unknown as Window & Record<string, boolean | unknown>;
   let initialized = false;
+  let pageViewSent = false;
+  let tagConfigured = false;
+
+  type Consent = { analytics?: boolean; marketing?: boolean };
 
   function readConsent() {
     const row = document.cookie.split('; ').find((item) => item.startsWith(`${cookieName}=`));
     if (!row) return null;
     try {
-      return JSON.parse(decodeURIComponent(row.slice(cookieName.length + 1))) as {
-        analytics?: boolean;
+      const parsed = JSON.parse(decodeURIComponent(row.slice(cookieName.length + 1))) as Consent & {
+        version?: number;
       };
+      return parsed.version === 1 ? parsed : null;
     } catch {
       return null;
     }
@@ -32,34 +37,46 @@ if (/^AW-\d+$/i.test(googleTagId)) {
     (window.dataLayer ??= []).push(arguments);
   }
 
-  function updateConsent(granted: boolean) {
-    googleWindow[disabledKey] = !granted;
+  function updateConsent(consent: Consent | null) {
+    const analytics = Boolean(consent?.analytics);
+    const marketing = Boolean(consent?.marketing);
+    googleWindow[disabledKey] = !analytics && !marketing;
     if (!initialized) return;
     gtag('consent', 'update', {
-      analytics_storage: granted ? 'granted' : 'denied',
-      ad_storage: 'denied',
-      ad_user_data: 'denied',
-      ad_personalization: 'denied',
+      analytics_storage: analytics ? 'granted' : 'denied',
+      ad_storage: marketing ? 'granted' : 'denied',
+      ad_user_data: marketing ? 'granted' : 'denied',
+      ad_personalization: marketing ? 'granted' : 'denied',
     });
+    if (analytics && tagConfigured && !pageViewSent) {
+      pageViewSent = true;
+      gtag('event', 'page_view');
+    }
   }
 
-  function loadGoogleTag() {
+  function loadGoogleTag(consent: Consent) {
     if (initialized) {
-      updateConsent(true);
+      updateConsent(consent);
       return;
     }
     initialized = true;
     googleWindow[disabledKey] = false;
     gtag('js', new Date());
     gtag('consent', 'default', {
-      analytics_storage: 'granted',
+      analytics_storage: 'denied',
       ad_storage: 'denied',
       ad_user_data: 'denied',
       ad_personalization: 'denied',
     });
+    updateConsent(consent);
     // AW is the one global Google tag. The linked GA4 destination receives its
     // page view through the Google tag configuration in Google Analytics.
-    gtag('config', googleTagId, { send_page_view: true });
+    gtag('config', googleTagId, { send_page_view: false });
+    tagConfigured = true;
+    if (consent.analytics) {
+      pageViewSent = true;
+      gtag('event', 'page_view');
+    }
 
     const script = document.createElement('script');
     script.async = true;
@@ -68,13 +85,57 @@ if (/^AW-\d+$/i.test(googleTagId)) {
   }
 
   function track(name: string, parameters: Record<string, string | number> = {}) {
-    if (!initialized || googleWindow[disabledKey]) return;
+    if (!initialized || googleWindow[disabledKey]) return false;
+    // The object supports a future GTM Custom Event trigger; the gtag command
+    // continues to feed the one existing Google tag and its GA4 destination.
+    (window.dataLayer ??= []).push({ event: name, ...parameters });
     gtag('event', name, parameters);
+    return true;
   }
 
-  function updateFromCookie(consent: { analytics?: boolean } | null) {
-    if (consent?.analytics) loadGoogleTag();
-    else updateConsent(false);
+  function flushPendingLead() {
+    const confirmation = document.querySelector<HTMLElement>(
+      '.conversion-summary[data-public-code]',
+    );
+    if (!confirmation || !initialized || googleWindow[disabledKey]) return;
+    try {
+      const pending = JSON.parse(sessionStorage.getItem('bubu:pending-lead') ?? 'null') as {
+        publicCode?: string;
+        applicationId?: string;
+        branch?: string;
+        course?: string;
+      } | null;
+      if (
+        !pending ||
+        pending.publicCode !== confirmation.dataset.publicCode ||
+        pending.branch !== confirmation.dataset.branch ||
+        pending.course !== confirmation.dataset.course ||
+        !/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(pending.applicationId ?? '')
+      )
+        return;
+      const sentKey = `bubu:lead-sent:${pending.applicationId}`;
+      if (sessionStorage.getItem(sentKey)) {
+        sessionStorage.removeItem('bubu:pending-lead');
+        return;
+      }
+      const sent = track('generate_lead', {
+        branch: pending.branch!,
+        course: pending.course!.toUpperCase(),
+        application_id: pending.applicationId!,
+      });
+      if (sent) {
+        sessionStorage.setItem(sentKey, '1');
+        sessionStorage.removeItem('bubu:pending-lead');
+      }
+    } catch {
+      // Storage can be unavailable; tracking must never affect an order.
+    }
+  }
+
+  function updateFromCookie(consent: Consent | null) {
+    if (consent?.analytics || consent?.marketing) loadGoogleTag(consent);
+    else updateConsent(null);
+    flushPendingLead();
   }
 
   updateFromCookie(readConsent());
@@ -86,8 +147,9 @@ if (/^AW-\d+$/i.test(googleTagId)) {
     const detail = event instanceof CustomEvent ? event.detail : null;
     if (!detail || typeof detail.name !== 'string') return;
     track(detail.name, {
-      ...(typeof detail.course === 'string' ? { course: detail.course } : {}),
+      ...(typeof detail.course === 'string' ? { course: detail.course.toUpperCase() } : {}),
       ...(typeof detail.branch === 'string' ? { branch: detail.branch } : {}),
+      ...(typeof detail.applicationId === 'string' ? { application_id: detail.applicationId } : {}),
       ...(typeof detail.campaign === 'string' ? { campaign: detail.campaign } : {}),
       ...(typeof detail.valueCzk === 'number' ? { value: detail.valueCzk, currency: 'CZK' } : {}),
     });

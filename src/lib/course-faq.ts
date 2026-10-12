@@ -19,7 +19,7 @@ export function courseFaqs(course: Course): CourseFaq[] {
       ],
       [
         'Rezervuji si rovnou termín jízdy?',
-        'V objednávce vybíráte termín osobního zápisu. Samotné jízdy s Vámi domluvíme individuálně. Na Kladně Vás kontaktuje pobočka a dohodne také termín zápisu.',
+        'Na Střížkově a ve Statenicích vybíráte termín osobního zápisu. V Kladně se přihlásíte online bez osobního zápisu a další pokyny dostanete e-mailem. Samotné jízdy s Vámi domluvíme individuálně.',
       ],
     ];
   }
@@ -27,11 +27,11 @@ export function courseFaqs(course: Course): CourseFaq[] {
     return [
       [
         'Jak se přihlásím do kurzu skupiny B?',
-        'Online vyplníte objednávku a v posledním kroku si zvolíte termín zápisu. E-mail není nutné předem ověřovat.',
+        'Online vyplníte objednávku. Na Střížkově a ve Statenicích si zvolíte termín osobního zápisu; v Kladně přihlášení dokončíte online bez výběru termínu a další pokyny dostanete e-mailem.',
       ],
       [
         'Co vyřeším na pobočce?',
-        'Při zápisu spolu projdeme dokumenty, domluvíme platbu a oznámíme vám datum zahájení kurzu.',
+        'Na Střížkově a ve Statenicích vše probereme při osobním zápisu. V Kladně dokumenty a způsob platby dořešíme e-mailem; originály přinesete na první hodinu teorie.',
       ],
       [
         'Mohu dělat skupinu B na automat?',
@@ -70,8 +70,8 @@ export function courseFaqs(course: Course): CourseFaq[] {
         'Výuka a výcvik odpovídají skupině B. Rozdíl je v navazujícím řízení s mentorem po získání oprávnění.',
       ],
       [
-        'Co vyřídíme při zápisu?',
-        'Společně projdeme dokumenty, platbu, termín začátku kurzu a vše potřebné pro zahájení výuky.',
+        'Jak vyřídíme dokumenty a zahájení kurzu?',
+        'Na Střížkově a ve Statenicích vše probereme při osobním zápisu. V Kladně vám po online přihlášení pošleme pokyny k dokumentům, platbě a zahájení kurzu e-mailem.',
       ],
     ];
   }

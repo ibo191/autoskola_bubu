@@ -150,7 +150,7 @@ const { recaptchaSiteKey = '', captchaRequired = false } = Astro.props;
               name="note"
               rows="4"
               maxlength="1000"
-              placeholder="Například kdy vám nejlépe vyhovuje zápis nebo co potřebujete vědět."
+              placeholder="Například kdy vám vyhovuje začátek výuky nebo co potřebujete vědět."
             ></textarea></label
           >
         </div><p class="small">Doklady, adresu ani zdravotní údaje online nevyplňujete.</p>
@@ -184,8 +184,10 @@ const { recaptchaSiteKey = '', captchaRequired = false } = Astro.props;
           Odesláním objednávky potvrzujete, že jste se seznámil/a s{' '}
           <a href="/ochrana-osobnich-udaju" target="_blank" rel="noreferrer"
             >Informacemi o zpracování osobních údajů</a
-          >. Vaše údaje zpracováváme zejména za účelem vyřízení objednávky, rezervace zápisu a
-          uzavření a plnění smlouvy.
+          >. <span id="privacy-purpose"
+            >Vaše údaje zpracováváme zejména za účelem vyřízení objednávky, rezervace zápisu a
+            uzavření a plnění smlouvy.</span
+          >
         </p><label class="checkbox"
           ><input type="checkbox" name="marketing" /><span
             >Chci dostávat novinky, nabídky a informace o akcích Autoškoly BuBu. Souhlas mohu

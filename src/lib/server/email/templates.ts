@@ -131,9 +131,13 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
   const isRefresher = input.selection.course === 'kondicni';
   const preparation = isRefresher
     ? {
-        html: '<h2>Co připravit</h2><p>Na zápis si vezměte občanský průkaz a platný řidičský průkaz skupiny B. Domluvíme s Vámi platbu a termíny kondičních jízd. Zvolený termín je termín zápisu, nikoli samotné jízdy. Na Kladně Vás pobočka kontaktuje a domluví termín individuálně.</p>',
+        html: isKladno
+          ? '<h2>Co bude dál</h2><p>Na Kladně se přihlásíte online bez osobního zápisu. Pobočka Vás e-mailem kontaktuje s pokyny k platbě a domluvě kondičních jízd. Připravte si platný řidičský průkaz skupiny B.</p>'
+          : '<h2>Co připravit</h2><p>Na zápis si vezměte občanský průkaz a platný řidičský průkaz skupiny B. Domluvíme s Vámi platbu a termíny kondičních jízd. Zvolený termín je termín zápisu, nikoli samotné jízdy.</p>',
         text: [
-          'Co připravit: občanský průkaz a platný řidičský průkaz skupiny B. Domluvíme s Vámi platbu a termíny kondičních jízd. Zvolený termín je termín zápisu, nikoli samotné jízdy. Na Kladně Vás pobočka kontaktuje a domluví termín individuálně.',
+          isKladno
+            ? 'Na Kladně se přihlásíte online bez osobního zápisu. Pobočka Vás e-mailem kontaktuje s pokyny k platbě a domluvě kondičních jízd. Připravte si platný řidičský průkaz skupiny B.'
+            : 'Co připravit: občanský průkaz a platný řidičský průkaz skupiny B. Domluvíme s Vámi platbu a termíny kondičních jízd. Zvolený termín je termín zápisu, nikoli samotné jízdy.',
         ],
       }
     : preparationDetails(input.applicationFormUrl, input.price.amount, isKladno);
@@ -211,11 +215,11 @@ export function internalNewOrderEmail(input: CreatedOrderEmailInput): EmailMessa
   if (!input.notificationEmail) return null;
   const appointmentText = input.appointment
     ? formatEmailDateTime(input.appointment.startsAt)
-    : 'bez termínu zápisu';
+    : 'bez termínu osobního zápisu';
   const name = `${input.contact.firstName} ${input.contact.lastName}`;
   const kladnoNote =
     input.selection.branch === 'kladno'
-      ? '<p style="margin:0 0 18px;padding:14px 16px;border-radius:12px;background:#fff4d6;color:#5e4500;font-weight:700;">Kladno: zákazníka kontaktujte a domluvte s ním individuální termín zápisu.</p>'
+      ? '<p style="margin:0 0 18px;padding:14px 16px;border-radius:12px;background:#fff4d6;color:#5e4500;font-weight:700;">Kladno: přihlášení proběhlo online. Navazující komunikaci o dokumentech a zahájení výuky vyřiďte e-mailem.</p>'
       : '';
   const body = `${kladnoNote}${rows([
     ['Zákazník', name],
@@ -228,12 +232,14 @@ export function internalNewOrderEmail(input: CreatedOrderEmailInput): EmailMessa
     ['Doplňky', addonText(input.addons)],
     ['Hodnota objednávky', money(input.price.amount)],
     ['Vytvořeno', formatEmailDateTime(input.createdAt)],
-    ['Termín zápisu', appointmentText],
+    ...(input.selection.branch === 'kladno'
+      ? []
+      : ([['Termín zápisu', appointmentText]] as Array<[string, string]>)),
   ])}${noteHtml(input.note)}`;
   const text = [
     `Nová objednávka – ${name}`,
     ...(input.selection.branch === 'kladno'
-      ? ['Kladno: kontaktujte zákazníka a domluvte individuální termín zápisu.']
+      ? ['Kladno: přihlášení proběhlo online. Dokumenty a další postup vyřiďte e-mailem.']
       : []),
     `Zákazník: ${name}`,
     `E-mail: ${input.contact.email}`,
@@ -245,7 +251,7 @@ export function internalNewOrderEmail(input: CreatedOrderEmailInput): EmailMessa
     `Doplňky: ${addonText(input.addons)}`,
     `Hodnota objednávky: ${money(input.price.amount)}`,
     `Vytvořeno: ${formatEmailDateTime(input.createdAt)}`,
-    `Termín zápisu: ${appointmentText}`,
+    ...(input.selection.branch === 'kladno' ? [] : [`Termín zápisu: ${appointmentText}`]),
     ...(input.note ? ['', 'Poznámka k objednávce:', input.note] : []),
   ].join('\n');
   return {

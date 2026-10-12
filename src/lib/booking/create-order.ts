@@ -29,7 +29,7 @@ const requestSchema = z
       ctx.addIssue({
         code: 'custom',
         path: ['slotId'],
-        message: 'Kladno domlouvá termín individuálně.',
+        message: 'V Kladně se přihlášení dokončí online bez osobního zápisu.',
       });
   });
 
@@ -133,7 +133,9 @@ export class CreateOrderService {
         privacy: {
           version: 'GDPR-2026-09-01',
           wording:
-            'Odesláním objednávky potvrzujete, že jste se seznámil/a s Informacemi o zpracování osobních údajů. Vaše údaje zpracováváme zejména za účelem vyřízení objednávky, rezervace zápisu a uzavření a plnění smlouvy.',
+            parsed.data.selection.branch === 'kladno'
+              ? 'Odesláním objednávky potvrzujete, že jste se seznámil/a s Informacemi o zpracování osobních údajů. Vaše údaje zpracováváme zejména za účelem vyřízení online přihlášky a uzavření a plnění smlouvy.'
+              : 'Odesláním objednávky potvrzujete, že jste se seznámil/a s Informacemi o zpracování osobních údajů. Vaše údaje zpracováváme zejména za účelem vyřízení objednávky, rezervace zápisu a uzavření a plnění smlouvy.',
           accepted: true,
         },
         addons: serverQuote.addons,

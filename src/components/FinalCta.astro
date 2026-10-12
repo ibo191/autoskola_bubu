@@ -9,8 +9,14 @@ const { branch = '' } = Astro.props;
         <span class="eyebrow">Vaše první jízda začíná tady</span><h2>
           Na řidičák nemusíte být sami.
         </h2><p>Vyberte si kurz. Zbytek projdeme společně.</p>
-      </div><button class="btn" data-order disabled data-branch={branch}
-        >Vybrat kurz <span aria-hidden="true">↗</span></button
+      </div><button
+        class="btn"
+        data-order
+        disabled
+        data-branch={branch}
+        data-course={branch === 'kladno' ? 'b' : undefined}
+        >{branch === 'kladno' ? 'Přihlásit se do autoškoly' : 'Vybrat kurz'}
+        <span aria-hidden="true">↗</span></button
       >
     </div>
   </div>

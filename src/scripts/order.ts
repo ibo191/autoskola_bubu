@@ -38,6 +38,28 @@ let monthCursor = new Date();
 let loadedSlots: Slot[] = [];
 let selectedDate = '';
 let selectedSlotId = '';
+let applicationStarted = false;
+let trackedSelection = '';
+
+function trackSelection() {
+  const branch = field('branch').value;
+  const course = field('course').value;
+  if (!branch || !course) return;
+  const detail = { branch, course };
+  if (!applicationStarted) {
+    window.dispatchEvent(
+      new CustomEvent('bubu:tracking', { detail: { name: 'begin_application', ...detail } }),
+    );
+    applicationStarted = true;
+  }
+  const selection = `${branch}:${course}`;
+  if (selection !== trackedSelection) {
+    window.dispatchEvent(
+      new CustomEvent('bubu:tracking', { detail: { name: 'select_course', ...detail } }),
+    );
+    trackedSelection = selection;
+  }
+}
 
 const packageLabels: Record<Selection['package'], string> = {
   single: 'Jednotná cena',
@@ -161,13 +183,18 @@ function requiresAppointment() {
 function updateOrderStepCopy() {
   const steps = document.querySelectorAll<HTMLLIElement>('.wizard-steps li');
   const intro = document.querySelector<HTMLElement>('#order-intro')!;
+  const privacyPurpose = document.querySelector<HTMLElement>('#privacy-purpose')!;
   if (requiresAppointment()) {
     intro.textContent = 'Nejprve kurz, potom kontakt a osobní zápis na pobočce.';
+    privacyPurpose.textContent =
+      'Vaše údaje zpracováváme zejména za účelem vyřízení objednávky, rezervace zápisu a uzavření a plnění smlouvy.';
     if (steps[2]) steps[2].textContent = '3. Osobní zápis';
     return;
   }
   intro.textContent =
-    'Vyberete kurz a kontakt. Termín zápisu s vámi následně domluví vedoucí pobočky.';
+    'Vyberete kurz a vyplníte kontakt. Přihlášení v Kladně dokončíte online; další pokyny obdržíte e-mailem.';
+  privacyPurpose.textContent =
+    'Vaše údaje zpracováváme zejména za účelem vyřízení online přihlášky a uzavření a plnění smlouvy.';
   if (steps[2]) steps[2].textContent = '3. Potvrzení';
 }
 
@@ -200,7 +227,7 @@ function setStep(value: number) {
       selectedDate = '';
       selectedSlotLabel.textContent = '';
       document.querySelector('#order-summary')!.textContent =
-        `${course} · ${branch} · ${validQuote ? money(validQuote.amount) : ''} · Termín zápisu s vámi individuálně domluví vedoucí pobočky.${addons}`;
+        `${course} · ${branch} · ${validQuote ? money(validQuote.amount) : ''} · Přihlášení online, další pokyny e-mailem.${addons}`;
     } else {
       calendar.hidden = false;
       slotField.value = '';
@@ -220,6 +247,8 @@ function reset() {
   form.reset();
   dirty = false;
   validQuote = undefined;
+  applicationStarted = false;
+  trackedSelection = '';
   question.hidden = true;
   loadedSlots = [];
   selectedDate = '';
@@ -245,8 +274,11 @@ document.querySelectorAll<HTMLElement>('[data-order]').forEach((button) => {
     field('branch').value = button.dataset.branch ?? '';
     if (button.dataset.transmission) field('transmission').value = button.dataset.transmission;
     if (button.dataset.drivingBlocks) field('drivingBlocks').value = button.dataset.drivingBlocks;
+    syncAvailableCourses();
+    updateOrderStepCopy();
     dialog.showModal();
     document.body.classList.add('dialog-open');
+    trackSelection();
     void updateQuote();
   });
   button.removeAttribute('disabled');
@@ -312,6 +344,7 @@ form.addEventListener('change', (event) => {
     return;
   syncAvailableCourses();
   updateOrderStepCopy();
+  trackSelection();
   void updateQuote();
 });
 back.addEventListener('click', () => setStep(step - 1));
@@ -605,6 +638,7 @@ async function submitOrder() {
       code?: string;
       thankYouUrl?: string;
       publicCode?: string;
+      orderId?: string;
     };
     if (!response.ok || !result.ok) {
       error.textContent =
@@ -622,15 +656,21 @@ async function submitOrder() {
       return;
     }
     dirty = false;
-    window.dispatchEvent(
-      new CustomEvent('bubu:tracking', {
-        detail: {
-          name: 'generate_lead',
-          course: body.selection.course,
-          branch: body.selection.branch,
-        },
-      }),
-    );
+    if (result.publicCode && typeof result.orderId === 'string') {
+      try {
+        sessionStorage.setItem(
+          'bubu:pending-lead',
+          JSON.stringify({
+            publicCode: result.publicCode,
+            applicationId: result.orderId,
+            branch: body.selection.branch,
+            course: body.selection.course,
+          }),
+        );
+      } catch {
+        // Storage is optional; order success and redirect must not depend on tracking.
+      }
+    }
     window.location.href =
       result.thankYouUrl ?? `/dekujeme?kod=${encodeURIComponent(result.publicCode ?? '')}`;
   } catch {

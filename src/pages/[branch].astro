@@ -106,7 +106,7 @@ const breadcrumbSchema = {
   description={isStrizkov
     ? 'Autoškola Praha 8 Střížkov. Řidičák skupiny B s jasným plánem výcviku, přípravou na pražský provoz a lidským přístupem bez křiku.'
     : isKladno
-      ? 'Autoškola v Kladně s klidným a lidským přístupem. Kurz skupiny B, kondiční jízdy a postupný výcvik od prvních jízd až po běžný provoz.'
+      ? `Řidičák skupiny B nebo L17 v Kladně za ${money(branch.bPrice)}. Přihlášení online bez osobního zápisu, další pokyny k výcviku a dokumentům e-mailem.`
       : isStatenice
         ? 'Autoškola Statenice s postupným výcvikem bez stresu. Řidičák skupiny B pro Statenice, Horoměřice, Velké Přílepy a okolí Prahy-západ.'
         : `Autoškola BuBu ${branch.name}. ${branch.address}. Kurz B za ${money(branch.bPrice)}. Osobní zápis a výcvik s lidským přístupem.`}
@@ -125,7 +125,7 @@ const breadcrumbSchema = {
               isStrizkov
                 ? 'Autoškola Praha 8 – Střížkov. Řidičák bez stresu.'
                 : isKladno
-                  ? 'Autoškola Kladno'
+                  ? 'Řidičák v Kladně bez stresu'
                   : isStatenice
                     ? 'Autoškola Statenice'
                     : `Za řidičákem do ${branch.name}.`
@@ -135,7 +135,7 @@ const breadcrumbSchema = {
               isStrizkov
                 ? 'Řidičák skupiny B – manuál nebo automat a možnost absolvovat kurz v režimu L17. Výcvik má jasný plán, přípravu na reálný pražský provoz a lidský přístup bez křiku.'
                 : isKladno
-                  ? 'Výuku i praktický výcvik stavíme postupně – od prvního seznámení s autem až po jízdu v běžném městském provozu, mimo obec, po dálnici nebo v Praze. Učíme klidně, lidsky a bez zbytečného stresu.'
+                  ? `Řidičák skupiny B nebo L17 za ${money(branch.bPrice)}. Přihlášení vyřídíte online, další postup a potřebné dokumenty s vámi dořešíme e-mailem.`
                   : isStatenice
                     ? 'Naučíme vás řídit postupně – od prvních metrů na cvičišti až po samostatnější jízdu v běžném provozu. Ve Statenicích a okolí trénujeme rozjezdy do kopce, menší ulice, zóny 30, zatáčky i jízdu mimo obec.'
                     : 'Začínáte od nuly? To je v pořádku. V BuBu vás provedeme od prvního rozjezdu až k závěrečné zkoušce.'
@@ -164,7 +164,13 @@ const breadcrumbSchema = {
             )
           }<div class="actions">
             <button class="btn primary" data-order disabled data-branch={branch.id} data-course="b">
-              {isStrizkov ? 'Přihlásit se do kurzu ↗' : 'Chci začít řidičák ↗'}
+              {
+                isKladno
+                  ? 'Přihlásit se do autoškoly ↗'
+                  : isStrizkov
+                    ? 'Přihlásit se do kurzu ↗'
+                    : 'Chci začít řidičák ↗'
+              }
             </button>
             {
               isStrizkov ? (
@@ -181,7 +187,13 @@ const breadcrumbSchema = {
                 </a>
               )
             }
-          </div><p class="branch-price">
+          </div>{
+            isKladno && (
+              <p class="hero-copy">
+                Bez osobního zápisu. Po odeslání přihlášky vám zašleme další pokyny e-mailem.
+              </p>
+            )
+          }<p class="branch-price">
             Skupina B <strong>{money(branch.bPrice)}</strong> · jedna cena, bez balíčků
           </p>
         </div><Image
@@ -200,7 +212,8 @@ const breadcrumbSchema = {
     <div class="container">
       <span>✓ Skupina B – manuál{branch.id === 'strizkov' ? ' i automat' : ''}</span><span
         >✓ Možnost kurzu v režimu L17</span
-      ><span>✓ Osobní zápis na pobočce</span>{isStrizkov && <span>✓ Motorky pouze Praha</span>}
+      ><span>{isKladno ? '✓ Přihlášení online, pokyny e-mailem' : '✓ Osobní zápis na pobočce'}</span
+      >{isStrizkov && <span>✓ Motorky pouze Praha</span>}
     </div>
   </div>
 

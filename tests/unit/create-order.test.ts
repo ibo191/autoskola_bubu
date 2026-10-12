@@ -183,7 +183,7 @@ test('client price fields and stale price versions are rejected', async () => {
   assert.equal(f.repository.calls.length, 0);
 });
 
-test('Kladno stores a complete order without a booking slot and asks staff to arrange the appointment', async () => {
+test('Kladno stores a complete order without a booking slot and continues by email', async () => {
   const f = fixture();
   const captchaToken = f.captcha.issue('order', now);
   const result = await f.execute({
@@ -199,7 +199,8 @@ test('Kladno stores a complete order without a booking slot and asks staff to ar
   const internal = [...f.email.messages.values()].find(
     (item) => item.to === 'orders@example.invalid',
   );
-  assert.match(internal?.text ?? '', /kontaktujte zákazníka a domluvte individuální termín/i);
+  assert.match(internal?.text ?? '', /Dokumenty a další postup vyřiďte e-mailem/i);
+  assert.doesNotMatch(internal?.text ?? '', /termín zápisu/i);
 });
 
 test('invalid contact, honeypot and failed captcha never reach storage', async () => {
