@@ -14,9 +14,8 @@ test('Kladno explains online enrollment and preselects B or L17 without appointm
     'Recenze značky Autoškola BuBu',
   );
   await expect(page.locator('[data-google-reviews]')).not.toContainText('Střížkov');
-  await expect(page.locator('.kladno-proof figcaption')).toContainText(
-    'Ilustrační vizuál s modelem',
-  );
+  await expect(page.locator('.kladno-proof-visual img')).toBeVisible();
+  await expect(page.locator('.kladno-proof figcaption')).toHaveCount(0);
 
   await page.locator('.page-hero').getByRole('button', { name: 'Přihlásit se v Kladně ↗' }).click();
   const dialog = page.getByRole('dialog');

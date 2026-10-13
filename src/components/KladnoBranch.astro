@@ -118,17 +118,16 @@ const faqs = [
         >Přihlásit se v Kladně ↗</button
       >
     </div>
-    <figure>
+    <div class="kladno-proof-visual">
       <Image
         src={modelCar}
-        alt="Ilustrační vizuál Autoškoly BuBu s modelem u auta"
+        alt="Muž u vozu Autoškoly BuBu"
         widths={[480, 800]}
         sizes="(max-width: 760px) 90vw, 40vw"
         format="webp"
         loading="lazy"
       />
-      <figcaption>Ilustrační vizuál s modelem.</figcaption>
-    </figure>
+    </div>
   </div>
 </section>
 
@@ -405,21 +404,10 @@ const faqs = [
     color: var(--brand-dark);
     margin-right: 10px;
   }
-  .kladno-proof figure {
-    margin: 0;
-    padding: 16px;
-    border-radius: var(--radius-lg);
-    background: linear-gradient(145deg, #edf8f5, #e3eef7);
-  }
-  .kladno-proof img {
+  .kladno-proof-visual img {
     display: block;
     width: 100%;
     height: auto;
-  }
-  .kladno-proof figcaption {
-    margin-top: 10px;
-    color: var(--muted);
-    font-size: 0.76rem;
   }
   .narrow-heading {
     max-width: 780px;
