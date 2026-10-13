@@ -8,6 +8,7 @@ declare global {
 
 const cookieName = 'bubu_cookie_consent';
 const googleTagId = document.body.dataset.googleTagId?.trim() ?? '';
+const googleTagManagerId = 'GTM-PGNDXXCL';
 
 // Basic Consent Mode: no Google script or request exists until the visitor
 // expressly grants analytics or marketing consent.
@@ -82,6 +83,14 @@ if (/^AW-\d+$/i.test(googleTagId)) {
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(googleTagId)}`;
     document.head.append(script);
+
+    // Load the GTM container only after the same consent that permits Google
+    // tracking. Its tags must also respect analytics/marketing consent.
+    (window.dataLayer ??= []).push({ 'gtm.start': Date.now(), event: 'gtm.js' });
+    const managerScript = document.createElement('script');
+    managerScript.async = true;
+    managerScript.src = `https://www.googletagmanager.com/gtm.js?id=${googleTagManagerId}`;
+    document.head.append(managerScript);
   }
 
   function track(name: string, parameters: Record<string, string | number> = {}) {

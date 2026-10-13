@@ -1,7 +1,9 @@
 ---
+import { Image } from 'astro:assets';
 import type { Branch } from '../lib/catalog';
 import { money } from '../lib/catalog';
 import GoogleReviewsBanner from './GoogleReviewsBanner.astro';
+import modelCar from '../assets/branches/kladno-model-car.png';
 
 interface Props {
   branch: Branch;
@@ -96,6 +98,45 @@ const faqs = [
   ],
 ];
 ---
+
+<section class="section kladno-proof" aria-labelledby="kladno-proof-title">
+  <div class="container kladno-proof-grid">
+    <div class="kladno-proof-copy">
+      <span class="eyebrow">Za volantem s BuBu</span>
+      <h2 id="kladno-proof-title">Začnete v klidu. Pak zvládnete Kladno i cestu do Prahy.</h2>
+      <p>
+        První rozjezdy si vyzkoušíte na kladenském cvičišti. Náročnost jízd roste postupně podle
+        toho, jak získáváte jistotu. Teorii absolvujete na jedné ze dvou kladenských škol podle
+        vypsaného termínu.
+      </p>
+      <ul>
+        <li>Skupina B na manuálu za {money(branch.bPrice)}</li>
+        <li>Možnost absolvovat kurz v režimu L17</li>
+        <li>Přihláška online bez čekání na osobní zápis</li>
+      </ul>
+      <button class="btn primary" data-order disabled data-branch="kladno" data-course="b"
+        >Přihlásit se v Kladně ↗</button
+      >
+    </div>
+    <figure>
+      <Image
+        src={modelCar}
+        alt="Ilustrační vizuál Autoškoly BuBu s modelem u auta"
+        widths={[480, 800]}
+        sizes="(max-width: 760px) 90vw, 40vw"
+        format="webp"
+        loading="lazy"
+      />
+      <figcaption>Ilustrační vizuál s modelem.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<GoogleReviewsBanner
+  heading="Zkušenosti se značkou Autoškola BuBu."
+  profileLabel="Autoškola BuBu"
+  brandReviews={true}
+/>
 
 <section class="section kladno-training" id="vycvik">
   <div class="container">
@@ -281,8 +322,6 @@ const faqs = [
   </div>
 </section>
 
-<GoogleReviewsBanner heading="Zkušenosti žáků Autoškoly BuBu." profileLabel="Autoškola BuBu" />
-
 <section class="section tinted" id="faq">
   <div class="container faq-layout">
     <div>
@@ -335,6 +374,53 @@ const faqs = [
 </section>
 
 <style>
+  .kladno-proof {
+    background: var(--canvas);
+  }
+  .kladno-proof-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    align-items: center;
+    gap: clamp(32px, 6vw, 88px);
+  }
+  .kladno-proof-copy h2 {
+    margin-top: 14px;
+    max-width: 700px;
+  }
+  .kladno-proof-copy p {
+    margin-top: 24px;
+    max-width: 650px;
+  }
+  .kladno-proof-copy ul {
+    display: grid;
+    gap: 12px;
+    list-style: none;
+    padding: 0;
+    margin: 26px 0 30px;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .kladno-proof-copy li::before {
+    content: '✓';
+    color: var(--brand-dark);
+    margin-right: 10px;
+  }
+  .kladno-proof figure {
+    margin: 0;
+    padding: 16px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(145deg, #edf8f5, #e3eef7);
+  }
+  .kladno-proof img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .kladno-proof figcaption {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 0.76rem;
+  }
   .narrow-heading {
     max-width: 780px;
   }
@@ -520,6 +606,9 @@ const faqs = [
     }
   }
   @media (max-width: 760px) {
+    .kladno-proof-grid {
+      grid-template-columns: 1fr;
+    }
     .training-timeline,
     .reasons-grid,
     .theory-grid,

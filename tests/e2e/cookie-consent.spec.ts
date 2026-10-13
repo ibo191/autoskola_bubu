@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 
 const cookieName = 'bubu_cookie_consent';
 const googleTagId = 'AW-17619012335';
+const googleTagManagerId = 'GTM-PGNDXXCL';
 
 test('cookie consent starts with optional categories disabled and can be reopened from footer', async ({
   page,
@@ -84,6 +85,42 @@ test('analytics consent loads one Google tag with the Ads loader ID', async ({ p
   );
   expect(commands).toContainEqual(['config', googleTagId, '[object Object]']);
   expect(commands).toContainEqual(['consent', 'default', '[object Object]']);
+});
+
+test('GTM container loads once after consent and never before it', async ({ page }) => {
+  await page.context().clearCookies();
+  const managerRequests: string[] = [];
+  await page.route(
+    `https://www.googletagmanager.com/gtm.js?id=${googleTagManagerId}`,
+    async (route) => {
+      managerRequests.push(route.request().url());
+      await route.fulfill({ status: 200, contentType: 'application/javascript', body: '' });
+    },
+  );
+  await page.route(`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`, (route) =>
+    route.fulfill({ status: 200, contentType: 'application/javascript', body: '' }),
+  );
+  await page.goto('/');
+  test.skip(
+    (await page.locator('body').getAttribute('data-google-tag-id')) !== googleTagId,
+    'Google tag environment variable is not configured.',
+  );
+  expect(managerRequests).toHaveLength(0);
+  await page.getByRole('button', { name: 'Souhlasím se vším' }).click();
+  await expect.poll(() => managerRequests.length).toBe(1);
+  await page.evaluate(() =>
+    document.dispatchEvent(
+      new CustomEvent('bubu:cookie-consent-updated', {
+        detail: { analytics: true, marketing: true },
+      }),
+    ),
+  );
+  expect(managerRequests).toHaveLength(1);
+  expect(
+    await page
+      .locator(`script[src="https://www.googletagmanager.com/gtm.js?id=${googleTagManagerId}"]`)
+      .count(),
+  ).toBe(1);
 });
 
 test('old consent version asks for a fresh choice', async ({ page }) => {

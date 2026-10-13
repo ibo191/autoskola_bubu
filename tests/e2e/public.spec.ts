@@ -4,15 +4,21 @@ test('Kladno explains online enrollment and preselects B or L17 without appointm
   page,
 }) => {
   await page.goto('/kladno');
-  await expect(page.getByRole('heading', { name: 'Řidičák v Kladně bez stresu' })).toBeVisible();
-  await expect(page.locator('.branch-price')).toContainText('20 000 Kč');
+  await expect(
+    page.getByRole('heading', { name: 'Autoškola Kladno. Řidičák B za 20 000 Kč.' }),
+  ).toBeVisible();
+  await expect(page.locator('.branch-price')).toContainText('L17');
   await expect(page.locator('.local-trust')).toContainText('Přihlášení online');
   await expect(page.locator('#faq')).toContainText('Na osobní zápis se v Kladně nyní nedochází.');
+  await expect(page.locator('[data-google-reviews]')).toContainText(
+    'Recenze značky Autoškola BuBu',
+  );
+  await expect(page.locator('[data-google-reviews]')).not.toContainText('Střížkov');
+  await expect(page.locator('.kladno-proof figcaption')).toContainText(
+    'Ilustrační vizuál s modelem',
+  );
 
-  await page
-    .getByRole('button', { name: /Přihlásit se do autoškoly/ })
-    .first()
-    .click();
+  await page.locator('.page-hero').getByRole('button', { name: 'Přihlásit se v Kladně ↗' }).click();
   const dialog = page.getByRole('dialog');
   await expect(dialog.locator('[name="branch"]')).toHaveValue('kladno');
   await expect(dialog.locator('[name="course"]')).toHaveValue('b');

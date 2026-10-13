@@ -129,7 +129,7 @@ const nav = [
           set:html={JSON.stringify(structuredData).replace(/</g, '\\u003c')}
         />
       )
-    }</head
+    }{/^AW-\d+$/i.test(googleTagId) && <GoogleTag />}</head
   ><body data-recaptcha-site-key={recaptchaSiteKey} data-google-tag-id={googleTagId}>
     <a class="skip" href="#main">Přeskočit na obsah</a>
     {
@@ -225,7 +225,10 @@ const nav = [
               <div class="footer-bottom">
                 <>
                   <span>© {new Date().getFullYear()} Autoškola BuBu</span>
-                  <span>Marketing a spolupráce: <a href="mailto:business@autoskolabubu.cz">business@autoskolabubu.cz</a></span>
+                  <span>
+                    Marketing a spolupráce:{' '}
+                    <a href="mailto:business@autoskolabubu.cz">business@autoskolabubu.cz</a>
+                  </span>
                   <div class="footer-legal">
                     <>
                       <a href="/obchodni-podminky">Obchodní podmínky</a>
@@ -245,7 +248,6 @@ const nav = [
       )
     }
     <OrderDialog recaptchaSiteKey={recaptchaSiteKey} captchaRequired={isProduction} />
-    {/^AW-\d+$/i.test(googleTagId) && <GoogleTag />}
     <CookieConsent />
     <script>
       const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');

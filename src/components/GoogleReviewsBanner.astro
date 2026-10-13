@@ -3,6 +3,7 @@ import { fallbackGoogleReviews } from '../lib/google/reviews';
 const {
   heading = 'Žáci oceňují klid, respekt a jasný plán.',
   profileLabel = 'Autoškola BuBu Střížkov',
+  brandReviews = false,
 } = Astro.props;
 const fallback = fallbackGoogleReviews;
 const fallbackReviews = fallback.reviews.slice(0, 5);
@@ -13,7 +14,9 @@ const stars = '★★★★★';
   <div class="container">
     <div class="google-board">
       <div class="google-summary">
-        <span class="eyebrow">Google recenze</span>
+        <span class="eyebrow"
+          >{brandReviews ? 'Recenze značky Autoškola BuBu' : 'Google recenze'}</span
+        >
         <div class="google-logo" aria-label="Google">
           <span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span>
         </div>
@@ -22,7 +25,12 @@ const stars = '★★★★★';
           <strong data-rating
             >{fallback.rating ? fallback.rating.toFixed(1).replace('.', ',') : '—'}</strong
           >
-          <span class="stars" aria-label={`${fallback.rating} z 5 hvězdiček`}>{stars}</span>
+          <span
+            class="stars"
+            data-rating-stars
+            hidden={fallback.rating <= 0}
+            aria-label="5 z 5 hvězdiček">{stars}</span
+          >
           <span class="review-count" data-review-count>
             {
               fallback.userRatingCount
@@ -155,6 +163,11 @@ const stars = '★★★★★';
       if (!response.ok) return;
       const data = (await response.json()) as ReviewsPayload;
       rating.textContent = data.rating ? data.rating.toFixed(1).replace('.', ',') : '—';
+      const ratingStars = section.querySelector<HTMLElement>('[data-rating-stars]');
+      if (ratingStars) {
+        ratingStars.hidden = data.rating <= 0;
+        ratingStars.setAttribute('aria-label', `${data.rating} z 5 hvězdiček`);
+      }
       count.textContent = data.userRatingCount
         ? `${data.userRatingCount} recenzí`
         : 'Hodnocení není dostupné';
