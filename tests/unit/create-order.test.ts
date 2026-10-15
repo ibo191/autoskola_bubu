@@ -168,6 +168,26 @@ test('order workflow recalculates price, stores a hash, then sends customer and 
   );
 });
 
+test('winter campaign is identified only in the internal order message', async () => {
+  const f = fixture();
+  const result = await f.execute({
+    ...baseBody,
+    campaign: 'zimni-kampan',
+    captchaToken: f.captcha.issue('order', now),
+  });
+  assert.equal(result.ok, true);
+  const customer = [...f.email.messages.values()].find(
+    (item) => item.to === 'fixture@example.invalid',
+  );
+  const internal = [...f.email.messages.values()].find(
+    (item) => item.to === 'orders@example.invalid',
+  );
+  assert.ok(customer);
+  assert.ok(internal);
+  assert.doesNotMatch(customer.text, /Zimní kampaň/);
+  assert.match(internal.text, /Zdroj: Zimní kampaň/);
+});
+
 test('client price fields and stale price versions are rejected', async () => {
   const f = fixture();
   let token = f.captcha.issue('order', now);

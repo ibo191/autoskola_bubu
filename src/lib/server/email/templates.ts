@@ -23,6 +23,7 @@ export type CreatedOrderEmailInput = {
   publicCode: string;
   contact: Contact;
   note: string;
+  campaign?: 'zimni-kampan';
   selection: Selection;
   price: Extract<Quote, { ok: true }>;
   addons: OrderAddon[];
@@ -226,6 +227,7 @@ export function internalNewOrderEmail(input: CreatedOrderEmailInput): EmailMessa
     ['E-mail', input.contact.email],
     ['Telefon', input.contact.phone],
     ['Objednávka', input.publicCode],
+    ...(input.campaign ? ([['Zdroj', 'Zimní kampaň']] as Array<[string, string]>) : []),
     ['Kurz', selectionLabel(input.selection)],
     ['Pobočka', branchLabel(input.selection.branch)],
     ['Balíček', packageLabel(input.selection.package)],
@@ -245,6 +247,7 @@ export function internalNewOrderEmail(input: CreatedOrderEmailInput): EmailMessa
     `E-mail: ${input.contact.email}`,
     `Telefon: ${input.contact.phone}`,
     `Objednávka: ${input.publicCode}`,
+    ...(input.campaign ? ['Zdroj: Zimní kampaň'] : []),
     `Kurz: ${selectionLabel(input.selection)}`,
     `Pobočka: ${branchLabel(input.selection.branch)}`,
     `Balíček: ${packageLabel(input.selection.package)}`,

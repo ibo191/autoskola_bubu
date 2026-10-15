@@ -1,0 +1,700 @@
+---
+export const prerender = true;
+import { getImage } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import GoogleReviewsBanner from '../components/GoogleReviewsBanner.astro';
+import car from '../assets/courses/b-manual-fabia.png';
+import winterCars from '../assets/winter-prague-bubu.png';
+import { getBranch, money } from '../lib/catalog';
+
+const branch = getBranch('strizkov');
+const winterVisual = await getImage({ src: winterCars, width: 1200, format: 'webp', quality: 80 });
+const order = {
+  'data-order': true,
+  'data-course': 'b',
+  'data-branch': 'strizkov',
+  'data-campaign': 'zimni-kampan',
+};
+const faq = [
+  [
+    'Kdy začínají nejbližší zimní kurzy?',
+    'Přesný termín zahájení výuky vám potvrdíme při zápisu podle zvolené varianty a aktuální kapacity. Termín osobního zápisu si můžete rezervovat hned online.',
+  ],
+  [
+    'Kolik míst ještě zbývá?',
+    'Zimní kapacita je omezená. Aktuální dostupnost vám potvrdíme při zápisu; počet volných míst na webu neodhadujeme.',
+  ],
+  [
+    'Kolik kurz stojí?',
+    `Kurz skupiny B na manuálu na Střížkově stojí ${money(branch.bPrice)}. Cenu automatu a L17 ověříte při výběru varianty v objednávce nebo v ceníku.`,
+  ],
+  [
+    'Mohu absolvovat kurz L17?',
+    'Ano, na Střížkově nabízíme také skupinu B v režimu L17 s mentorem. Zvolte ji v objednávce.',
+  ],
+  [
+    'Je možné absolvovat výcvik na automatu?',
+    'Ano, na Střížkově nabízíme kurz skupiny B také na vozidle s automatickou převodovkou.',
+  ],
+  [
+    'Kdy začnou praktické jízdy?',
+    'Postup výuky a první praktické jízdy s vámi domluvíme při zápisu. Termíny jízd plánujete následně s přiděleným instruktorem.',
+  ],
+  [
+    'Kde probíhá teorie?',
+    'Podrobnosti o teoretické výuce a místě konání dostanete při osobním zápisu na pobočce Střížkov.',
+  ],
+  [
+    'Co potřebuji k zápisu?',
+    'Oboustranně vytištěnou a podepsanou přihlášku, zdravotní posudek a občanský průkaz. Pokyny dostanete také v potvrzovacím e-mailu.',
+  ],
+];
+---
+
+<Base
+  title="Zimní kurzy autoškoly Praha 8 – Střížkov"
+  description="Rezervujte si termín zápisu do zimního kurzu skupiny B na Střížkově. Manuál, automat i L17, přehledná cena a klidný výcvik Autoškoly BuBu."
+>
+  <main class="winter-page">
+    <section class="winter-hero">
+      <div class="winter-flakes" aria-hidden="true">
+        <span>❄</span><span>❄</span><span>✦</span><span>❄</span><span>✦</span>
+      </div>
+      <div class="container winter-hero-grid">
+        <div>
+          <span class="winter-kicker">Zimní kurzy · Praha 8 – Střížkov</span>
+          <h1>Zimní kurzy autoškoly Praha 8 se už plní</h1>
+          <p class="winter-lead">
+            Teď je správný čas rezervovat si zápis do kurzu skupiny B na Střížkově. Termín zahájení
+            výuky s vámi potvrdíme osobně — místo si můžete začít řešit už dnes.
+          </p>
+          <div class="winter-actions">
+            <button class="btn primary" {...order}>Vybrat termín zápisu ↗</button><a
+              class="winter-link"
+              href="#jak-to-funguje">Jak to funguje</a
+            >
+          </div>
+          <p class="winter-note">Nejbližší volný termín zápisu uvidíte v rezervačním kalendáři.</p>
+          <div class="winter-facts" aria-label="Základní informace">
+            <span>Praha 8 – Střížkov</span><span>Skupina B</span><span>Manuál · automat · L17</span
+            ><span>Manuál {money(branch.bPrice)}</span>
+          </div>
+        </div>
+        <div class="winter-visual">
+          <img
+            src={winterVisual.src}
+            width={winterVisual.attributes.width}
+            height={winterVisual.attributes.height}
+            alt="Zimní atmosféra s vozy Autoškoly BuBu v Praze"
+            loading="eager"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="winter-section" id="zimni-zapis">
+      <div class="container">
+        <span class="winter-kicker">Zimní zápis</span><div class="winter-heading">
+          <h2>Prosincové a lednové kurzy se rychle plní.</h2><p>
+            Právě zapisujeme zájemce do kurzů na prosinec a leden. Pokud chcete mít místo v zimním
+            kurzu, přijďte na <strong>osobní zápis co nejdříve</strong>. Volný termín si vyberete
+            online během chvíle.
+          </p>
+        </div><div class="winter-booking">
+          <div>
+            <strong>Termíny zápisu na Střížkově</strong><p>
+              Pondělí a čtvrtek 15:00–18:00. Volné časy se průběžně mění, přesnou dostupnost uvidíte
+              po otevření formuláře.
+            </p><small
+              >Místa v zimních kurzech průběžně obsazujeme. Rezervace termínu zápisu je první krok
+              k vašemu řidičáku.</small
+            >
+          </div><button class="btn primary" {...order}>Zobrazit volné termíny zápisu ↗</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="winter-section winter-mint">
+      <div class="container winter-two">
+        <div>
+          <span class="winter-kicker">Proč se přihlásit už teď</span><h2>
+            Více času na výběr. Méně nejistoty.
+          </h2>
+        </div><ul class="winter-checks">
+          <li>Zimní kapacita se postupně obsazuje.</li><li>
+            Termín zápisu si vyberete pohodlně online.
+          </li><li>Učíme klidně, lidsky a bez křiku.</li><li>
+            Náročnost jízd zvyšujeme postupně.
+          </li><li>Připravíme vás na zkoušku i běžný provoz.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="winter-section" id="cena">
+      <div class="container winter-price">
+        <div>
+          <span class="winter-kicker">Jasná cena</span><h2>
+            Řidičák B na Střížkově za {money(branch.bPrice)}
+          </h2><p>
+            Cena platí pro skupinu B s manuální převodovkou. Automat a L17 jsou také dostupné;
+            jejich aktuální cenu uvidíte přímo při volbě varianty.
+          </p><button class="btn primary" {...order}>Vybrat variantu a zápis ↗</button>
+        </div><div class="winter-price-card">
+          <div>
+            <strong>V ceně kurzu</strong><p>
+              Teoretická výuka, předepsaný praktický výcvik, příprava na závěrečnou zkoušku,
+              online učební materiály, tištěná učebnice a psací potřeby.
+            </p>
+          </div><div>
+            <strong>Platí se samostatně</strong><p>
+              Poplatky za zkoušku, lékařský posudek a případné doplňující jízdy. <a href="/cenik"
+                >Podrobný ceník ↗</a
+              >
+            </p>
+          </div><div>
+            <strong>Platba na třikrát</strong><p>
+              Na Střížkově můžete kurz uhradit ve třech splátkách: 8 700 Kč, 8 600 Kč a 8 600 Kč.
+              Podmínky si potvrdíte při zápisu.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="winter-section winter-blue" id="jak-to-funguje">
+      <div class="container">
+        <span class="winter-kicker">Jak to funguje</span><h2>
+          Od rezervace zápisu k prvním jízdám.
+        </h2><ol class="winter-steps">
+          <li>
+            <b>01</b><strong>Zvolíte variantu</strong><span
+              >Manuál, automat nebo L17 na Střížkově.</span
+            >
+          </li><li>
+            <b>02</b><strong>Vyberete zápis</strong><span
+              >Volný čas si rezervujete online a odešlete objednávku.</span
+            >
+          </li><li>
+            <b>03</b><strong>Dokončíte zápis</strong><span
+              >Na pobočce potvrdíme začátek kurzu i další postup.</span
+            >
+          </li><li>
+            <b>04</b><strong>Začnete výuku</strong><span
+              >Teorie a praktické jízdy na sebe postupně navazují.</span
+            >
+          </li><li>
+            <b>05</b><strong>Připravíte se na zkoušku</strong><span
+              >Probereme vše potřebné i pro samostatnou jízdu.</span
+            >
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="winter-section">
+      <div class="container winter-location">
+        <div>
+          <span class="winter-kicker">Vaše pobočka</span><h2>
+            Na Střížkově vás přivítáme osobně.
+          </h2><p>
+            Výcvik vedeme s respektem, bez křiku a s jasným plánem. Na začátku nemusíte umět nic —
+            od toho jsme tu my.
+          </p><address>{branch.address}</address><a href={`tel:${branch.phone}`}>+420 725 717 755</a
+          ><a
+            href="https://www.google.com/maps/search/?api=1&query=U+Kapli%C4%8Dek+34+Praha+8+St%C5%99%C3%AD%C5%BEkov"
+            target="_blank"
+            rel="noopener noreferrer">Zobrazit trasu ↗</a
+          >
+        </div><div class="winter-location-photo">
+          <img
+            src={car.src}
+            width={car.width}
+            height={car.height}
+            loading="lazy"
+            alt="Výcvikový vůz Autoškoly BuBu"
+          />
+        </div>
+      </div>
+    </section>
+
+    <GoogleReviewsBanner
+      heading="Co říkají žáci Autoškoly BuBu"
+      profileLabel="Autoškola BuBu Střížkov"
+    />
+
+    <section class="winter-section winter-faq">
+      <div class="container">
+        <span class="winter-kicker">Časté otázky</span><h2>
+          Co potřebujete vědět před zápisem?
+        </h2><div class="winter-faq-grid">
+          {
+            faq.map(([question, answer]) => (
+              <details>
+                <>
+                  <summary>
+                    {question}
+                    <span aria-hidden="true">+</span>
+                  </summary>
+                  <p>{answer}</p>
+                </>
+              </details>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="winter-final">
+      <div class="container winter-final-inner">
+        <div>
+          <h2>Neodkládejte výběr termínu zápisu.</h2><p>
+            Vyberte si čas, který vám vyhovuje. Nejbližší začátek zimního kurzu vám potvrdíme při
+            zápisu.
+          </p>
+        </div><button class="btn primary" {...order}>Rezervovat termín zápisu ↗</button>
+      </div>
+    </section>
+  </main>
+  <div class="winter-mobile-cta">
+    <button class="btn primary" {...order}>Rezervovat zápis na Střížkově ↗</button>
+  </div>
+</Base>
+<style>
+  .winter-page {
+    color: #17345d;
+    background: #fbfdff;
+  }
+  .winter-page .btn.primary,
+  .winter-mobile-cta .btn.primary {
+    background: linear-gradient(115deg, #0d8eaa, #41bdb7);
+    border-color: #0d8eaa;
+    color: #fff;
+    box-shadow: 0 12px 28px #0b688e2b;
+  }
+  .winter-page .btn.primary:hover,
+  .winter-mobile-cta .btn.primary:hover {
+    background: linear-gradient(115deg, #086d91, #289eaa);
+  }
+  .winter-page h1,
+  .winter-page h2 {
+    letter-spacing: -0.045em;
+    line-height: 1.08;
+  }
+  .winter-page h1 {
+    font-size: clamp(3rem, 6vw, 6rem);
+    margin: 0.35em 0;
+  }
+  .winter-page h2 {
+    font-size: clamp(2rem, 3.6vw, 3.6rem);
+    margin: 0.3em 0 0.65em;
+  }
+  .winter-page p {
+    line-height: 1.65;
+  }
+  .winter-kicker {
+    display: inline-block;
+    color: #087e9b;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.78rem;
+  }
+  .winter-hero {
+    overflow: hidden;
+    position: relative;
+    background:
+      radial-gradient(circle at 12% 15%, #fff 0, transparent 28%),
+      linear-gradient(118deg, #ecf8ff 10%, #d7ecfa 58%, #c6dff1);
+  }
+  .winter-hero:after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: radial-gradient(40px 14px at 40px 32px, #fbfdff 98%, transparent 100%) 0 -18px /
+      80px 30px repeat-x;
+  }
+  .winter-flakes {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    color: #6eadd080;
+  }
+  .winter-flakes span {
+    position: absolute;
+    font-size: clamp(1.4rem, 3vw, 3rem);
+  }
+  .winter-flakes span:nth-child(1) {
+    top: 8%;
+    left: 3%;
+  }
+  .winter-flakes span:nth-child(2) {
+    top: 72%;
+    left: 44%;
+    font-size: 2rem;
+  }
+  .winter-flakes span:nth-child(3) {
+    top: 12%;
+    right: 7%;
+  }
+  .winter-flakes span:nth-child(4) {
+    bottom: 8%;
+    right: 3%;
+    font-size: 3.5rem;
+  }
+  .winter-flakes span:nth-child(5) {
+    top: 43%;
+    right: 49%;
+    font-size: 1.5rem;
+  }
+  .winter-hero-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1.04fr 0.96fr;
+    align-items: center;
+    gap: 3rem;
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+  .winter-lead {
+    font-size: 1.28rem;
+    max-width: 39rem;
+  }
+  .winter-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin: 2rem 0 0.5rem;
+  }
+  .winter-link {
+    font-weight: 700;
+  }
+  .winter-note {
+    font-size: 0.9rem;
+    color: #58708e;
+  }
+  .winter-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 2rem;
+  }
+  .winter-facts span {
+    background: #ffffffd9;
+    border: 1px solid #b8d9ea;
+    border-radius: 999px;
+    padding: 0.6rem 0.85rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+  .winter-visual {
+    min-height: 430px;
+    border-radius: 2rem;
+    background: #b9d7e9;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 30px 65px #1b52702c;
+    border: 5px solid #ffffffc7;
+  }
+  .winter-visual img {
+    width: 100%;
+    height: 100%;
+    min-height: 430px;
+    object-fit: cover;
+    object-position: center;
+  }
+  .winter-section {
+    padding: 5rem 0;
+  }
+  .winter-heading {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+  }
+  .winter-heading p {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+  .winter-booking {
+    margin-top: 1.5rem;
+    border: 1px solid #bad9eb;
+    background: linear-gradient(125deg, #edf8ff, #f7fcff);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+  .winter-booking strong {
+    font-size: 1.35rem;
+  }
+  .winter-booking p {
+    margin: 0.5rem 0;
+  }
+  .winter-booking small {
+    color: #58708e;
+  }
+  .winter-mint {
+    position: relative;
+    background: linear-gradient(125deg, #e6f4fc, #f5fbff);
+  }
+  .winter-mint:before,
+  .winter-faq:before {
+    content: '❄';
+    position: absolute;
+    right: 4%;
+    top: 5%;
+    color: #8ac1de4a;
+    font-size: clamp(5rem, 12vw, 12rem);
+    line-height: 1;
+    pointer-events: none;
+  }
+  .winter-two,
+  .winter-price,
+  .winter-location {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+  .winter-checks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .winter-checks li {
+    background: #ffffffd9;
+    border: 1px solid #c6deed;
+    border-radius: 0.9rem;
+    padding: 1rem 1.1rem;
+    font-weight: 650;
+  }
+  .winter-checks li:before {
+    content: '✓';
+    color: #08776d;
+    margin-right: 0.7rem;
+  }
+  .winter-price-card {
+    border: 1px solid #c6deed;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    box-shadow: 0 22px 50px #17345d0a;
+  }
+  .winter-price-card div + div {
+    border-top: 1px solid #d5e9e7;
+    margin-top: 1rem;
+    padding-top: 1rem;
+  }
+  .winter-price-card strong {
+    font-size: 1.1rem;
+  }
+  .winter-price-card p {
+    margin: 0.4rem 0 0;
+  }
+  .winter-blue {
+    position: relative;
+    background: radial-gradient(circle at 90% 10%, #315f92, transparent 37%), #17345d;
+    color: #fff;
+  }
+  .winter-blue .winter-kicker {
+    color: #a7e8f5;
+  }
+  .winter-steps {
+    list-style: none;
+    margin: 2rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+  }
+  .winter-steps li {
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    border-top: 1px solid #ffffff55;
+    padding-top: 1rem;
+  }
+  .winter-steps b {
+    color: #a7e8f5;
+    font-size: 1.5rem;
+  }
+  .winter-steps strong {
+    font-size: 1.2rem;
+  }
+  .winter-steps span {
+    color: #d9e6f3;
+    font-size: 0.95rem;
+  }
+  .winter-location address {
+    font-style: normal;
+    font-weight: 700;
+    margin: 1.3rem 0;
+  }
+  .winter-location a {
+    display: block;
+    width: max-content;
+    margin: 0.6rem 0;
+    color: #08776d;
+    font-weight: 700;
+  }
+  .winter-location-photo {
+    background: #e6f4fc;
+    border-radius: 1.5rem;
+    min-height: 320px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .winter-location-photo img {
+    max-width: 95%;
+    height: auto;
+  }
+  .winter-faq {
+    position: relative;
+    background: #edf7fc;
+  }
+  .winter-faq-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem 1rem;
+  }
+  .winter-faq details {
+    background: #fff;
+    border: 1px solid #c6deed;
+    border-radius: 0.9rem;
+    padding: 1rem 1.2rem;
+  }
+  .winter-faq summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-weight: 700;
+  }
+  .winter-faq summary::-webkit-details-marker {
+    display: none;
+  }
+  .winter-faq summary span {
+    color: #08776d;
+  }
+  .winter-faq details[open] summary span {
+    transform: rotate(45deg);
+  }
+  .winter-faq details p {
+    color: #58708e;
+    margin: 0.8rem 0 0;
+  }
+  .winter-final {
+    position: relative;
+    background: linear-gradient(110deg, #123a70, #23629a);
+    color: white;
+    padding: 3rem 0;
+  }
+  .winter-final:after {
+    content: '❄';
+    position: absolute;
+    right: 3%;
+    top: -1.5rem;
+    color: #ffffff26;
+    font-size: 9rem;
+    pointer-events: none;
+  }
+  .winter-final-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+  .winter-final h2 {
+    font-size: clamp(1.8rem, 3vw, 3rem);
+    margin: 0;
+  }
+  .winter-final p {
+    margin: 0.6rem 0 0;
+    color: #fff;
+  }
+  .winter-mobile-cta {
+    display: none;
+  }
+  @media (max-width: 800px) {
+    .winter-hero-grid,
+    .winter-heading,
+    .winter-two,
+    .winter-price,
+    .winter-location {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    .winter-hero-grid {
+      padding-top: 2.5rem;
+      padding-bottom: 3rem;
+    }
+    .winter-visual {
+      min-height: 260px;
+    }
+    .winter-visual img {
+      min-height: 260px;
+    }
+    .winter-section {
+      padding: 3rem 0;
+    }
+    .winter-booking,
+    .winter-final-inner {
+      display: grid;
+    }
+    .winter-steps {
+      grid-template-columns: 1fr 1fr;
+    }
+    .winter-faq-grid {
+      grid-template-columns: 1fr;
+    }
+    .winter-facts {
+      margin-top: 1rem;
+    }
+    .winter-page {
+      padding-bottom: 5rem;
+    }
+    .winter-mobile-cta {
+      display: block;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      background: #f1f9fff0;
+      backdrop-filter: blur(10px);
+      border-top: 1px solid #bad9eb;
+      padding: 0.7rem max(1rem, env(safe-area-inset-right))
+        calc(0.7rem + env(safe-area-inset-bottom));
+    }
+    .winter-mobile-cta .btn {
+      width: 100%;
+    }
+    body.dialog-open .winter-mobile-cta {
+      display: none;
+    }
+  }
+  @media (max-width: 480px) {
+    .winter-page h1 {
+      font-size: 2.65rem;
+    }
+    .winter-actions {
+      display: grid;
+    }
+    .winter-steps {
+      grid-template-columns: 1fr;
+    }
+    .winter-hero-grid {
+      gap: 0.5rem;
+    }
+  }
+</style>

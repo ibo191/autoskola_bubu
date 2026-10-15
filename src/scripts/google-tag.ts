@@ -97,7 +97,9 @@ if (/^AW-\d+$/i.test(googleTagId)) {
     if (!initialized || googleWindow[disabledKey]) return false;
     // The object supports a future GTM Custom Event trigger; the gtag command
     // continues to feed the one existing Google tag and its GA4 destination.
-    (window.dataLayer ??= []).push({ event: name, ...parameters });
+    // generate_lead is sent through the Google tag once; mirroring it as a GTM
+    // Custom Event could fire a second conversion tag for the same order.
+    if (name !== 'generate_lead') (window.dataLayer ??= []).push({ event: name, ...parameters });
     gtag('event', name, parameters);
     return true;
   }
@@ -113,6 +115,7 @@ if (/^AW-\d+$/i.test(googleTagId)) {
         applicationId?: string;
         branch?: string;
         course?: string;
+        campaign?: string;
       } | null;
       if (
         !pending ||
@@ -131,6 +134,7 @@ if (/^AW-\d+$/i.test(googleTagId)) {
         branch: pending.branch!,
         course: pending.course!.toUpperCase(),
         application_id: pending.applicationId!,
+        ...(pending.campaign === 'zimni-kampan' ? { campaign: pending.campaign } : {}),
       });
       if (sent) {
         sessionStorage.setItem(sentKey, '1');

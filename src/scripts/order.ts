@@ -32,6 +32,7 @@ let step = 0;
 let dirty = false;
 let validQuote: Extract<Quote, { ok: true }> | undefined;
 let trigger: HTMLElement | undefined;
+let campaign: 'zimni-kampan' | undefined;
 let requestSequence = 0;
 let slotSequence = 0;
 let monthCursor = new Date();
@@ -249,6 +250,7 @@ function reset() {
   validQuote = undefined;
   applicationStarted = false;
   trackedSelection = '';
+  campaign = undefined;
   question.hidden = true;
   loadedSlots = [];
   selectedDate = '';
@@ -270,6 +272,7 @@ document.querySelectorAll<HTMLElement>('[data-order]').forEach((button) => {
   button.addEventListener('click', () => {
     trigger = button;
     reset();
+    campaign = button.dataset.campaign === 'zimni-kampan' ? 'zimni-kampan' : undefined;
     field('course').value = button.dataset.course ?? '';
     field('branch').value = button.dataset.branch ?? '';
     if (button.dataset.transmission) field('transmission').value = button.dataset.transmission;
@@ -620,6 +623,7 @@ async function submitOrder() {
       phone: field('phone').value,
     },
     note: field('note').value,
+    ...(campaign ? { campaign } : {}),
     selection: selectionWithAddons(),
     priceVersion: validQuote.priceVersion,
     captchaToken,
@@ -665,6 +669,7 @@ async function submitOrder() {
             applicationId: result.orderId,
             branch: body.selection.branch,
             course: body.selection.course,
+            ...(campaign ? { campaign } : {}),
           }),
         );
       } catch {
