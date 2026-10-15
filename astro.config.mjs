@@ -26,6 +26,7 @@ const indexableStaticPaths = new Set([
   '/blog',
   '/black-friday',
   '/vanoce',
+  '/zimni-kurzy-praha-8',
   '/strizkov',
   '/kladno',
   '/statenice',
