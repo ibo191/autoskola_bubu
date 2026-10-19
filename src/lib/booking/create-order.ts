@@ -8,6 +8,25 @@ import type { RateLimiter } from '../security/rate-limit';
 import { applicationFormAttachment, APPLICATION_FORM_URL_PATH } from '../server/email/attachments';
 import { internalNewOrderEmail, orderConfirmationEmail } from '../server/email/templates';
 
+const attributionSchema = z
+  .object({
+    gclid: z.string().max(256).optional(),
+    gbraid: z.string().max(256).optional(),
+    wbraid: z.string().max(256).optional(),
+    utm: z.object({
+      utm_source: z.string().max(256).optional(),
+      utm_medium: z.string().max(256).optional(),
+      utm_campaign: z.string().max(256).optional(),
+      utm_id: z.string().max(256).optional(),
+      utm_term: z.string().max(256).optional(),
+      utm_content: z.string().max(256).optional(),
+    }).strict(),
+    landingPage: z.url().max(2048),
+    firstClickAt: z.iso.datetime({ offset: true }),
+    consentAt: z.iso.datetime({ offset: true }),
+  })
+  .strict();
+
 const requestSchema = z
   .object({
     slotId: z.uuid().optional(),
@@ -20,6 +39,7 @@ const requestSchema = z
     termsAccepted: z.literal(true),
     privacyAccepted: z.literal(true),
     marketingAccepted: z.boolean().default(false),
+    attribution: attributionSchema.optional(),
   })
   .strict()
   .superRefine((value, ctx) => {
@@ -83,6 +103,7 @@ export class CreateOrderService {
     hostname: string;
     clientFingerprint: string;
     now: Date;
+    advertisingConsent?: boolean;
   }): Promise<CreateOrderResult> {
     if (!this.dependencies.legal.approved) return { ok: false, code: 'ORDERS_DISABLED' };
 
@@ -151,6 +172,24 @@ export class CreateOrderService {
             });
     } catch {
       return { ok: false, code: 'STORAGE_FAILED' };
+    }
+
+    const attribution = parsed.data.attribution;
+    const validAttribution =
+      attribution &&
+      new URL(attribution.landingPage).origin === new URL(this.dependencies.origin).origin &&
+      Date.parse(attribution.firstClickAt) <= context.now.getTime() + 5 * 60_000 &&
+      Date.parse(attribution.firstClickAt) >= context.now.getTime() - 90 * 24 * 60 * 60_000 &&
+      Date.parse(attribution.consentAt) <= context.now.getTime() + 5 * 60_000;
+    if (context.advertisingConsent && validAttribution) {
+      try {
+        await this.dependencies.repository.storeAttribution?.(saved.orderId, attribution);
+      } catch (error) {
+        console.warn('order_attribution_storage_failed', {
+          orderId: saved.orderId,
+          error: error instanceof Error ? error.message : 'unknown',
+        });
+      }
     }
 
     const thankYouUrl = new URL('/dekujeme', this.dependencies.origin);

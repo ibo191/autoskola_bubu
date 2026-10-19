@@ -35,8 +35,12 @@ const baseBody = {
 
 class FakeRepository implements BookingRepository {
   calls: ProvisionalInput[] = [];
+  attributionCalls: { orderId: string; gclid?: string }[] = [];
   kladnoCalls: OrderWithoutAppointmentInput[] = [];
   shouldFail = false;
+  async storeAttribution(orderId: string, attribution: { gclid?: string }) {
+    this.attributionCalls.push({ orderId, gclid: attribution.gclid });
+  }
   async listAvailableSlots() {
     return [];
   }
@@ -104,6 +108,36 @@ test('order workflow fails closed while legal texts are not approved', async () 
   const f = fixture({ legal: { ...legal, approved: false } });
   assert.deepEqual(await f.execute(), { ok: false, code: 'ORDERS_DISABLED' });
   assert.equal(f.repository.calls.length, 0);
+});
+
+test('advertising click is stored only with separate cookie consent', async () => {
+  const attribution = {
+    gclid: 'test-click',
+    utm: { utm_source: 'google' },
+    landingPage: 'http://127.0.0.1:4321/kladno',
+    firstClickAt: now.toISOString(),
+    consentAt: now.toISOString(),
+  };
+  const denied = fixture();
+  await denied.service.execute({
+    body: { ...baseBody, attribution, captchaToken: denied.captcha.issue('order', now) },
+    hostname: '127.0.0.1',
+    clientFingerprint: 'denied',
+    now,
+    advertisingConsent: false,
+  });
+  assert.equal(denied.repository.attributionCalls.length, 0);
+  const accepted = fixture();
+  await accepted.service.execute({
+    body: { ...baseBody, attribution, captchaToken: accepted.captcha.issue('order', now) },
+    hostname: '127.0.0.1',
+    clientFingerprint: 'accepted',
+    now,
+    advertisingConsent: true,
+  });
+  assert.deepEqual(accepted.repository.attributionCalls, [
+    { orderId: '22222222-2222-4222-8222-222222222222', gclid: 'test-click' },
+  ]);
 });
 
 test('Refresher order stores quantity and sends relevant instructions and price', async () => {

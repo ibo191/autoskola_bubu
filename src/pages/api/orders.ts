@@ -48,6 +48,18 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
     const body = await readJson(request);
+    let advertisingConsent = false;
+    try {
+      const cookie = request.headers
+        .get('cookie')
+        ?.split('; ')
+        .find((part) => part.startsWith('bubu_cookie_consent='));
+      const consent =
+        cookie && JSON.parse(decodeURIComponent(cookie.slice('bubu_cookie_consent='.length + 1)));
+      advertisingConsent = consent?.version === 1 && consent.marketing === true;
+    } catch {
+      /* Malformed consent defaults to denied. */
+    }
     const url = new URL(request.url);
     const isProduction =
       process.env.VERCEL_ENV === 'production' || process.env.APP_ENV === 'production';
@@ -56,6 +68,7 @@ export const POST: APIRoute = async ({ request }) => {
       hostname: url.hostname,
       clientFingerprint: fingerprintRequest(request, process.env),
       now: new Date(),
+      advertisingConsent,
     });
     return Response.json(result, {
       status: result.ok
