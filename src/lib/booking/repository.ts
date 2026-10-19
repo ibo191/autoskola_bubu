@@ -3,6 +3,15 @@ import type { z } from 'zod';
 import type { contactSchema } from '../validation/contact';
 export type Contact = z.infer<typeof contactSchema>;
 export type ConsentSnapshot = { version: string; wording: string; accepted: boolean };
+export type AdAttribution = {
+  gclid?: string;
+  gbraid?: string;
+  wbraid?: string;
+  utm: Record<string, string>;
+  landingPage: string;
+  firstClickAt: string;
+  consentAt: string;
+};
 export type OrderAddon = {
   id: string;
   title: string;
@@ -63,6 +72,7 @@ export type AdminSummary = {
   byDay: { date: string; count: number }[];
 };
 export interface BookingRepository {
+  storeAttribution?(orderId: string, attribution: AdAttribution): Promise<void>;
   listAvailableSlots(input: { branch: string; from: string; to: string }): Promise<AvailableSlot[]>;
   createProvisional(input: ProvisionalInput): Promise<CreatedOrder>;
   createWithoutAppointment(input: OrderWithoutAppointmentInput): Promise<CreatedOrder>;

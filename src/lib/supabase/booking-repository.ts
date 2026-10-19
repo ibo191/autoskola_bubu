@@ -5,6 +5,7 @@ import type {
   AvailableSlot,
   BookingRepository,
   ProvisionalInput,
+  AdAttribution,
   OrderWithoutAppointmentInput,
   PublicOrderOverview,
 } from '../booking/repository';
@@ -242,7 +243,8 @@ export class SupabaseBookingRepository implements BookingRepository {
       | 'bubu_admin_schedule_day'
       | 'bubu_admin_dashboard'
       | 'bubu_admin_dashboard_authorized'
-      | 'bubu_admin_schedule_action',
+      | 'bubu_admin_schedule_action'
+      | 'bubu_store_order_attribution',
     body: unknown,
   ) {
     const response = await fetch(this.base + name, {
@@ -295,6 +297,12 @@ export class SupabaseBookingRepository implements BookingRepository {
         p_token_hash: input.verificationHash,
       }),
     );
+  }
+  async storeAttribution(orderId: string, attribution: AdAttribution) {
+    await this.rpc('bubu_store_order_attribution', {
+      p_order_id: orderId,
+      p_attribution: attribution,
+    });
   }
   async createWithoutAppointment(input: OrderWithoutAppointmentInput) {
     return createdWithoutAppointmentSchema.parse(

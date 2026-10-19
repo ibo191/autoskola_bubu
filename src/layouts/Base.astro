@@ -263,6 +263,7 @@ const nav = [
     <OrderDialog recaptchaSiteKey={recaptchaSiteKey} captchaRequired={isProduction} />
     <CookieConsent />
     <script>
+      import '../scripts/ad-attribution';
       const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
       toggle?.addEventListener('click', () => {
         const open = toggle.getAttribute('aria-expanded') !== 'true';

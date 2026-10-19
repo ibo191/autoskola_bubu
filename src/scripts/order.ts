@@ -2,6 +2,7 @@ import { money } from '../lib/format';
 import type { Quote, Selection } from '../lib/pricing/quote';
 import { getRecaptchaToken } from './recaptcha';
 import { firstBookingMonth } from '../lib/booking/enrollment-window';
+import { readAdAttribution } from './ad-attribution';
 
 type Slot = { id: string; branch: string; startsAt: string; endsAt: string; remaining: number };
 
@@ -630,6 +631,7 @@ async function submitOrder() {
     termsAccepted: (field('terms') as HTMLInputElement).checked,
     privacyAccepted: true,
     marketingAccepted: (field('marketing') as HTMLInputElement).checked,
+    ...(readAdAttribution() ? { attribution: readAdAttribution() } : {}),
   };
   try {
     const response = await fetch('/api/orders', {
