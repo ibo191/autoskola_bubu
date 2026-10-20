@@ -5,9 +5,10 @@ test('Kladno explains online enrollment and preselects B or L17 without appointm
 }) => {
   await page.goto('/kladno');
   await expect(
-    page.getByRole('heading', { name: 'Autoškola Kladno. Řidičák B za 20 000 Kč.' }),
+    page.getByRole('heading', { name: 'Autoškola Kladno. Řidičák bez stresu.' }),
   ).toBeVisible();
-  await expect(page.locator('.branch-price')).toContainText('L17');
+  await expect(page.locator('.kladno-hero-offer')).toContainText('20 000 Kč');
+  await expect(page.locator('.kladno-hero-offer')).toContainText('L17');
   await expect(page.locator('.local-trust')).toContainText('Přihlášení online');
   await expect(page.locator('#faq')).toContainText('Na osobní zápis se v Kladně nyní nedochází.');
   await expect(page.locator('[data-google-reviews]')).toContainText(
@@ -17,7 +18,7 @@ test('Kladno explains online enrollment and preselects B or L17 without appointm
   await expect(page.locator('.kladno-proof-visual img')).toBeVisible();
   await expect(page.locator('.kladno-proof figcaption')).toHaveCount(0);
 
-  await page.locator('.page-hero').getByRole('button', { name: 'Přihlásit se v Kladně ↗' }).click();
+  await page.locator('.page-hero').getByRole('button', { name: 'Vyplnit přihlášku v Kladně ↗' }).click();
   const dialog = page.getByRole('dialog');
   await expect(dialog.locator('[name="branch"]')).toHaveValue('kladno');
   await expect(dialog.locator('[name="course"]')).toHaveValue('b');
@@ -37,6 +38,10 @@ test('Kladno explains online enrollment and preselects B or L17 without appointm
   await expect(dialog.locator('[name="branch"]')).toHaveValue('kladno');
   await expect(dialog.locator('[name="course"]')).toHaveValue('l17');
   await expect(dialog.locator('[name="transmission"]')).toHaveValue('manual');
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+    true,
+  );
 });
 test('B pricing asks for transmission and L17, with manual only outside Prague', async ({
   page,
@@ -241,6 +246,7 @@ for (const path of [
   '/',
   '/cenik',
   '/strizkov',
+  '/kladno',
   '/kurzy/ridicak-skupina-b',
   '/kurzy/kondicni-jizdy',
   '/blog',

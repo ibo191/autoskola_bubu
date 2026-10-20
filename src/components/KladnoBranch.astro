@@ -102,7 +102,7 @@ const faqs = [
 <section class="section kladno-proof" aria-labelledby="kladno-proof-title">
   <div class="container kladno-proof-grid">
     <div class="kladno-proof-copy">
-      <span class="eyebrow">Za volantem s BuBu</span>
+      <span class="eyebrow">Výcvik bez zbytečného stresu</span>
       <h2 id="kladno-proof-title">Začnete v klidu. Pak zvládnete Kladno i cestu do Prahy.</h2>
       <p>
         První rozjezdy si vyzkoušíte na kladenském cvičišti. Náročnost jízd roste postupně podle
@@ -110,8 +110,8 @@ const faqs = [
         vypsaného termínu.
       </p>
       <ul>
-        <li>Skupina B na manuálu za {money(branch.bPrice)}</li>
-        <li>Možnost absolvovat kurz v režimu L17</li>
+        <li>Nejprve cvičiště, pak skutečný provoz</li>
+        <li>Manuál i možnost kurzu v režimu L17</li>
         <li>Přihláška online bez čekání na osobní zápis</li>
       </ul>
       <button class="btn primary" data-order disabled data-branch="kladno" data-course="b"
@@ -167,7 +167,7 @@ const faqs = [
   </div>
 </section>
 
-<section class="section tinted" id="kde-jezdime">
+<section class="section tinted kladno-routes" id="kde-jezdime">
   <div class="container split local-split">
     <div>
       <span class="eyebrow">Kde se jezdí</span>
@@ -193,7 +193,7 @@ const faqs = [
   </div>
 </section>
 
-<section class="section">
+<section class="section kladno-reasons">
   <div class="container">
     <div class="section-heading narrow-heading">
       <div>
@@ -217,7 +217,7 @@ const faqs = [
   </div>
 </section>
 
-<section class="section tinted">
+<section class="section tinted kladno-approach">
   <div class="container split local-split">
     <div>
       <span class="eyebrow">Lidský přístup</span>
@@ -240,7 +240,7 @@ const faqs = [
   </div>
 </section>
 
-<section class="section" id="teorie">
+<section class="section kladno-theory" id="teorie">
   <div class="container">
     <div class="section-heading narrow-heading">
       <div>
@@ -271,22 +271,24 @@ const faqs = [
   </div>
 </section>
 
-<section class="section tinted" id="kurz-b">
+<section class="section tinted kladno-course-offer" id="kurz-b">
   <div class="container split local-split">
     <div>
-      <span class="eyebrow">Kurz skupiny B</span>
-      <h2>Řidičský průkaz skupiny B v Kladně.</h2>
+      <span class="eyebrow">Jasná cena, klidný začátek</span>
+      <h2>Řidičák B v Kladně za {money(branch.bPrice)}.</h2>
       <p class="lead">
-        Kurz zahrnuje zákonem stanovenou teoretickou výuku a praktický výcvik. Cena se načítá z
-        aktuálního ceníku pobočky.
+        Vyplňte přihlášku online. Na osobní zápis čekat nemusíte: další pokyny k dokumentům a
+        zahájení kurzu vám pošleme e-mailem.
       </p>
+      <p class="course-offer-points">Manuál <span>·</span> L17 <span>·</span> Výcvik v Kladně a okolí</p>
     </div>
     <div class="price-card">
-      <span>Aktuální cena kurzu</span><strong>{money(branch.bPrice)}</strong><p>
-        Poplatky spojené se závěrečnou zkouškou nejsou součástí ceny kurzu.
+      <span>Skupina B na manuálu</span><strong>{money(branch.bPrice)}</strong><p>
+        V ceně je teoretická výuka a praktický výcvik. Poplatky spojené se závěrečnou zkouškou se
+        hradí samostatně.
       </p><div class="actions">
         <button class="btn primary" data-order disabled data-branch="kladno" data-course="b"
-          >Přihlásit se do autoškoly ↗</button
+          >Vyplnit přihlášku online ↗</button
         ><a class="btn secondary" href="/cenik?branch=kladno">Zobrazit ceník</a>
       </div>
       <p class="small local-course-links">
@@ -346,7 +348,7 @@ const faqs = [
   </div>
 </section>
 
-<section class="section" id="pobocka">
+<section class="section kladno-contact" id="pobocka">
   <div class="container split local-split">
     <div>
       <span class="eyebrow">Pobočka Kladno</span><h2>Začněte tam, kde se vám to hodí.</h2><p
@@ -374,7 +376,7 @@ const faqs = [
 
 <style>
   .kladno-proof {
-    background: var(--canvas);
+    background: linear-gradient(145deg, #f8fcfb 0%, #e8f5f2 100%);
   }
   .kladno-proof-grid {
     display: grid;
@@ -385,6 +387,12 @@ const faqs = [
   .kladno-proof-copy h2 {
     margin-top: 14px;
     max-width: 700px;
+  }
+  .kladno-proof-copy .eyebrow {
+    display: inline-block;
+    border-radius: 999px;
+    background: #d8f2ed;
+    padding: 8px 12px;
   }
   .kladno-proof-copy p {
     margin-top: 24px;
@@ -408,6 +416,71 @@ const faqs = [
     display: block;
     width: 100%;
     height: auto;
+    filter: drop-shadow(0 28px 24px #17335f20);
+  }
+  .kladno-training {
+    background: #edf5fa;
+  }
+  .kladno-training .section-heading h2 {
+    max-width: 700px;
+  }
+  .kladno-routes {
+    background: #e3f4f0;
+  }
+  .kladno-routes .route-card {
+    border-color: #a4d7ce;
+    background: #fff;
+  }
+  .kladno-reasons {
+    background: #fff;
+  }
+  .kladno-reasons .card {
+    border-color: #c9e1df;
+    border-top: 5px solid var(--brand);
+    box-shadow: 0 14px 32px #17335f0c;
+  }
+  .kladno-reasons .card:nth-child(even) {
+    border-top-color: var(--blue);
+  }
+  .kladno-approach {
+    background: #e9f0fa;
+  }
+  .kladno-approach .approach-card {
+    border-color: #c7d8ee;
+  }
+  .kladno-theory {
+    background: #fff;
+  }
+  .kladno-course-offer {
+    background:
+      radial-gradient(circle at 0% 100%, #4ab9ab35 0%, transparent 36%),
+      linear-gradient(120deg, #17335f 0%, #244d84 100%);
+  }
+  .kladno-course-offer h2,
+  .kladno-course-offer .lead {
+    color: #fff;
+  }
+  .kladno-course-offer .eyebrow {
+    color: #a7e6dc;
+  }
+  .course-offer-points {
+    margin-top: 24px;
+    color: #d7e9f6;
+    font-weight: 650;
+  }
+  .course-offer-points span {
+    color: #7ee0d0;
+    padding-inline: 8px;
+  }
+  .kladno-course-offer .price-card {
+    border: 2px solid #b7e6dc;
+    box-shadow: 0 24px 56px #0d234952;
+  }
+  .kladno-course-offer .price-card strong {
+    color: var(--ink);
+  }
+  .kladno-contact {
+    background: linear-gradient(145deg, #f8fcfb, #eaf5f3);
   }
   .narrow-heading {
     max-width: 780px;
@@ -424,9 +497,10 @@ const faqs = [
   .training-timeline li {
     min-height: 220px;
     padding: 26px;
-    border: 1px solid var(--line);
+    border: 1px solid #c9dce7;
     border-radius: var(--radius-lg);
     background: #fff;
+    box-shadow: 0 10px 25px #17335f0c;
   }
   .training-timeline li > span {
     display: inline-grid;
@@ -435,8 +509,8 @@ const faqs = [
     place-items: center;
     margin-bottom: 24px;
     border-radius: 50%;
-    background: var(--brand-soft);
-    color: var(--brand-dark);
+    background: var(--ink);
+    color: #fff;
     font-size: 0.78rem;
     font-weight: 800;
   }
@@ -533,6 +607,9 @@ const faqs = [
     margin: 12px 0;
     font-size: clamp(2.1rem, 5vw, 3.3rem);
     color: var(--ink);
+  }
+  .price-card .actions .primary {
+    box-shadow: 0 10px 22px #126b6029;
   }
   .price-card .actions {
     margin-top: 24px;

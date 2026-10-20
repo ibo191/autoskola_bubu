@@ -112,7 +112,7 @@ const breadcrumbSchema = {
         : `Autoškola BuBu ${branch.name}. ${branch.address}. Kurz B za ${money(branch.bPrice)}. Osobní zápis a výcvik s lidským přístupem.`}
   schema={[branchSchema, breadcrumbSchema]}
 >
-  <section class="page-hero">
+  <section class:list={['page-hero', { 'kladno-hero': isKladno }]}>
     <div class="container">
       <nav class="breadcrumbs" aria-label="Drobečková navigace">
         <a href="/">Domů</a><span>/</span><span>{branch.name}</span>
@@ -125,7 +125,7 @@ const breadcrumbSchema = {
               isStrizkov
                 ? 'Autoškola Praha 8 – Střížkov. Řidičák bez stresu.'
                 : isKladno
-                  ? `Autoškola Kladno. Řidičák B za ${money(branch.bPrice)}.`
+                  ? 'Autoškola Kladno. Řidičák bez stresu.'
                   : isStatenice
                     ? 'Autoškola Statenice'
                     : `Za řidičákem do ${branch.name}.`
@@ -135,7 +135,7 @@ const breadcrumbSchema = {
               isStrizkov
                 ? 'Řidičák skupiny B – manuál nebo automat a možnost absolvovat kurz v režimu L17. Výcvik má jasný plán, přípravu na reálný pražský provoz a lidský přístup bez křiku.'
                 : isKladno
-                  ? 'Manuál nebo režim L17. Začnete na cvičišti, v provozu postupujete vlastním tempem a na nic nejste sami.'
+                  ? 'Manuál nebo režim L17. Začnete na cvičišti a do provozu vyjedete postupně, bez křiku a zbytečného stresu.'
                   : isStatenice
                     ? 'Naučíme vás řídit postupně – od prvních metrů na cvičišti až po samostatnější jízdu v běžném provozu. Ve Statenicích a okolí trénujeme rozjezdy do kopce, menší ulice, zóny 30, zatáčky i jízdu mimo obec.'
                     : 'Začínáte od nuly? To je v pořádku. V BuBu vás provedeme od prvního rozjezdu až k závěrečné zkoušce.'
@@ -149,24 +149,22 @@ const breadcrumbSchema = {
               </p>
             )
           }{
-            isKladno && (
-              <p class="hero-copy">
-                Přihlášku odešlete online hned teď. V Kladně nečekáte na volný termín osobního
-                zápisu; pokyny k zahájení kurzu dostanete e-mailem.
-              </p>
-            )
-          }{
             isStatenice && (
               <p class="hero-copy">
                 Výcvik probíhá ve Statenicích a okolních obcích na Praze-západ. Trasy přizpůsobujeme
                 zkušenostem žáka, aby náročnost rostla postupně.
               </p>
             )
-          }<div class="actions">
+          }{isKladno && (
+            <div class="kladno-hero-offer" aria-label="Cena a možnosti kurzu">
+              <div><span>Skupina B na manuálu</span><strong>{money(branch.bPrice)}</strong></div>
+              <span class="kladno-hero-l17">Také pro L17</span>
+            </div>
+          )}<div class="actions">
             <button class="btn primary" data-order disabled data-branch={branch.id} data-course="b">
               {
                 isKladno
-                  ? 'Přihlásit se v Kladně ↗'
+                  ? 'Vyplnit přihlášku v Kladně ↗'
                   : isStrizkov
                     ? 'Přihlásit se do kurzu ↗'
                     : 'Chci začít řidičák ↗'
@@ -190,7 +188,7 @@ const breadcrumbSchema = {
           </div><p class="branch-price">
             {
               isKladno ? (
-                'Skupina B na manuálu · také v režimu L17 · přihlášení online'
+                'Online přihláška · pokyny e-mailem · bez osobního zápisu'
               ) : (
                 <>
                   Skupina B <strong>{money(branch.bPrice)}</strong> · jedna cena, bez balíčků
@@ -198,7 +196,13 @@ const breadcrumbSchema = {
               )
             }
           </p>
-        </div><Image
+          {isKladno && (
+            <p class="hero-copy">
+              Přihlášku odešlete online hned teď. V Kladně nečekáte na osobní zápis; pokyny k
+              zahájení kurzu dostanete e-mailem.
+            </p>
+          )}
+        </div><div class:list={['branch-hero-image', { 'kladno-hero-image': isKladno }]}><Image
           src={manualCar}
           alt="Bílá Škoda Fabia Autoškoly BuBu pro manuální výcvik"
           widths={[480, 800]}
@@ -206,11 +210,11 @@ const breadcrumbSchema = {
           format="webp"
           loading="eager"
           fetchpriority="high"
-        />
+        />{isKladno && <span class="kladno-image-caption">Začnete v klidu. Jízdy přizpůsobíme vašemu tempu.</span>}</div>
       </div>
     </div>
   </section>
-  <div class="local-trust">
+  <div class:list={['local-trust', { 'kladno-trust': isKladno }]}>
     <div class="container">
       <span>✓ Skupina B – manuál{branch.id === 'strizkov' ? ' i automat' : ''}</span><span
         >✓ Možnost kurzu v režimu L17</span
@@ -460,6 +464,129 @@ const breadcrumbSchema = {
   <FinalCta branch={branch.id} />
 </Base>
 <style>
+  .kladno-hero {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 93% 5%, #a9e5dd 0, transparent 31%),
+      linear-gradient(125deg, #f0faf8 0%, #e7f4f2 48%, #e2eef9 100%);
+  }
+  .kladno-hero::before {
+    content: '';
+    position: absolute;
+    width: 410px;
+    height: 410px;
+    left: -230px;
+    bottom: -260px;
+    border: 90px solid #4ab9ab22;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .kladno-hero .container {
+    position: relative;
+  }
+  .kladno-hero .split {
+    gap: clamp(34px, 5vw, 72px);
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  }
+  .kladno-hero .eyebrow {
+    display: inline-flex;
+    border-radius: 999px;
+    border: 1px solid #89cbc2;
+    background: #ffffffc9;
+    padding: 9px 15px;
+    margin-bottom: 20px;
+  }
+  .kladno-hero h1 {
+    font-size: clamp(2.7rem, 5vw, 4.5rem);
+    max-width: 760px;
+  }
+  .kladno-hero .lead {
+    font-size: clamp(1.06rem, 1.5vw, 1.25rem);
+    line-height: 1.6;
+  }
+  .kladno-hero .hero-copy {
+    max-width: 590px;
+    font-size: 0.9rem;
+  }
+  .kladno-hero-offer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 26px;
+  }
+  .kladno-hero-offer > div {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    padding: 11px 17px;
+    border-radius: 13px;
+    background: var(--ink);
+    color: #fff;
+    box-shadow: 0 13px 27px #17335f25;
+  }
+  .kladno-hero-offer div span {
+    font-size: 0.78rem;
+    font-weight: 650;
+  }
+  .kladno-hero-offer strong {
+    font-size: clamp(1.55rem, 2.2vw, 2rem);
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+  .kladno-hero-l17 {
+    border-radius: 999px;
+    background: #c8eee8;
+    color: #0e5f57;
+    font-size: 0.76rem;
+    font-weight: 750;
+    padding: 10px 13px;
+  }
+  .kladno-hero .actions {
+    margin-top: 25px;
+  }
+  .kladno-hero .btn.primary {
+    box-shadow: 0 12px 25px #126b6029;
+  }
+  .kladno-hero-image {
+    position: relative;
+    padding: 16px;
+    border-radius: 32px;
+    background: #ffffff9c;
+    border: 1px solid #ffffffd9;
+    box-shadow: 0 24px 65px #17335f1c;
+    transform: rotate(1.3deg);
+  }
+  .kladno-hero-image :global(img) {
+    width: 100%;
+    border-radius: 22px;
+    transform: rotate(-1.3deg);
+  }
+  .kladno-image-caption {
+    position: absolute;
+    left: 0;
+    bottom: 10%;
+    max-width: 245px;
+    padding: 14px 17px;
+    border-radius: 12px;
+    background: var(--ink);
+    color: #fff;
+    box-shadow: 0 12px 25px #17335f33;
+    font-size: 0.8rem;
+    font-weight: 650;
+    line-height: 1.45;
+    transform: rotate(-3deg) translateX(-12%);
+  }
+  .kladno-trust {
+    background: var(--ink);
+    color: #fff;
+    border-bottom: 0;
+  }
+  .kladno-trust .container {
+    justify-content: space-between;
+  }
   .hero-copy {
     margin-top: 18px;
     max-width: 650px;
@@ -613,6 +740,21 @@ const breadcrumbSchema = {
     }
   }
   @media (max-width: 640px) {
+    .kladno-hero .split {
+      grid-template-columns: 1fr;
+    }
+    .kladno-hero-image {
+      transform: none;
+      margin: 12px 8px 18px;
+    }
+    .kladno-hero-image :global(img) {
+      transform: none;
+    }
+    .kladno-image-caption {
+      left: 12px;
+      bottom: -18px;
+      transform: none;
+    }
     .local-trust .container {
       gap: 12px 20px;
       font-size: 0.65rem;
