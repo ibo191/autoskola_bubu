@@ -4,6 +4,7 @@ import OrderDialog from '../components/OrderDialog.astro';
 import CookieConsent from '../components/CookieConsent.astro';
 import GoogleTag from '../components/GoogleTag.astro';
 import { branches } from '../lib/catalog';
+import { isInternalAdminPath } from '../lib/admin-route';
 interface Props {
   title: string;
   description: string;
@@ -29,6 +30,7 @@ const {
   hideFooter = false,
 } = Astro.props;
 const path = Astro.url.pathname;
+const isInternalAdmin = isInternalAdminPath(path);
 const canonical = new URL(path, 'https://www.autoskolabubu.cz').href;
 const pageTitle = title.includes('Autoškola BuBu') ? title : `${title} | Autoškola BuBu`;
 const isProduction =
@@ -129,8 +131,8 @@ const nav = [
           set:html={JSON.stringify(structuredData).replace(/</g, '\\u003c')}
         />
       )
-    }{/^AW-\d+$/i.test(googleTagId) && <GoogleTag />}</head
-  ><body data-recaptcha-site-key={recaptchaSiteKey} data-google-tag-id={googleTagId}>
+    }{!isInternalAdmin && /^AW-\d+$/i.test(googleTagId) && <GoogleTag />}</head
+  ><body data-recaptcha-site-key={recaptchaSiteKey} data-google-tag-id={isInternalAdmin ? undefined : googleTagId}>
     <a class="skip" href="#main">Přeskočit na obsah</a>
     {
       !hideHeader && (
