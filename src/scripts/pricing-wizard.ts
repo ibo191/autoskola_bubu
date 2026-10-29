@@ -166,7 +166,7 @@ function focusPanel() {
 function goto(step: Step, announce = true) {
   active = step;
   render();
-  if (announce && step !== 'result') focusPanel();
+  if (announce) focusPanel();
 }
 function advance() {
   const route = steps();
@@ -290,7 +290,9 @@ function render() {
 }
 async function requestQuote() {
   const sequence = ++quoteSequence;
-  show('#pricing-results', false);
+  show('#result-loading', true);
+  show('.result-heading', false);
+  show('.offer-card', false);
   const selection: Record<string, unknown> = {
     course: courseId(),
     branch: state.branch,
@@ -332,14 +334,16 @@ async function requestQuote() {
       return;
     }
     showOffer(selection, quote);
-    show('#pricing-results', true);
-    focusPanel();
+    show('#result-loading', false);
+    show('.result-heading', true);
+    show('.offer-card', true);
   } catch {
     if (sequence === quoteSequence)
       showContact('Cenu se teď nepodařilo načíst. Ozvěte se nám a výběr spolu projdeme.');
   }
 }
 function showContact(message: string) {
+  show('#pricing-results', false);
   $('#contact-message').textContent = message;
   show('#contact-result', true);
 }

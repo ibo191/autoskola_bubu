@@ -16,6 +16,7 @@ const scriptSources = [
   'https://www.recaptcha.net',
   'https://www.googletagmanager.com',
   'https://www.googleadservices.com',
+  'https://googleads.g.doubleclick.net',
 ];
 const indexableStaticPaths = new Set([
   '/',

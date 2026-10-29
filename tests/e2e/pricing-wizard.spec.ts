@@ -97,3 +97,21 @@ test('mobile keeps one question visible and no horizontal overflow', async ({ pa
   await expect(page.locator('#pricing-wizard fieldset:visible')).toHaveCount(1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
+
+test('result panel stays visible while the server calculates the quote', async ({ page }) => {
+  await page.route('**/api/quote', async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 900));
+    await route.continue();
+  });
+  await page.goto('/cenik');
+  await page.locator('[data-category="auto"]').click();
+  await page.locator('#branch-question [data-branch="strizkov"]').click();
+  await page.locator('#transmission-question [data-transmission="manual"]').click();
+  await page.locator('[data-mode="standard"]').click();
+  await expect(page.locator('#pricing-results')).toBeVisible();
+  await expect(page.locator('#result-loading')).toBeVisible();
+  await expect(page.locator('.offer-card')).toBeHidden();
+  await expect(page.locator('#offer-price')).toHaveText('25 900 Kč');
+  await expect(page.locator('#result-loading')).toBeHidden();
+  await expect(page.locator('.offer-card')).toBeVisible();
+});

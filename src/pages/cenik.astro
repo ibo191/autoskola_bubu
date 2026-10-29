@@ -360,14 +360,19 @@ const priceRows = [
           aria-labelledby="result-title"
           aria-live="polite"
         >
-          <div class="result-heading">
+          <div id="result-loading" class="result-loading" role="status" aria-live="polite" hidden>
+            <span class="eyebrow">Váš kurz</span>
+            <h2>Načítáme vaši cenu…</h2>
+            <p>Vybranou variantu právě ověřujeme v aktuálním ceníku.</p>
+          </div>
+          <div class="result-heading" hidden>
             <div>
               <span class="eyebrow">Váš kurz</span><h2 id="result-title">
                 Tohle je varianta pro vás.
               </h2>
             </div><button type="button" class="text-link reset-selection">Začít znovu</button>
           </div>
-          <article class="offer-card">
+          <article class="offer-card" hidden>
             <div>
               <span class="eyebrow" id="offer-label"></span><h3 id="offer-title"></h3><p
                 id="offer-description"
@@ -711,6 +716,25 @@ const priceRows = [
   .decision-card .pricing-results,
   .decision-card .contact-result {
     margin-top: 0;
+  }
+  .result-loading {
+    min-height: 250px;
+    padding: 34px;
+    border: 1px solid #a5d9d1;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, #effaf8, #fff 66%);
+  }
+  .result-loading h2 {
+    margin-top: 12px;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+  }
+  .result-loading p {
+    margin-top: 12px;
+  }
+  .result-loading[hidden],
+  .result-heading[hidden],
+  .offer-card[hidden] {
+    display: none;
   }
   .decision-card .offer-card {
     box-shadow: none;
