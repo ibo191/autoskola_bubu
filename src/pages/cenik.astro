@@ -2,7 +2,67 @@
 export const prerender = true;
 import Base from '../layouts/Base.astro';
 import FinalCta from '../components/FinalCta.astro';
-import { branches, courses, fees, money, priceSource, examAuthorities } from '../lib/catalog';
+import {
+  branches,
+  courses,
+  fees,
+  money,
+  priceSource,
+  examAuthorities,
+  prices,
+} from '../lib/catalog';
+
+const priceRows = [
+  { name: 'Skupina B', variant: 'manuál', price: [25900, 20000, 25900], slug: 'ridicak-skupina-b' },
+  {
+    name: 'Skupina BA',
+    variant: 'automat · kód 78',
+    price: [25900, null, null],
+    slug: 'ridicak-skupina-b-automat',
+  },
+  { name: 'L17', variant: 'manuál', price: [25900, 20000, 25900], slug: 'l17' },
+  { name: 'BA-L17', variant: 'automat · kód 78', price: [25900, null, null], slug: 'l17' },
+  ...(['AM', 'A2', 'A'] as const).flatMap((group) => [
+    {
+      name: `Skupina ${group}`,
+      variant: 'Moto Základ',
+      price: [prices.motoBasic, null, null],
+      slug: `ridicak-skupina-${group.toLowerCase()}`,
+    },
+    {
+      name: `Skupina ${group}`,
+      variant: 'Moto Jistota',
+      price: [prices.motoConfidence, null, null],
+      slug: `ridicak-skupina-${group.toLowerCase()}`,
+    },
+  ]),
+  {
+    name: 'Skupina A1',
+    variant: 'Moto Jistota',
+    price: [prices.motoConfidence, null, null],
+    slug: 'ridicak-skupina-a1',
+  },
+  {
+    name: 'Rozšíření A2 / A',
+    variant: 'doplňovací zkouška při splnění podmínek',
+    price: [prices.supplement, null, null],
+    slug: 'ridicak-skupina-a2',
+  },
+  { name: 'Rozšíření B96', variant: 'přívěs', price: [prices.b96, null, null], slug: 'b96' },
+  { name: 'Skupina B+E', variant: 'přívěs', price: [prices.be, null, null], slug: 'be' },
+  {
+    name: 'Kondiční jízdy',
+    variant: 'manuál · 90 minut',
+    price: [1600, 1600, 1600],
+    slug: 'kondicni-jizdy',
+  },
+  {
+    name: 'Kondiční jízdy',
+    variant: 'automat · 90 minut',
+    price: [1600, null, null],
+    slug: 'kondicni-jizdy',
+  },
+] as const;
 ---
 
 <Base
@@ -28,7 +88,7 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
     <div class="container">
       <div class="decision-header">
         <span class="eyebrow">Průvodce ceníkem</span><h2>Pojďme najít správný kurz.</h2><p>
-          Žádné hledání v tabulkách. Vyberte pár možností a hned uvidíte cenu kurzu pro vás.
+          Odpovězte na pár otázek a hned uvidíte cenu kurzu pro vás.
         </p>
       </div>
 
@@ -38,7 +98,8 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
             <span id="wizard-step-label">Krok 1</span><button
               type="button"
               id="wizard-restart"
-              class="text-link">Začít znovu</button>
+              class="text-link">Začít znovu</button
+            >
           </div><div
             class="progress-track"
             role="progressbar"
@@ -289,7 +350,8 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
             type="button"
             id="wizard-licences-next"
             class="btn secondary"
-            hidden>Potvrdit oprávnění →</button>
+            hidden>Potvrdit oprávnění →</button
+          >
         </div>
         <section
           id="pricing-results"
@@ -340,6 +402,58 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
           >
         </section>
       </div>
+
+      <section class="price-list" aria-labelledby="price-list-title" data-reveal>
+        <div class="price-list-heading">
+          <span class="eyebrow">Všechny ceny pohromadě</span>
+          <h2 id="price-list-title">Přehledný ceník kurzů</h2>
+          <p>Chcete ceny raději porovnat najednou? Tady jsou aktuální varianty podle pobočky.</p>
+        </div>
+        <div
+          class="price-table-wrap"
+          tabindex="0"
+          role="region"
+          aria-label="Tabulka cen kurzů podle pobočky"
+        >
+          <table>
+            <thead
+              ><tr
+                ><th scope="col">Kurz</th><th scope="col">Střížkov</th><th scope="col">Kladno</th
+                ><th scope="col">Statenice</th></tr
+              ></thead
+            >
+            <tbody>
+              {
+                priceRows.map((row) => (
+                  <tr>
+                    <th scope="row">
+                      <>
+                        <a href={`/kurzy/${row.slug}`}>{row.name}</a>
+                        <small>{row.variant}</small>
+                      </>
+                    </th>
+                    {row.price.map((amount) => (
+                      <td>
+                        {amount === null ? (
+                          <span class="unavailable" aria-label="Není dostupné">
+                            —
+                          </span>
+                        ) : (
+                          money(amount)
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <p class="price-table-note">
+          Motocyklové kurzy: nyní sbíráme pouze předběžný zájem na sezonu 2027. Cena varianty závisí
+          na vašem dosavadním oprávnění. Částky nezahrnují samostatné poplatky za zkoušku.
+        </p>
+      </section>
       <aside class="fees" data-reveal>
         <div class="section-heading">
           <div>
@@ -431,9 +545,18 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
 </script>
 
 <style>
+  .page-hero .container {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+  }
+  .page-hero .lead {
+    max-width: 690px;
+  }
   .decision-header {
     max-width: 760px;
-    margin-bottom: 30px;
+    margin: 0 auto 30px;
+    text-align: center;
   }
   .decision-header p {
     margin-top: 14px;
@@ -442,6 +565,7 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
     display: grid;
     gap: 18px;
     max-width: 900px;
+    margin-inline: auto;
     padding: clamp(16px, 3vw, 30px);
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
@@ -475,17 +599,97 @@ import { branches, courses, fees, money, priceSource, examAuthorities } from '..
     flex-wrap: wrap;
     gap: 8px;
   }
-  #wizard-path button {
-    padding: 6px 10px;
-    border: 1px solid var(--line);
+  :global(#wizard-path button) {
+    padding: 8px 13px;
+    border: 1px solid #bad9d5;
     border-radius: 99px;
-    background: #f1f8f8;
-    color: var(--ink);
+    background: #eff8f6;
+    color: var(--blue);
     cursor: pointer;
-    font-size: 0.72rem;
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 650;
+    line-height: 1.2;
   }
-  #wizard-path button:hover {
+  :global(#wizard-path button:hover),
+  :global(#wizard-path button:focus-visible) {
     border-color: var(--brand);
+    background: #e1f4f0;
+    outline-color: var(--blue);
+  }
+  .price-list {
+    margin-top: 72px;
+  }
+  .price-list-heading {
+    max-width: 760px;
+    margin-bottom: 24px;
+  }
+  .price-list-heading p {
+    margin-top: 10px;
+  }
+  .price-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: #fff;
+    box-shadow: var(--shadow);
+  }
+  .price-table-wrap:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 3px;
+  }
+  .price-table-wrap table {
+    width: 100%;
+    min-width: 650px;
+    border-collapse: collapse;
+    text-align: left;
+  }
+  .price-table-wrap thead {
+    background: #eaf6f4;
+    color: var(--ink);
+  }
+  .price-table-wrap th,
+  .price-table-wrap td {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .price-table-wrap tbody tr:last-child th,
+  .price-table-wrap tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  .price-table-wrap tbody tr:nth-child(even) {
+    background: #f8fbfa;
+  }
+  .price-table-wrap tbody tr:hover {
+    background: #edf8f6;
+  }
+  .price-table-wrap tbody th {
+    font-weight: 700;
+  }
+  .price-table-wrap tbody th a {
+    color: var(--blue);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .price-table-wrap tbody th small {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .price-table-wrap td {
+    white-space: nowrap;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .price-table-wrap .unavailable {
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .price-table-note {
+    max-width: 850px;
+    margin-top: 16px;
+    font-size: 0.82rem;
   }
   .wizard-navigation {
     display: flex;

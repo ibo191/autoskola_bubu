@@ -9,6 +9,7 @@ import {
   availableAt,
   displayPrice,
   money,
+  prices,
   motoEnrollmentPausedMessage,
 } from '../../lib/catalog';
 import automaticScala from '../../assets/courses/b-automatic-scala.png';
@@ -78,10 +79,13 @@ const courseIcons = {
         role="group"
         aria-label="Filtrovat kurzy podle pobočky"
       >
-        <button type="button" data-course-branch="all" aria-pressed="true">Všechny kurzy</button>
         {
           branches.map((branch) => (
-            <button type="button" data-course-branch={branch.id} aria-pressed="false">
+            <button
+              type="button"
+              data-course-branch={branch.id}
+              aria-pressed={branch.id === 'strizkov' ? 'true' : 'false'}
+            >
               {branch.name}
             </button>
           ))
@@ -100,14 +104,21 @@ const courseIcons = {
         {
           courses.map((course) => {
             const availableBranches = branches.filter((branch) => availableAt(course, branch.id));
-            const price = Math.min(
-              ...availableBranches.map((branch) => displayPrice(course, branch.id)),
+            const branchPrices = Object.fromEntries(
+              availableBranches.map((branch) => [
+                branch.id,
+                course.id === 'a1' ? prices.motoConfidence : displayPrice(course, branch.id),
+              ]),
             );
+            const price =
+              course.id === 'a1' ? prices.motoConfidence : displayPrice(course, 'strizkov');
             return (
               <article
                 class="course-tile"
                 data-branches={availableBranches.map((branch) => branch.id).join(' ')}
                 data-category={course.category}
+                data-course-id={course.id}
+                data-prices={JSON.stringify(branchPrices)}
               >
                 <a
                   class="course-tile-overlay"
@@ -145,11 +156,15 @@ const courseIcons = {
                 <p>{course.description}</p>
                 <div class="tile-meta">
                   <span>
-                    {course.category === 'moto' ? 'od ' : ''}
                     {money(price)}
                     {course.id === 'kondicni' ? ' / 90 min' : '*'}
                   </span>
-                  <small>{availableBranches.map((branch) => branch.name).join(' · ')}</small>
+                  <small class="price-branch">
+                    Střížkov
+                    {course.category === 'moto'
+                      ? ` · ${course.id === 'a1' ? 'Moto Jistota' : 'Moto Základ'}`
+                      : ''}
+                  </small>
                 </div>
                 <div class="tile-actions">
                   <a class="text-link" href={`/kurzy/${course.slug}`}>
@@ -160,7 +175,13 @@ const courseIcons = {
                       Zjistit více
                     </a>
                   ) : (
-                    <button class="btn secondary" data-order disabled data-course={course.id}>
+                    <button
+                      class="btn secondary"
+                      data-order
+                      disabled
+                      data-course={course.id}
+                      data-branch="strizkov"
+                    >
                       Přihlásit se
                     </button>
                   )}
@@ -171,8 +192,8 @@ const courseIcons = {
         }
       </div>
       <p class="small fee-note">
-        * Cena kurzu nezahrnuje poplatky za zkoušku. Přesnou cenu podle pobočky a varianty najdete v
-        ceníku.
+        * Cena kurzu nezahrnuje poplatky za zkoušku. U motorek je zobrazená cena uvedené varianty;
+        vhodnou variantu určí dosavadní oprávnění.
       </p>
     </div>
   </section>
@@ -200,7 +221,7 @@ const courseIcons = {
     const categoryButtons = document.querySelectorAll<HTMLButtonElement>('[data-course-category]');
     const tiles = document.querySelectorAll<HTMLElement>('.course-tile');
     const motoNotice = document.querySelector<HTMLElement>('#moto-enrollment-notice');
-    let selectedBranch = 'all';
+    let selectedBranch = 'strizkov';
     let selectedCategory = 'all';
     const filterTiles = () => {
       tiles.forEach((tile) => {
@@ -210,6 +231,32 @@ const courseIcons = {
         const categoryMatches =
           selectedCategory === 'all' || tile.dataset.category === selectedCategory;
         tile.hidden = !branchMatches || !categoryMatches;
+        const price = (JSON.parse(tile.dataset.prices ?? '{}') as Record<string, number>)[
+          selectedBranch
+        ];
+        if (price !== undefined) {
+          const amount = tile.querySelector<HTMLElement>('.tile-meta span');
+          if (amount)
+            amount.textContent =
+              new Intl.NumberFormat('cs-CZ', {
+                style: 'currency',
+                currency: 'CZK',
+                maximumFractionDigits: 0,
+              }).format(price) + (tile.dataset.courseId === 'kondicni' ? ' / 90 min' : '*');
+          const branchLabel = tile.querySelector<HTMLElement>('.price-branch');
+          if (branchLabel)
+            branchLabel.textContent =
+              (selectedBranch === 'kladno'
+                ? 'Kladno'
+                : selectedBranch === 'statenice'
+                  ? 'Statenice'
+                  : 'Střížkov') +
+              (tile.dataset.category === 'moto'
+                ? ` · ${tile.dataset.courseId === 'a1' ? 'Moto Jistota' : 'Moto Základ'}`
+                : '');
+        }
+        const order = tile.querySelector<HTMLButtonElement>('[data-order]');
+        if (order) order.dataset.branch = selectedBranch;
       });
       if (motoNotice) motoNotice.hidden = selectedCategory !== 'moto';
     };
