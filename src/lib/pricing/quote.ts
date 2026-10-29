@@ -54,6 +54,15 @@ export type Quote =
     };
 
 export function quote(input: unknown): Quote {
+  return calculateQuote(input, false);
+}
+
+/** Pricing preview only. Ordering remains blocked by quote(). */
+export function quoteForDisplay(input: unknown): Quote {
+  return calculateQuote(input, true);
+}
+
+function calculateQuote(input: unknown, allowPausedMoto: boolean): Quote {
   const parsed = selectionSchema.safeParse(input);
   if (!parsed.success)
     return {
@@ -83,7 +92,7 @@ export function quote(input: unknown): Quote {
       code: 'UNAVAILABLE',
       message: 'Tato kombinace kurzu a pobočky není dostupná.',
     };
-  if (course.category === 'moto' && motoEnrollmentPaused)
+  if (course.category === 'moto' && motoEnrollmentPaused && !allowPausedMoto)
     return { ok: false, code: 'UNAVAILABLE', message: motoEnrollmentPausedMessage };
   const selectedAddons: {
     id: string;
@@ -144,6 +153,10 @@ export function quote(input: unknown): Quote {
       code: 'CONTACT_REQUIRED',
       message: 'Zvolenou nebo vyšší motocyklovou skupinu už držíte. Správný postup ověří Střížkov.',
     };
+  if (s.course === 'a1') {
+    if (s.package !== 'moto-confidence') return choose(['moto-confidence']);
+    return result(prices.motoConfidence, 'standard', 2);
+  }
   const direct =
     (heldMoto === 'A1' && s.course === 'a2') || (heldMoto === 'A2' && s.course === 'a');
   if (direct && (!s.holdingPeriod || ['unknown', 'exactly-two'].includes(s.holdingPeriod)))

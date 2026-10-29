@@ -96,11 +96,21 @@ if (!isInternalAdminPath(window.location.pathname) && /^AW-\d+$/i.test(googleTag
 
   function track(name: string, parameters: Record<string, string | number> = {}) {
     if (!initialized || googleWindow[disabledKey]) return false;
+    const configuratorEvents = [
+      'course_config_start',
+      'course_type_selected',
+      'course_location_selected',
+      'course_transmission_selected',
+      'course_config_completed',
+      'course_registration_click',
+    ];
+    if (configuratorEvents.includes(name) && !readConsent()?.analytics) return false;
     // The object supports a future GTM Custom Event trigger; the gtag command
     // continues to feed the one existing Google tag and its GA4 destination.
     // generate_lead is sent through the Google tag once; mirroring it as a GTM
     // Custom Event could fire a second conversion tag for the same order.
-    if (name !== 'generate_lead') (window.dataLayer ??= []).push({ event: name, ...parameters });
+    if (name !== 'generate_lead' && !configuratorEvents.includes(name))
+      (window.dataLayer ??= []).push({ event: name, ...parameters });
     gtag('event', name, parameters);
     return true;
   }
@@ -162,6 +172,11 @@ if (!isInternalAdminPath(window.location.pathname) && /^AW-\d+$/i.test(googleTag
     if (!detail || typeof detail.name !== 'string') return;
     track(detail.name, {
       ...(typeof detail.course === 'string' ? { course: detail.course.toUpperCase() } : {}),
+      ...(typeof detail.courseType === 'string' ? { course_type: detail.courseType } : {}),
+      ...(typeof detail.courseId === 'string' ? { course_id: detail.courseId } : {}),
+      ...(typeof detail.location === 'string' ? { location: detail.location } : {}),
+      ...(typeof detail.transmission === 'string' ? { transmission: detail.transmission } : {}),
+      ...(typeof detail.stepNumber === 'number' ? { step_number: detail.stepNumber } : {}),
       ...(typeof detail.branch === 'string' ? { branch: detail.branch } : {}),
       ...(typeof detail.applicationId === 'string' ? { application_id: detail.applicationId } : {}),
       ...(typeof detail.campaign === 'string' ? { campaign: detail.campaign } : {}),

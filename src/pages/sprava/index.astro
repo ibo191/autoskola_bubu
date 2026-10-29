@@ -7,6 +7,7 @@ import Base from '../../layouts/Base.astro';
 import { branches, courses, money } from '../../lib/catalog';
 import { requireLiveRepository } from '../../lib/server/live-order';
 import { appointmentReportBranches } from '../../lib/server/email/workflows';
+import { listMotoInterests } from '../../lib/moto-interest';
 import {
   isDate,
   orderPeriodRange,
@@ -142,6 +143,9 @@ const adminData = authorizedDashboard?.ok
   : repository && currentUser && Astro.request.method === 'POST'
     ? await timeAdminQuery('dashboard', () => repository.adminDashboard(dashboardInput))
     : null;
+const motoInterests = currentUser
+  ? await timeAdminQuery('moto-interest', () => listMotoInterests(process.env)).catch(() => null)
+  : null;
 if (currentUser && queryTimings.length) {
   Astro.response.headers.set(
     'Server-Timing',
@@ -442,6 +446,27 @@ const calendarDays = calendarDates.map((item) => ({
                   )}
                 </article>
               </div>
+            </section>
+
+            <section class="admin-panel" data-admin-panel="moto-interest">
+              <h2>Motorky 2027 – předběžný zájem</h2>
+              <p>Kontakty čekající na otevření přihlašování. Nejde o objednávky ani rezervovaná místa.</p>
+              {motoInterests === null ? <div class="notice schedule-error" role="alert">Seznam zájemců se nepodařilo načíst.</div> : (
+                <>
+                  <p><strong>Čeká: {motoInterests.length}{motoInterests.length === 200 ? '+' : ''}</strong></p>
+                  <div class="table-wrap"><table>
+                    <thead><tr><th>Datum</th><th>Jméno</th><th>Kontakt</th><th>Skupina</th><th>Oprávnění</th><th>Varianta</th></tr></thead>
+                    <tbody>{motoInterests.length ? motoInterests.map((item) => <tr>
+                      <td>{formatDateTime(item.created_at)}</td>
+                      <td>{item.first_name && item.last_name ? `${item.first_name} ${item.last_name}` : item.name}</td>
+                      <td><a href={`mailto:${item.email}`}>{item.email}</a><br /><a href={`tel:${item.phone}`}>{item.phone}</a></td>
+                      <td>{item.course.toUpperCase()}</td>
+                      <td>{item.licence_status === 'none' ? 'Bez oprávnění' : item.held_licences.join(', ') || 'Neuvedeno'}</td>
+                      <td>{item.package ? packageLabel(item.package) : 'Neuvedeno'}</td>
+                    </tr>) : <tr><td colspan="6">Zatím žádní zájemci.</td></tr>}</tbody>
+                  </table></div>
+                </>
+              )}
             </section>
 
             <section class="admin-panel" data-admin-panel="orders">

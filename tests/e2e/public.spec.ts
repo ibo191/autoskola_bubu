@@ -18,7 +18,10 @@ test('Kladno explains online enrollment and preselects B or L17 without appointm
   await expect(page.locator('.kladno-proof-visual img')).toBeVisible();
   await expect(page.locator('.kladno-proof figcaption')).toHaveCount(0);
 
-  await page.locator('.page-hero').getByRole('button', { name: 'Vyplnit přihlášku v Kladně ↗' }).click();
+  await page
+    .locator('.page-hero')
+    .getByRole('button', { name: 'Vyplnit přihlášku v Kladně ↗' })
+    .click();
   const dialog = page.getByRole('dialog');
   await expect(dialog.locator('[name="branch"]')).toHaveValue('kladno');
   await expect(dialog.locator('[name="course"]')).toHaveValue('b');
@@ -54,7 +57,7 @@ test('B pricing asks for transmission and L17, with manual only outside Prague',
   await page.getByRole('button', { name: 'Manuál', exact: true }).click();
   await page.getByRole('button', { name: /Kurz skupiny B/ }).click();
   await expect(page.locator('#offer-price')).toHaveText('20 000 Kč');
-  await expect(page.locator('#offer-variant')).toHaveText('Manuál');
+  await expect(page.locator('#offer-variant')).toHaveText('Klasický kurz · manuál');
   await expect(page.locator('.offer-price')).toContainText('Nezahrnuje poplatky za zkoušku.');
 });
 
@@ -107,18 +110,15 @@ test('Price guide transfers refresher quantity, branch and transmission to the o
   }
 });
 
-test('Moto enrollment is paused in the price guide while trailer courses remain Prague-only', async ({
+test('Moto price guide collects preliminary interest while trailer courses remain Prague-only', async ({
   page,
 }) => {
   await page.goto('/cenik');
   await page.getByRole('button', { name: /^Motorku/ }).click();
-  await expect(page.locator('#availability-message')).toContainText(
-    'Přihlašování do motocyklových kurzů je nyní pozastavené. Kurzy pro sezonu 2027 otevřeme během zimy.',
-  );
-  await expect(page.locator('#pricing-results')).toBeHidden();
+  await expect(page.locator('#branch-question [data-branch="kladno"]')).toBeDisabled();
+  await page.locator('#wizard-restart').click();
   await page.getByRole('button', { name: /^Auto s přívěsem/ }).click();
-  await page.getByRole('button', { name: /^Kladno/ }).click();
-  await expect(page.locator('#availability-message')).toContainText('pouze na pobočce Střížkov');
+  await expect(page.locator('#branch-question [data-branch="kladno"]')).toBeDisabled();
 });
 
 test('Prefilled order, server price, contact back navigation and booking calendar', async ({

@@ -2,15 +2,7 @@
 export const prerender = true;
 import Base from '../layouts/Base.astro';
 import FinalCta from '../components/FinalCta.astro';
-import {
-  branches,
-  courses,
-  fees,
-  money,
-  priceSource,
-  examAuthorities,
-  motoEnrollmentPausedMessage,
-} from '../lib/catalog';
+import { branches, courses, fees, money, priceSource, examAuthorities } from '../lib/catalog';
 ---
 
 <Base
@@ -41,6 +33,23 @@ import {
       </div>
 
       <div class="decision-card" id="pricing-wizard">
+        <div class="wizard-progress">
+          <div>
+            <span id="wizard-step-label">Krok 1</span><button
+              type="button"
+              id="wizard-restart"
+              class="text-link">Začít znovu</button>
+          </div><div
+            class="progress-track"
+            role="progressbar"
+            aria-label="Postup výběru kurzu"
+            aria-valuemin="1"
+            aria-valuemax="5"
+            aria-valuenow="1"
+          >
+            <span id="wizard-progress-fill"></span>
+          </div><nav id="wizard-path" aria-label="Upravit výběr"></nav>
+        </div>
         <fieldset class="question">
           <legend><span>01</span> Co chcete řídit?</legend><div
             class="choice-grid category-choices"
@@ -59,8 +68,20 @@ import {
               ></button
             >
             <button type="button" data-category="prives" aria-pressed="false"
-              ><img src="/icons/ui/blue-hands-wheel.webp" alt="" width="192" height="192" />Auto s
-              přívěsem <small>B96 nebo B+E podle toho, co potřebujete táhnout.</small></button
+              ><img
+                src="/icons/ui/trailer-blue.jpeg"
+                alt=""
+                width="192"
+                height="192"
+                class="trailer-blue"
+              /><img
+                src="/icons/ui/trailer-mint.jpeg"
+                alt=""
+                width="192"
+                height="192"
+                class="trailer-mint"
+              />Auto s přívěsem <small>B96 nebo B+E podle toho, co potřebujete táhnout.</small
+              ></button
             >
             <button type="button" data-category="kondicni" aria-pressed="false">
               <img src="/icons/ui/blue-hands-wheel.webp" alt="" width="192" height="192" />
@@ -93,15 +114,6 @@ import {
           </div>
         </fieldset>
 
-        <div
-          id="availability-message"
-          class="notice next-question"
-          data-moto-message={motoEnrollmentPausedMessage}
-          hidden
-          role="status"
-        >
-        </div>
-
         <fieldset class="question next-question" id="transmission-question" hidden>
           <legend><span>03</span> Jak chcete jezdit?</legend><div class="choice-grid compact">
             <button type="button" data-transmission="manual" aria-pressed="false">Manuál</button>
@@ -122,6 +134,7 @@ import {
           <label
             >Počet 90minutových bloků
             <select id="pricing-driving-blocks">
+              <option value="0">Vyberte počet jízd</option>
               {
                 Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
                   <option value={n}>
@@ -239,67 +252,94 @@ import {
           <legend><span>03</span> Jaké oprávnění potřebujete?</legend><div
             class="choice-grid compact"
           >
-            <button type="button" data-trailer="b96" aria-pressed="false">Rozšíření B96</button>
-            <button type="button" data-trailer="be" aria-pressed="false">Skupina B+E</button>
+            <button type="button" data-trailer="b96" aria-pressed="false"
+              ><img
+                src="/icons/ui/trailer-blue.jpeg"
+                alt=""
+                width="192"
+                height="192"
+                class="trailer-blue"
+              /><img
+                src="/icons/ui/trailer-mint.jpeg"
+                alt=""
+                width="192"
+                height="192"
+                class="trailer-mint"
+              />Rozšíření B96</button
+            >
+            <button type="button" data-trailer="be" aria-pressed="false"
+              ><img
+                src="/icons/ui/trailer-blue.jpeg"
+                alt=""
+                width="192"
+                height="192"
+                class="trailer-blue"
+              /><img
+                src="/icons/ui/trailer-mint.jpeg"
+                alt=""
+                width="192"
+                height="192"
+                class="trailer-mint"
+              />Skupina B+E</button
+            >
           </div>
         </fieldset>
-      </div>
-
-      <section
-        id="pricing-results"
-        class="pricing-results"
-        hidden
-        aria-labelledby="result-title"
-        aria-live="polite"
-      >
-        <div class="result-heading">
-          <div>
-            <span class="eyebrow">Váš kurz</span><h2 id="result-title">
-              Tohle je varianta pro vás.
-            </h2>
-          </div><button type="button" class="text-link reset-selection">Začít znovu</button>
+        <div class="wizard-navigation">
+          <button type="button" id="wizard-back" class="text-link" hidden>← Zpět</button><button
+            type="button"
+            id="wizard-licences-next"
+            class="btn secondary"
+            hidden>Potvrdit oprávnění →</button>
         </div>
-        <article class="offer-card">
-          <div>
-            <span class="eyebrow" id="offer-label"></span><h3 id="offer-title"></h3><p
-              id="offer-description"
-            >
-            </p><p>Podle vašeho výběru vám doporučujeme:</p><p
-              class="offer-variant"
-              id="offer-variant"
-            >
-            </p>
-          </div>
-          <div class="offer-price">
-            <strong id="offer-price"></strong><span id="offer-price-asterisk">*</span><small
-              id="offer-price-note"
-              >Cena odpovídá zvolené pobočce a variantě kurzu. * Nezahrnuje poplatky za zkoušku.</small
-            >
-          </div>
-          <div class="offer-actions">
-            <button class="btn primary" data-order disabled>Chci se přihlásit ↗</button><a
-              id="offer-detail"
-              class="text-link"
-              href="/cenik">Podrobnosti o kurzu</a
-            >
-          </div>
-        </article>
-      </section>
-
-      <section id="contact-result" class="contact-result notice" hidden aria-live="polite">
-        <h2>Výběr potřebujeme ověřit osobně.</h2><p id="contact-message"></p><a
-          class="btn secondary"
-          href="/kontakt">Kontaktovat Střížkov</a
+        <section
+          id="pricing-results"
+          class="pricing-results"
+          hidden
+          aria-labelledby="result-title"
+          aria-live="polite"
         >
-      </section>
+          <div class="result-heading">
+            <div>
+              <span class="eyebrow">Váš kurz</span><h2 id="result-title">
+                Tohle je varianta pro vás.
+              </h2>
+            </div><button type="button" class="text-link reset-selection">Začít znovu</button>
+          </div>
+          <article class="offer-card">
+            <div>
+              <span class="eyebrow" id="offer-label"></span><h3 id="offer-title"></h3><p
+                id="offer-description"
+              >
+              </p><p id="offer-summary"></p><p>Podle vašeho výběru vám doporučujeme:</p><p
+                class="offer-variant"
+                id="offer-variant"
+              >
+              </p>
+            </div>
+            <div class="offer-price">
+              <strong id="offer-price"></strong><span id="offer-price-asterisk">*</span><small
+                id="offer-price-note"
+                >Cena odpovídá zvolené pobočce a variantě kurzu. * Nezahrnuje poplatky za zkoušku.</small
+              >
+            </div>
+            <div class="offer-actions">
+              <button class="btn primary" data-order disabled>Chci se přihlásit ↗</button><a
+                id="moto-interest-link"
+                class="btn primary"
+                href="/motorky-2027"
+                hidden>Odeslat předběžný zájem ↗</a
+              ><a id="offer-detail" class="text-link" href="/cenik">Podrobnosti o kurzu</a>
+            </div>
+          </article>
+        </section>
 
-      <section class="notice">
-        <h2>Kondiční jízdy</h2><p>
-          800 Kč za 45 minut. Jezdíme vždy v 90minutových blocích za 1 600 Kč. Manuál na Střížkově,
-          v Kladně i Statenicích; automat pouze na Střížkově.
-        </p>
-        <a class="text-link" href="/kurzy/kondicni-jizdy">Vybrat počet jízd a pobočku →</a>
-      </section>
+        <section id="contact-result" class="contact-result notice" hidden aria-live="polite">
+          <h2>Výběr potřebujeme ověřit osobně.</h2><p id="contact-message"></p><a
+            class="btn secondary"
+            href="/kontakt">Kontaktovat Střížkov</a
+          >
+        </section>
+      </div>
       <aside class="fees" data-reveal>
         <div class="section-heading">
           <div>
@@ -387,335 +427,7 @@ import {
   set:html={JSON.stringify(courses).replace(/</g, '\u003c')}
 />
 <script>
-  import type { Quote } from '../lib/pricing/quote';
-  type CatalogCourse = {
-    id: string;
-    label: string;
-    name: string;
-    description: string;
-    slug: string;
-  };
-  const catalog = JSON.parse(
-    document.querySelector('#course-catalog')?.textContent ?? '[]',
-  ) as CatalogCourse[];
-  const state = {
-    category: '',
-    branch: '',
-    transmission: '',
-    mode: '',
-    motoTarget: '',
-    licenceStatus: '',
-    period: '',
-    package: '',
-    trailer: '',
-    drivingBlocks: 1,
-  };
-  const branchParam = new URLSearchParams(location.search).get('branch');
-  if (branchParam && ['strizkov', 'kladno', 'statenice'].includes(branchParam))
-    state.branch = branchParam;
-  let requestSequence = 0;
-  const show = (selector: string, visible: boolean) => {
-    const element = document.querySelector<HTMLElement>(selector);
-    if (element) element.hidden = !visible;
-  };
-  const press = (selector: string, value: string) =>
-    document
-      .querySelectorAll<HTMLButtonElement>(selector)
-      .forEach((button) =>
-        button.setAttribute('aria-pressed', String(Object.values(button.dataset).includes(value))),
-      );
-  const reveal = (selector: string) => {
-    show(selector, true);
-    document.querySelector(selector)?.classList.add('revealed');
-  };
-  const money = (amount: number) =>
-    new Intl.NumberFormat('cs-CZ', {
-      style: 'currency',
-      currency: 'CZK',
-      maximumFractionDigits: 0,
-    }).format(amount);
-  const heldLicences = () =>
-    [...document.querySelectorAll<HTMLInputElement>('input[name="held-licence"]:checked')].map(
-      (input) => input.value,
-    );
-  function clearResults() {
-    show('#pricing-results', false);
-    show('#contact-result', false);
-  }
-  function resetDependent() {
-    state.transmission = '';
-    state.mode = '';
-    state.motoTarget = '';
-    state.licenceStatus = '';
-    state.period = '';
-    state.package = '';
-    state.trailer = '';
-    state.drivingBlocks = 1;
-    document.querySelector<HTMLSelectElement>('#pricing-driving-blocks')!.value = '1';
-    document
-      .querySelectorAll<HTMLInputElement>('input[name="held-licence"]')
-      .forEach((input) => (input.checked = false));
-    clearResults();
-  }
-
-  function render() {
-    requestSequence += 1;
-    clearResults();
-    show('.fees', state.category !== 'kondicni');
-    for (const selector of [
-      '#transmission-question',
-      '#driving-blocks-question',
-      '#mode-question',
-      '#moto-target-question',
-      '#licence-status-question',
-      '#licences-question',
-      '#period-question',
-      '#package-question',
-      '#trailer-question',
-      '#availability-message',
-    ])
-      show(selector, false);
-    press('[data-category]', state.category);
-    press('[data-branch]', state.branch);
-    press('[data-transmission]', state.transmission);
-    press('[data-mode]', state.mode);
-    press('[data-moto-target]', state.motoTarget);
-    press('[data-licence-status]', state.licenceStatus);
-    press('[data-period]', state.period);
-    press('[data-package]', state.package);
-    press('[data-trailer]', state.trailer);
-    if (!state.category) return;
-    if (state.category === 'moto') {
-      const message = document.querySelector<HTMLElement>('#availability-message')!;
-      message.textContent = message.dataset.motoMessage ?? '';
-      reveal('#availability-message');
-      return;
-    }
-    show('#branch-question', true);
-    if (!state.branch) return;
-    if ((state.category === 'moto' || state.category === 'prives') && state.branch !== 'strizkov') {
-      const message = document.querySelector('#availability-message')!;
-      message.textContent =
-        state.category === 'moto'
-          ? 'Motocyklové kurzy poskytujeme pouze na pobočce Střížkov v Praze.'
-          : 'Kurzy pro přívěsy poskytujeme pouze na pobočce Střížkov v Praze.';
-      reveal('#availability-message');
-      return;
-    }
-    if (state.category === 'auto' || state.category === 'kondicni') {
-      reveal('#transmission-question');
-      const automatic = document.querySelector<HTMLButtonElement>(
-        '[data-transmission="automatic"]',
-      )!;
-      automatic.disabled = state.branch !== 'strizkov';
-      automatic.hidden = state.category === 'kondicni' && state.branch !== 'strizkov';
-      document.querySelector('#transmission-note')!.textContent =
-        state.category === 'kondicni'
-          ? state.branch === 'strizkov'
-            ? 'Kondiční jízdy na manuálu i automatu.'
-            : 'Kondiční jízdy na této pobočce probíhají pouze na manuálu.'
-          : state.branch === 'strizkov'
-            ? 'Manuál i automat jsou dostupné pro klasický kurz i L17.'
-            : 'Na této pobočce poskytujeme pouze výcvik s manuální převodovkou.';
-      if (!state.transmission) return;
-      if (state.category === 'kondicni') {
-        reveal('#driving-blocks-question');
-        void requestQuote({
-          course: 'kondicni',
-          branch: state.branch,
-          transmission: state.transmission,
-          drivingBlocks: state.drivingBlocks,
-          package: 'single',
-        });
-        return;
-      }
-      const selectedBranch = document.querySelector<HTMLButtonElement>(
-        `[data-branch="${state.branch}"]`,
-      );
-      const autoPrice = Number(selectedBranch?.dataset.bPrice ?? 0);
-      document
-        .querySelectorAll<HTMLElement>('[data-auto-card-price]')
-        .forEach((element) => (element.textContent = `${money(autoPrice)}*`));
-      reveal('#mode-question');
-      if (!state.mode) return;
-      const course =
-        state.mode === 'l17' ? 'l17' : state.transmission === 'automatic' ? 'b-automat' : 'b';
-      void requestQuote({
-        course,
-        branch: state.branch,
-        transmission: state.transmission,
-        package: 'single',
-      });
-      return;
-    }
-    if (state.category === 'prives') {
-      reveal('#trailer-question');
-      if (!state.trailer) return;
-      void requestQuote({ course: state.trailer, branch: state.branch, package: 'single' });
-      return;
-    }
-    reveal('#moto-target-question');
-    if (!state.motoTarget) return;
-    reveal('#licence-status-question');
-    if (!state.licenceStatus) return;
-    if (state.licenceStatus === 'none') {
-      void requestQuote({
-        course: state.motoTarget,
-        branch: state.branch,
-        heldLicences: [],
-        package: 'moto-confidence',
-      });
-      return;
-    }
-    reveal('#licences-question');
-    const licences = heldLicences();
-    if (!licences.length) return;
-    const ranks: Record<string, number> = { AM: 0, A1: 1, A2: 2, A: 3 };
-    const highest = licences
-      .filter((item) => item in ranks)
-      .sort((a, b) => ranks[b]! - ranks[a]!)[0];
-    const direct =
-      (highest === 'A1' && state.motoTarget === 'a2') ||
-      (highest === 'A2' && state.motoTarget === 'a');
-    if (direct) {
-      reveal('#period-question');
-      if (!state.period) return;
-    }
-    if (['moto-basic', 'moto-confidence'].includes(state.package)) reveal('#package-question');
-    void requestQuote({
-      course: state.motoTarget,
-      branch: state.branch,
-      heldLicences: licences,
-      package: state.package || 'single',
-      ...(direct ? { holdingPeriod: state.period } : {}),
-    });
-  }
-
-  async function requestQuote(selection: Record<string, unknown>) {
-    const sequence = ++requestSequence;
-    try {
-      const response = await fetch('/api/quote', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(selection),
-      });
-      const result = (await response.json()) as Quote;
-      if (sequence !== requestSequence) return;
-      if (!result.ok) {
-        if (result.code === 'PACKAGE_REQUIRED' && result.allowedPackages) {
-          if (result.allowedPackages.length === 1) {
-            state.package = result.allowedPackages[0]!;
-            render();
-            return;
-          }
-          reveal('#package-question');
-          return;
-        }
-        showContact(result.message);
-        return;
-      }
-      showOffer(selection, result);
-    } catch {
-      showContact('Cenu se teď nepodařilo načíst. Ozvěte se nám a výběr spolu projdeme.');
-    }
-  }
-  function showContact(message: string) {
-    document.querySelector('#contact-message')!.textContent = message;
-    reveal('#contact-result');
-  }
-  function showOffer(selection: Record<string, unknown>, result: Extract<Quote, { ok: true }>) {
-    const course = catalog.find((item) => item.id === selection.course);
-    if (!course) return;
-    document.querySelector('#offer-label')!.textContent = course.label;
-    document.querySelector('#offer-title')!.textContent = course.name;
-    document.querySelector('#offer-description')!.textContent = course.description;
-    document.querySelector('#offer-price')!.textContent = money(result.amount);
-    const isRefresher = selection.course === 'kondicni';
-    document.querySelector('#offer-price-note')!.textContent = isRefresher
-      ? 'Celková cena vybraných kondičních jízd. 800 Kč / 45 minut; vždy jezdíme v 90minutových blocích.'
-      : 'Cena odpovídá zvolené pobočce a variantě kurzu. * Nezahrnuje poplatky za zkoušku.';
-    show('#offer-price-asterisk', !isRefresher);
-    const packageLabel = isRefresher
-      ? `${state.drivingBlocks} × 90 minut · ${state.drivingBlocks * 2} vyučovacích hodin · ${state.transmission === 'automatic' ? 'automat' : 'manuál'}`
-      : result.training === 'supplement'
-        ? 'Doplňovací zkouška · 4 hodiny jízd'
-        : result.package === 'moto-basic'
-          ? 'Moto Základ · 13 hodin jízd'
-          : result.package === 'moto-confidence'
-            ? 'Moto Jistota · 20 hodin jízd' +
-              (result.extraTheoryHours ? ' · 2 hodiny teorie navíc' : '')
-            : state.mode === 'l17'
-              ? `L17 · ${state.transmission === 'automatic' ? 'automat' : 'manuál'}`
-              : state.category === 'auto'
-                ? state.transmission === 'automatic'
-                  ? 'Automat'
-                  : 'Manuál'
-                : 'Rozšíření oprávnění';
-    document.querySelector('#offer-variant')!.textContent = packageLabel;
-    const order = document.querySelector<HTMLButtonElement>('.offer-card [data-order]')!;
-    order.dataset.course = String(selection.course);
-    order.dataset.branch = state.branch;
-    order.dataset.transmission = state.transmission;
-    order.dataset.drivingBlocks = isRefresher ? String(state.drivingBlocks) : '';
-    order.textContent = isRefresher ? 'Objednat kondiční jízdy ↗' : 'Chci se přihlásit ↗';
-    const detail = document.querySelector<HTMLAnchorElement>('#offer-detail')!;
-    detail.href = `/kurzy/${course.slug}`;
-    reveal('#pricing-results');
-    document
-      .querySelector('#pricing-results')
-      ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-  document
-    .querySelector<HTMLSelectElement>('#pricing-driving-blocks')!
-    .addEventListener('change', (event) => {
-      state.drivingBlocks = Number((event.target as HTMLSelectElement).value);
-      render();
-    });
-  document.querySelectorAll<HTMLButtonElement>('[data-category]').forEach((button) =>
-    button.addEventListener('click', () => {
-      state.category = button.dataset.category!;
-      resetDependent();
-      render();
-    }),
-  );
-  document.querySelectorAll<HTMLButtonElement>('[data-branch]').forEach((button) =>
-    button.addEventListener('click', () => {
-      state.branch = button.dataset.branch!;
-      resetDependent();
-      render();
-    }),
-  );
-  for (const [selector, key] of [
-    ['[data-transmission]', 'transmission'],
-    ['[data-mode]', 'mode'],
-    ['[data-moto-target]', 'motoTarget'],
-    ['[data-licence-status]', 'licenceStatus'],
-    ['[data-period]', 'period'],
-    ['[data-package]', 'package'],
-    ['[data-trailer]', 'trailer'],
-  ] as const)
-    document.querySelectorAll<HTMLButtonElement>(selector).forEach((button) =>
-      button.addEventListener('click', () => {
-        state[key] = button.dataset[key] ?? '';
-        if (key !== 'package') state.package = '';
-        render();
-      }),
-    );
-  document.querySelectorAll<HTMLInputElement>('input[name="held-licence"]').forEach((input) =>
-    input.addEventListener('change', () => {
-      state.period = '';
-      state.package = '';
-      render();
-    }),
-  );
-  document.querySelector('.reset-selection')?.addEventListener('click', () => {
-    state.category = '';
-    state.branch = '';
-    resetDependent();
-    render();
-    document.querySelector('#pricing-wizard')?.scrollIntoView({ behavior: 'smooth' });
-  });
-  render();
+  import '../scripts/pricing-wizard';
 </script>
 
 <style>
@@ -729,6 +441,93 @@ import {
   .decision-card {
     display: grid;
     gap: 18px;
+    max-width: 900px;
+    padding: clamp(16px, 3vw, 30px);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: #fff;
+    box-shadow: var(--shadow);
+  }
+  .wizard-progress > div:first-child {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: center;
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .progress-track {
+    height: 7px;
+    margin: 12px 0;
+    overflow: hidden;
+    border-radius: 99px;
+    background: #e4eef3;
+  }
+  .progress-track span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--brand);
+    transition: width 180ms ease;
+  }
+  #wizard-path {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  #wizard-path button {
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    background: #f1f8f8;
+    color: var(--ink);
+    cursor: pointer;
+    font-size: 0.72rem;
+  }
+  #wizard-path button:hover {
+    border-color: var(--brand);
+  }
+  .wizard-navigation {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .wizard-navigation .text-link,
+  #wizard-restart {
+    cursor: pointer;
+    border: 0;
+    background: none;
+    color: var(--blue);
+  }
+  .decision-card .question {
+    border: 0;
+    border-radius: 0;
+    padding: 16px 0;
+  }
+  .decision-card .pricing-results,
+  .decision-card .contact-result {
+    margin-top: 0;
+  }
+  .decision-card .offer-card {
+    box-shadow: none;
+  }
+  .trailer-mint {
+    display: none;
+  }
+  button[aria-pressed='true'] .trailer-blue {
+    display: none;
+  }
+  button[aria-pressed='true'] .trailer-mint {
+    display: block;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .question.revealed,
+    .next-question.revealed {
+      animation: none;
+    }
+    .progress-track span {
+      transition: none;
+    }
   }
   .question {
     min-width: 0;
