@@ -112,7 +112,7 @@ const breadcrumbSchema = {
         : `Autoškola BuBu ${branch.name}. ${branch.address}. Kurz B za ${money(branch.bPrice)}. Osobní zápis a výcvik s lidským přístupem.`}
   schema={[branchSchema, breadcrumbSchema]}
 >
-  <section class:list={['page-hero', { 'kladno-hero': isKladno }]}>
+  <section class:list={['page-hero', { 'kladno-hero': isKladno, 'strizkov-hero': isStrizkov }]}>
     <div class="container">
       <nav class="breadcrumbs" aria-label="Drobečková navigace">
         <a href="/">Domů</a><span>/</span><span>{branch.name}</span>
@@ -155,10 +155,10 @@ const breadcrumbSchema = {
                 zkušenostem žáka, aby náročnost rostla postupně.
               </p>
             )
-          }{isKladno && (
+          }{(isKladno || isStrizkov) && (
             <div class="kladno-hero-offer" aria-label="Cena a možnosti kurzu">
-              <div><span>Skupina B na manuálu</span><strong>{money(branch.bPrice)}</strong></div>
-              <span class="kladno-hero-l17">Také pro L17</span>
+              <div><span>{isKladno ? 'Skupina B na manuálu' : 'Skupina B'}</span><strong>{money(branch.bPrice)}</strong></div>
+              <span class="kladno-hero-l17">{isStrizkov ? 'Manuál · automat · L17' : 'Také pro L17'}</span>
             </div>
           )}<div class="actions">
             <button class="btn primary" data-order disabled data-branch={branch.id} data-course="b">
@@ -166,7 +166,7 @@ const breadcrumbSchema = {
                 isKladno
                   ? 'Vyplnit přihlášku v Kladně ↗'
                   : isStrizkov
-                    ? 'Přihlásit se do kurzu ↗'
+                    ? 'Rezervovat zápis na Střížkově ↗'
                     : 'Chci začít řidičák ↗'
               }
             </button>
@@ -189,6 +189,8 @@ const breadcrumbSchema = {
             {
               isKladno ? (
                 'Online přihláška · pokyny e-mailem · bez osobního zápisu'
+              ) : isStrizkov ? (
+                'Termín zápisu si vyberete online · kurz a možnosti si potvrdíte na pobočce'
               ) : (
                 <>
                   Skupina B <strong>{money(branch.bPrice)}</strong> · jedna cena, bez balíčků
@@ -202,7 +204,7 @@ const breadcrumbSchema = {
               zahájení kurzu dostanete e-mailem.
             </p>
           )}
-        </div><div class:list={['branch-hero-image', { 'kladno-hero-image': isKladno }]}><Image
+        </div><div class:list={['branch-hero-image', { 'kladno-hero-image': isKladno, 'strizkov-hero-image': isStrizkov }]}><Image
           src={manualCar}
           alt="Bílá Škoda Fabia Autoškoly BuBu pro manuální výcvik"
           widths={[480, 800]}
@@ -210,11 +212,11 @@ const breadcrumbSchema = {
           format="webp"
           loading="eager"
           fetchpriority="high"
-        />{isKladno && <span class="kladno-image-caption">Začnete v klidu. Jízdy přizpůsobíme vašemu tempu.</span>}</div>
+        />{isKladno && <span class="kladno-image-caption">Začnete v klidu. Jízdy přizpůsobíme vašemu tempu.</span>}{isStrizkov && <span class="strizkov-image-caption">Od prvních rozjezdů až do pražského provozu.</span>}</div>
       </div>
     </div>
   </section>
-  <div class:list={['local-trust', { 'kladno-trust': isKladno }]}>
+  <div class:list={['local-trust', { 'kladno-trust': isKladno, 'strizkov-trust': isStrizkov }]}>
     <div class="container">
       <span>✓ Skupina B – manuál{branch.id === 'strizkov' ? ' i automat' : ''}</span><span
         >✓ Možnost kurzu v režimu L17</span
@@ -223,6 +225,23 @@ const breadcrumbSchema = {
     </div>
   </div>
 
+  {isStrizkov && (
+    <section class="section strizkov-intro" aria-labelledby="strizkov-intro-title">
+      <div class="container strizkov-intro-grid">
+        <div>
+          <span class="eyebrow">Za volantem v Praze 8</span>
+          <h2 id="strizkov-intro-title">Nejdřív jistota. Potom skutečná Praha.</h2>
+          <p class="lead">První rozjezdy si vyzkoušíte na cvičišti v Čakovicích. Do provozu vyjedete postupně a s instruktorem, který vám vše srozumitelně vysvětlí.</p>
+          <button class="btn primary" data-order disabled data-branch="strizkov" data-course="b">Vybrat termín zápisu ↗</button>
+        </div>
+        <div class="strizkov-intro-points">
+          <article><span>01</span><div><h3>Začátek bez tlaku</h3><p>Nejprve ovládání auta, rozjezdy a manévrování v klidnějším prostředí.</p></div></article>
+          <article><span>02</span><div><h3>Pražský provoz krok za krokem</h3><p>Střížkov, Prosek a okolí. Náročnější trasy přidáváme, jak získáváte jistotu.</p></div></article>
+          <article><span>03</span><div><h3>Výcvik pro běžný život</h3><p>Procvičíte i situace, které potkáte po zkoušce: parkování, dálnici nebo cestu centrem.</p></div></article>
+        </div>
+      </div>
+    </section>
+  )}
   {!isKladno && !isStatenice && <Roadmap />}
 
   {
@@ -464,6 +483,105 @@ const breadcrumbSchema = {
   <FinalCta branch={branch.id} />
 </Base>
 <style>
+  .strizkov-hero {
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(circle at 85% 0%, #b4e8df 0, transparent 36%),
+      linear-gradient(125deg, #f0faf8 0%, #e7f5f3 45%, #dcecf9 100%);
+  }
+  .strizkov-hero::before {
+    content: '';
+    position: absolute;
+    width: 380px;
+    height: 380px;
+    right: -220px;
+    bottom: -260px;
+    border: 80px solid #4ab9ab25;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .strizkov-hero .container { position: relative; }
+  .strizkov-hero .split {
+    gap: clamp(34px, 5vw, 72px);
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  }
+  .strizkov-hero .eyebrow {
+    display: inline-flex;
+    border-radius: 999px;
+    border: 1px solid #89cbc2;
+    background: #ffffffc9;
+    padding: 9px 15px;
+    margin-bottom: 20px;
+  }
+  .strizkov-hero h1 { font-size: clamp(2.7rem, 5vw, 4.5rem); max-width: 760px; }
+  .strizkov-hero .lead { font-size: clamp(1.06rem, 1.5vw, 1.25rem); line-height: 1.6; }
+  .strizkov-hero .hero-copy { max-width: 590px; font-size: 0.9rem; }
+  .strizkov-hero .actions { margin-top: 25px; }
+  .strizkov-hero-image {
+    position: relative;
+    padding: 16px;
+    border-radius: 32px;
+    background: #ffffffb8;
+    border: 1px solid #fff;
+    box-shadow: 0 24px 65px #17335f1c;
+    transform: rotate(-1.3deg);
+  }
+  .strizkov-hero-image :global(img) {
+    width: 100%;
+    border-radius: 22px;
+    transform: rotate(1.3deg);
+  }
+  .strizkov-image-caption {
+    position: absolute;
+    right: 0;
+    bottom: 9%;
+    max-width: 230px;
+    padding: 14px 17px;
+    border-radius: 12px;
+    background: var(--ink);
+    color: #fff;
+    box-shadow: 0 12px 25px #17335f33;
+    font-size: 0.8rem;
+    font-weight: 650;
+    line-height: 1.45;
+    transform: rotate(3deg) translateX(12%);
+  }
+  .strizkov-trust { background: var(--ink); color: #fff; border-bottom: 0; }
+  .strizkov-trust .container { justify-content: space-between; }
+  .strizkov-intro {
+    background: linear-gradient(180deg, #fff 0%, #f2faf9 100%);
+  }
+  .strizkov-intro-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(32px, 6vw, 90px);
+    align-items: center;
+  }
+  .strizkov-intro-grid > div:first-child { max-width: 560px; }
+  .strizkov-intro-grid .btn { margin-top: 28px; }
+  .strizkov-intro-points {
+    border: 1px solid #d0e7e3;
+    border-radius: 26px;
+    padding: clamp(22px, 3vw, 38px);
+    background: #fff;
+    box-shadow: 0 18px 45px #17335f12;
+  }
+  .strizkov-intro-points article { display: flex; gap: 20px; padding-block: 20px; }
+  .strizkov-intro-points article + article { border-top: 1px solid var(--line); }
+  .strizkov-intro-points article > span {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #dff5f0;
+    color: var(--brand-dark);
+    font-size: 0.78rem;
+    font-weight: 800;
+  }
+  .strizkov-intro-points h3 { margin: 0 0 7px; font-size: 1.12rem; }
+  .strizkov-intro-points p { margin: 0; font-size: 0.91rem; }
   .kladno-hero {
     position: relative;
     overflow: hidden;
@@ -734,12 +852,17 @@ const breadcrumbSchema = {
     resize: vertical;
   }
   @media (max-width: 760px) {
+    .strizkov-intro-grid { grid-template-columns: 1fr; }
     .faq-layout {
       grid-template-columns: 1fr;
       gap: 28px;
     }
   }
   @media (max-width: 640px) {
+    .strizkov-hero .split { grid-template-columns: 1fr; }
+    .strizkov-hero-image { transform: none; margin: 12px 8px 18px; }
+    .strizkov-hero-image :global(img) { transform: none; }
+    .strizkov-image-caption { right: 12px; bottom: -18px; transform: none; }
     .kladno-hero .split {
       grid-template-columns: 1fr;
     }
