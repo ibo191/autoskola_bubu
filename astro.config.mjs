@@ -17,6 +17,7 @@ const scriptSources = [
   'https://www.googletagmanager.com',
   'https://www.googleadservices.com',
   'https://googleads.g.doubleclick.net',
+  'https://www.clarity.ms',
 ];
 const indexableStaticPaths = new Set([
   '/',
@@ -80,8 +81,8 @@ export default defineConfig({
       },
       directives: [
         "default-src 'self'",
-        "img-src 'self' data: https://www.google.com https://*.google.com https://www.gstatic.com https://www.recaptcha.net https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.g.doubleclick.net https://googleads.g.doubleclick.net https://www.googleadservices.com https://pagead2.googlesyndication.com",
-        "connect-src 'self' https://www.google.com https://*.google.com https://www.gstatic.com https://www.recaptcha.net https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://region1.google-analytics.com https://*.g.doubleclick.net https://googleads.g.doubleclick.net https://www.googleadservices.com https://pagead2.googlesyndication.com https://ad.doubleclick.net",
+        "img-src 'self' data: https://www.google.com https://*.google.com https://www.gstatic.com https://www.recaptcha.net https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.g.doubleclick.net https://googleads.g.doubleclick.net https://www.googleadservices.com https://pagead2.googlesyndication.com https://*.clarity.ms",
+        "connect-src 'self' https://www.google.com https://*.google.com https://www.gstatic.com https://www.recaptcha.net https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://region1.google-analytics.com https://*.g.doubleclick.net https://googleads.g.doubleclick.net https://www.googleadservices.com https://pagead2.googlesyndication.com https://ad.doubleclick.net https://*.clarity.ms",
         "font-src 'self'",
         "object-src 'none'",
         "base-uri 'self'",

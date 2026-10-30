@@ -3,6 +3,7 @@ import '../styles/global.css';
 import OrderDialog from '../components/OrderDialog.astro';
 import CookieConsent from '../components/CookieConsent.astro';
 import GoogleTag from '../components/GoogleTag.astro';
+import Clarity from '../components/Clarity.astro';
 import { branches } from '../lib/catalog';
 import { isInternalAdminPath } from '../lib/admin-route';
 interface Props {
@@ -131,7 +132,7 @@ const nav = [
           set:html={JSON.stringify(structuredData).replace(/</g, '\\u003c')}
         />
       )
-    }{!isInternalAdmin && /^AW-\d+$/i.test(googleTagId) && <GoogleTag />}</head
+    }{!isInternalAdmin && /^AW-\d+$/i.test(googleTagId) && <GoogleTag />}{!isInternalAdmin && <Clarity />}</head
   ><body data-recaptcha-site-key={recaptchaSiteKey} data-google-tag-id={isInternalAdmin ? undefined : googleTagId}>
     <a class="skip" href="#main">Přeskočit na obsah</a>
     {
