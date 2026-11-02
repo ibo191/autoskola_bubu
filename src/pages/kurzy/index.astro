@@ -91,6 +91,10 @@ const courseIcons = {
           ))
         }
       </div>
+      <p class="branch-context-links">
+        Chcete znát místo výcviku? Prohlédněte si <a href="/strizkov">autoškolu na Praze 8 – Střížkově</a>
+        nebo <a href="/kladno">kurzy autoškoly v Kladně</a>.
+      </p>
       <div class="tabs course-filter" role="group" aria-label="Filtrovat kurzy podle typu">
         <button type="button" data-course-category="all" aria-pressed="true">Všechny typy</button>
         <button type="button" data-course-category="auto" aria-pressed="false">Auto a L17</button>
@@ -279,6 +283,8 @@ const courseIcons = {
   </script>
 </Base>
 <style>
+  .branch-context-links { margin: -12px 0 24px; font-size: 0.85rem; }
+  .branch-context-links a { color: var(--brand-dark); text-underline-offset: 3px; }
   .course-filter {
     margin-bottom: 28px;
   }

@@ -273,6 +273,22 @@ const breadcrumbSchema = {
             </>
           </div>
         </section>
+        <section class="section strizkov-courses" aria-labelledby="strizkov-courses-title">
+          <div class="container split">
+            <div>
+              <span class="eyebrow">Kurzy na Střížkově</span>
+              <h2 id="strizkov-courses-title">Vyberte si cestu k řidičáku.</h2>
+              <p class="lead">Na Praze 8 nabízíme skupinu B na manuálu i automatu a výcvik v režimu L17. Začít můžete také kondičními jízdami.</p>
+              <a class="text-link" href="/cenik?branch=strizkov">Porovnat ceny kurzů na Střížkově ↗</a>
+            </div>
+            <div class="strizkov-course-links">
+              <a href="/kurzy/ridicak-skupina-b">Řidičák skupiny B na manuálu <span>→</span></a>
+              <a href="/kurzy/ridicak-skupina-b-automat">Skupina B na automatu <span>→</span></a>
+              <a href="/kurzy/l17">Řidičák od 17 let – L17 <span>→</span></a>
+              <a href="/kurzy/kondicni-jizdy">Kondiční jízdy <span>→</span></a>
+            </div>
+          </div>
+        </section>
         <section class="section tinted" id="pobocka">
           <div class="container split">
             <>
@@ -582,6 +598,26 @@ const breadcrumbSchema = {
   }
   .strizkov-intro-points h3 { margin: 0 0 7px; font-size: 1.12rem; }
   .strizkov-intro-points p { margin: 0; font-size: 0.91rem; }
+  .strizkov-courses .split { align-items: start; gap: clamp(28px, 5vw, 70px); }
+  .strizkov-courses .text-link { display: inline-block; margin-top: 20px; }
+  .strizkov-course-links {
+    display: grid;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 12px 24px;
+    background: #fff;
+  }
+  .strizkov-course-links a {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 17px 0;
+    color: var(--ink);
+    font-weight: 650;
+    text-decoration: none;
+  }
+  .strizkov-course-links a + a { border-top: 1px solid var(--line); }
+  .strizkov-course-links a:hover { color: var(--brand-dark); }
   .kladno-hero {
     position: relative;
     overflow: hidden;

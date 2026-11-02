@@ -92,7 +92,7 @@ Praze? Řídit v Praze není stejné jako jezdit po prázdných ulicích menší
 - rychlé rozhodování,
 - nervózní řidiče okolo vás.
 
-Dobrá pražská autoškola by vás měla připravovat na reálné situace, nejen na nejjednodušší trasu ke zkoušce. Pro studenty z Prahy je nejvhodnější naše pobočka Autoškola BuBu Praha 8 – Střížkov. Ptejte se: „Budeme jezdit i v hustším provozu a složitějších situacích?“ Pokud ano, je to plus. Pokud se jezdí stále jen po jednoduchých trasách, může vás realita po zkoušce nepříjemně překvapit.
+Dobrá pražská autoškola by vás měla připravovat na reálné situace, nejen na nejjednodušší trasu ke zkoušce. Pro studenty z Prahy 8 je dostupná naše [pobočka na Střížkově](/strizkov). Pokud vám více vyhovuje Kladno a okolí, podívejte se na [Autoškolu BuBu v Kladně](/kladno), kde výcvik začíná na kladenském cvičišti. Ptejte se: „Budeme jezdit i v hustším provozu a složitějších situacích?“ Pokud ano, je to plus. Pokud se jezdí stále jen po jednoduchých trasách, může vás realita po zkoušce nepříjemně překvapit.
 
 ## 7. Jaký má autoškola vozový park?
 

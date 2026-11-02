@@ -31,7 +31,7 @@ V roce 2026 se cena za řidičský průkaz skupiny B (osobní auto) v České re
 | Správní poplatek magistrátu | 700 Kč                 | Poplatek za závěrečnou zkoušku |
 | Kondiční jízda (45 min)     | cca 800 Kč             | Dobrovolné jízdy navíc         |
 
-Cena závisí hlavně na lokalitě, kvalitě instruktorů a modernosti vozidel. Ve velkých městech, zejména v Praze, bývá cena obvykle vyšší než v menších regionech kvůli nákladům na provoz a náročnosti výcviku. Kolik stojí řidičák v Praze a na Střížkově? Praha patří mezi města s nejvyššími cenami, ale také s nejkvalitnější přípravou na reálný provoz. Průměrná cena kurzu se zde pohybuje mezi 23 000 Kč a 28 000 Kč. Například v Autoškole BuBu Praha – Střížkov stojí základní kurz pro skupinu B: 24 900 Kč Tato částka představuje ideální poměr mezi férovou cenou a vysokou kvalitou výuky v náročném pražském provozu. Co všechno zahrnuje cena kurzu? Při porovnávání cen si vždy ověřte, zda balíček obsahuje vše potřebné. Standardní kurz by měl obsahovat:
+Cena závisí hlavně na lokalitě, rozsahu výuky a tom, co je v kurzovném zahrnuto. V [Autoškole BuBu na Praze 8 – Střížkově](/strizkov) stojí kurz skupiny B na manuálu 25 900 Kč. Pokud hledáte výcvik mimo Prahu, [řidičák v Kladně](/kladno) stojí na manuálu 20 000 Kč. Aktuální varianty a poplatky najdete vždy v [ceníku](/cenik). Při porovnávání cen si ověřte, co kurz zahrnuje a co se hradí samostatně. Standardní kurz by měl obsahovat:
 
 ## 1. Teoretickou výuku:
 
@@ -53,4 +53,6 @@ Jak vybrat tu správnou autoškolu? Cena by neměla být jediným kritériem. Sl
 
 - Recenze studentů (Google, Facebook).
 - Přístup instruktorů (trpělivost a profesionalita).
-- Stav vozového parku (moderní a bezpečná auta). Začněte svou cestu za volantem ještě dnes! Získání řidičáku nemusí být stresující zážitek. V Autoškole BuBu na Střížkově sázíme na individuální přístup, moderní metody a pohodovou atmosféru, díky kterým vás jízdy budou bavit. Chcete mít řidičák v ruce co nejdříve? Rezervujte si své místo v kurzu za 24 500 Kč – aktuální termíny se rychle plní!
+- Stav vozového parku (moderní a bezpečná auta).
+
+Chcete začít? Projděte si [kurz skupiny B](/kurzy/ridicak-skupina-b) a vyberte pobočku, která vám vyhovuje. Na Střížkově si termín zápisu rezervujete online; v Kladně odešlete přihlášku online a další pokyny dostanete e-mailem.

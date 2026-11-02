@@ -169,6 +169,14 @@ const nav = [
                     {label}
                   </a>
                 ))}
+                <details class="branch-menu">
+                  <summary>Naše pobočky</summary>
+                  <div class="branch-menu-links">
+                    <a href="/strizkov" aria-current={path === '/strizkov' ? 'page' : undefined}>Praha 8 – Střížkov</a>
+                    <a href="/kladno" aria-current={path === '/kladno' ? 'page' : undefined}>Kladno</a>
+                    <a href="/statenice" aria-current={path === '/statenice' ? 'page' : undefined}>Statenice</a>
+                  </div>
+                </details>
                 <button class="btn primary" data-order disabled>
                   Přihlásit se ↗
                 </button>
@@ -320,14 +328,43 @@ const nav = [
     align-items: center;
     gap: 25px;
   }
-  nav > a {
+  nav > a,
+  .branch-menu summary {
     font-size: 0.8rem;
     font-weight: 650;
     text-decoration: none;
     padding-block: 12px;
   }
+  .branch-menu { position: relative; }
+  .branch-menu summary { cursor: pointer; list-style: none; white-space: nowrap; }
+  .branch-menu summary::-webkit-details-marker { display: none; }
+  .branch-menu summary::after { content: '⌄'; margin-left: 7px; }
+  .branch-menu[open] summary::after { content: '⌃'; }
+  .branch-menu-links {
+    position: absolute;
+    z-index: 30;
+    top: 100%;
+    left: -16px;
+    min-width: 215px;
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: var(--shadow);
+  }
+  .branch-menu-links a {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 7px;
+    font-size: 0.78rem;
+    text-decoration: none;
+  }
+  .branch-menu-links a:hover,
+  .branch-menu-links a:focus-visible,
+  .branch-menu-links a[aria-current='page'] { background: var(--canvas); color: var(--brand-dark); }
   nav > a:hover,
-  nav > a[aria-current='page'] {
+  nav > a[aria-current='page'],
+  .branch-menu[open] summary {
     color: var(--brand-dark);
   }
   .menu-toggle {
@@ -452,6 +489,12 @@ const nav = [
       display: flex;
       flex-direction: column;
       align-items: stretch;
+    }
+    .branch-menu-links {
+      position: static;
+      min-width: 0;
+      margin-top: 4px;
+      box-shadow: none;
     }
     .footer-bottom,
     .footer-bottom > div {
