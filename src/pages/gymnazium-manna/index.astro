@@ -179,10 +179,12 @@ const faq = [
             <h3>Kontakty na partu</h3><p>
               Na první místo napiš sebe. E-maily musí být jedinečné, aby každý dostal svůj odkaz.
             </p><div id="manna-members"></div><label class="manna-consent"
-              ><input type="checkbox" id="manna-privacy" /> Potvrzuji, že mohu spolužákům poslat pozvánku
-              a seznámil/a jsem se s <a href="/ochrana-osobnich-udaju" target="_blank"
-                >informacemi o zpracování údajů</a
-              >.</label
+              ><input type="checkbox" id="manna-privacy" /><span
+                >Potvrzuji, že mohu spolužákům poslat pozvánku a seznámil/a jsem se s <a
+                  href="/ochrana-osobnich-udaju"
+                  target="_blank">informacemi o zpracování údajů</a
+                >.</span
+              ></label
             >
           </div>
           <div data-group-step="3" hidden>
@@ -420,26 +422,28 @@ const faq = [
     font-weight: 400;
     margin-left: auto;
   }
-  .manna-member {
+  #manna-members :global(.manna-member) {
     border-top: 1px solid #dbe8e8;
     padding: 20px 0;
   }
-  .manna-member h4 {
+  #manna-members :global(.manna-member h4) {
     margin: 0 0 12px;
   }
-  .manna-fields {
+  #manna-members :global(.manna-fields) {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
   }
-  .manna-fields label {
+  #manna-members :global(.manna-fields label) {
     display: grid;
     gap: 5px;
+    min-width: 0;
     font-size: 0.9rem;
     font-weight: 600;
   }
-  .manna-fields input {
+  #manna-members :global(.manna-fields input) {
     width: 100%;
+    min-width: 0;
     border: 1px solid #b9d0ce;
     border-radius: 9px;
     padding: 12px;
@@ -450,6 +454,14 @@ const faq = [
     gap: 10px;
     margin-top: 15px;
     font-size: 0.9rem;
+  }
+  .manna-consent input {
+    flex: none;
+    margin-top: 0.25em;
+  }
+  .manna-consent span {
+    min-width: 0;
+    line-height: 1.5;
   }
   .manna-form-actions {
     display: flex;
@@ -488,7 +500,7 @@ const faq = [
   .manna-final .btn {
     margin: 14px 0;
   }
-  .manna-recap-row {
+  #manna-recap :global(.manna-recap-row) {
     padding: 8px 0;
     border-bottom: 1px solid #e1eded;
   }
@@ -531,7 +543,7 @@ const faq = [
     .manna-grid.two,
     .manna-grid.three,
     .manna-grid.four,
-    .manna-fields {
+    #manna-members :global(.manna-fields) {
       grid-template-columns: 1fr;
     }
     .manna-car {
