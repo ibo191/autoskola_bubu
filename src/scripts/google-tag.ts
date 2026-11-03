@@ -103,6 +103,11 @@ if (!isInternalAdminPath(window.location.pathname) && /^AW-\d+$/i.test(googleTag
       'course_transmission_selected',
       'course_config_completed',
       'course_registration_click',
+      'school_landing_view',
+      'group_form_start',
+      'group_registration_submit',
+      'group_member_confirmed',
+      'school_booking_complete',
     ];
     if (configuratorEvents.includes(name) && !readConsent()?.analytics) return false;
     // The object supports a future GTM Custom Event trigger; the gtag command
@@ -127,6 +132,7 @@ if (!isInternalAdminPath(window.location.pathname) && /^AW-\d+$/i.test(googleTag
         branch?: string;
         course?: string;
         campaign?: string;
+        partnerSchool?: string;
       } | null;
       if (
         !pending ||
@@ -137,18 +143,22 @@ if (!isInternalAdminPath(window.location.pathname) && /^AW-\d+$/i.test(googleTag
       )
         return;
       const sentKey = `bubu:lead-sent:${pending.applicationId}`;
-      if (sessionStorage.getItem(sentKey)) {
-        sessionStorage.removeItem('bubu:pending-lead');
-        return;
-      }
-      const sent = track('generate_lead', {
-        branch: pending.branch!,
-        course: pending.course!.toUpperCase(),
-        application_id: pending.applicationId!,
-        ...(pending.campaign === 'zimni-kampan' ? { campaign: pending.campaign } : {}),
-      });
+      const sent =
+        sessionStorage.getItem(sentKey) === '1' ||
+        track('generate_lead', {
+          branch: pending.branch!,
+          course: pending.course!.toUpperCase(),
+          application_id: pending.applicationId!,
+          ...(pending.campaign === 'zimni-kampan' ? { campaign: pending.campaign } : {}),
+        });
       if (sent) {
         sessionStorage.setItem(sentKey, '1');
+        if (pending.partnerSchool === 'gymnazium_manna')
+          track('school_booking_complete', {
+            partner_school: 'gymnazium_manna',
+            branch: pending.branch!,
+            course: pending.course!,
+          });
         sessionStorage.removeItem('bubu:pending-lead');
       }
     } catch {
@@ -180,6 +190,7 @@ if (!isInternalAdminPath(window.location.pathname) && /^AW-\d+$/i.test(googleTag
       ...(typeof detail.branch === 'string' ? { branch: detail.branch } : {}),
       ...(typeof detail.applicationId === 'string' ? { application_id: detail.applicationId } : {}),
       ...(typeof detail.campaign === 'string' ? { campaign: detail.campaign } : {}),
+      ...(typeof detail.partnerSchool === 'string' ? { partner_school: detail.partnerSchool } : {}),
       ...(typeof detail.valueCzk === 'number' ? { value: detail.valueCzk, currency: 'CZK' } : {}),
     });
   });

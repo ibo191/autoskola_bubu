@@ -19,6 +19,8 @@ export const selectionSchema = z
     branch: branchId,
     transmission: z.enum(['manual', 'automatic']).optional(),
     package: z.enum(['single', 'moto-basic', 'moto-confidence', 'supplement']).default('single'),
+    partnerSchool: z.literal('gymnazium_manna').optional(),
+    schoolCourseType: z.enum(['school', 'isp']).optional(),
     heldLicences: z
       .array(z.enum(['B', 'AM', 'A1', 'A2', 'A', 'other']))
       .max(6)
@@ -26,6 +28,7 @@ export const selectionSchema = z
     holdingPeriod: z.enum(['less-than-two', 'exactly-two', 'more-than-two', 'unknown']).optional(),
   })
   .strict()
+  .refine((value) => Boolean(value.partnerSchool) === Boolean(value.schoolCourseType))
   .transform((value) => ({
     ...value,
     transmission: value.transmission ?? (value.course === 'b-automat' ? 'automatic' : 'manual'),
@@ -118,7 +121,9 @@ function calculateQuote(input: unknown, allowPausedMoto: boolean): Quote {
     extraTheoryHours,
     schoolFee: s.course === 'kondicni' ? 0 : fees.schoolOrganization,
     authorityFee: s.course === 'kondicni' ? 0 : fees.authorityFirstExam,
-    priceVersion: priceSource.version,
+    priceVersion: s.schoolCourseType
+      ? `${priceSource.version}-manna-${s.schoolCourseType}`
+      : priceSource.version,
   });
   const choose = (allowed: Selection['package'][]): Quote => ({
     ok: false,
@@ -128,6 +133,20 @@ function calculateQuote(input: unknown, allowPausedMoto: boolean): Quote {
   });
   if (course.category !== 'moto') {
     if (s.package !== 'single') return choose(['single']);
+    if (s.schoolCourseType) {
+      if (
+        s.partnerSchool !== 'gymnazium_manna' ||
+        s.branch !== 'strizkov' ||
+        !['b', 'l17'].includes(s.course) ||
+        s.transmission !== 'manual'
+      )
+        return {
+          ok: false,
+          code: 'UNAVAILABLE',
+          message: 'Školní kurz je dostupný jen na Střížkově.',
+        };
+      return result(s.schoolCourseType === 'school' ? 30500 : 25900);
+    }
     if (s.course === 'kondicni') return result(s.drivingBlocks! * 1600);
     if (course.category === 'auto') return result(getBranch(s.branch).bPrice);
     return result(s.course === 'b96' ? prices.b96 : prices.be, 'extension');

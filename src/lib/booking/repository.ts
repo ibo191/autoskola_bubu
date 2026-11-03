@@ -29,6 +29,7 @@ export type ProvisionalInput = {
   privacy: ConsentSnapshot;
   addons: OrderAddon[];
   verificationHash: string;
+  groupMemberId?: string;
 };
 export type OrderWithoutAppointmentInput = Omit<ProvisionalInput, 'slotId'>;
 export type CreatedOrder = {

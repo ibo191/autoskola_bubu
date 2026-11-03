@@ -34,6 +34,8 @@ let dirty = false;
 let validQuote: Extract<Quote, { ok: true }> | undefined;
 let trigger: HTMLElement | undefined;
 let campaign: 'zimni-kampan' | undefined;
+let groupToken: string | undefined;
+let schoolCourseType: 'school' | 'isp' | undefined;
 let requestSequence = 0;
 let slotSequence = 0;
 let monthCursor = new Date();
@@ -155,6 +157,7 @@ function selectionWithAddons() {
   return {
     course,
     branch: field('branch').value,
+    ...(schoolCourseType ? { partnerSchool: 'gymnazium_manna', schoolCourseType } : {}),
     transmission:
       course === 'b-automat'
         ? 'automatic'
@@ -252,6 +255,9 @@ function reset() {
   applicationStarted = false;
   trackedSelection = '';
   campaign = undefined;
+  groupToken = undefined;
+  schoolCourseType = undefined;
+  for (const name of ['firstName', 'lastName', 'email']) field(name).removeAttribute('readonly');
   question.hidden = true;
   loadedSlots = [];
   selectedDate = '';
@@ -274,8 +280,20 @@ document.querySelectorAll<HTMLElement>('[data-order]').forEach((button) => {
     trigger = button;
     reset();
     campaign = button.dataset.campaign === 'zimni-kampan' ? 'zimni-kampan' : undefined;
+    groupToken = button.dataset.groupToken;
+    schoolCourseType =
+      button.dataset.schoolCourseType === 'school' || button.dataset.schoolCourseType === 'isp'
+        ? button.dataset.schoolCourseType
+        : undefined;
     field('course').value = button.dataset.course ?? '';
     field('branch').value = button.dataset.branch ?? '';
+    if (groupToken) {
+      for (const name of ['firstName', 'lastName', 'email']) {
+        field(name).value = button.dataset[name] ?? '';
+        field(name).setAttribute('readonly', '');
+      }
+      field('phone').value = button.dataset.phone ?? '';
+    }
     if (button.dataset.transmission) field('transmission').value = button.dataset.transmission;
     if (button.dataset.drivingBlocks) field('drivingBlocks').value = button.dataset.drivingBlocks;
     syncAvailableCourses();
@@ -637,6 +655,7 @@ async function submitOrder() {
     },
     note: field('note').value,
     ...(campaign ? { campaign } : {}),
+    ...(groupToken ? { groupToken } : {}),
     selection: selectionWithAddons(),
     priceVersion: validQuote.priceVersion,
     captchaToken,
@@ -684,6 +703,7 @@ async function submitOrder() {
             branch: body.selection.branch,
             course: body.selection.course,
             ...(campaign ? { campaign } : {}),
+            ...(groupToken ? { partnerSchool: 'gymnazium_manna' } : {}),
           }),
         );
       } catch {

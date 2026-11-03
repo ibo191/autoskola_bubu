@@ -1,0 +1,86 @@
+---
+export const prerender = true;
+import Base from '../../layouts/Base.astro';
+---
+
+<Base
+  title="Účast ve společném kurzu potvrzena"
+  description="Další krok ke společnému kurzu Autoškoly BuBu."
+  noindex
+>
+  <section class="section confirmed-page">
+    <div class="container confirmed-card">
+      <span class="eyebrow">Gymnázium Thomase Manna × Autoškola BuBu</span>
+      <h1>Jsi v partě! 👻</h1>
+      <p>
+        Díky za potvrzení zájmu. Teď si vyber svůj vlastní termín osobního zápisu na Střížkově.
+        Spolužáci si zvolí termín samostatně.
+      </p>
+      <a class="btn primary" id="continue-booking" href="/gymnazium-manna">Vybrat termín zápisu ↗</a
+      >
+      <p>Pokud odkaz nemáš po ruce, můžeš znovu otevřít původní pozvánku z e-mailu.</p>
+    </div>
+  </section>
+  <script>
+    const button = document.querySelector<HTMLAnchorElement>('#continue-booking');
+    let token = '';
+    try {
+      token = sessionStorage.getItem('manna:confirmed-token') ?? '';
+    } catch {
+      /* Link still works via email. */
+    }
+    if (button && token)
+      button.href = `/gymnazium-manna/pozvanka?token=${encodeURIComponent(token)}`;
+    const track = () => {
+      if (!token) return;
+      try {
+        const cookie = document.cookie
+          .split('; ')
+          .find((part) => part.startsWith('bubu_cookie_consent='));
+        const consent =
+          cookie && JSON.parse(decodeURIComponent(cookie.slice('bubu_cookie_consent='.length + 1)));
+        if (
+          consent?.version !== 1 ||
+          consent.analytics !== true ||
+          sessionStorage.getItem(`manna:confirmed-tracked:${token}`)
+        )
+          return;
+        window.dispatchEvent(
+          new CustomEvent('bubu:tracking', {
+            detail: { name: 'group_member_confirmed', partnerSchool: 'gymnazium_manna' },
+          }),
+        );
+        sessionStorage.setItem(`manna:confirmed-tracked:${token}`, '1');
+      } catch {
+        /* Analytics must never block booking. */
+      }
+    };
+    window.addEventListener('load', track, { once: true });
+    document.addEventListener('bubu:cookie-consent-updated', track);
+  </script>
+</Base>
+<style>
+  .confirmed-page {
+    background: #edf7f6;
+    min-height: 65vh;
+  }
+  .confirmed-card {
+    max-width: 760px;
+    background: white;
+    border: 1px solid #cfe4e1;
+    border-radius: 28px;
+    padding: clamp(24px, 5vw, 50px);
+  }
+  .confirmed-card h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    color: #19345e;
+  }
+  .confirmed-card p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 580px;
+  }
+  .confirmed-card .btn {
+    margin: 18px 0;
+  }
+</style>

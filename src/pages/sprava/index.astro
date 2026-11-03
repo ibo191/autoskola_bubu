@@ -8,6 +8,7 @@ import { branches, courses, money } from '../../lib/catalog';
 import { requireLiveRepository } from '../../lib/server/live-order';
 import { appointmentReportBranches } from '../../lib/server/email/workflows';
 import { listMotoInterests } from '../../lib/moto-interest';
+import { adminGroups } from '../../lib/school-groups';
 import {
   isDate,
   orderPeriodRange,
@@ -19,6 +20,7 @@ import {
 const repositoryReady = Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
 const repository = repositoryReady ? requireLiveRepository(process.env) : null;
 const url = new URL(Astro.request.url);
+const showSchoolGroups = url.searchParams.get('schoolGroups') === '1';
 const today = pragueToday();
 const requestedPeriod = url.searchParams.get('period');
 const period: OrderPeriod | 'custom' =
@@ -146,6 +148,10 @@ const adminData = authorizedDashboard?.ok
 const motoInterests = currentUser
   ? await timeAdminQuery('moto-interest', () => listMotoInterests(process.env)).catch(() => null)
   : null;
+const schoolGroups =
+  currentUser && showSchoolGroups
+    ? await timeAdminQuery('school-groups', () => adminGroups(process.env)).catch(() => null)
+    : null;
 if (currentUser && queryTimings.length) {
   Astro.response.headers.set(
     'Server-Timing',
@@ -171,13 +177,17 @@ const orderCourseLabel = (order: { course: string; selection: unknown }) => {
 };
 const courseLabel = (id: string) => courses.find((item) => item.id === id)?.label ?? id;
 const branchLabel = (id: string) => branches.find((item) => item.id === id)?.name ?? id;
-const packageLabel = (id: string) =>
-  ({
+const packageLabel = (id: string, selection?: unknown) => {
+  const parsed = selectionSchema.safeParse(selection);
+  if (parsed.success && parsed.data.partnerSchool === 'gymnazium_manna')
+    return parsed.data.schoolCourseType === 'school' ? 'Školní kurz' : 'Kurz ISP';
+  return ({
     single: 'Samostatný kurz',
     'moto-basic': 'Moto základ',
     'moto-confidence': 'Moto Jistota',
     supplement: 'Doplňovací zkouška',
   })[id] ?? id;
+};
 const statusLabel = (value: string) =>
   ({
     provisional: 'Rozpracované',
@@ -450,22 +460,152 @@ const calendarDays = calendarDates.map((item) => ({
 
             <section class="admin-panel" data-admin-panel="moto-interest">
               <h2>Motorky 2027 – předběžný zájem</h2>
-              <p>Kontakty čekající na otevření přihlašování. Nejde o objednávky ani rezervovaná místa.</p>
-              {motoInterests === null ? <div class="notice schedule-error" role="alert">Seznam zájemců se nepodařilo načíst.</div> : (
+              <p>
+                Kontakty čekající na otevření přihlašování. Nejde o objednávky ani rezervovaná
+                místa.
+              </p>
+              {motoInterests === null ? (
+                <div class="notice schedule-error" role="alert">
+                  Seznam zájemců se nepodařilo načíst.
+                </div>
+              ) : (
                 <>
-                  <p><strong>Čeká: {motoInterests.length}{motoInterests.length === 200 ? '+' : ''}</strong></p>
-                  <div class="table-wrap"><table>
-                    <thead><tr><th>Datum</th><th>Jméno</th><th>Kontakt</th><th>Skupina</th><th>Oprávnění</th><th>Varianta</th></tr></thead>
-                    <tbody>{motoInterests.length ? motoInterests.map((item) => <tr>
-                      <td>{formatDateTime(item.created_at)}</td>
-                      <td>{item.first_name && item.last_name ? `${item.first_name} ${item.last_name}` : item.name}</td>
-                      <td><a href={`mailto:${item.email}`}>{item.email}</a><br /><a href={`tel:${item.phone}`}>{item.phone}</a></td>
-                      <td>{item.course.toUpperCase()}</td>
-                      <td>{item.licence_status === 'none' ? 'Bez oprávnění' : item.held_licences.join(', ') || 'Neuvedeno'}</td>
-                      <td>{item.package ? packageLabel(item.package) : 'Neuvedeno'}</td>
-                    </tr>) : <tr><td colspan="6">Zatím žádní zájemci.</td></tr>}</tbody>
-                  </table></div>
+                  <p>
+                    <strong>
+                      Čeká: {motoInterests.length}
+                      {motoInterests.length === 200 ? '+' : ''}
+                    </strong>
+                  </p>
+                  <div class="table-wrap">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Datum</th>
+                          <th>Jméno</th>
+                          <th>Kontakt</th>
+                          <th>Skupina</th>
+                          <th>Oprávnění</th>
+                          <th>Varianta</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {motoInterests.length ? (
+                          motoInterests.map((item) => (
+                            <tr>
+                              <td>{formatDateTime(item.created_at)}</td>
+                              <td>
+                                {item.first_name && item.last_name
+                                  ? `${item.first_name} ${item.last_name}`
+                                  : item.name}
+                              </td>
+                              <td>
+                                <a href={`mailto:${item.email}`}>{item.email}</a>
+                                <br />
+                                <a href={`tel:${item.phone}`}>{item.phone}</a>
+                              </td>
+                              <td>{item.course.toUpperCase()}</td>
+                              <td>
+                                {item.licence_status === 'none'
+                                  ? 'Bez oprávnění'
+                                  : item.held_licences.join(', ') || 'Neuvedeno'}
+                              </td>
+                              <td>{item.package ? packageLabel(item.package) : 'Neuvedeno'}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colspan="6">Zatím žádní zájemci.</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </>
+              )}
+            </section>
+
+            <section class="admin-panel" data-admin-panel="school-groups">
+              <h2>Gymnázium Manna – skupinové objednávky</h2>
+              {!showSchoolGroups ? (
+                <a class="btn secondary" href="/sprava?schoolGroups=1">
+                  Zobrazit skupiny a členy ↗
+                </a>
+              ) : schoolGroups === null ? (
+                <div class="notice" role="alert">
+                  Skupiny se nepodařilo načíst.
+                </div>
+              ) : schoolGroups.length === 0 ? (
+                <p>Zatím žádná skupinová přihláška.</p>
+              ) : (
+                <div class="school-admin-groups">
+                  {schoolGroups.map((group) => {
+                    const confirmed = group.members.filter(
+                      (m) => m.confirmation_status === 'confirmed',
+                    ).length;
+                    const booked = group.members.filter((m) => Boolean(m.order)).length;
+                    const enrolled = group.members.filter(
+                      (m) => m.order?.status === 'enrolled' || m.order?.status === 'attended',
+                    ).length;
+                    const coordinator = group.members.find((m) => m.id === group.coordinator_id);
+                    return (
+                      <details class="school-admin-group">
+                        <summary>
+                          <strong>
+                            {group.course_type === 'school' ? 'Školní kurz' : 'Kurz ISP'}
+                          </strong>
+                          <span>
+                            {coordinator?.first_name} {coordinator?.last_name}
+                          </span>
+                          <span>
+                            {group.members.length} pozvaných · {confirmed} potvrzených · {booked}{' '}
+                            rezervací · {enrolled} nástupů
+                          </span>
+                          <small>
+                            {formatDateTime(group.created_at)} ·{' '}
+                            {booked === group.members.length
+                              ? 'Všichni rezervovali'
+                              : confirmed
+                                ? 'Potvrzování účasti'
+                                : 'Rozeslané pozvánky'}{' '}
+                            · {group.id}
+                          </small>
+                        </summary>
+                        <div class="school-admin-members">
+                          {group.members.map((member) => {
+                            const appointment = Array.isArray(member.order?.appointments)
+                              ? member.order.appointments[0]
+                              : member.order?.appointments;
+                            return (
+                              <article>
+                                <strong>
+                                  {member.first_name} {member.last_name}
+                                </strong>
+                                <a href={`mailto:${member.email}`}>{member.email}</a>
+                                <a href={`tel:${member.phone}`}>{member.phone}</a>
+                                <span>
+                                  {member.confirmation_status === 'confirmed'
+                                    ? 'Potvrzený zájem'
+                                    : member.confirmation_status === 'declined'
+                                      ? 'Odmítl/a'
+                                      : 'Pozvaný/á'}
+                                </span>
+                                {member.order && (
+                                  <span>
+                                    Objednávka {member.order.public_code} ·{' '}
+                                    {statusLabel(member.order.status)}
+                                  </span>
+                                )}
+                                {appointment?.starts_at && (
+                                  <span>Zápis: {formatDateTime(appointment.starts_at)}</span>
+                                )}
+                              </article>
+                            );
+                          })}
+                        </div>
+                      </details>
+                    );
+                  })}
+                </div>
               )}
             </section>
 
@@ -507,7 +647,7 @@ const calendarDays = calendarDates.map((item) => ({
                           </td>
                           <td>{orderCourseLabel(order)}</td>
                           <td>{branchLabel(order.branch)}</td>
-                          <td>{packageLabel(order.package)}</td>
+                          <td>{packageLabel(order.package, order.selection)}</td>
                           <td>
                             {order.addons.length
                               ? order.addons
@@ -605,7 +745,7 @@ const calendarDays = calendarDates.map((item) => ({
                       </h3>
                       <p>
                         {orderCourseLabel(order)} · {branchLabel(order.branch)} ·{' '}
-                        {packageLabel(order.package)}
+                        {packageLabel(order.package, order.selection)}
                       </p>
                       <dl>
                         <div>
@@ -1112,6 +1252,39 @@ const calendarDays = calendarDates.map((item) => ({
 <script src="../../scripts/admin-portal.ts"></script>
 
 <style>
+  .school-admin-groups {
+    display: grid;
+    gap: 12px;
+  }
+  .school-admin-group {
+    border: 1px solid #d4e3e4;
+    border-radius: 14px;
+    padding: 14px;
+  }
+  .school-admin-group summary {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+    cursor: pointer;
+  }
+  .school-admin-group summary small {
+    color: #60758b;
+  }
+  .school-admin-members {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .school-admin-members article {
+    display: grid;
+    gap: 5px;
+    border: 1px solid #e3ecec;
+    border-radius: 12px;
+    padding: 12px;
+    overflow-wrap: anywhere;
+  }
   :global(.admin-ajax-status) {
     position: fixed;
     right: max(16px, env(safe-area-inset-right));

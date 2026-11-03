@@ -19,6 +19,7 @@ interface Props {
   };
   hideHeader?: boolean;
   hideFooter?: boolean;
+  disableTracking?: boolean;
 }
 const {
   title,
@@ -29,6 +30,7 @@ const {
   article,
   hideHeader = false,
   hideFooter = false,
+  disableTracking = false,
 } = Astro.props;
 const path = Astro.url.pathname;
 const isInternalAdmin = isInternalAdminPath(path);
@@ -132,8 +134,13 @@ const nav = [
           set:html={JSON.stringify(structuredData).replace(/</g, '\\u003c')}
         />
       )
-    }{!isInternalAdmin && /^AW-\d+$/i.test(googleTagId) && <GoogleTag />}{!isInternalAdmin && <Clarity />}</head
-  ><body data-recaptcha-site-key={recaptchaSiteKey} data-google-tag-id={isInternalAdmin ? undefined : googleTagId}>
+    }{!isInternalAdmin && !disableTracking && /^AW-\d+$/i.test(googleTagId) && <GoogleTag />}{
+      !isInternalAdmin && !disableTracking && <Clarity />
+    }</head
+  ><body
+    data-recaptcha-site-key={recaptchaSiteKey}
+    data-google-tag-id={isInternalAdmin || disableTracking ? undefined : googleTagId}
+  >
     <a class="skip" href="#main">Přeskočit na obsah</a>
     {
       !hideHeader && (
@@ -172,9 +179,15 @@ const nav = [
                 <details class="branch-menu">
                   <summary>Naše pobočky</summary>
                   <div class="branch-menu-links">
-                    <a href="/strizkov" aria-current={path === '/strizkov' ? 'page' : undefined}>Praha 8 – Střížkov</a>
-                    <a href="/kladno" aria-current={path === '/kladno' ? 'page' : undefined}>Kladno</a>
-                    <a href="/statenice" aria-current={path === '/statenice' ? 'page' : undefined}>Statenice</a>
+                    <a href="/strizkov" aria-current={path === '/strizkov' ? 'page' : undefined}>
+                      Praha 8 – Střížkov
+                    </a>
+                    <a href="/kladno" aria-current={path === '/kladno' ? 'page' : undefined}>
+                      Kladno
+                    </a>
+                    <a href="/statenice" aria-current={path === '/statenice' ? 'page' : undefined}>
+                      Statenice
+                    </a>
                   </div>
                 </details>
                 <button class="btn primary" data-order disabled>
@@ -335,11 +348,24 @@ const nav = [
     text-decoration: none;
     padding-block: 12px;
   }
-  .branch-menu { position: relative; }
-  .branch-menu summary { cursor: pointer; list-style: none; white-space: nowrap; }
-  .branch-menu summary::-webkit-details-marker { display: none; }
-  .branch-menu summary::after { content: '⌄'; margin-left: 7px; }
-  .branch-menu[open] summary::after { content: '⌃'; }
+  .branch-menu {
+    position: relative;
+  }
+  .branch-menu summary {
+    cursor: pointer;
+    list-style: none;
+    white-space: nowrap;
+  }
+  .branch-menu summary::-webkit-details-marker {
+    display: none;
+  }
+  .branch-menu summary::after {
+    content: '⌄';
+    margin-left: 7px;
+  }
+  .branch-menu[open] summary::after {
+    content: '⌃';
+  }
   .branch-menu-links {
     position: absolute;
     z-index: 30;
@@ -361,7 +387,10 @@ const nav = [
   }
   .branch-menu-links a:hover,
   .branch-menu-links a:focus-visible,
-  .branch-menu-links a[aria-current='page'] { background: var(--canvas); color: var(--brand-dark); }
+  .branch-menu-links a[aria-current='page'] {
+    background: var(--canvas);
+    color: var(--brand-dark);
+  }
   nav > a:hover,
   nav > a[aria-current='page'],
   .branch-menu[open] summary {

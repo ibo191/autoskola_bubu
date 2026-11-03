@@ -244,7 +244,8 @@ export class SupabaseBookingRepository implements BookingRepository {
       | 'bubu_admin_dashboard'
       | 'bubu_admin_dashboard_authorized'
       | 'bubu_admin_schedule_action'
-      | 'bubu_store_order_attribution',
+      | 'bubu_store_order_attribution'
+      | 'bubu_create_school_order',
     body: unknown,
   ) {
     const response = await fetch(this.base + name, {
@@ -279,7 +280,7 @@ export class SupabaseBookingRepository implements BookingRepository {
   }
   async createProvisional(input: ProvisionalInput) {
     return createdSchema.parse(
-      await this.rpc('bubu_create_provisional', {
+      await this.rpc(input.groupMemberId ? 'bubu_create_school_order' : 'bubu_create_provisional', {
         p_slot: input.slotId,
         p_contact: input.contact,
         p_selection: input.selection,
@@ -295,6 +296,7 @@ export class SupabaseBookingRepository implements BookingRepository {
           unit_price_czk: item.unitPrice,
         })),
         p_token_hash: input.verificationHash,
+        ...(input.groupMemberId ? { p_member_id: input.groupMemberId } : {}),
       }),
     );
   }
@@ -508,7 +510,7 @@ export class SupabaseRateLimiter implements RateLimiter {
     this.key = env.SUPABASE_SERVICE_ROLE_KEY;
   }
   async consume(input: {
-    scope: 'create_order' | 'exam_contact' | 'moto_interest';
+    scope: 'create_order' | 'exam_contact' | 'moto_interest' | 'school_group';
     key: string;
     now: Date;
     limit: number;
