@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { quote } from '../../lib/pricing/quote';
+import { quoteForDisplay } from '../../lib/pricing/quote';
 export const prerender = false;
 export const POST: APIRoute = async ({ request }) => {
   if (request.headers.get('origin') !== new URL(request.url).origin)
@@ -22,7 +22,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
   try {
     const data = JSON.parse(new TextDecoder().decode(Buffer.concat(chunks)));
-    const result = quote(data);
+    const result = quoteForDisplay(data);
     return Response.json(result, {
       status: result.ok ? 200 : 422,
       headers: { 'Cache-Control': 'no-store' },

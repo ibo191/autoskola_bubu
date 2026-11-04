@@ -4,6 +4,7 @@ import OrderDialog from '../components/OrderDialog.astro';
 import CookieConsent from '../components/CookieConsent.astro';
 import GoogleTag from '../components/GoogleTag.astro';
 import { branches } from '../lib/catalog';
+import { isInternalAdminPath } from '../lib/admin-route';
 interface Props {
   title: string;
   description: string;
@@ -29,6 +30,7 @@ const {
   hideFooter = false,
 } = Astro.props;
 const path = Astro.url.pathname;
+const isInternalAdmin = isInternalAdminPath(path);
 const canonical = new URL(path, 'https://www.autoskolabubu.cz').href;
 const pageTitle = title.includes('Autoškola BuBu') ? title : `${title} | Autoškola BuBu`;
 const isProduction =
@@ -129,8 +131,11 @@ const nav = [
           set:html={JSON.stringify(structuredData).replace(/</g, '\\u003c')}
         />
       )
-    }{/^AW-\d+$/i.test(googleTagId) && <GoogleTag />}</head
-  ><body data-recaptcha-site-key={recaptchaSiteKey} data-google-tag-id={googleTagId}>
+    }{!isInternalAdmin && /^AW-\d+$/i.test(googleTagId) && <GoogleTag />}</head
+  ><body
+    data-recaptcha-site-key={recaptchaSiteKey}
+    data-google-tag-id={isInternalAdmin ? undefined : googleTagId}
+  >
     <a class="skip" href="#main">Přeskočit na obsah</a>
     {
       !hideHeader && (
@@ -221,6 +226,19 @@ const nav = [
                     </>
                   </div>
                 ))}
+              </div>
+              <div class="footer-documents" aria-label="Dokumenty ke stažení">
+                <strong>Dokumenty ke stažení</strong>
+                <a href="/dokumenty/prihlaska-k-vycviku.pdf" target="_blank" rel="noopener">
+                  Žádost o přijetí k výuce a výcviku (PDF)
+                </a>
+                <a
+                  href="/dokumenty/zadost-o-odstoupeni-od-smlouvy.pdf"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  Žádost o odstoupení od smlouvy (PDF)
+                </a>
               </div>
               <div class="footer-bottom">
                 <>
@@ -351,13 +369,31 @@ const nav = [
     color: var(--brand-dark);
     text-decoration: underline;
   }
+  .footer-documents {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 28px;
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-size: 0.85rem;
+  }
+  .footer-documents strong {
+    font-weight: 700;
+    margin-right: 8px;
+  }
+  .footer-documents a {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
   .footer-bottom {
     display: flex;
     justify-content: space-between;
     gap: 20px;
     font-size: 0.68rem;
     color: var(--muted);
-    margin-top: 44px;
+    margin-top: 24px;
     padding-top: 24px;
     border-top: 1px solid var(--line);
   }

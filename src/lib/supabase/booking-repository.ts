@@ -508,7 +508,7 @@ export class SupabaseRateLimiter implements RateLimiter {
     this.key = env.SUPABASE_SERVICE_ROLE_KEY;
   }
   async consume(input: {
-    scope: 'create_order' | 'exam_contact';
+    scope: 'create_order' | 'exam_contact' | 'moto_interest';
     key: string;
     now: Date;
     limit: number;

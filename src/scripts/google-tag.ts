@@ -1,4 +1,5 @@
 export {};
+import { isInternalAdminPath } from '../lib/admin-route';
 
 declare global {
   interface Window {
@@ -12,7 +13,7 @@ const googleTagManagerId = 'GTM-PGNDXXCL';
 
 // Basic Consent Mode: no Google script or request exists until the visitor
 // expressly grants analytics or marketing consent.
-if (/^AW-\d+$/i.test(googleTagId)) {
+if (!isInternalAdminPath(window.location.pathname) && /^AW-\d+$/i.test(googleTagId)) {
   const disabledKey = `ga-disable-${googleTagId}`;
   const googleWindow = window as unknown as Window & Record<string, boolean | unknown>;
   let initialized = false;

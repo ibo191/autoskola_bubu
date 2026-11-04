@@ -4,6 +4,41 @@ const cookieName = 'bubu_cookie_consent';
 const googleTagId = 'AW-17619012335';
 const googleTagManagerId = 'GTM-PGNDXXCL';
 
+test('internal administration never initializes Google tracking with saved consent', async ({
+  page,
+}) => {
+  await page.context().addCookies([
+    {
+      name: cookieName,
+      value: encodeURIComponent(
+        JSON.stringify({ version: 1, necessary: true, analytics: true, marketing: true }),
+      ),
+      domain: '127.0.0.1',
+      path: '/',
+    },
+  ]);
+  const googleRequests: string[] = [];
+  page.on('request', (request) => {
+    if (/google(tagmanager|\-analytics)\.com|doubleclick\.net/.test(request.url()))
+      googleRequests.push(request.url());
+  });
+  for (const path of ['/sprava', '/sprava?period=this-month']) {
+    await page.goto(path);
+    await page.evaluate(() => {
+      window.dispatchEvent(new CustomEvent('bubu:tracking', { detail: { name: 'page_view' } }));
+      document.dispatchEvent(
+        new CustomEvent('bubu:cookie-consent-updated', {
+          detail: { analytics: true, marketing: true },
+        }),
+      );
+    });
+    expect(await page.locator('body').getAttribute('data-google-tag-id')).toBeNull();
+    expect(await page.locator('script[src*="googletagmanager.com"]').count()).toBe(0);
+    expect(await page.evaluate(() => window.dataLayer)).toBeUndefined();
+  }
+  expect(googleRequests).toEqual([]);
+});
+
 test('cookie consent starts with optional categories disabled and can be reopened from footer', async ({
   page,
 }) => {

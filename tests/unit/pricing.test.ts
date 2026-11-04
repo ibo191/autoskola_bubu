@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { quote } from '../../src/lib/pricing/quote';
+import { quote, quoteForDisplay } from '../../src/lib/pricing/quote';
 import {
   courses,
   branches,
@@ -38,6 +38,21 @@ for (const course of ['am', 'a1', 'a2', 'a'])
       assert.equal(result.message, motoEnrollmentPausedMessage);
     }
   });
+
+test('moto prices are visible while server-side enrollment stays paused', () => {
+  const selection = { course: 'a', branch: 'strizkov', package: 'moto-confidence' };
+  assert.equal(quote(selection).ok, false);
+  const display = quoteForDisplay(selection);
+  assert.equal(display.ok, true);
+  if (display.ok) assert.equal(display.amount, 31900);
+});
+test('A1 displays only Moto Jistota even when applicant already holds B', () => {
+  const basic = quoteForDisplay({ course: 'a1', branch: 'strizkov', heldLicences: ['B'], package: 'moto-basic' });
+  assert.equal(basic.ok, false);
+  if (!basic.ok) assert.deepEqual(basic.allowedPackages, ['moto-confidence']);
+  const confidence = quoteForDisplay({ course: 'a1', branch: 'strizkov', heldLicences: ['B'], package: 'moto-confidence' });
+  assert.equal(confidence.ok, true);
+});
 test('Moto enrollment pause applies before a direct selection can create an offer', () => {
   const result = quote({
     course: 'a2',

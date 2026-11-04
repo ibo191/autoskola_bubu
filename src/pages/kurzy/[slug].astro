@@ -261,9 +261,14 @@ const faqSchema = {
           <div class="actions">
             {
               isMoto && motoEnrollmentPaused ? (
-                <span class="moto-pause" role="status">
-                  {motoEnrollmentPausedMessage}
-                </span>
+                <>
+                  <span class="moto-pause" role="status">
+                    {motoEnrollmentPausedMessage}
+                  </span>
+                  <a class="btn primary" href={`/motorky-2027?skupina=${course.id}&zdroj=course`}>
+                    Mám předběžný zájem ↗
+                  </a>
+                </>
               ) : (
                 <button class="btn primary" data-order disabled data-course={course.id}>
                   Přihlásit se do kurzu ↗
@@ -445,9 +450,17 @@ const faqSchema = {
                         : 'Jedna cena kurzu na zvolené pobočce. Bez matoucích balíčků.'}
                   </p>
                   {isMoto && motoEnrollmentPaused ? (
-                    <span class="moto-pause" role="status">
-                      {motoEnrollmentPausedMessage}
-                    </span>
+                    <>
+                      <span class="moto-pause" role="status">
+                        {motoEnrollmentPausedMessage}
+                      </span>
+                      <a
+                        class="btn primary"
+                        href={`/motorky-2027?skupina=${course.id}&zdroj=course`}
+                      >
+                        Mám předběžný zájem ↗
+                      </a>
+                    </>
                   ) : (
                     <button
                       class="btn primary"
@@ -478,16 +491,27 @@ const faqSchema = {
     <section class="next-step">
       <div class="container next-grid">
         <div>
-          <span>DALŠÍ KROK</span><h2>Stačí si vybrat termín zápisu.</h2><p>
-            Pokud vám kurz sedí, objednávka vás provede výběrem pobočky a termínu zápisu.
+          <span>DALŠÍ KROK</span><h2>
+            {isMoto ? 'Dejte nám vědět o zájmu.' : 'Stačí si vybrat termín zápisu.'}
+          </h2><p>
+            {
+              isMoto
+                ? 'Přihlášky na sezonu 2027 jsou zatím pozastavené. Zanechte nám kontakt a po otevření přihlášek vás vyzveme k vytvoření objednávky.'
+                : 'Pokud vám kurz sedí, objednávka vás provede výběrem pobočky a termínu zápisu.'
+            }
           </p>
         </div><div>
           <div class="actions">
             {
               isMoto && motoEnrollmentPaused ? (
-                <span class="moto-pause" role="status">
-                  {motoEnrollmentPausedMessage}
-                </span>
+                <>
+                  <span class="moto-pause" role="status">
+                    {motoEnrollmentPausedMessage}
+                  </span>
+                  <a class="btn primary" href={`/motorky-2027?skupina=${course.id}&zdroj=course`}>
+                    Mám předběžný zájem ↗
+                  </a>
+                </>
               ) : (
                 <button class="btn primary" data-order disabled data-course={course.id}>
                   Přihlásit se ↗

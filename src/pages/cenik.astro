@@ -17,17 +17,70 @@ import {
   title="Ceník autoškoly 2026 | Praha 8, Kladno, Statenice"
   description="Aktuální ceník Autoškoly BuBu pro řidičák skupiny B, L17, motorky, přívěsy a kondiční jízdy v Praze 8, Kladně a Statenicích."
 >
-  <section class="page-hero">
+  <section class="page-hero pricing-hero">
     <div class="container">
       <nav class="breadcrumbs" aria-label="Drobečková navigace">
         <a href="/">Domů</a><span>/</span><span>Ceník</span>
       </nav>
-      <span class="eyebrow">Jasný výběr. Jasná cena.</span><h1>
-        Vyberte si kurz.<br />Cenu víte hned.
-      </h1>
+      <span class="eyebrow">Jasný výběr. Jasná cena.</span><h1>Ceník autoškoly</h1>
       <p class="lead">
-        Stačí pár odpovědí a ukážeme vám kurz, který odpovídá tomu, co chcete řídit, kde chcete
-        jezdit a jakou variantu výcviku preferujete.
+        Ceny kurzů B a L17 podle pobočky. Další kurzy a varianty najdete v průvodci níže.
+      </p>
+      <div
+        class="quick-prices"
+        role="region"
+        aria-label="Ceny kurzů B a L17 podle pobočky"
+        tabindex="0"
+      >
+        <table>
+          <caption class="sr-only">Ceny výuky a výcviku bez poplatků za zkoušku</caption>
+          <thead>
+            <tr>
+              <th scope="col">Kurz</th>
+              {branches.map((branch) => <th scope="col">{branch.name}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row"><a href="/kurzy/ridicak-skupina-b">B · manuál</a></th>
+              {
+                branches.map((branch) => (
+                  <td>
+                    <strong>{money(branch.bPrice)}</strong>
+                  </td>
+                ))
+              }
+            </tr>
+            <tr>
+              <th scope="row"><a href="/kurzy/ridicak-skupina-b-automat">B · automat</a></th>
+              {
+                branches.map((branch) => (
+                  <td>
+                    {branch.id === 'strizkov' ? (
+                      <strong>{money(branch.bPrice)}</strong>
+                    ) : (
+                      'Nenabízíme'
+                    )}
+                  </td>
+                ))
+              }
+            </tr>
+            <tr>
+              <th scope="row"><a href="/kurzy/l17">L17 · manuál</a></th>
+              {
+                branches.map((branch) => (
+                  <td>
+                    <strong>{money(branch.bPrice)}</strong>
+                  </td>
+                ))
+              }
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="quick-prices-hint">Další pobočky zobrazíte posunutím tabulky do strany →</p>
+      <p class="quick-prices-note">
+        Ceny zahrnují výuku a výcvik. Poplatky za zkoušku se hradí zvlášť.
       </p>
     </div>
   </section>
@@ -36,7 +89,7 @@ import {
     <div class="container">
       <div class="decision-header">
         <span class="eyebrow">Průvodce ceníkem</span><h2>Pojďme najít správný kurz.</h2><p>
-          Žádné hledání v tabulkách. Vyberte pár možností a hned uvidíte cenu kurzu pro vás.
+          Vyberte pár možností a zobrazíme cenu i podrobnosti kurzu pro vás.
         </p>
       </div>
 
@@ -277,11 +330,10 @@ import {
             >
           </div>
           <div class="offer-actions">
-            <button class="btn primary" data-order disabled>Chci se přihlásit ↗</button><a
-              id="offer-detail"
-              class="text-link"
-              href="/cenik">Podrobnosti o kurzu</a
-            >
+            <button class="btn primary" data-order disabled>Chci se přihlásit ↗</button>
+            <a class="btn primary" id="moto-interest-link" href="/motorky-2027" hidden
+              >Odeslat předběžný zájem ↗</a
+            ><a id="offer-detail" class="text-link" href="/cenik">Podrobnosti o kurzu</a>
           </div>
         </article>
       </section>
@@ -489,7 +541,6 @@ import {
       const message = document.querySelector<HTMLElement>('#availability-message')!;
       message.textContent = message.dataset.motoMessage ?? '';
       reveal('#availability-message');
-      return;
     }
     show('#branch-question', true);
     if (!state.branch) return;
@@ -653,6 +704,17 @@ import {
                 : 'Rozšíření oprávnění';
     document.querySelector('#offer-variant')!.textContent = packageLabel;
     const order = document.querySelector<HTMLButtonElement>('.offer-card [data-order]')!;
+    const motoInterest = document.querySelector<HTMLAnchorElement>('#moto-interest-link')!;
+    order.hidden = state.category === 'moto';
+    motoInterest.hidden = state.category !== 'moto';
+    if (state.category === 'moto') {
+      const params = new URLSearchParams({ skupina: String(selection.course), zdroj: 'cenik' });
+      params.set('ridicak', state.licenceStatus);
+      if (state.licenceStatus === 'yes') params.set('opravneni', heldLicences().join(','));
+      if (state.period) params.set('doba', state.period);
+      params.set('varianta', result.package);
+      motoInterest.href = `/motorky-2027?${params}`;
+    }
     order.dataset.course = String(selection.course);
     order.dataset.branch = state.branch;
     order.dataset.transmission = state.transmission;
@@ -719,6 +781,78 @@ import {
 </script>
 
 <style>
+  .pricing-hero {
+    padding-block: 28px 40px;
+  }
+  .quick-prices {
+    margin-top: 24px;
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--paper);
+  }
+  .quick-prices table {
+    width: 100%;
+    min-width: 580px;
+    border-spacing: 0;
+    table-layout: fixed;
+    text-align: left;
+  }
+  .quick-prices th,
+  .quick-prices td {
+    padding: 14px 16px;
+    white-space: nowrap;
+  }
+  .quick-prices thead th {
+    background: var(--brand-soft);
+  }
+  .quick-prices tbody th,
+  .quick-prices tbody td {
+    border-top: 1px solid var(--line);
+  }
+  .quick-prices th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--paper);
+    box-shadow: 1px 0 var(--line);
+  }
+  .quick-prices thead th:first-child {
+    background: var(--brand-soft);
+  }
+  .quick-prices-note,
+  .quick-prices-hint {
+    margin-top: 12px;
+    font-size: 0.8rem;
+  }
+  .quick-prices-hint {
+    display: none;
+  }
+  @media (max-width: 760px) {
+    .pricing-hero h1 {
+      font-size: 2rem;
+    }
+    .pricing-hero .eyebrow {
+      margin-bottom: 12px;
+    }
+    .pricing-hero .lead {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-top: 16px;
+    }
+    .quick-prices table {
+      width: 520px;
+      min-width: 520px;
+    }
+    .quick-prices th,
+    .quick-prices td {
+      padding: 12px 10px;
+      font-size: 0.85rem;
+    }
+    .quick-prices-hint {
+      display: block;
+    }
+  }
   .decision-header {
     max-width: 760px;
     margin-bottom: 30px;

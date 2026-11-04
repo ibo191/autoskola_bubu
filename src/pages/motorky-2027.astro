@@ -1,0 +1,307 @@
+---
+import Base from '../layouts/Base.astro';
+import { motoEnrollmentPausedMessage } from '../lib/catalog';
+---
+
+<Base
+  title="Motorky 2027 – předběžný zájem | Autoškola BuBu"
+  description="Motocyklové kurzy na Střížkově: zanechte nám předběžný zájem o sezonu 2027. Až otevřeme přihlášky, vyzveme vás k vytvoření objednávky."
+>
+  <main class="interest-page">
+    <div class="container">
+      <nav class="breadcrumbs" aria-label="Drobečková navigace">
+        <a href="/">Domů</a><span>/</span><a href="/cenik">Ceník</a><span>/</span><span
+          >Motorky 2027</span
+        >
+      </nav>
+      <div class="interest-grid">
+        <section class="interest-copy">
+          <span class="eyebrow">Praha 8 – Střížkov · sezona 2027</span>
+          <h1>Na motorku příští sezonu? Dejte nám vědět.</h1>
+          <p class="lead">{motoEnrollmentPausedMessage}</p>
+          <p>
+            Ceny a varianty si můžete v klidu projít v <a href="/cenik">ceníku</a>. Zatím stačí
+            zanechat kontakt. Jakmile přihlašování otevřeme, ozveme se vám s výzvou k vytvoření
+            objednávky.
+          </p>
+          <div class="notice">
+            <strong>Jde pouze o předběžný zájem.</strong> Odesláním formuláře nevzniká objednávka, rezervace
+            místa ani termín zápisu.
+          </div>
+        </section>
+        <section class="interest-card" aria-labelledby="interest-title">
+          <span class="eyebrow">Předběžný zájem</span>
+          <h2 id="interest-title">Dejte nám na sebe kontakt</h2>
+          <form id="moto-interest-form">
+            <div class="name-grid"><label>Jméno<input name="firstName" autocomplete="given-name" required minlength="2" maxlength="80" /></label>
+            <label>Příjmení<input name="lastName" autocomplete="family-name" required minlength="2" maxlength="80" /></label></div>
+            <label
+              >E-mail<input
+                name="email"
+                type="email"
+                autocomplete="email"
+                required
+                maxlength="254"
+              /></label
+            >
+            <label
+              >Telefon<input
+                name="phone"
+                type="tel"
+                autocomplete="tel"
+                required
+                inputmode="tel"
+              /></label
+            >
+            <label
+              >Skupina
+              <select name="course" required>
+                <option value="">Vyberte skupinu</option>
+                <option value="am">AM</option><option value="a1">A1</option>
+                <option value="a2">A2</option><option value="a">A</option>
+              </select>
+            </label>
+            <fieldset>
+              <legend>Máte už řidičské oprávnění?</legend>
+              <label><input type="radio" name="licenceStatus" value="none" required /> Ještě žádné nemám</label>
+              <label><input type="radio" name="licenceStatus" value="yes" required /> Ano, mám</label>
+            </fieldset>
+            <fieldset id="held-licences" hidden>
+              <legend>Které skupiny už máte?</legend>
+              {['B', 'AM', 'A1', 'A2', 'A', 'other'].map((licence) => <label><input type="checkbox" name="heldLicence" value={licence} /> {licence === 'other' ? 'Jiné' : licence}</label>)}
+            </fieldset>
+            <label id="period-field" hidden>Jak dlouho držíte současné moto oprávnění?
+              <select name="holdingPeriod"><option value="">Vyberte</option><option value="less-than-two">Méně než 2 roky</option><option value="more-than-two">Více než 2 roky</option></select>
+            </label>
+            <fieldset id="package-field" hidden>
+              <legend>O jakou variantu máte zájem?</legend>
+              <label data-package-choice="moto-basic"><input type="radio" name="package" value="moto-basic" /> Moto Základ</label>
+              <label data-package-choice="moto-confidence"><input type="radio" name="package" value="moto-confidence" /> Moto Jistota</label>
+              <label data-package-choice="supplement"><input type="radio" name="package" value="supplement" /> Doplňovací zkouška</label>
+              <small id="package-note"></small>
+            </fieldset>
+            <label class="honeypot" aria-hidden="true"
+              >Web<input name="website" tabindex="-1" autocomplete="off" /></label
+            >
+            <label class="consent"
+              ><input name="notificationConsent" type="checkbox" required /><span>
+                Chci, aby mě Autoškola BuBu jednorázově kontaktovala, až otevře přihlašování do
+                motocyklových kurzů pro sezonu 2027. Vím, že nejde o rezervaci ani objednávku.
+              </span></label
+            >
+            <p class="privacy">
+              Údaje použijeme pouze pro tuto výzvu. O odstranění kontaktu můžete kdykoli požádat na <a
+                href="mailto:info@autoskolabubu.cz">info@autoskolabubu.cz</a
+              >. <a href="/ochrana-osobnich-udaju">Informace o zpracování osobních údajů</a>.
+            </p>
+            <button class="btn primary" type="submit">Chci vědět, až otevřete přihlášky ↗</button>
+            <p id="interest-status" role="status" aria-live="polite"></p>
+          </form>
+        </section>
+      </div>
+    </div>
+  </main>
+  <script>
+    import { getRecaptchaToken } from '../scripts/recaptcha';
+    const form = document.querySelector<HTMLFormElement>('#moto-interest-form')!;
+    const status = document.querySelector<HTMLElement>('#interest-status')!;
+    const params = new URLSearchParams(location.search);
+    const course = params.get('skupina');
+    if (course && ['am', 'a1', 'a2', 'a'].includes(course))
+      (form.elements.namedItem('course') as HTMLSelectElement).value = course;
+    const source = params.get('zdroj');
+    const group = form.elements.namedItem('course') as HTMLSelectElement;
+    const periodField = document.querySelector<HTMLElement>('#period-field')!;
+    const heldField = document.querySelector<HTMLElement>('#held-licences')!;
+    const packageField = document.querySelector<HTMLElement>('#package-field')!;
+    const statusRadios = [...form.querySelectorAll<HTMLInputElement>('input[name="licenceStatus"]')];
+    const licenceBoxes = [...form.querySelectorAll<HTMLInputElement>('input[name="heldLicence"]')];
+    const packageRadios = [...form.querySelectorAll<HTMLInputElement>('input[name="package"]')];
+    const periodSelect = form.elements.namedItem('holdingPeriod') as HTMLSelectElement;
+    const packageNote = document.querySelector<HTMLElement>('#package-note')!;
+    const preselectedLicences = params.get('opravneni')?.split(',') ?? [];
+    const preselectedStatus = params.get('ridicak');
+    const preselectedPeriod = params.get('doba');
+    const preselectedPackage = params.get('varianta');
+    if (preselectedStatus === 'none' || preselectedStatus === 'yes')
+      form.querySelector<HTMLInputElement>(`input[name="licenceStatus"][value="${preselectedStatus}"]`)!.checked = true;
+    licenceBoxes.forEach((box) => { box.checked = preselectedLicences.includes(box.value); });
+    if (preselectedPeriod === 'less-than-two' || preselectedPeriod === 'more-than-two') periodSelect.value = preselectedPeriod;
+    if (preselectedPackage && ['moto-basic', 'moto-confidence', 'supplement'].includes(preselectedPackage))
+      form.querySelector<HTMLInputElement>(`input[name="package"][value="${preselectedPackage}"]`)!.checked = true;
+    function updateChoices() {
+      const licenceStatus = statusRadios.find((radio) => radio.checked)?.value;
+      const held = licenceBoxes.filter((box) => box.checked).map((box) => box.value);
+      const ranks: Record<string, number> = { AM: 0, A1: 1, A2: 2, A: 3 };
+      const highest = held.filter((item) => item in ranks).sort((a, b) => ranks[b]! - ranks[a]!)[0];
+      const direct = (highest === 'A1' && group.value === 'a2') || (highest === 'A2' && group.value === 'a');
+      heldField.hidden = licenceStatus !== 'yes';
+      periodField.hidden = !direct;
+      periodSelect.required = direct;
+      packageField.hidden = !licenceStatus || !group.value || (licenceStatus === 'yes' && !held.length) || (direct && !periodSelect.value);
+      const onlyConfidence = licenceStatus === 'none' || group.value === 'a1';
+      const onlySupplement = direct && periodSelect.value === 'more-than-two';
+      const allowed = onlySupplement ? ['supplement'] : onlyConfidence ? ['moto-confidence'] : ['moto-basic', 'moto-confidence'];
+      packageRadios.forEach((radio) => {
+        radio.closest<HTMLElement>('label')!.hidden = !allowed.includes(radio.value);
+        radio.required = !packageField.hidden;
+        if (!allowed.includes(radio.value)) radio.checked = false;
+      });
+      if (allowed.length === 1 && !packageField.hidden)
+        packageRadios.find((radio) => radio.value === allowed[0])!.checked = true;
+      packageNote.textContent = onlyConfidence ? 'Pro první výcvik a A1 nabízíme variantu Moto Jistota.' : onlySupplement ? 'Při tomto rozšíření se řeší doplňovací zkouška.' : 'Zvolte variantu, která vám vyhovuje.';
+    }
+    form.addEventListener('change', updateChoices);
+    updateChoices();
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+      submit.disabled = true;
+      status.textContent = 'Odesíláme…';
+      try {
+        const data = new FormData(form);
+        const recaptchaToken = await getRecaptchaToken('contact');
+        const response = await fetch('/api/moto-interest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firstName: data.get('firstName'),
+            lastName: data.get('lastName'),
+            email: data.get('email'),
+            phone: data.get('phone'),
+            course: data.get('course'),
+            licenceStatus: data.get('licenceStatus'),
+            heldLicences: data.get('licenceStatus') === 'yes' ? data.getAll('heldLicence') : [],
+            ...(periodField.hidden ? {} : { holdingPeriod: data.get('holdingPeriod') }),
+            package: data.get('package'),
+            source: source === 'cenik' || source === 'course' ? source : 'direct',
+            notificationConsent: data.get('notificationConsent') === 'on',
+            website: data.get('website') ?? '',
+            recaptchaToken,
+          }),
+        });
+        if (!response.ok) throw new Error('SUBMISSION_FAILED');
+        form.reset();
+        updateChoices();
+        status.textContent =
+          'Děkujeme. Váš předběžný zájem jsme uložili. Až otevřeme přihlášky, vyzveme vás k vytvoření objednávky.';
+        status.classList.add('success');
+      } catch {
+        status.textContent = 'Zájem se nepodařilo odeslat. Zkuste to prosím znovu.';
+        submit.disabled = false;
+      }
+    });
+  </script>
+</Base>
+
+<style>
+  .interest-page {
+    padding: 3rem 0 6rem;
+    background: linear-gradient(135deg, #eff8f6, #fff 60%);
+  }
+  .breadcrumbs {
+    display: flex;
+    gap: 0.7rem;
+    margin-bottom: 3rem;
+    font-size: 0.9rem;
+  }
+  .interest-grid {
+    display: grid;
+    grid-template-columns: 1fr minmax(330px, 500px);
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: start;
+  }
+  h1 {
+    max-width: 12ch;
+    font-size: clamp(2.8rem, 5vw, 5rem);
+    line-height: 1.05;
+  }
+  .lead {
+    font-size: 1.25rem;
+    line-height: 1.6;
+  }
+  .interest-copy > p:not(.lead) {
+    max-width: 55ch;
+    line-height: 1.7;
+  }
+  .notice {
+    margin-top: 2rem;
+    padding: 1.25rem;
+    border: 1px solid #b7d8d2;
+    border-radius: 1rem;
+    background: #e9f6f3;
+  }
+  .interest-card {
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 1.5rem;
+    box-shadow: 0 20px 45px #15345b12;
+  }
+  .interest-card h2 {
+    margin: 0.5rem 0 1.5rem;
+  }
+  form {
+    display: grid;
+    gap: 1rem;
+  }
+  form > label:not(.consent), .name-grid label {
+    display: grid;
+    gap: 0.35rem;
+    font-weight: 600;
+  }
+  .name-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  fieldset { border: 1px solid #b7c9c8; border-radius: .7rem; padding: .8rem 1rem; display: grid; gap: .5rem; }
+  fieldset[hidden], label[hidden] { display: none; }
+  fieldset legend { font-weight: 700; padding: 0 .3rem; }
+  fieldset label { display: flex; align-items: center; gap: .5rem; }
+  fieldset small { color: var(--muted); }
+  input:not([type='checkbox']),
+  select {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid #b7c9c8;
+    border-radius: 0.7rem;
+    background: #fff;
+    font: inherit;
+  }
+  .consent {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  .consent input {
+    flex: none;
+    margin-top: 0.3rem;
+  }
+  .privacy {
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+  .honeypot {
+    position: absolute;
+    left: -9999px;
+  }
+  #interest-status {
+    margin: 0;
+    min-height: 1.5em;
+    color: #a02d2d;
+  }
+  #interest-status.success {
+    color: #10695d;
+    font-weight: 600;
+  }
+  @media (max-width: 800px) {
+    .name-grid { grid-template-columns: 1fr; }
+    .interest-grid {
+      grid-template-columns: 1fr;
+    }
+    .interest-page {
+      padding-top: 2rem;
+    }
+  }
+</style>
