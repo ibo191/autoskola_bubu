@@ -33,8 +33,25 @@ import { motoEnrollmentPausedMessage } from '../lib/catalog';
           <span class="eyebrow">Předběžný zájem</span>
           <h2 id="interest-title">Dejte nám na sebe kontakt</h2>
           <form id="moto-interest-form">
-            <div class="name-grid"><label>Jméno<input name="firstName" autocomplete="given-name" required minlength="2" maxlength="80" /></label>
-            <label>Příjmení<input name="lastName" autocomplete="family-name" required minlength="2" maxlength="80" /></label></div>
+            <div class="name-grid">
+              <label
+                >Jméno<input
+                  name="firstName"
+                  autocomplete="given-name"
+                  required
+                  minlength="2"
+                  maxlength="80"
+                /></label
+              >
+              <label
+                >Příjmení<input
+                  name="lastName"
+                  autocomplete="family-name"
+                  required
+                  minlength="2"
+                  maxlength="80"
+                /></label>
+            </div>
             <label
               >E-mail<input
                 name="email"
@@ -63,21 +80,43 @@ import { motoEnrollmentPausedMessage } from '../lib/catalog';
             </label>
             <fieldset>
               <legend>Máte už řidičské oprávnění?</legend>
-              <label><input type="radio" name="licenceStatus" value="none" required /> Ještě žádné nemám</label>
-              <label><input type="radio" name="licenceStatus" value="yes" required /> Ano, mám</label>
+              <label
+                ><input type="radio" name="licenceStatus" value="none" required /> Ještě žádné nemám</label
+              >
+              <label
+                ><input type="radio" name="licenceStatus" value="yes" required /> Ano, mám</label
+              >
             </fieldset>
             <fieldset id="held-licences" hidden>
               <legend>Které skupiny už máte?</legend>
-              {['B', 'AM', 'A1', 'A2', 'A', 'other'].map((licence) => <label><input type="checkbox" name="heldLicence" value={licence} /> {licence === 'other' ? 'Jiné' : licence}</label>)}
+              {
+                ['B', 'AM', 'A1', 'A2', 'A', 'other'].map((licence) => (
+                  <label>
+                    <input type="checkbox" name="heldLicence" value={licence} />{' '}
+                    {licence === 'other' ? 'Jiné' : licence}
+                  </label>
+                ))
+              }
             </fieldset>
-            <label id="period-field" hidden>Jak dlouho držíte současné moto oprávnění?
-              <select name="holdingPeriod"><option value="">Vyberte</option><option value="less-than-two">Méně než 2 roky</option><option value="more-than-two">Více než 2 roky</option></select>
+            <label id="period-field" hidden
+              >Jak dlouho držíte současné moto oprávnění?
+              <select name="holdingPeriod"
+                ><option value="">Vyberte</option><option value="less-than-two"
+                  >Méně než 2 roky</option
+                ><option value="more-than-two">Více než 2 roky</option></select
+              >
             </label>
             <fieldset id="package-field" hidden>
               <legend>O jakou variantu máte zájem?</legend>
-              <label data-package-choice="moto-basic"><input type="radio" name="package" value="moto-basic" /> Moto Základ</label>
-              <label data-package-choice="moto-confidence"><input type="radio" name="package" value="moto-confidence" /> Moto Jistota</label>
-              <label data-package-choice="supplement"><input type="radio" name="package" value="supplement" /> Doplňovací zkouška</label>
+              <label data-package-choice="moto-basic"
+                ><input type="radio" name="package" value="moto-basic" /> Moto Základ</label
+              >
+              <label data-package-choice="moto-confidence"
+                ><input type="radio" name="package" value="moto-confidence" /> Moto Jistota</label
+              >
+              <label data-package-choice="supplement"
+                ><input type="radio" name="package" value="supplement" /> Doplňovací zkouška</label
+              >
               <small id="package-note"></small>
             </fieldset>
             <label class="honeypot" aria-hidden="true"
@@ -114,7 +153,9 @@ import { motoEnrollmentPausedMessage } from '../lib/catalog';
     const periodField = document.querySelector<HTMLElement>('#period-field')!;
     const heldField = document.querySelector<HTMLElement>('#held-licences')!;
     const packageField = document.querySelector<HTMLElement>('#package-field')!;
-    const statusRadios = [...form.querySelectorAll<HTMLInputElement>('input[name="licenceStatus"]')];
+    const statusRadios = [
+      ...form.querySelectorAll<HTMLInputElement>('input[name="licenceStatus"]'),
+    ];
     const licenceBoxes = [...form.querySelectorAll<HTMLInputElement>('input[name="heldLicence"]')];
     const packageRadios = [...form.querySelectorAll<HTMLInputElement>('input[name="package"]')];
     const periodSelect = form.elements.namedItem('holdingPeriod') as HTMLSelectElement;
@@ -124,24 +165,43 @@ import { motoEnrollmentPausedMessage } from '../lib/catalog';
     const preselectedPeriod = params.get('doba');
     const preselectedPackage = params.get('varianta');
     if (preselectedStatus === 'none' || preselectedStatus === 'yes')
-      form.querySelector<HTMLInputElement>(`input[name="licenceStatus"][value="${preselectedStatus}"]`)!.checked = true;
-    licenceBoxes.forEach((box) => { box.checked = preselectedLicences.includes(box.value); });
-    if (preselectedPeriod === 'less-than-two' || preselectedPeriod === 'more-than-two') periodSelect.value = preselectedPeriod;
-    if (preselectedPackage && ['moto-basic', 'moto-confidence', 'supplement'].includes(preselectedPackage))
-      form.querySelector<HTMLInputElement>(`input[name="package"][value="${preselectedPackage}"]`)!.checked = true;
+      form.querySelector<HTMLInputElement>(
+        `input[name="licenceStatus"][value="${preselectedStatus}"]`,
+      )!.checked = true;
+    licenceBoxes.forEach((box) => {
+      box.checked = preselectedLicences.includes(box.value);
+    });
+    if (preselectedPeriod === 'less-than-two' || preselectedPeriod === 'more-than-two')
+      periodSelect.value = preselectedPeriod;
+    if (
+      preselectedPackage &&
+      ['moto-basic', 'moto-confidence', 'supplement'].includes(preselectedPackage)
+    )
+      form.querySelector<HTMLInputElement>(
+        `input[name="package"][value="${preselectedPackage}"]`,
+      )!.checked = true;
     function updateChoices() {
       const licenceStatus = statusRadios.find((radio) => radio.checked)?.value;
       const held = licenceBoxes.filter((box) => box.checked).map((box) => box.value);
       const ranks: Record<string, number> = { AM: 0, A1: 1, A2: 2, A: 3 };
       const highest = held.filter((item) => item in ranks).sort((a, b) => ranks[b]! - ranks[a]!)[0];
-      const direct = (highest === 'A1' && group.value === 'a2') || (highest === 'A2' && group.value === 'a');
+      const direct =
+        (highest === 'A1' && group.value === 'a2') || (highest === 'A2' && group.value === 'a');
       heldField.hidden = licenceStatus !== 'yes';
       periodField.hidden = !direct;
       periodSelect.required = direct;
-      packageField.hidden = !licenceStatus || !group.value || (licenceStatus === 'yes' && !held.length) || (direct && !periodSelect.value);
+      packageField.hidden =
+        !licenceStatus ||
+        !group.value ||
+        (licenceStatus === 'yes' && !held.length) ||
+        (direct && !periodSelect.value);
       const onlyConfidence = licenceStatus === 'none' || group.value === 'a1';
       const onlySupplement = direct && periodSelect.value === 'more-than-two';
-      const allowed = onlySupplement ? ['supplement'] : onlyConfidence ? ['moto-confidence'] : ['moto-basic', 'moto-confidence'];
+      const allowed = onlySupplement
+        ? ['supplement']
+        : onlyConfidence
+          ? ['moto-confidence']
+          : ['moto-basic', 'moto-confidence'];
       packageRadios.forEach((radio) => {
         radio.closest<HTMLElement>('label')!.hidden = !allowed.includes(radio.value);
         radio.required = !packageField.hidden;
@@ -149,7 +209,11 @@ import { motoEnrollmentPausedMessage } from '../lib/catalog';
       });
       if (allowed.length === 1 && !packageField.hidden)
         packageRadios.find((radio) => radio.value === allowed[0])!.checked = true;
-      packageNote.textContent = onlyConfidence ? 'Pro první výcvik a A1 nabízíme variantu Moto Jistota.' : onlySupplement ? 'Při tomto rozšíření se řeší doplňovací zkouška.' : 'Zvolte variantu, která vám vyhovuje.';
+      packageNote.textContent = onlyConfidence
+        ? 'Pro první výcvik a A1 nabízíme variantu Moto Jistota.'
+        : onlySupplement
+          ? 'Při tomto rozšíření se řeší doplňovací zkouška.'
+          : 'Zvolte variantu, která vám vyhovuje.';
     }
     form.addEventListener('change', updateChoices);
     updateChoices();
@@ -246,18 +310,72 @@ import { motoEnrollmentPausedMessage } from '../lib/catalog';
     display: grid;
     gap: 1rem;
   }
-  form > label:not(.consent), .name-grid label {
+  form > label:not(.consent),
+  .name-grid label {
     display: grid;
     gap: 0.35rem;
     font-weight: 600;
+    text-align: left;
   }
-  .name-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-  fieldset { border: 1px solid #b7c9c8; border-radius: .7rem; padding: .8rem 1rem; display: grid; gap: .5rem; }
-  fieldset[hidden], label[hidden] { display: none; }
-  fieldset legend { font-weight: 700; padding: 0 .3rem; }
-  fieldset label { display: flex; align-items: center; gap: .5rem; }
-  fieldset small { color: var(--muted); }
-  input:not([type='checkbox']),
+  .name-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  fieldset {
+    min-width: 0;
+    border: 1px solid #b7c9c8;
+    border-radius: 0.7rem;
+    padding: 1rem;
+    display: grid;
+    gap: 0.65rem;
+    text-align: left;
+  }
+  fieldset[hidden],
+  label[hidden] {
+    display: none;
+  }
+  fieldset legend {
+    max-width: 100%;
+    font-weight: 700;
+    padding: 0 0.3rem;
+    color: var(--ink);
+  }
+  fieldset label {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.7rem;
+    width: 100%;
+    min-height: 44px;
+    margin: 0;
+    padding: 0.65rem 0.8rem;
+    border: 1px solid var(--line);
+    border-radius: 0.7rem;
+    background: #f8fbfa;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+  }
+  fieldset label:has(input:checked) {
+    border-color: var(--brand);
+    background: #eaf8f5;
+  }
+  fieldset input[type='radio'],
+  fieldset input[type='checkbox'] {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--brand-dark);
+  }
+  fieldset small {
+    display: block;
+    color: var(--muted);
+    text-align: left;
+    line-height: 1.5;
+  }
+  input:not([type='checkbox']):not([type='radio']),
   select {
     width: 100%;
     padding: 0.8rem 1rem;
@@ -272,6 +390,7 @@ import { motoEnrollmentPausedMessage } from '../lib/catalog';
     gap: 0.75rem;
     font-size: 0.9rem;
     line-height: 1.5;
+    text-align: left;
   }
   .consent input {
     flex: none;
@@ -281,6 +400,12 @@ import { motoEnrollmentPausedMessage } from '../lib/catalog';
     font-size: 0.82rem;
     line-height: 1.55;
     color: var(--muted);
+    text-align: left;
+  }
+  .interest-card .btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
   }
   .honeypot {
     position: absolute;
@@ -296,7 +421,9 @@ import { motoEnrollmentPausedMessage } from '../lib/catalog';
     font-weight: 600;
   }
   @media (max-width: 800px) {
-    .name-grid { grid-template-columns: 1fr; }
+    .name-grid {
+      grid-template-columns: 1fr;
+    }
     .interest-grid {
       grid-template-columns: 1fr;
     }

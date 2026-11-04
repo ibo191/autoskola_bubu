@@ -34,6 +34,8 @@ let dirty = false;
 let validQuote: Extract<Quote, { ok: true }> | undefined;
 let trigger: HTMLElement | undefined;
 let campaign: 'zimni-kampan' | undefined;
+let groupToken: string | undefined;
+let schoolCourseType: 'school' | 'isp' | undefined;
 let requestSequence = 0;
 let slotSequence = 0;
 let monthCursor = new Date();
@@ -155,6 +157,7 @@ function selectionWithAddons() {
   return {
     course,
     branch: field('branch').value,
+    ...(schoolCourseType ? { partnerSchool: 'gymnazium_manna', schoolCourseType } : {}),
     transmission:
       course === 'b-automat'
         ? 'automatic'
@@ -237,7 +240,7 @@ function setStep(value: number) {
       selectedDate = '';
       selectedSlotLabel.textContent = 'Termín zatím není vybraný.';
       monthCursor = firstBookingMonth(field('branch').value);
-      void loadSlots();
+      void loadSlots(true);
     }
   }
   form
@@ -252,6 +255,9 @@ function reset() {
   applicationStarted = false;
   trackedSelection = '';
   campaign = undefined;
+  groupToken = undefined;
+  schoolCourseType = undefined;
+  for (const name of ['firstName', 'lastName', 'email']) field(name).removeAttribute('readonly');
   question.hidden = true;
   loadedSlots = [];
   selectedDate = '';
@@ -274,8 +280,20 @@ document.querySelectorAll<HTMLElement>('[data-order]').forEach((button) => {
     trigger = button;
     reset();
     campaign = button.dataset.campaign === 'zimni-kampan' ? 'zimni-kampan' : undefined;
+    groupToken = button.dataset.groupToken;
+    schoolCourseType =
+      button.dataset.schoolCourseType === 'school' || button.dataset.schoolCourseType === 'isp'
+        ? button.dataset.schoolCourseType
+        : undefined;
     field('course').value = button.dataset.course ?? '';
     field('branch').value = button.dataset.branch ?? '';
+    if (groupToken) {
+      for (const name of ['firstName', 'lastName', 'email']) {
+        field(name).value = button.dataset[name] ?? '';
+        field(name).setAttribute('readonly', '');
+      }
+      field('phone').value = button.dataset.phone ?? '';
+    }
     if (button.dataset.transmission) field('transmission').value = button.dataset.transmission;
     if (button.dataset.drivingBlocks) field('drivingBlocks').value = button.dataset.drivingBlocks;
     syncAvailableCourses();
@@ -545,7 +563,7 @@ function renderCalendar() {
   if (!selectedDate) slotList.innerHTML = '<p>Vyberte zvýrazněný den v kalendáři.</p>';
 }
 
-async function loadSlots() {
+async function loadSlots(findNearest = false) {
   const branch = field('branch').value;
   const seq = ++slotSequence;
   loadedSlots = [];
@@ -555,25 +573,37 @@ async function loadSlots() {
   calendarDays.replaceChildren();
   slotList.innerHTML = '<p>Načítáme volné termíny…</p>';
   if (!branch) return;
-  const from = new Date(monthCursor.getFullYear(), monthCursor.getMonth(), 1);
-  const to = new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 0);
   try {
-    const response = await fetch(
-      `/api/slots?branch=${encodeURIComponent(branch)}&from=${localDateKey(from)}&to=${localDateKey(to)}`,
-    );
-    const result = (await response.json()) as { ok: boolean; slots?: Slot[]; message?: string };
-    if (seq !== slotSequence) return;
-    if (!response.ok || !result.ok || !result.slots?.length) {
-      calendarTitle.textContent = new Intl.DateTimeFormat('cs-CZ', {
-        month: 'long',
-        year: 'numeric',
-      }).format(monthCursor);
-      slotList.innerHTML = `<p>${result.message ?? 'Pro tuto pobočku nejsou vypsané termíny.'}</p>`;
-      renderCalendar();
-      return;
+    // Search at most one year ahead when the calendar first opens. Manual month
+    // navigation still shows the requested month, including an empty one.
+    const monthsToCheck = findNearest ? 12 : 1;
+    for (let offset = 0; offset < monthsToCheck; offset += 1) {
+      const month = new Date(monthCursor.getFullYear(), monthCursor.getMonth() + offset, 1);
+      const from = new Date(month.getFullYear(), month.getMonth(), 1);
+      const to = new Date(month.getFullYear(), month.getMonth() + 1, 0);
+      const response = await fetch(
+        `/api/slots?branch=${encodeURIComponent(branch)}&from=${localDateKey(from)}&to=${localDateKey(to)}`,
+      );
+      const result = (await response.json()) as { ok: boolean; slots?: Slot[]; message?: string };
+      if (seq !== slotSequence) return;
+      if (!response.ok || !result.ok) {
+        renderCalendar();
+        slotList.textContent = result.message ?? 'Termíny se nepodařilo načíst.';
+        return;
+      }
+      if (result.slots?.length) {
+        monthCursor = month;
+        loadedSlots = result.slots;
+        renderCalendar();
+        return;
+      }
+      if (offset === monthsToCheck - 1) {
+        renderCalendar();
+        slotList.textContent = findNearest
+          ? 'V následujících 12 měsících nejsou vypsané volné termíny. Kontaktujte prosím pobočku.'
+          : (result.message ?? 'V tomto měsíci nejsou volné termíny. Zkuste další měsíc.');
+      }
     }
-    loadedSlots = result.slots;
-    renderCalendar();
   } catch {
     if (seq !== slotSequence) return;
     calendarTitle.textContent = 'Termíny se nepodařilo načíst';
@@ -625,6 +655,7 @@ async function submitOrder() {
     },
     note: field('note').value,
     ...(campaign ? { campaign } : {}),
+    ...(groupToken ? { groupToken } : {}),
     selection: selectionWithAddons(),
     priceVersion: validQuote.priceVersion,
     captchaToken,
@@ -672,6 +703,7 @@ async function submitOrder() {
             branch: body.selection.branch,
             course: body.selection.course,
             ...(campaign ? { campaign } : {}),
+            ...(groupToken ? { partnerSchool: 'gymnazium_manna' } : {}),
           }),
         );
       } catch {

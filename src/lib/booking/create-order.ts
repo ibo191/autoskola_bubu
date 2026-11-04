@@ -13,14 +13,16 @@ const attributionSchema = z
     gclid: z.string().max(256).optional(),
     gbraid: z.string().max(256).optional(),
     wbraid: z.string().max(256).optional(),
-    utm: z.object({
-      utm_source: z.string().max(256).optional(),
-      utm_medium: z.string().max(256).optional(),
-      utm_campaign: z.string().max(256).optional(),
-      utm_id: z.string().max(256).optional(),
-      utm_term: z.string().max(256).optional(),
-      utm_content: z.string().max(256).optional(),
-    }).strict(),
+    utm: z
+      .object({
+        utm_source: z.string().max(256).optional(),
+        utm_medium: z.string().max(256).optional(),
+        utm_campaign: z.string().max(256).optional(),
+        utm_id: z.string().max(256).optional(),
+        utm_term: z.string().max(256).optional(),
+        utm_content: z.string().max(256).optional(),
+      })
+      .strict(),
     landingPage: z.url().max(2048),
     firstClickAt: z.iso.datetime({ offset: true }),
     consentAt: z.iso.datetime({ offset: true }),
@@ -33,6 +35,7 @@ const requestSchema = z
     contact: contactSchema,
     note: z.string().trim().max(1000).optional().default(''),
     campaign: z.literal('zimni-kampan').optional(),
+    groupToken: z.string().min(20).max(150).optional(),
     selection: selectionSchema,
     captchaToken: z.string().max(4096).optional(),
     priceVersion: z.string().min(1).max(80),
@@ -93,6 +96,13 @@ type Dependencies = {
   legal: OrderLegalSettings;
   origin: string;
   notificationEmail?: string;
+  validateGroupMember?: (token: string) => Promise<{
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    courseType: 'school' | 'isp';
+  } | null>;
 };
 
 export class CreateOrderService {
@@ -113,6 +123,26 @@ export class CreateOrderService {
         fields: [...new Set(parsed.error.issues.map((issue) => issue.path.join('.')))],
       });
       return { ok: false, code: 'INVALID_REQUEST' };
+    }
+
+    let groupMemberId: string | undefined;
+    if (parsed.data.groupToken || parsed.data.selection.schoolCourseType) {
+      if (
+        !parsed.data.groupToken ||
+        !parsed.data.selection.schoolCourseType ||
+        !this.dependencies.validateGroupMember
+      )
+        return { ok: false, code: 'INVALID_REQUEST' };
+      const member = await this.dependencies.validateGroupMember(parsed.data.groupToken);
+      if (
+        !member ||
+        member.courseType !== parsed.data.selection.schoolCourseType ||
+        member.firstName !== parsed.data.contact.firstName ||
+        member.lastName !== parsed.data.contact.lastName ||
+        member.email !== parsed.data.contact.email.toLowerCase()
+      )
+        return { ok: false, code: 'INVALID_REQUEST' };
+      groupMemberId = member.id;
     }
 
     if (!parsed.data.captchaToken) return { ok: false, code: 'CAPTCHA_FAILED' };
@@ -162,6 +192,7 @@ export class CreateOrderService {
         },
         addons: serverQuote.addons,
         verificationHash: verification.hash,
+        ...(groupMemberId ? { groupMemberId } : {}),
       };
       saved =
         parsed.data.selection.branch === 'kladno'

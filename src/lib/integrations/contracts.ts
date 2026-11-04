@@ -28,7 +28,9 @@ export type EmailEventType =
   | 'appointment_no_show'
   | 'admin_order_cancelled'
   | 'weekly_order_report'
-  | 'monthly_order_report';
+  | 'monthly_order_report'
+  | 'school_group_invitation'
+  | 'school_group_reminder';
 export interface EmailMessage {
   idempotencyKey: string;
   to: string;

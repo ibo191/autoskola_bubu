@@ -1,0 +1,228 @@
+---
+export const prerender = false;
+import Base from '../../layouts/Base.astro';
+import { memberFromToken, schoolPrices } from '../../lib/school-groups';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('Referrer-Policy', 'no-referrer');
+const token = Astro.url.searchParams.get('token') ?? '';
+const pair =
+  token.length <= 150 ? await memberFromToken(process.env, token).catch(() => null) : null;
+const groupLabel = pair?.group.course_type === 'school' ? 'Školní kurz' : 'Kurz ISP';
+const price = pair ? schoolPrices[pair.group.course_type].toLocaleString('cs-CZ') : '';
+---
+
+<Base
+  title="Pozvánka do společného kurzu"
+  description="Potvrzení pozvánky do společného kurzu Autoškoly BuBu."
+  noindex
+  disableTracking
+>
+  <section class="section invite-page">
+    <div class="container invite-card">
+      {
+        pair ? (
+          <>
+            <span class="eyebrow">Gymnázium Thomase Manna × Autoškola BuBu</span>
+            <h1>Ahoj, {pair.member.first_name}! 👻</h1>
+            <p>
+              Spolužák tě pozval do společného kurzu na Střížkově. Zkontroluj své údaje, potvrď
+              zájem a vyber si vlastní termín zápisu.
+            </p>
+            <dl>
+              <>
+                <div>
+                  <>
+                    <dt>Kurz</dt>
+                    <dd>{groupLabel}</dd>
+                  </>
+                </div>
+                <div>
+                  <>
+                    <dt>Cena za osobu</dt>
+                    <dd>{price} Kč</dd>
+                  </>
+                </div>
+                <div>
+                  <>
+                    <dt>Jméno</dt>
+                    <dd>
+                      {pair.member.first_name} {pair.member.last_name}
+                    </dd>
+                  </>
+                </div>
+                <div>
+                  <>
+                    <dt>E-mail</dt>
+                    <dd>{pair.member.email}</dd>
+                  </>
+                </div>
+                <div>
+                  <>
+                    <dt>Telefon</dt>
+                    <dd>{pair.member.phone}</dd>
+                  </>
+                </div>
+              </>
+            </dl>
+            <p>
+              Pokud některý údaj nesedí, napiš nám na{' '}
+              <a href="mailto:info@autoskolabubu.cz">info@autoskolabubu.cz</a> před rezervací. Je ti
+              17 let? Ve výběru kurzu můžeš zvolit režim L17.
+            </p>
+            <div
+              id="invite-actions"
+              data-token={token}
+              data-status={pair.member.confirmation_status}
+            >
+              <button
+                class="btn primary"
+                type="button"
+                id="invite-confirm"
+                hidden={pair.member.confirmation_status !== 'invited'}
+              >
+                Potvrdit účast
+              </button>
+              <button
+                class="btn secondary"
+                type="button"
+                id="invite-decline"
+                hidden={pair.member.confirmation_status !== 'invited'}
+              >
+                Nemám zájem
+              </button>
+              <button
+                class="btn primary"
+                type="button"
+                data-order
+                data-course="b"
+                data-branch="strizkov"
+                data-group-token={token}
+                data-school-course-type={pair.group.course_type}
+                data-first-name={pair.member.first_name}
+                data-last-name={pair.member.last_name}
+                data-email={pair.member.email}
+                data-phone={pair.member.phone}
+                hidden={
+                  pair.member.confirmation_status !== 'confirmed' ||
+                  Boolean(pair.member.existing_order_id)
+                }
+                disabled
+              >
+                Vybrat termín zápisu ↗
+              </button>
+            </div>
+            {pair.member.existing_order_id && (
+              <p>Termín zápisu už máš rezervovaný. Potvrzení objednávky najdeš ve svém e-mailu.</p>
+            )}
+            <p id="invite-message" role="status" aria-live="polite" />
+            <p class="invite-privacy">
+              Soukromý odkaz platí 30 dní. Údaje používáme pro tuto pozvánku a případnou objednávku.{' '}
+              <a href="/ochrana-osobnich-udaju">Informace o zpracování osobních údajů</a>.
+            </p>
+          </>
+        ) : (
+          <>
+            <>
+              <h1>Pozvánka už není dostupná</h1>
+              <p>
+                Odkaz vypršel nebo není platný. Požádej spolužáka o nové pozvání, případně nám napiš
+                na <a href="mailto:info@autoskolabubu.cz">info@autoskolabubu.cz</a>.
+              </p>
+            </>
+          </>
+        )
+      }
+    </div>
+  </section>
+  <script>
+    const actions = document.querySelector<HTMLElement>('#invite-actions');
+    const message = document.querySelector<HTMLElement>('#invite-message');
+    for (const [id, decision] of [
+      ['invite-confirm', 'confirmed'],
+      ['invite-decline', 'declined'],
+    ] as const) {
+      document.querySelector<HTMLButtonElement>(`#${id}`)?.addEventListener('click', async () => {
+        if (!actions || !message) return;
+        const button = document.querySelector<HTMLButtonElement>(`#${id}`)!;
+        button.disabled = true;
+        try {
+          const response = await fetch('/api/school-groups/decision', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: actions.dataset.token, decision }),
+          });
+          if (!response.ok) throw new Error('Zkuste to prosím znovu.');
+          document.querySelector<HTMLButtonElement>('#invite-confirm')?.setAttribute('hidden', '');
+          document.querySelector<HTMLButtonElement>('#invite-decline')?.setAttribute('hidden', '');
+          if (decision === 'confirmed') {
+            let stored = false;
+            try {
+              sessionStorage.setItem('manna:confirmed-token', actions.dataset.token ?? '');
+              stored = true;
+            } catch {
+              /* A private link remains usable without storage. */
+            }
+            if (stored) window.location.assign('/gymnazium-manna/potvrzeno');
+            else {
+              document
+                .querySelector<HTMLButtonElement>('[data-group-token]')
+                ?.removeAttribute('hidden');
+              message.textContent = 'Účast je potvrzená. Vyber si nyní termín zápisu.';
+            }
+          } else message.textContent = 'Pozvání bylo odmítnuto. Děkujeme za odpověď.';
+        } catch {
+          message.textContent = 'Odpověď se nepodařilo uložit. Zkuste to prosím znovu.';
+          button.disabled = false;
+        }
+      });
+    }
+  </script>
+</Base>
+<style>
+  .invite-page {
+    background: #edf7f6;
+    min-height: 65vh;
+  }
+  .invite-card {
+    max-width: 760px;
+    background: white;
+    border: 1px solid #cfe4e1;
+    border-radius: 28px;
+    padding: clamp(24px, 5vw, 50px);
+  }
+  .invite-card h1 {
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    color: #19345e;
+  }
+  .invite-card p {
+    line-height: 1.6;
+  }
+  .invite-card dl {
+    border-top: 1px solid #deebec;
+  }
+  .invite-card dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    border-bottom: 1px solid #deebec;
+    padding: 12px 0;
+  }
+  .invite-card dt {
+    font-weight: 700;
+  }
+  .invite-card dd {
+    margin: 0;
+    text-align: right;
+  }
+  .invite-card #invite-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 24px 0;
+  }
+  .invite-privacy {
+    font-size: 0.9rem;
+    color: #516783;
+  }
+</style>

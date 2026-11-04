@@ -105,23 +105,49 @@ if (root) {
     if (!selected) slotsEl.innerHTML = '<p>Vyberte zvýrazněný den.</p>';
   }
 
-  async function load() {
+  let loadSequence = 0;
+  async function load(findNearest = false) {
+    const sequence = ++loadSequence;
     selected = '';
     selectedSlot = '';
     loaded = [];
     title.textContent = 'Načítáme termíny…';
     days.replaceChildren();
     slotsEl.innerHTML = '<p>Načítáme volné termíny…</p>';
-    const from = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
-    const to = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0);
-    const response = await fetch(
-      `/api/slots?branch=${encodeURIComponent(branch)}&from=${key(from)}&to=${key(to)}`,
-    );
-    const result = await response.json().catch(() => ({ ok: false }));
-    loaded = result.ok ? (result.slots ?? []) : [];
-    if (!loaded.length)
-      slotsEl.innerHTML = `<p>${result.message ?? 'Pro tuto pobočku nejsou vypsané termíny.'}</p>`;
-    renderCalendar();
+    try {
+      const monthsToCheck = findNearest ? 12 : 1;
+      for (let offset = 0; offset < monthsToCheck; offset += 1) {
+        const month = new Date(cursor.getFullYear(), cursor.getMonth() + offset, 1);
+        const from = new Date(month.getFullYear(), month.getMonth(), 1);
+        const to = new Date(month.getFullYear(), month.getMonth() + 1, 0);
+        const response = await fetch(
+          `/api/slots?branch=${encodeURIComponent(branch)}&from=${key(from)}&to=${key(to)}`,
+        );
+        const result = await response.json().catch(() => ({ ok: false }));
+        if (sequence !== loadSequence) return;
+        if (!response.ok || !result.ok) {
+          renderCalendar();
+          slotsEl.textContent = result.message ?? 'Termíny se nepodařilo načíst.';
+          return;
+        }
+        if (result.slots?.length) {
+          cursor = month;
+          loaded = result.slots;
+          renderCalendar();
+          return;
+        }
+        if (offset === monthsToCheck - 1) {
+          renderCalendar();
+          slotsEl.textContent = findNearest
+            ? 'V následujících 12 měsících nejsou vypsané volné termíny. Kontaktujte prosím pobočku.'
+            : (result.message ?? 'V tomto měsíci nejsou volné termíny. Zkuste další měsíc.');
+        }
+      }
+    } catch {
+      if (sequence !== loadSequence) return;
+      renderCalendar();
+      slotsEl.textContent = 'Termíny se nepodařilo načíst. Zkuste to prosím znovu.';
+    }
   }
 
   document.querySelector('#manage-prev')!.addEventListener('click', () => {
@@ -157,5 +183,5 @@ if (root) {
       message.textContent = 'Odeslání se nepodařilo. Zkuste to prosím znovu.';
     }
   });
-  void load();
+  void load(true);
 }

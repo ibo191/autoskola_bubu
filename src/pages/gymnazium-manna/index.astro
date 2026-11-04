@@ -1,0 +1,563 @@
+---
+export const prerender = true;
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import GoogleReviewsBanner from '../../components/GoogleReviewsBanner.astro';
+import car from '../../assets/courses/b-manual-fabia.png';
+
+const faq = [
+  [
+    'Musíme se všichni přihlásit najednou?',
+    'Jeden spolužák vyplní kontakty celé skupiny. Každý pak samostatně potvrdí zájem a vybere si vlastní termín zápisu.',
+  ],
+  [
+    'Můžeme chodit na jízdy každý zvlášť?',
+    'Ano. Praktické jízdy probíhají individuálně s instruktorem.',
+  ],
+  [
+    'Jaký je rozdíl mezi školním kurzem a ISP?',
+    'Školní kurz má 36 hodin teorie s učitelem a skupinu 10 studentů. ISP má 11 konzultačních hodin teorie a individuální samostudium ve skupině 5 studentů. V obou variantách jsou jízdy individuální.',
+  ],
+  [
+    'Co když nás není pět nebo deset?',
+    'Napište nám na info@autoskolabubu.cz. Možnosti společné výuky s vámi ověříme; otevření neúplné skupiny nemůžeme slíbit.',
+  ],
+  [
+    'Co potřebuji přinést na zápis?',
+    'Oboustranně vytištěnou a podepsanou přihlášku, zdravotní posudek a občanský průkaz. Podrobné pokyny dostanete v potvrzovacím e-mailu.',
+  ],
+  [
+    'Můžu začít už v 17 letech?',
+    'Ano, skupinu B lze absolvovat v režimu L17 se zákonným zástupcem a mentorem. Vhodný postup domluvíme při zápisu.',
+  ],
+];
+---
+
+<Base
+  title="Řidičák s partou – Gymnázium Thomase Manna"
+  description="Společný kurz autoškoly pro studenty Gymnázia Thomase Manna. Vyberte školní kurz nebo ISP a rezervujte si zápis na Střížkově."
+  noindex
+>
+  <div class="manna-page">
+    <section class="manna-hero">
+      <div class="container manna-hero-grid">
+        <div>
+          <span class="eyebrow">Autoškola BuBu × Gymnázium Thomase Manna</span>
+          <h1>ŘIDIČÁK<br /><span>S PARTOU.</span> 👻</h1>
+          <p class="manna-lead">
+            Domluv se se spolužáky, vyberte si společný kurz a začněte jezdit bez zbytečného stresu.
+          </p>
+          <div class="manna-actions">
+            <a class="btn primary" href="#sestavit-partu">Sestavit naši partu ↗</a><a
+              class="btn secondary"
+              href="#kurzy">Porovnat kurzy</a
+            >
+          </div>
+          <a class="manna-review-link" href="#recenze">Přečíst skutečné recenze žáků na Google ↗</a>
+          <p class="manna-fact">Praha 8 · Střížkov · individuální jízdy · od 25 900 Kč za osobu</p>
+        </div>
+        <div class="manna-car">
+          <Image src={car} alt="Výcvikový vůz Autoškoly BuBu" width={720} loading="eager" />
+        </div>
+      </div>
+    </section>
+    <div id="recenze">
+      <GoogleReviewsBanner
+        brandReviews
+        profileLabel="Autoškola BuBu"
+        heading="S námi můžeš za volant usednout v klidu."
+      />
+    </div>
+    <section class="section manna-benefits">
+      <div class="container">
+        <span class="eyebrow">Proč s námi</span><h2>Parta do teorie. Vlastní tempo za volantem.</h2>
+        <div class="manna-grid three">
+          <article>
+            <span>01</span><h3>Bez křiku a zbytečného stresu</h3><p>
+              Trpělivý přístup a srozumitelné vysvětlení od prvních rozjezdů.
+            </p>
+          </article><article>
+            <span>02</span><h3>Jízdy jen pro tebe</h3><p>
+              Teorii absolvujete společně, praktické jízdy plánuje každý individuálně.
+            </p>
+          </article><article>
+            <span>03</span><h3>Střížkov na dosah</h3><p>
+              Výuka na Praze 8, dobré spojení metrem C a jasná cena předem.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+    <section class="section manna-courses" id="kurzy">
+      <div class="container">
+        <span class="eyebrow">Dvě cesty ke skupině B</span><h2>
+          Vyberte kurz, který vaší partě sedí.
+        </h2>
+        <div class="manna-grid two">
+          <article class="course-card">
+            <span class="course-kicker">Školní kurz · 10 studentů</span><h3>
+              Víc času spolu v učebně.
+            </h3><strong>30 500 Kč <small>/ osoba</small></strong><ul>
+              <li>36 hodin teorie s učitelem</li><li>Víkendová výuka</li><li>
+                Individuální praktické jízdy
+              </li>
+            </ul><a href="#sestavit-partu" class="btn primary" data-choose-course="school"
+              >Vybrat školní kurz ↗</a
+            >
+          </article>
+          <article class="course-card">
+            <span class="course-kicker">Kurz ISP · 5 studentů</span><h3>
+              Více prostoru pro samostudium.
+            </h3><strong>25 900 Kč <small>/ osoba</small></strong><ul>
+              <li>11 konzultačních hodin teorie a individuální samostudium</li><li>
+                Všední dny nebo víkend podle kapacity
+              </li><li>Individuální praktické jízdy</li>
+            </ul><a href="#sestavit-partu" class="btn primary" data-choose-course="isp"
+              >Vybrat kurz ISP ↗</a
+            >
+          </article>
+        </div>
+        <p class="manna-small">
+          Cena je za osobu. Před první zkouškou se samostatně hradí poplatek autoškole za organizaci
+          zkoušky 1 000 Kč a úřední poplatek.
+        </p>
+      </div>
+    </section>
+    <section class="section manna-process">
+      <div class="container">
+        <span class="eyebrow">Jak to funguje</span><h2>
+          Jeden tým. Vlastní termín pro každého.
+        </h2><div class="manna-grid four">
+          <article>
+            <b>1</b><h3>Sestav partu</h3><p>Vyber kurz a vyplň kontakty na spolužáky.</p>
+          </article><article>
+            <b>2</b><h3>Každému přijde pozvánka</h3><p>
+              Každý sám potvrdí zájem nebo pozvání odmítne.
+            </p>
+          </article><article>
+            <b>3</b><h3>Vyber si svůj zápis</h3><p>
+              Každý si v kalendáři rezervuje vlastní volný termín na Střížkově.
+            </p>
+          </article><article>
+            <b>4</b><h3>Vidíme se v BuBu!</h3><p>
+              Na zápis přineseš dokumenty a domluvíme další postup.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+    <section class="section manna-form-section" id="sestavit-partu">
+      <div class="container manna-form-wrap">
+        <div>
+          <span class="eyebrow">Skupinová přihláška</span><h2>Dej partu dohromady.</h2><p>
+            Ty jsi prvním členem skupiny. Spolužákům přijde vlastní pozvánka. Po potvrzení si každý
+            sám rezervuje zápis.
+          </p><p class="manna-small">
+            Pozvánka ještě není objednávkou ani rezervací místa v kalendáři.
+          </p>
+        </div>
+        <form id="manna-form" novalidate>
+          <div class="manna-progress">
+            <span data-progress="1">1. Kurz</span><span data-progress="2">2. Kontakty</span><span
+              data-progress="3">3. Kontrola</span
+            >
+          </div>
+          <div data-group-step="1">
+            <h3>Jaký kurz chcete?</h3><div class="manna-choices">
+              <label
+                ><input type="radio" name="courseType" value="school" checked />Školní kurz <small
+                  >10 lidí · 30 500 Kč / osoba</small
+                ></label
+              ><label
+                ><input type="radio" name="courseType" value="isp" />Kurz ISP <small
+                  >5 lidí · 25 900 Kč / osoba</small
+                ></label
+              >
+            </div>
+          </div>
+          <div data-group-step="2" hidden>
+            <h3>Kontakty na partu</h3><p>
+              Na první místo napiš sebe. E-maily musí být jedinečné, aby každý dostal svůj odkaz.
+            </p><div id="manna-members"></div><label class="manna-consent"
+              ><input type="checkbox" id="manna-privacy" /><span
+                >Potvrzuji, že mohu spolužákům poslat pozvánku a seznámil/a jsem se s <a
+                  href="/ochrana-osobnich-udaju"
+                  target="_blank">informacemi o zpracování údajů</a
+                >.</span
+              ></label
+            >
+          </div>
+          <div data-group-step="3" hidden>
+            <h3>Ještě jednou zkontroluj údaje</h3><div id="manna-recap"></div><p>
+              Po odeslání přijde každému členovi e-mail. Kdo potvrdí účast, vybere si svůj termín
+              osobního zápisu.
+            </p>
+          </div>
+          <p id="manna-error" class="manna-error" role="alert" aria-live="polite"></p><div
+            class="manna-form-actions"
+          >
+            <button type="button" class="btn secondary" id="manna-back" hidden>Zpět</button><button
+              type="button"
+              class="btn primary"
+              id="manna-next">Pokračovat ↗</button
+            ><button type="submit" class="btn primary" id="manna-submit" hidden
+              >Odeslat skupinovou přihlášku ↗</button
+            >
+          </div>
+        </form>
+      </div>
+    </section>
+    <section class="section manna-faq">
+      <div class="container">
+        <span class="eyebrow">Časté otázky</span><h2>Co chcete vědět předem?</h2>{
+          faq.map(([q, a]) => (
+            <details>
+              <>
+                <summary>{q}</summary>
+                <p>{a}</p>
+              </>
+            </details>
+          ))
+        }
+      </div>
+    </section>
+    <section class="manna-final">
+      <div class="container">
+        <h2>Domluv partu a pojďte do toho s námi!</h2><p>
+          Každému pošleme vlastní pozvánku a termín zápisu si vybere samostatně.
+        </p><a class="btn primary" href="#sestavit-partu">Sestavit naši partu ↗</a><p>
+          U Kapliček 34, Praha 8 – Střížkov · <a href="tel:+420725717755">+420 725 717 755</a>
+        </p>
+      </div>
+    </section>
+  </div>
+  <div class="manna-mobile-cta">
+    <a class="btn primary" href="#sestavit-partu">Sestavit naši partu ↗</a>
+  </div>
+  <script src="../../scripts/school-group.ts"></script>
+</Base>
+
+<style>
+  .manna-page {
+    color: #19345e;
+  }
+  .manna-page h1,
+  .manna-page h2,
+  .manna-page h3 {
+    color: #19345e;
+  }
+  .manna-page h2 {
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    line-height: 1.12;
+    max-width: 760px;
+  }
+  .manna-page p {
+    line-height: 1.65;
+  }
+  .manna-hero {
+    background: linear-gradient(120deg, #e7f6f5, #f5f9ff);
+    padding: clamp(60px, 7vw, 120px) 0;
+  }
+  .manna-hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 32px;
+  }
+  .manna-hero h1 {
+    font-size: clamp(3.3rem, 7vw, 7rem);
+    line-height: 0.96;
+    letter-spacing: -0.06em;
+    margin: 24px 0;
+  }
+  .manna-hero h1 span {
+    color: #2f5aa6;
+  }
+  .manna-lead {
+    font-size: clamp(1.2rem, 2vw, 1.5rem);
+    max-width: 620px;
+  }
+  .manna-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 30px 0;
+  }
+  .manna-fact {
+    font-size: 0.9rem;
+  }
+  .manna-review-link {
+    color: #19345e;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .manna-mobile-cta {
+    display: none;
+  }
+  .manna-car img {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 24px 30px #244b7240);
+  }
+  .manna-grid {
+    display: grid;
+    gap: 18px;
+    margin-top: 32px;
+  }
+  .manna-grid.three {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .manna-grid.two {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .manna-grid.four {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .manna-grid article {
+    background: white;
+    border: 1px solid #d5e6e7;
+    border-radius: 24px;
+    padding: 26px;
+    box-shadow: 0 12px 32px #19345e0a;
+  }
+  .manna-grid article span,
+  .course-kicker {
+    color: #08766d;
+    font-weight: 700;
+  }
+  .manna-grid article h3 {
+    font-size: 1.4rem;
+    margin: 14px 0;
+  }
+  .manna-benefits,
+  .manna-process {
+    background: #f4f9f9;
+  }
+  .manna-courses,
+  .manna-faq {
+    background: #fff;
+  }
+  .course-card {
+    display: flex;
+    flex-direction: column;
+  }
+  .course-card strong {
+    font-size: 2.4rem;
+  }
+  .course-card strong small {
+    font-size: 0.9rem;
+  }
+  .course-card ul {
+    padding-left: 1.3em;
+    line-height: 2;
+    flex: 1;
+  }
+  .course-card .btn {
+    align-self: start;
+  }
+  .manna-small {
+    font-size: 0.9rem;
+    color: #526783;
+    margin-top: 24px;
+  }
+  .manna-process article b {
+    display: grid;
+    place-items: center;
+    background: #dcf5f1;
+    color: #086d65;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+  }
+  .manna-form-section {
+    background: #eaf5f4;
+  }
+  .manna-form-wrap {
+    display: grid;
+    grid-template-columns: minmax(250px, 0.7fr) minmax(0, 1.3fr);
+    gap: 40px;
+    align-items: start;
+  }
+  .manna-form-wrap form {
+    background: #fff;
+    border: 1px solid #cde3e1;
+    border-radius: 26px;
+    padding: clamp(20px, 4vw, 40px);
+    box-shadow: 0 20px 50px #18335412;
+  }
+  .manna-progress {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  .manna-progress span {
+    border-radius: 100px;
+    background: #f0f4f5;
+    color: #60758d;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+  .manna-progress span.active {
+    background: #d5f1ec;
+    color: #096f68;
+    font-weight: 700;
+  }
+  .manna-choices {
+    display: grid;
+    gap: 10px;
+  }
+  .manna-choices label {
+    border: 1px solid #bfd8d6;
+    border-radius: 14px;
+    padding: 17px;
+    cursor: pointer;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-weight: 700;
+  }
+  .manna-choices small {
+    font-weight: 400;
+    margin-left: auto;
+  }
+  #manna-members :global(.manna-member) {
+    border-top: 1px solid #dbe8e8;
+    padding: 20px 0;
+  }
+  #manna-members :global(.manna-member h4) {
+    margin: 0 0 12px;
+  }
+  #manna-members :global(.manna-fields) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  #manna-members :global(.manna-fields label) {
+    display: grid;
+    gap: 5px;
+    min-width: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  #manna-members :global(.manna-fields input) {
+    width: 100%;
+    min-width: 0;
+    border: 1px solid #b9d0ce;
+    border-radius: 9px;
+    padding: 12px;
+  }
+  .manna-consent {
+    display: flex;
+    align-items: start;
+    gap: 10px;
+    margin-top: 15px;
+    font-size: 0.9rem;
+  }
+  .manna-consent input {
+    flex: none;
+    margin-top: 0.25em;
+  }
+  .manna-consent span {
+    min-width: 0;
+    line-height: 1.5;
+  }
+  .manna-form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+  .manna-error {
+    color: #9b2626;
+    min-height: 1.5em;
+  }
+  .manna-faq details {
+    border-bottom: 1px solid #d3e1e3;
+    padding: 18px 0;
+    max-width: 850px;
+  }
+  .manna-faq summary {
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .manna-faq details p {
+    margin-bottom: 0;
+  }
+  .manna-final {
+    background: #2f5aa6;
+    padding: 65px 0;
+    color: #fff;
+  }
+  .manna-final h2,
+  .manna-final a:not(.btn) {
+    color: #fff;
+  }
+  .manna-final p {
+    color: #fff;
+  }
+  .manna-final .btn {
+    margin: 14px 0;
+  }
+  #manna-recap :global(.manna-recap-row) {
+    padding: 8px 0;
+    border-bottom: 1px solid #e1eded;
+  }
+  @media (max-width: 850px) {
+    .manna-hero-grid,
+    .manna-form-wrap {
+      grid-template-columns: 1fr;
+    }
+    .manna-grid.three,
+    .manna-grid.four {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 600px) {
+    .manna-page {
+      padding-bottom: 5rem;
+    }
+    .manna-mobile-cta {
+      display: block;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      background: #f1f9fff0;
+      backdrop-filter: blur(10px);
+      border-top: 1px solid #bad9eb;
+      padding: 0.7rem max(1rem, env(safe-area-inset-right))
+        calc(0.7rem + env(safe-area-inset-bottom));
+    }
+    .manna-mobile-cta .btn {
+      width: 100%;
+    }
+    body.dialog-open .manna-mobile-cta {
+      display: none;
+    }
+    .manna-hero {
+      padding: 50px 0;
+    }
+    .manna-grid.two,
+    .manna-grid.three,
+    .manna-grid.four,
+    #manna-members :global(.manna-fields) {
+      grid-template-columns: 1fr;
+    }
+    .manna-car {
+      max-width: 480px;
+    }
+    .manna-choices label {
+      align-items: start;
+      flex-direction: column;
+    }
+    .manna-choices small {
+      margin-left: 0;
+    }
+    .manna-page .btn {
+      min-height: 48px;
+    }
+  }
+</style>

@@ -10,6 +10,7 @@ import {
   orderNotificationEmail,
 } from './email';
 import { createOrderEmailOutbox } from './email/order-outbox';
+import { memberFromToken } from '../school-groups';
 
 const termsWording = 'Seznámil/a jsem se s Všeobecnými obchodními podmínkami a souhlasím s nimi.';
 const marketingWording =
@@ -49,6 +50,18 @@ export function createLiveOrderService(
     legal: legalSettings,
     origin: publicAppOrigin(env),
     notificationEmail: orderNotificationEmail(env),
+    validateGroupMember: async (token) => {
+      const pair = await memberFromToken(env, token);
+      if (!pair || pair.member.confirmation_status !== 'confirmed' || pair.member.existing_order_id)
+        return null;
+      return {
+        id: pair.member.id,
+        firstName: pair.member.first_name,
+        lastName: pair.member.last_name,
+        email: pair.member.email,
+        courseType: pair.group.course_type,
+      };
+    },
   });
 }
 

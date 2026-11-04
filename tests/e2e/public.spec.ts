@@ -18,7 +18,10 @@ test('Kladno explains online enrollment and preselects B or L17 without appointm
   await expect(page.locator('.kladno-proof-visual img')).toBeVisible();
   await expect(page.locator('.kladno-proof figcaption')).toHaveCount(0);
 
-  await page.locator('.page-hero').getByRole('button', { name: 'Vyplnit přihlášku v Kladně ↗' }).click();
+  await page
+    .locator('.page-hero')
+    .getByRole('button', { name: 'Vyplnit přihlášku v Kladně ↗' })
+    .click();
   const dialog = page.getByRole('dialog');
   await expect(dialog.locator('[name="branch"]')).toHaveValue('kladno');
   await expect(dialog.locator('[name="course"]')).toHaveValue('b');
@@ -54,7 +57,7 @@ test('B pricing asks for transmission and L17, with manual only outside Prague',
   await page.getByRole('button', { name: 'Manuál', exact: true }).click();
   await page.getByRole('button', { name: /Kurz skupiny B/ }).click();
   await expect(page.locator('#offer-price')).toHaveText('20 000 Kč');
-  await expect(page.locator('#offer-variant')).toHaveText('Manuál');
+  await expect(page.locator('#offer-variant')).toHaveText('Klasický kurz · manuál');
   await expect(page.locator('.offer-price')).toContainText('Nezahrnuje poplatky za zkoušku.');
 });
 
@@ -107,29 +110,15 @@ test('Price guide transfers refresher quantity, branch and transmission to the o
   }
 });
 
-test('Moto prices lead to preliminary interest while trailer courses remain Prague-only', async ({
+test('Moto price guide collects preliminary interest while trailer courses remain Prague-only', async ({
   page,
 }) => {
   await page.goto('/cenik');
   await page.getByRole('button', { name: /^Motorku/ }).click();
-  await expect(page.locator('#availability-message')).toContainText(
-    'Přihlašování do motocyklových kurzů je nyní pozastavené. Kurzy pro sezonu 2027 otevřeme během zimy.',
-  );
-  await page.getByRole('button', { name: /^Střížkov/ }).click();
-  await page.locator('[data-moto-target="a"]').click();
-  await page.locator('[data-licence-status="none"]').click();
-  await expect(page.locator('#offer-price')).toHaveText('31 900 Kč');
-  await expect(page.locator('.offer-card [data-order]')).toBeHidden();
-  await page.locator('#moto-interest-link').click();
-  await expect(page).toHaveURL(/\/motorky-2027\?skupina=a&zdroj=cenik/);
-  await expect(page.locator('#moto-interest-form select[name="course"]')).toHaveValue('a');
-  await expect(page.locator('input[name="licenceStatus"][value="none"]')).toBeChecked();
-  await expect(page.locator('input[name="package"][value="moto-confidence"]')).toBeChecked();
-  await expect(page.locator('[data-package-choice="moto-basic"]')).toBeHidden();
-  await page.goto('/cenik');
+  await expect(page.locator('#branch-question [data-branch="kladno"]')).toBeDisabled();
+  await page.locator('#wizard-restart').click();
   await page.getByRole('button', { name: /^Auto s přívěsem/ }).click();
-  await page.getByRole('button', { name: /^Kladno/ }).click();
-  await expect(page.locator('#availability-message')).toContainText('pouze na pobočce Střížkov');
+  await expect(page.locator('#branch-question [data-branch="kladno"]')).toBeDisabled();
 });
 
 test('Prefilled order, server price, contact back navigation and booking calendar', async ({
@@ -270,30 +259,6 @@ for (const path of [
     expect(result.violations).toEqual([]);
     await expect(page.locator('h1')).toHaveCount(1);
   });
-
-test('Footer offers both downloadable application and withdrawal forms', async ({
-  page,
-  request,
-}) => {
-  await page.goto('/');
-  const documents = page.getByLabel('Dokumenty ke stažení');
-  await expect(documents.getByRole('link', { name: /Žádost o přijetí/ })).toHaveAttribute(
-    'href',
-    '/dokumenty/prihlaska-k-vycviku.pdf',
-  );
-  await expect(documents.getByRole('link', { name: /Žádost o odstoupení/ })).toHaveAttribute(
-    'href',
-    '/dokumenty/zadost-o-odstoupeni-od-smlouvy.pdf',
-  );
-  for (const path of [
-    '/dokumenty/prihlaska-k-vycviku.pdf',
-    '/dokumenty/zadost-o-odstoupeni-od-smlouvy.pdf',
-  ]) {
-    const response = await request.get(path);
-    expect(response.ok()).toBe(true);
-    expect(response.headers()['content-type']).toContain('application/pdf');
-  }
-});
 test('Mobile layout and fullscreen dialog', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');

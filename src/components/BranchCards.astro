@@ -30,7 +30,7 @@ import { branches, money } from '../lib/catalog';
                 </>
               </div>
               <h3>
-                <a href={`/${b.id}`}>{b.name}</a>
+                <a href={`/${b.id}`}>{b.id === 'strizkov' ? 'Praha 8 – Střížkov' : b.id === 'kladno' ? 'Autoškola Kladno' : b.name}</a>
               </h3>
               <p>{b.address}</p>
               <p>{b.hours ?? 'Čas návštěvy si ověřte na pobočce.'}</p>

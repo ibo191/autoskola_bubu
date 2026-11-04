@@ -85,7 +85,18 @@ class FakeRepository implements BookingRepository {
   }
 }
 
-function fixture(overrides: Partial<{ legal: OrderLegalSettings }> = {}) {
+function fixture(
+  overrides: Partial<{
+    legal: OrderLegalSettings;
+    validateGroupMember: (token: string) => Promise<{
+      id: string;
+      firstName: string;
+      lastName: string;
+      email: string;
+      courseType: 'school' | 'isp';
+    } | null>;
+  }> = {},
+) {
   const repository = new FakeRepository();
   const captcha = new LocalCaptcha(env);
   const email = new LocalEmail(env);
@@ -98,11 +109,53 @@ function fixture(overrides: Partial<{ legal: OrderLegalSettings }> = {}) {
     legal: overrides.legal ?? legal,
     origin: 'http://127.0.0.1:4321',
     notificationEmail: 'orders@example.invalid',
+    validateGroupMember: overrides.validateGroupMember,
   });
   const execute = (body: unknown = baseBody, at = now) =>
     service.execute({ body, hostname: '127.0.0.1', clientFingerprint: 'hashed-client', now: at });
   return { repository, captcha, email, rateLimiter, service, execute };
 }
+
+test('school price cannot be ordered without a confirmed matching invitation', async () => {
+  const body = {
+    ...baseBody,
+    selection: {
+      ...baseBody.selection,
+      partnerSchool: 'gymnazium_manna',
+      schoolCourseType: 'school',
+    },
+    priceVersion: `${priceSource.version}-manna-school`,
+  };
+  const noToken = fixture();
+  assert.deepEqual(
+    await noToken.execute({ ...body, captchaToken: noToken.captcha.issue('order', now) }),
+    { ok: false, code: 'INVALID_REQUEST' },
+  );
+  assert.equal(noToken.repository.calls.length, 0);
+  const withToken = fixture({
+    validateGroupMember: async (token) =>
+      token === 'signed-test-token-0001'
+        ? {
+            id: '44444444-4444-4444-8444-444444444444',
+            firstName: 'Fiktivní',
+            lastName: 'Test',
+            email: 'fixture@example.invalid',
+            courseType: 'school',
+          }
+        : null,
+  });
+  const result = await withToken.execute({
+    ...body,
+    groupToken: 'signed-test-token-0001',
+    captchaToken: withToken.captcha.issue('order', now),
+  });
+  assert.equal(result.ok, true);
+  assert.equal(
+    withToken.repository.calls[0]?.groupMemberId,
+    '44444444-4444-4444-8444-444444444444',
+  );
+  assert.equal(withToken.repository.calls[0]?.price.amount, 30500);
+});
 
 test('order workflow fails closed while legal texts are not approved', async () => {
   const f = fixture({ legal: { ...legal, approved: false } });

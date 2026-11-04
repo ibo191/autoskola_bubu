@@ -22,6 +22,8 @@ export function courseLabel(id: string) {
 }
 
 export function selectionLabel(selection: Selection) {
+  if (selection.partnerSchool === 'gymnazium_manna' && selection.schoolCourseType)
+    return `${selection.schoolCourseType === 'school' ? 'Školní kurz' : 'Kurz ISP'} · ${courseLabel(selection.course)}`;
   if (selection.course !== 'kondicni') return courseLabel(selection.course);
   const blocks = selection.drivingBlocks ?? 1;
   return (
@@ -39,7 +41,9 @@ export function branchLabel(id: string) {
   return branches.find((item) => item.id === id)?.name ?? id;
 }
 
-export function packageLabel(id?: string) {
+export function packageLabel(id?: string, selection?: Selection) {
+  if (selection?.partnerSchool === 'gymnazium_manna' && selection.schoolCourseType)
+    return selection.schoolCourseType === 'school' ? 'Školní kurz' : 'Kurz ISP';
   switch (id) {
     case 'moto-basic':
       return 'Moto základ';

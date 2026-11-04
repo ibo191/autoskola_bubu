@@ -102,7 +102,7 @@ function inactiveOrderAlert(input: { order: PublicOrderOverview; to: string }): 
       `Telefon: ${input.order.contact.phone}`,
       `Kurz: ${courseLabel(input.order.selection.course)}`,
       `Pobočka: ${branchLabel(input.order.selection.branch)}`,
-      `Balíček: ${packageLabel(input.order.selection.package)}`,
+      `Balíček: ${packageLabel(input.order.selection.package, input.order.selection)}`,
       `Datum objednávky: ${formatEmailDateTime(input.order.createdAt)}`,
       `Hodnota objednávky: ${money(input.order.price.amount)}`,
       `Stáří objednávky: ${age} dní`,
