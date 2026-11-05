@@ -14,8 +14,21 @@ export const POST: APIRoute = async ({ request }) => {
     const raw = await request.text();
     if (raw.length > 12000) return new Response(null, { status: 413 });
     const parsed = groupSchema.safeParse(JSON.parse(raw));
-    if (!parsed.success)
-      return Response.json({ ok: false, code: 'INVALID_REQUEST' }, { status: 422 });
+    if (!parsed.success) {
+      const phone = parsed.error.issues.find(
+        ({ path }) => path[0] === 'members' && typeof path[1] === 'number' && path[2] === 'phone',
+      );
+      return Response.json(
+        {
+          ok: false,
+          code: 'INVALID_REQUEST',
+          message: phone
+            ? `Zkontroluj telefon u člena č. ${Number(phone.path[1]) + 1}. Zadej devět číslic nebo číslo s mezinárodní předvolbou.`
+            : 'Zkontroluj kontaktní údaje, počet členů a to, že každý má vlastní e-mail.',
+        },
+        { status: 422 },
+      );
+    }
     if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY)
       return Response.json({ ok: false, code: 'UNAVAILABLE' }, { status: 503 });
     const production =
@@ -24,6 +37,7 @@ export const POST: APIRoute = async ({ request }) => {
       return Response.json({ ok: false, code: 'EMAIL_UNAVAILABLE' }, { status: 503 });
     const captcha = production
       ? await verifyRecaptcha(parsed.data.recaptchaToken, 'order', {
+          env: process.env,
           hostname: new URL(request.url).hostname,
         })
       : parsed.data.recaptchaToken === 'preview-order-submission';

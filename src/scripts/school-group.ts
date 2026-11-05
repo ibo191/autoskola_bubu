@@ -195,13 +195,17 @@ if (form) {
           ...(readAdAttribution() ? { attribution: readAdAttribution() } : {}),
         }),
       });
-      const result = (await response.json()) as { ok: boolean; code?: string };
+      const result = (await response.json()) as { ok: boolean; code?: string; message?: string };
+      if (result.code === 'INVALID_REQUEST') {
+        showStep(2);
+        throw new Error(result.message ?? 'Zkontroluj kontaktní údaje všech členů skupiny.');
+      }
+      if (result.code === 'CAPTCHA_FAILED')
+        throw new Error('Ověření reCAPTCHA se nezdařilo. Zkus formulář odeslat znovu.');
+      if (result.code === 'RATE_LIMITED')
+        throw new Error('Příliš mnoho pokusů. Zkuste to za chvíli.');
       if (!response.ok || !result.ok)
-        throw new Error(
-          result.code === 'RATE_LIMITED'
-            ? 'Příliš mnoho pokusů. Zkuste to za chvíli.'
-            : 'Skupinu se nepodařilo uložit. Zkuste to prosím znovu.',
-        );
+        throw new Error('Skupinu se nepodařilo uložit. Zkuste to prosím znovu.');
       track('group_registration_submit', { courseType: course() });
       submissionKey = crypto.randomUUID();
       form.innerHTML =
