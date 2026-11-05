@@ -302,12 +302,12 @@ export async function adminGroups(env: Env) {
   const orders = orderIds.length
     ? ((await db(
         env,
-        `orders?id=in.(${orderIds.join(',')})&select=id,public_code,status,appointments(starts_at,ends_at)&limit=100`,
+        `orders?id=in.(${orderIds.join(',')})&select=id,public_code,status,appointments(slot:appointment_slots(starts_at))&limit=100`,
       )) as Array<{
         id: string;
         public_code: string;
         status: string;
-        appointments: Array<{ starts_at: string }> | { starts_at: string } | null;
+        appointments: { slot: { starts_at: string } | null } | null;
       }>)
     : [];
   return groups.map((group) => ({

@@ -572,9 +572,7 @@ const calendarDays = calendarDates.map((item) => ({
                         </summary>
                         <div class="school-admin-members">
                           {group.members.map((member) => {
-                            const appointment = Array.isArray(member.order?.appointments)
-                              ? member.order.appointments[0]
-                              : member.order?.appointments;
+                            const slot = member.order?.appointments?.slot;
                             return (
                               <article>
                                 <strong>
@@ -595,8 +593,8 @@ const calendarDays = calendarDates.map((item) => ({
                                     {statusLabel(member.order.status)}
                                   </span>
                                 )}
-                                {appointment?.starts_at && (
-                                  <span>Zápis: {formatDateTime(appointment.starts_at)}</span>
+                                {slot?.starts_at && (
+                                  <span>Zápis: {formatDateTime(slot.starts_at)}</span>
                                 )}
                               </article>
                             );
