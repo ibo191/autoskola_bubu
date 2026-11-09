@@ -1,9 +1,9 @@
 ---
 export const prerender = true;
-import { readFileSync } from 'node:fs';
 import Base from '../layouts/Base.astro';
+import { Content as Terms, getHeadings } from '../content/legal/vop.md';
 
-const termsText = readFileSync('src/content/legal/vop.txt', 'utf8').trim();
+const chapters = getHeadings().filter(({ depth }) => depth === 2);
 ---
 
 <Base
@@ -19,21 +19,53 @@ const termsText = readFileSync('src/content/legal/vop.txt', 'utf8').trim();
         Tento dokument upravuje podmínky výuky a výcviku, kurzovné, odstoupení od smlouvy, zkoušky
         odborné způsobilosti a souhlas se zpracováním osobních údajů.
       </div>
-      <pre>{termsText}</pre>
+      <nav class="legal-toc" aria-label="Obsah obchodních podmínek">
+        <strong>Obsah</strong>
+        <ul>
+          {
+            chapters.map(({ slug, text }) => (
+              <li>
+                <a href={`#${slug}`}>{text}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <article class="legal-text">
+        <Terms />
+      </article>
       <a class="text-link" href="/cenik">Zpět na ceník</a>
     </div>
   </section>
 </Base>
 
 <style>
-  .legal-document pre {
-    white-space: pre-wrap;
-    font: inherit;
-    line-height: 1.7;
-    color: var(--muted);
-    background: transparent;
-    border: 0;
+  .legal-toc {
+    margin-block: 24px;
+    padding: 16px 20px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  .legal-toc ul {
+    list-style: none;
     padding: 0;
-    margin: 32px 0;
+    margin: 8px 0 0;
+  }
+  .legal-text {
+    margin-block: 32px;
+    line-height: 1.75;
+  }
+  .legal-text :global(h2) {
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    font-weight: 750;
+    scroll-margin-top: 24px;
+  }
+  .legal-text :global(h3) {
+    font-weight: 750;
+  }
+  .legal-text :global(a),
+  .legal-toc a {
+    color: var(--brand-dark);
   }
 </style>
