@@ -9,6 +9,7 @@ import {
   examQuestionConfirmationEmail,
   examQuestionNotificationEmail,
   contactFormEmail,
+  christmasVoucherEmails,
   internalNewOrderEmail,
   orderConfirmationEmail,
   reportEmail,
@@ -31,6 +32,64 @@ import { SupabaseEmailEventStore, type EmailEventRow } from '../../src/lib/serve
 import { LettermintEmailAdapter } from '../../src/lib/server/email/lettermint';
 import type { PublicOrderOverview } from '../../src/lib/booking/repository';
 import type { AdminAppointment } from '../../src/lib/supabase/booking-repository';
+
+test('Christmas voucher queues and delivers both confirmations with the same code and deposit', async () => {
+  const code = 'BUBU-VOUCHER-TEST';
+  const messages = christmasVoucherEmails({
+    requestId: 'c8f60dac-d6a4-41fa-912a-83be6aa47b62',
+    voucherNumber: code,
+    buyer: {
+      firstName: 'Kupující',
+      lastName: 'Test',
+      email: 'buyer@example.invalid',
+      phone: '+420777000000',
+    },
+    recipient: 'Obdarovaný Test',
+    branch: 'kladno',
+    deposit: 5000,
+    bonus: '2 výcvikové hodiny před zkouškou zdarma',
+    internalTo: 'staff@example.invalid',
+  });
+  const events = new Map<string, EmailEventRow>();
+  const delivered: EmailMessage[] = [];
+  const store = {
+    async createPending(message: EmailMessage) {
+      const event: EmailEventRow = {
+        id: message.idempotencyKey,
+        idempotency_key: message.idempotencyKey,
+        status: 'pending',
+        metadata: message.metadata ?? {},
+      };
+      events.set(event.id, event);
+      return event;
+    },
+    async claimDue(id: string) {
+      return events.get(id) ?? null;
+    },
+    async markSent() {},
+  } as unknown as SupabaseEmailEventStore;
+  const outbox = new OrderEmailOutbox(
+    {
+      async send(message) {
+        delivered.push(message);
+        return { status: 'sent' };
+      },
+    },
+    store,
+  );
+  for (const message of messages) assert.equal((await outbox.send(message)).status, 'queued');
+  assert.equal(events.size, 2);
+  for (const id of events.keys()) assert.equal(await outbox.deliver(id), 'sent');
+  assert.deepEqual(
+    delivered.map(({ to }) => to),
+    ['buyer@example.invalid', 'staff@example.invalid'],
+  );
+  for (const message of delivered) {
+    assert.ok(message.text.includes(code));
+    assert.match(message.text, /5\s000\sKč/);
+    assert.match(message.text, /Kladno/);
+  }
+});
 
 test('exam question email goes centrally and replies to the student', () => {
   const internal = examQuestionNotificationEmail({

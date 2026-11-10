@@ -24,6 +24,10 @@ export function courseLabel(id: string) {
 export function selectionLabel(selection: Selection) {
   if (selection.partnerSchool === 'gymnazium_manna' && selection.schoolCourseType)
     return `${selection.schoolCourseType === 'school' ? 'Školní kurz' : 'Kurz ISP'} · ${courseLabel(selection.course)}`;
+  if (selection.course === 'vraceni') {
+    const blocks = selection.drivingBlocks ?? 0;
+    return `Vrácení řidičského oprávnění${blocks ? ` · ${blocks} × 90 minut přípravy · ${selection.transmission === 'automatic' ? 'automat' : 'manuál'}` : ''}`;
+  }
   if (selection.course !== 'kondicni') return courseLabel(selection.course);
   const blocks = selection.drivingBlocks ?? 1;
   return (

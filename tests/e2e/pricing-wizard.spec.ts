@@ -1,5 +1,40 @@
 import { test, expect } from '@playwright/test';
 
+test('licence return prices optional rides and reaches the existing enrollment calendar', async ({
+  page,
+}) => {
+  await page.goto('/cenik');
+  await page.locator('[data-category="vraceni"]').click();
+  await expect(page.locator('#branch-question [data-branch="kladno"]')).toBeDisabled();
+  await page.locator('#branch-question [data-branch="statenice"]').click();
+  await page.locator('#transmission-question [data-transmission="manual"]').click();
+  await expect(page.locator('#pricing-return-ride-note')).toContainText('alespoň 4 jízdy');
+  await page.locator('#pricing-driving-blocks').selectOption('0');
+  await expect(page.locator('#offer-price')).toHaveText('7 000 Kč');
+  await page.locator('#wizard-path button').filter({ hasText: 'Počet jízd' }).click();
+  await page.locator('#pricing-driving-blocks').selectOption('4');
+  await expect(page.locator('#offer-price')).toHaveText('13 400 Kč');
+  await page.locator('.offer-card [data-order]').click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.locator('[name="course"]')).toHaveValue('vraceni');
+  await expect(dialog.locator('[name="drivingBlocks"]')).toHaveValue('4');
+  await expect(dialog.locator('#licence-return-documents')).toContainText('evidenční karty řidiče');
+  await expect(dialog.locator('#quote-amount')).toHaveText('13 400 Kč');
+  await dialog.locator('#order-next').click();
+  await dialog.locator('[name="firstName"]').fill('Test');
+  await dialog.locator('[name="lastName"]').fill('Student');
+  await dialog.locator('[name="email"]').fill('test@example.invalid');
+  await dialog.locator('[name="phone"]').fill('777123456');
+  const slotRequest = page.waitForRequest(
+    (request) =>
+      new URL(request.url()).pathname === '/api/slots' &&
+      new URL(request.url()).searchParams.get('branch') === 'statenice',
+  );
+  await dialog.locator('#order-next').click();
+  await slotRequest;
+  await expect(dialog.locator('#booking-calendar')).toBeVisible();
+});
+
 test('car variants retain course, transmission, branch and price in the order dialog', async ({
   page,
 }) => {

@@ -161,10 +161,12 @@ function selectionWithAddons() {
     transmission:
       course === 'b-automat'
         ? 'automatic'
-        : course === 'l17' || course === 'kondicni'
+        : ['l17', 'kondicni', 'vraceni'].includes(course)
           ? field('transmission').value
           : 'manual',
-    ...(course === 'kondicni' ? { drivingBlocks: Number(field('drivingBlocks').value) } : {}),
+    ...(['kondicni', 'vraceni'].includes(course)
+      ? { drivingBlocks: Number(field('drivingBlocks').value) }
+      : {}),
     package: moto ? field('package').value : 'single',
     heldLicences: moto && heldLicence ? [heldLicence] : [],
     ...(moto && direct ? { holdingPeriod: field('holdingPeriod').value } : {}),
@@ -176,9 +178,13 @@ function syncAvailableCourses() {
   const course = field('course') as HTMLSelectElement;
   for (const option of [...course.options]) {
     if (!option.value) continue;
-    option.hidden = restrictedBranches.has(branch) && !limitedBranchCourses.has(option.value);
+    option.hidden =
+      (restrictedBranches.has(branch) &&
+        !limitedBranchCourses.has(option.value) &&
+        !(branch === 'statenice' && option.value === 'vraceni')) ||
+      (branch === 'kladno' && option.value === 'vraceni');
   }
-  if (restrictedBranches.has(branch) && !limitedBranchCourses.has(course.value)) course.value = '';
+  if (course.selectedOptions[0]?.hidden) course.value = '';
 }
 
 function requiresAppointment() {
@@ -295,7 +301,13 @@ document.querySelectorAll<HTMLElement>('[data-order]').forEach((button) => {
       field('phone').value = button.dataset.phone ?? '';
     }
     if (button.dataset.transmission) field('transmission').value = button.dataset.transmission;
-    if (button.dataset.drivingBlocks) field('drivingBlocks').value = button.dataset.drivingBlocks;
+    if (field('course').value === 'vraceni') {
+      const zero = (field('drivingBlocks') as HTMLSelectElement).options[0]!;
+      zero.disabled = false;
+    }
+    if (button.dataset.drivingBlocks !== undefined && button.dataset.drivingBlocks !== '')
+      field('drivingBlocks').value = button.dataset.drivingBlocks;
+    else if (field('course').value === 'vraceni') field('drivingBlocks').value = '0';
     syncAvailableCourses();
     updateOrderStepCopy();
     dialog.showModal();
@@ -365,6 +377,8 @@ form.addEventListener('change', (event) => {
   if (!(event.target instanceof HTMLSelectElement) || !event.target.closest('[data-step="0"]'))
     return;
   syncAvailableCourses();
+  if (event.target.name === 'course' && field('course').value === 'vraceni')
+    field('drivingBlocks').value = '0';
   updateOrderStepCopy();
   trackSelection();
   void updateQuote();
@@ -404,6 +418,7 @@ async function updateQuote(retry = false) {
   error.textContent = '';
   const course = field('course').value;
   const branch = field('branch').value;
+  const licenceReturn = course === 'vraceni';
   const moto = ['am', 'a1', 'a2', 'a'].includes(course);
   document.querySelector<HTMLElement>('#licence-field')!.hidden = !moto;
   const direct =
@@ -415,8 +430,16 @@ async function updateQuote(retry = false) {
   document.querySelector<HTMLElement>('#transmission-field')!.hidden = ![
     'l17',
     'kondicni',
+    'vraceni',
   ].includes(course);
-  document.querySelector<HTMLElement>('#driving-blocks-field')!.hidden = course !== 'kondicni';
+  document.querySelector<HTMLElement>('#driving-blocks-field')!.hidden =
+    course !== 'kondicni' && !licenceReturn;
+  document.querySelector<HTMLElement>('#licence-return-documents')!.hidden = !licenceReturn;
+  document.querySelector<HTMLElement>('#licence-return-ride-note')!.hidden = !licenceReturn;
+  const blocks = field('drivingBlocks') as HTMLSelectElement;
+  const zero = blocks.options[0]!;
+  zero.hidden = zero.disabled = !licenceReturn;
+  if (course === 'kondicni' && Number(blocks.value) === 0) blocks.value = '1';
   const automaticOption = (
     field('transmission') as HTMLSelectElement
   ).querySelector<HTMLOptionElement>('option[value=automatic]')!;
@@ -477,7 +500,9 @@ async function updateQuote(retry = false) {
     note.textContent =
       course === 'kondicni'
         ? `${selection.drivingBlocks} × 90 minut (${(selection.drivingBlocks ?? 1) * 2} vyučovacích hodin). 800 Kč / 45 minut. Termíny jízd domluvíme při zápisu.`
-        : `Kurz: ${money(result.baseAmount)}.${addonsNote} Samostatně: organizace zkoušky ${money(result.schoolFee)}, úřední poplatek za první zkoušku ${money(result.authorityFee)}.${result.extraTheoryHours ? ' Součástí jsou také 2 hodiny teorie navíc.' : ''}`;
+        : licenceReturn
+          ? `Přezkoušení: ${money(result.baseAmount)}.${addonsNote} Termíny přípravných jízd domluvíme při zápisu.`
+          : `Kurz: ${money(result.baseAmount)}.${addonsNote} Samostatně: organizace zkoušky ${money(result.schoolFee)}, úřední poplatek za první zkoušku ${money(result.authorityFee)}.${result.extraTheoryHours ? ' Součástí jsou také 2 hodiny teorie navíc.' : ''}`;
     next.disabled = false;
   } catch {
     if (seq !== requestSequence) return;

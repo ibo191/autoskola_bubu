@@ -248,7 +248,7 @@ export class CreateOrderService {
     };
     const customerMessage = orderConfirmationEmail(emailInput);
     try {
-      if (parsed.data.selection.course !== 'kondicni')
+      if (!['kondicni', 'vraceni'].includes(parsed.data.selection.course))
         customerMessage.attachments = [await applicationFormAttachment()];
     } catch (error) {
       console.warn('email_attachment_missing', {

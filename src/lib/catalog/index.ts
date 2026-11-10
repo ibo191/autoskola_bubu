@@ -57,6 +57,7 @@ export const courseId = z.enum([
   'b96',
   'be',
   'kondicni',
+  'vraceni',
 ]);
 export type CourseId = z.infer<typeof courseId>;
 const courseSchema = z.object({
@@ -149,6 +150,15 @@ export const courses = z.array(courseSchema).parse([
     description:
       'Pro držitele řidičského průkazu skupiny B. Manuál na všech pobočkách, automat na Střížkově. Jeden blok trvá 90 minut a stojí 1 600 Kč.',
   },
+  {
+    id: 'vraceni',
+    slug: 'vraceni-ridicskeho-opravneni',
+    name: 'Přezkoušení pro vrácení řidičského oprávnění',
+    category: 'auto',
+    label: 'Vrácení řidičského oprávnění',
+    description:
+      'Domluvte si zápis k přezkoušení a podle potřeby přidejte přípravné jízdy s instruktorem.',
+  },
 ]);
 export type Course = (typeof courses)[number];
 export const getCourse = (id: CourseId) => courses.find((c) => c.id === id)!;
@@ -180,12 +190,16 @@ export const examAuthorities = [
   { branch: 'kladno', office: 'Magistrát města Kladna', firstExam: 700 },
 ] as const;
 export { money } from '../format';
+export const drivingBlockPrice = 1600;
+export const licenceReturnPrice = 7000;
 export function availableAt(course: Course, branch: BranchId) {
+  if (course.id === 'vraceni') return branch !== 'kladno';
   return branch === 'strizkov' || (course.category === 'auto' && course.id !== 'b-automat');
 }
 export function displayPrice(course: Course, branch: BranchId): number {
   if (!availableAt(course, branch)) throw new Error('Unavailable combination');
-  if (course.id === 'kondicni') return 1600;
+  if (course.id === 'kondicni') return drivingBlockPrice;
+  if (course.id === 'vraceni') return licenceReturnPrice;
   if (course.category === 'auto') return getBranch(branch).bPrice;
   return course.id === 'b96' ? prices.b96 : course.id === 'be' ? prices.be : prices.motoBasic;
 }

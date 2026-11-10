@@ -1,5 +1,6 @@
 ---
-import { branches, courses } from '../lib/catalog';
+import { branches, courses, drivingBlockPrice, money } from '../lib/catalog';
+import { licenceReturnDocuments } from '../lib/licence-return';
 interface Props {
   recaptchaSiteKey?: string;
   captchaRequired?: boolean;
@@ -60,17 +61,25 @@ const { recaptchaSiteKey = '', captchaRequired = false } = Astro.props;
           >
           <label id="driving-blocks-field" hidden>
             Počet 90minutových bloků<select name="drivingBlocks">
+              <option value="0" hidden disabled>Bez přípravných jízd</option>
               {
                 Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
                   <option value={n}>
                     {n} {n === 1 ? 'blok' : n < 5 ? 'bloky' : 'bloků'} · {n * 2} × 45 minut ·{' '}
-                    {(n * 1600).toLocaleString('cs-CZ')} Kč
+                    {money(n * drivingBlockPrice)}
                   </option>
                 ))
               }
             </select>
             <small>1 vyučovací hodina = 45 minut za 800 Kč. Jezdíme vždy 90 minut v kuse.</small>
+            <small id="licence-return-ride-note" hidden
+              >Doporučujeme alespoň 4 přípravné jízdy.</small
+            >
           </label>
+          <div class="notice" id="licence-return-documents" hidden>
+            <strong>K zápisu přineste</strong>
+            <ul>{licenceReturnDocuments.map((document) => <li>{document}</li>)}</ul>
+          </div>
           <label id="licence-field" hidden
             >Jaké oprávnění už máte?<select name="heldLicence"
               ><option value="">Zatím žádné</option><option value="B">B</option><option value="A1"

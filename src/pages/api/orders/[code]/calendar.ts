@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { requireLiveRepository } from '../../../../lib/server/live-order';
 import { branchLabel, selectionLabel } from '../../../../lib/order-display';
+import { licenceReturnDocuments } from '../../../../lib/licence-return';
 
 export const prerender = false;
 
@@ -26,9 +27,15 @@ export const GET: APIRoute = async ({ params }) => {
     if (!order?.appointment) return new Response('Not found', { status: 404 });
     const summary = `Zápis do Autoškoly BuBu – ${selectionLabel(order.selection)}`;
     const description =
-      order.selection.course === 'kondicni'
-        ? `Číslo objednávky: ${order.publicCode}\nNa zápis si vezměte občanský průkaz a platný řidičský průkaz skupiny B. Termíny jízd a platbu domluvíme při zápisu.`
-        : `Číslo objednávky: ${order.publicCode}\nPři zápisu se platí nevratná záloha za kurz 5 000 Kč na pobočce, ideálně v hotovosti, případně okamžitým převodem na účet.`;
+      order.selection.course === 'vraceni'
+        ? [
+            `Číslo objednávky: ${order.publicCode}`,
+            'K zápisu přineste:',
+            ...licenceReturnDocuments,
+          ].join('\n')
+        : order.selection.course === 'kondicni'
+          ? `Číslo objednávky: ${order.publicCode}\nNa zápis si vezměte občanský průkaz a platný řidičský průkaz skupiny B. Termíny jízd a platbu domluvíme při zápisu.`
+          : `Číslo objednávky: ${order.publicCode}\nPři zápisu se platí nevratná záloha za kurz 5 000 Kč na pobočce, ideálně v hotovosti, případně okamžitým převodem na účet.`;
     const body = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',

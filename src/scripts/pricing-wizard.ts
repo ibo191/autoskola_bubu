@@ -64,6 +64,7 @@ const heldLicences = () =>
   [...document.querySelectorAll<HTMLInputElement>('input[name="held-licence"]:checked')].map(
     (input) => input.value,
   );
+const hasDrivingBlocks = () => ['kondicni', 'vraceni'].includes(state.category);
 const track = (name: string, extra: Record<string, string | number> = {}) =>
   window.dispatchEvent(
     new CustomEvent('bubu:tracking', {
@@ -73,7 +74,7 @@ const track = (name: string, extra: Record<string, string | number> = {}) =>
         ...((state.category === 'auto' && state.mode && state.transmission) ||
         (state.category === 'moto' && state.motoTarget) ||
         (state.category === 'prives' && state.trailer) ||
-        state.category === 'kondicni'
+        hasDrivingBlocks()
           ? { courseId: courseId() }
           : {}),
         ...(state.branch ? { location: state.branch } : {}),
@@ -94,7 +95,7 @@ const courseId = () =>
       ? state.motoTarget
       : state.category === 'prives'
         ? state.trailer
-        : 'kondicni';
+        : state.category;
 const ranks: Record<string, number> = { AM: 0, A1: 1, A2: 2, A: 3 };
 function directExtension() {
   const highest = heldLicences()
@@ -110,7 +111,7 @@ function steps(): Step[] {
   if (!state.category) return base;
   base.push('branch');
   if (state.category === 'auto') base.push('transmission', 'mode');
-  if (state.category === 'kondicni') base.push('transmission', 'drivingBlocks');
+  if (hasDrivingBlocks()) base.push('transmission', 'drivingBlocks');
   if (state.category === 'prives') base.push('trailer');
   if (state.category === 'moto') {
     base.push('motoTarget', 'licenceStatus');
@@ -218,7 +219,13 @@ function render() {
   if (!route.includes(active)) active = route.at(-1)!;
   for (const selector of Object.values(panels)) show(selector, selector === panels[active]);
   show('#contact-result', false);
-  show('.fees', state.category !== 'kondicni');
+  show('.fees', !hasDrivingBlocks());
+  show('#pricing-return-ride-note', state.category === 'vraceni');
+  const drivingBlocks = $<HTMLSelectElement>('#pricing-driving-blocks');
+  const noRides = drivingBlocks.querySelector<HTMLOptionElement>('option[value="0"]')!;
+  noRides.hidden = noRides.disabled = state.category !== 'vraceni';
+  if (active === 'drivingBlocks')
+    drivingBlocks.value = state.drivingBlocks ? String(state.drivingBlocks) : '';
   for (const key of [
     'category',
     'branch',
@@ -241,19 +248,22 @@ function render() {
     .querySelectorAll<HTMLButtonElement>('#branch-question [data-branch]')
     .forEach((button) => {
       button.disabled =
-        ['moto', 'prives'].includes(state.category) && button.dataset.branch !== 'strizkov';
+        (['moto', 'prives'].includes(state.category) && button.dataset.branch !== 'strizkov') ||
+        (state.category === 'vraceni' && button.dataset.branch === 'kladno');
     });
   const automatic = $<HTMLButtonElement>('[data-transmission="automatic"]');
   automatic.disabled = state.branch !== 'strizkov';
-  automatic.hidden = state.category === 'kondicni' && state.branch !== 'strizkov';
+  automatic.hidden = hasDrivingBlocks() && state.branch !== 'strizkov';
   $('#transmission-note').textContent =
     state.category === 'kondicni'
       ? state.branch === 'strizkov'
         ? 'Kondiční jízdy na manuálu i automatu.'
         : 'Na této pobočce jezdíme pouze na manuálu.'
-      : state.branch === 'strizkov'
-        ? 'Manuál i automat jsou dostupné pro klasický kurz i L17.'
-        : 'Na této pobočce poskytujeme výcvik pouze na manuálu.';
+      : state.category === 'vraceni'
+        ? 'Vyberte převodovku pro přezkoušení.'
+        : state.branch === 'strizkov'
+          ? 'Manuál i automat jsou dostupné pro klasický kurz i L17.'
+          : 'Na této pobočce poskytujeme výcvik pouze na manuálu.';
   const autoPrice = Number(
     $<HTMLButtonElement>(`[data-branch="${state.branch}"]`)?.dataset.bPrice ?? 0,
   );
@@ -304,8 +314,8 @@ async function requestQuote() {
             : 'single')
         : 'single',
   };
-  if (['auto', 'kondicni'].includes(state.category)) selection.transmission = state.transmission;
-  if (state.category === 'kondicni') selection.drivingBlocks = state.drivingBlocks;
+  if (state.category === 'auto' || hasDrivingBlocks()) selection.transmission = state.transmission;
+  if (hasDrivingBlocks()) selection.drivingBlocks = state.drivingBlocks;
   if (state.category === 'moto') {
     selection.heldLicences = state.licenceStatus === 'yes' ? heldLicences() : [];
     if (directExtension()) selection.holdingPeriod = state.period;
@@ -371,30 +381,41 @@ function showOffer(selection: Record<string, unknown>, result: Extract<Quote, { 
   $('#offer-summary').textContent =
     `Pobočka: ${branchName}${state.transmission ? ` · Převodovka: ${state.transmission === 'automatic' ? 'automat' : 'manuál'}` : ''}`;
   const refresher = state.category === 'kondicni',
+    licenceReturn = state.category === 'vraceni',
     moto = state.category === 'moto';
   $('#offer-price-note').textContent = refresher
     ? 'Celková cena vybraných kondičních jízd. 800 Kč / 45 minut; jezdíme v 90minutových blocích.'
-    : moto
-      ? 'Orientační cena kurzu pro sezonu 2027. Přihlašování zatím není otevřené.'
-      : 'Cena odpovídá zvolené pobočce a variantě kurzu. * Nezahrnuje poplatky za zkoušku.';
-  show('#offer-price-asterisk', !refresher && !moto);
+    : licenceReturn
+      ? `Přezkoušení ${money(result.baseAmount)}${result.addonsAmount ? ` + přípravné jízdy ${money(result.addonsAmount)}` : ''}.`
+      : moto
+        ? 'Orientační cena kurzu pro sezonu 2027. Přihlašování zatím není otevřené.'
+        : 'Cena odpovídá zvolené pobočce a variantě kurzu. * Nezahrnuje poplatky za zkoušku.';
+  show('#offer-price-asterisk', !hasDrivingBlocks() && !moto);
   $('#offer-variant').textContent = refresher
     ? `${state.drivingBlocks} × 90 minut · ${state.drivingBlocks * 2} vyučovacích hodin · ${state.transmission === 'automatic' ? 'automat' : 'manuál'}`
-    : moto
-      ? result.training === 'supplement'
-        ? 'Doplňovací zkouška · 4 hodiny jízd'
-        : result.package === 'moto-basic'
-          ? 'Moto Základ · 13 hodin jízd'
-          : 'Moto Jistota · 20 hodin jízd'
-      : state.category === 'auto'
-        ? `${state.mode === 'l17' ? 'L17' : 'Klasický kurz'} · ${state.transmission === 'automatic' ? 'automat · kód 78' : 'manuál'}`
-        : 'Rozšíření oprávnění';
+    : licenceReturn
+      ? state.drivingBlocks
+        ? `${state.drivingBlocks} × 90 minut přípravných jízd`
+        : 'Bez přípravných jízd'
+      : moto
+        ? result.training === 'supplement'
+          ? 'Doplňovací zkouška · 4 hodiny jízd'
+          : result.package === 'moto-basic'
+            ? 'Moto Základ · 13 hodin jízd'
+            : 'Moto Jistota · 20 hodin jízd'
+        : state.category === 'auto'
+          ? `${state.mode === 'l17' ? 'L17' : 'Klasický kurz'} · ${state.transmission === 'automatic' ? 'automat · kód 78' : 'manuál'}`
+          : 'Rozšíření oprávnění';
   const order = $<HTMLButtonElement>('.offer-card [data-order]');
   order.dataset.course = String(selection.course);
   order.dataset.branch = state.branch;
   order.dataset.transmission = state.transmission;
-  order.dataset.drivingBlocks = refresher ? String(state.drivingBlocks) : '';
-  order.textContent = refresher ? 'Objednat kondiční jízdy ↗' : 'Chci se přihlásit ↗';
+  order.dataset.drivingBlocks = hasDrivingBlocks() ? String(state.drivingBlocks) : '';
+  order.textContent = licenceReturn
+    ? 'Rezervovat zápis ↗'
+    : refresher
+      ? 'Objednat kondiční jízdy ↗'
+      : 'Chci se přihlásit ↗';
   show('.offer-card [data-order]', !moto);
   const link = $<HTMLAnchorElement>('#moto-interest-link');
   if (moto) {
@@ -447,8 +468,9 @@ for (const [selector, step, key] of [
     );
 $<HTMLSelectElement>('#pricing-driving-blocks').addEventListener('change', (event) => {
   if (active !== 'drivingBlocks') return;
-  const count = Number((event.target as HTMLSelectElement).value);
-  if (count > 0) {
+  const value = (event.target as HTMLSelectElement).value;
+  const count = Number(value);
+  if (value && (count > 0 || state.category === 'vraceni')) {
     state.drivingBlocks = count;
     advance();
   }

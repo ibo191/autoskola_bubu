@@ -10,6 +10,8 @@ import {
   priceSource,
   examAuthorities,
   prices,
+  drivingBlockPrice,
+  licenceReturnPrice,
 } from '../lib/catalog';
 
 const priceRows = [
@@ -22,6 +24,12 @@ const priceRows = [
   },
   { name: 'L17', variant: 'manuál', price: [25900, 20000, 25900], slug: 'l17' },
   { name: 'BA-L17', variant: 'automat · kód 78', price: [25900, null, null], slug: 'l17' },
+  {
+    name: 'Vrácení řidičského oprávnění',
+    variant: `přezkoušení · volitelné jízdy ${money(drivingBlockPrice)} / 90 min`,
+    price: [licenceReturnPrice, null, licenceReturnPrice],
+    slug: 'vraceni-ridicskeho-opravneni',
+  },
   ...(['AM', 'A2', 'A'] as const).flatMap((group) => [
     {
       name: `Skupina ${group}`,
@@ -205,6 +213,14 @@ const priceRows = [
                 ></span
               >
             </button>
+            <button type="button" data-category="vraceni" aria-pressed="false">
+              <img src="/icons/ui/blue-classroom-outline.webp" alt="" width="192" height="192" />
+              <span
+                ><strong>Vrácení řidičského oprávnění</strong><small
+                  >Přezkoušení za {money(licenceReturnPrice)} s možností přípravných jízd.</small
+                ></span
+              >
+            </button>
           </div>
         </fieldset>
 
@@ -245,14 +261,18 @@ const priceRows = [
             Dopřejte si čas na návrat do provozu. Jeden 90minutový blok stojí 1 600 Kč (2 × 45 minut
             za 800 Kč).
           </p>
+          <p class="question-note" id="pricing-return-ride-note" hidden>
+            Přípravné jízdy jsou volitelné. Doporučujeme alespoň 4 jízdy.
+          </p>
           <label
             >Počet 90minutových bloků
             <select id="pricing-driving-blocks">
-              <option value="0">Vyberte počet jízd</option>
+              <option value="">Vyberte počet jízd</option>
+              <option value="0" hidden disabled>Bez přípravných jízd</option>
               {
                 Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
                   <option value={n}>
-                    {n} × 90 minut · {(n * 1600).toLocaleString('cs-CZ')} Kč
+                    {n} × 90 minut · {money(n * drivingBlockPrice)}
                   </option>
                 ))
               }

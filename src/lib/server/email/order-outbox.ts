@@ -4,28 +4,35 @@ import { applicationFormAttachment } from './attachments';
 import { SupabaseEmailEventStore, type EmailEventRow } from './events';
 import { LettermintEmailAdapter } from './lettermint';
 
-const storedMessageSchema = z.object({
-  idempotencyKey: z.string().min(1),
-  to: z.email(),
-  subject: z.string().min(1),
-  text: z.string(),
-  html: z.string().optional(),
-  from: z.string().optional(),
-  replyTo: z.string().optional(),
-  tag: z.string().optional(),
-  metadata: z.record(z.string(), z.unknown()).optional(),
-  eventType: z.enum([
-    'order_confirmation',
-    'internal_new_order',
-    'enrollment_welcome',
-    'appointment_no_show',
-    'admin_order_cancelled',
-    'appointment_rescheduled',
-    'appointment_cancelled',
-  ]),
-  orderId: z.uuid(),
-  appointmentId: z.uuid().optional(),
-});
+const storedMessageSchema = z
+  .object({
+    idempotencyKey: z.string().min(1),
+    to: z.email(),
+    subject: z.string().min(1),
+    text: z.string(),
+    html: z.string().optional(),
+    from: z.string().optional(),
+    replyTo: z.string().optional(),
+    tag: z.string().optional(),
+    metadata: z.record(z.string(), z.unknown()).optional(),
+    eventType: z.enum([
+      'order_confirmation',
+      'internal_new_order',
+      'enrollment_welcome',
+      'appointment_no_show',
+      'admin_order_cancelled',
+      'appointment_rescheduled',
+      'appointment_cancelled',
+      'contact_form_notification',
+    ]),
+    orderId: z.uuid().optional(),
+    appointmentId: z.uuid().optional(),
+  })
+  .refine((message) =>
+    message.eventType === 'contact_form_notification'
+      ? message.metadata?.campaignId === 'vanoce'
+      : Boolean(message.orderId),
+  );
 
 type OutboxStore = Pick<
   SupabaseEmailEventStore,
@@ -54,7 +61,11 @@ export class OrderEmailOutbox implements EmailAdapter {
       message.eventType !== 'appointment_no_show' &&
       message.eventType !== 'admin_order_cancelled' &&
       message.eventType !== 'appointment_rescheduled' &&
-      message.eventType !== 'appointment_cancelled'
+      message.eventType !== 'appointment_cancelled' &&
+      !(
+        message.eventType === 'contact_form_notification' &&
+        message.metadata?.campaignId === 'vanoce'
+      )
     )
       throw new Error('Unsupported order outbox event');
     const { attachments: _attachments, scheduledFor: _scheduledFor, ...snapshot } = message;
@@ -92,7 +103,11 @@ export class OrderEmailOutbox implements EmailAdapter {
           return 'skipped';
         }
       }
-      if (message.eventType === 'order_confirmation' && message.metadata?.course !== 'kondicni') {
+      if (
+        message.eventType === 'order_confirmation' &&
+        message.metadata?.course !== 'kondicni' &&
+        message.metadata?.course !== 'vraceni'
+      ) {
         message.attachments = [await applicationFormAttachment()];
       }
       const result = await this.provider.send(message);

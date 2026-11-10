@@ -10,12 +10,14 @@ import {
   priceSource,
   motoEnrollmentPaused,
   motoEnrollmentPausedMessage,
+  drivingBlockPrice,
+  licenceReturnPrice,
 } from '../catalog/index';
 
 export const selectionSchema = z
   .object({
     course: courseId,
-    drivingBlocks: z.number().int().min(1).max(20).optional(),
+    drivingBlocks: z.number().int().min(0).max(20).optional(),
     branch: branchId,
     transmission: z.enum(['manual', 'automatic']).optional(),
     package: z.enum(['single', 'moto-basic', 'moto-confidence', 'supplement']).default('single'),
@@ -75,7 +77,8 @@ function calculateQuote(input: unknown, allowPausedMoto: boolean): Quote {
     };
   if (
     (parsed.data.course === 'kondicni' && !parsed.data.drivingBlocks) ||
-    (parsed.data.course !== 'kondicni' && parsed.data.drivingBlocks !== undefined)
+    (!['kondicni', 'vraceni'].includes(parsed.data.course) &&
+      parsed.data.drivingBlocks !== undefined)
   )
     return {
       ok: false,
@@ -104,6 +107,15 @@ function calculateQuote(input: unknown, allowPausedMoto: boolean): Quote {
     unitPrice: number;
     total: number;
   }[] = [];
+  if (s.course === 'vraceni' && s.drivingBlocks) {
+    selectedAddons.push({
+      id: 'licence-return-driving',
+      title: 'Přípravné jízdy (90 minut)',
+      quantity: s.drivingBlocks,
+      unitPrice: drivingBlockPrice,
+      total: s.drivingBlocks * drivingBlockPrice,
+    });
+  }
   const addonsAmount = selectedAddons.reduce((sum, item) => sum + item.total, 0);
   const result = (
     baseAmount: number,
@@ -119,8 +131,8 @@ function calculateQuote(input: unknown, allowPausedMoto: boolean): Quote {
     package: s.package,
     training,
     extraTheoryHours,
-    schoolFee: s.course === 'kondicni' ? 0 : fees.schoolOrganization,
-    authorityFee: s.course === 'kondicni' ? 0 : fees.authorityFirstExam,
+    schoolFee: ['kondicni', 'vraceni'].includes(s.course) ? 0 : fees.schoolOrganization,
+    authorityFee: ['kondicni', 'vraceni'].includes(s.course) ? 0 : fees.authorityFirstExam,
     priceVersion: s.schoolCourseType
       ? `${priceSource.version}-manna-${s.schoolCourseType}`
       : priceSource.version,
@@ -147,7 +159,8 @@ function calculateQuote(input: unknown, allowPausedMoto: boolean): Quote {
         };
       return result(s.schoolCourseType === 'school' ? 30500 : 25900);
     }
-    if (s.course === 'kondicni') return result(s.drivingBlocks! * 1600);
+    if (s.course === 'kondicni') return result(s.drivingBlocks! * drivingBlockPrice);
+    if (s.course === 'vraceni') return result(licenceReturnPrice);
     if (course.category === 'auto') return result(getBranch(s.branch).bPrice);
     return result(s.course === 'b96' ? prices.b96 : prices.be, 'extension');
   }

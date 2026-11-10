@@ -1,0 +1,74 @@
+---
+export const prerender = true;
+import Base from '../../layouts/Base.astro';
+import {
+  availableAt,
+  branches,
+  drivingBlockPrice,
+  getCourse,
+  licenceReturnPrice,
+  money,
+} from '../../lib/catalog';
+import { licenceReturnDocuments } from '../../lib/licence-return';
+
+const course = getCourse('vraceni');
+const bookingBranches = branches.filter((branch) => availableAt(course, branch.id));
+---
+
+<Base title="Vrácení řidičského oprávnění | Autoškola BuBu" description={course.description}>
+  <section class="page-hero">
+    <div class="container content">
+      <nav class="breadcrumbs" aria-label="Drobečková navigace">
+        <a href="/">Domů</a><span>/</span><a href="/kurzy">Kurzy</a><span>/</span><span
+          >Vrácení řidičského oprávnění</span
+        >
+      </nav>
+      <h1>Vrácení řidičského oprávnění</h1>
+      <p class="lead">
+        Potřebujete přezkoušení? Zarezervujte si osobní zápis na Střížkově nebo ve Statenicích. Při
+        zápisu zkontrolujeme doklady a domluvíme další postup.
+      </p>
+      <div class="actions">
+        <button class="btn primary" data-order data-course={course.id} disabled
+          >Rezervovat zápis ↗</button
+        >
+        <a class="btn secondary" href="#doklady">Co vzít k zápisu</a>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container content">
+      <h2>Cena a přípravné jízdy</h2>
+      <p>
+        Přezkoušení stojí <strong>{money(licenceReturnPrice)}</strong>. Přípravné jízdy jsou
+        volitelné a stojí <strong>{money(drivingBlockPrice)} za 90 minut</strong> (2 × 45 minut). Doporučujeme
+        alespoň 4 přípravné jízdy.
+      </p>
+      <h2 id="doklady">Doklady k přijetí do autoškoly</h2>
+      <p>K osobnímu zápisu přineste:</p>
+      <ul>{licenceReturnDocuments.map((document) => <li>{document}</li>)}</ul>
+      <p>
+        O vrácení oprávnění rozhoduje příslušný úřad. Požadavky úřadu pro jednotlivé případy
+        popisuje <a href="https://portal.gov.cz/sluzby-vs/vraceni-ridicskeho-opravneni-S95"
+          >Portál veřejné správy</a
+        >.
+      </p>
+      <h2>Vyberte pobočku a termín zápisu</h2>
+      <div class="actions">
+        {
+          bookingBranches.map((branch) => (
+            <button
+              class="btn secondary"
+              data-order
+              data-course={course.id}
+              data-branch={branch.id}
+              disabled
+            >
+              {branch.name} ↗
+            </button>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>

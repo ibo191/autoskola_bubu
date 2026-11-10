@@ -23,6 +23,7 @@ const categoryLabels = {
 
 const coursePhotos = {
   kondicni: manualFabia,
+  vraceni: manualFabia,
   b: manualFabia,
   'b-automat': automaticScala,
   l17: manualFabia,
@@ -30,6 +31,7 @@ const coursePhotos = {
 
 const courseIcons = {
   kondicni: '/icons/ui/mint-car.webp',
+  vraceni: '/icons/ui/mint-classroom-outline.webp',
   b: '/icons/ui/mint-car.webp',
   'b-automat': '/icons/ui/mint-car-automatic.webp',
   l17: '/icons/ui/mint-graduation.webp',
@@ -161,7 +163,7 @@ const courseIcons = {
                 <div class="tile-meta">
                   <span>
                     {money(price)}
-                    {course.id === 'kondicni' ? ' / 90 min' : '*'}
+                    {course.id === 'kondicni' ? ' / 90 min' : course.id === 'vraceni' ? '' : '*'}
                   </span>
                   <small class="price-branch">
                     Střížkov
@@ -246,7 +248,12 @@ const courseIcons = {
                 style: 'currency',
                 currency: 'CZK',
                 maximumFractionDigits: 0,
-              }).format(price) + (tile.dataset.courseId === 'kondicni' ? ' / 90 min' : '*');
+              }).format(price) +
+              (tile.dataset.courseId === 'kondicni'
+                ? ' / 90 min'
+                : tile.dataset.courseId === 'vraceni'
+                  ? ''
+                  : '*');
           const branchLabel = tile.querySelector<HTMLElement>('.price-branch');
           if (branchLabel)
             branchLabel.textContent =

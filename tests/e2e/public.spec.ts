@@ -64,7 +64,7 @@ test('B pricing asks for transmission and L17, with manual only outside Prague',
 test('Course overview renders crawlable links for every course detail', async ({ page }) => {
   await page.goto('/kurzy');
   const courseLinks = page.locator('.course-tile > a.course-tile-overlay[href^="/kurzy/"]');
-  await expect(courseLinks).toHaveCount(10);
+  await expect(courseLinks).toHaveCount(11);
   for (const href of [
     '/kurzy/ridicak-skupina-b',
     '/kurzy/ridicak-skupina-b-automat',
@@ -76,6 +76,7 @@ test('Course overview renders crawlable links for every course detail', async ({
     '/kurzy/b96',
     '/kurzy/be',
     '/kurzy/kondicni-jizdy',
+    '/kurzy/vraceni-ridicskeho-opravneni',
   ])
     await expect(page.locator(`.course-tile > a.course-tile-overlay[href="${href}"]`)).toHaveCount(
       1,

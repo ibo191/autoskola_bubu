@@ -5,6 +5,7 @@ import type { Selection, Quote } from '../../pricing/quote';
 import { branches } from '../../catalog';
 import { money } from '../../format';
 import { branchLabel, courseLabel, selectionLabel, packageLabel } from '../../order-display';
+import { licenceReturnDocuments } from '../../licence-return';
 import {
   escapeHtml,
   eventKey,
@@ -130,18 +131,28 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
     ? formatEmailDateTime(input.appointment.startsAt)
     : 'Termín zápisu zatím není vybraný';
   const isRefresher = input.selection.course === 'kondicni';
-  const preparation = isRefresher
+  const isLicenceReturn = input.selection.course === 'vraceni';
+  const preparation = isLicenceReturn
     ? {
-        html: isKladno
-          ? '<h2>Co bude dál</h2><p>Na Kladně se přihlásíte online bez osobního zápisu. Pobočka Vás e-mailem kontaktuje s pokyny k platbě a domluvě kondičních jízd. Připravte si platný řidičský průkaz skupiny B.</p>'
-          : '<h2>Co připravit</h2><p>Na zápis si vezměte občanský průkaz a platný řidičský průkaz skupiny B. Domluvíme s Vámi platbu a termíny kondičních jízd. Zvolený termín je termín zápisu, nikoli samotné jízdy.</p>',
+        html: `<h2>Co přinést k zápisu</h2><ul>${licenceReturnDocuments.map((document) => `<li>${escapeHtml(document)}</li>`).join('')}</ul><p>Při zápisu ověříme doklady a domluvíme přezkoušení i termíny případných přípravných jízd.</p>`,
         text: [
-          isKladno
-            ? 'Na Kladně se přihlásíte online bez osobního zápisu. Pobočka Vás e-mailem kontaktuje s pokyny k platbě a domluvě kondičních jízd. Připravte si platný řidičský průkaz skupiny B.'
-            : 'Co připravit: občanský průkaz a platný řidičský průkaz skupiny B. Domluvíme s Vámi platbu a termíny kondičních jízd. Zvolený termín je termín zápisu, nikoli samotné jízdy.',
+          'Co přinést k zápisu:',
+          ...licenceReturnDocuments,
+          'Při zápisu ověříme doklady a domluvíme přezkoušení i termíny případných přípravných jízd.',
         ],
       }
-    : preparationDetails(input.applicationFormUrl, input.price.amount, isKladno);
+    : isRefresher
+      ? {
+          html: isKladno
+            ? '<h2>Co bude dál</h2><p>Na Kladně se přihlásíte online bez osobního zápisu. Pobočka Vás e-mailem kontaktuje s pokyny k platbě a domluvě kondičních jízd. Připravte si platný řidičský průkaz skupiny B.</p>'
+            : '<h2>Co připravit</h2><p>Na zápis si vezměte občanský průkaz a platný řidičský průkaz skupiny B. Domluvíme s Vámi platbu a termíny kondičních jízd. Zvolený termín je termín zápisu, nikoli samotné jízdy.</p>',
+          text: [
+            isKladno
+              ? 'Na Kladně se přihlásíte online bez osobního zápisu. Pobočka Vás e-mailem kontaktuje s pokyny k platbě a domluvě kondičních jízd. Připravte si platný řidičský průkaz skupiny B.'
+              : 'Co připravit: občanský průkaz a platný řidičský průkaz skupiny B. Domluvíme s Vámi platbu a termíny kondičních jízd. Zvolený termín je termín zápisu, nikoli samotné jízdy.',
+          ],
+        }
+      : preparationDetails(input.applicationFormUrl, input.price.amount, isKladno);
   const manageLink = input.appointment
     ? ` <a href="${escapeHtml(input.manageUrl)}" style="display:inline-block;color:#17345d;text-decoration:underline;margin-left:12px;font-weight:700;">Změnit termín zápisu</a>`
     : '';
@@ -164,7 +175,7 @@ export function orderConfirmationEmail(input: CreatedOrderEmailInput): EmailMess
     noteHtml(input.note),
     preparation.html,
     `<p style="margin:24px 0;"><a href="${escapeHtml(input.thankYouUrl)}" style="display:inline-block;background:#4daeb6;color:#ffffff;text-decoration:none;padding:13px 18px;border-radius:999px;font-weight:700;">Zobrazit objednávku</a>${manageLink}</p>`,
-    ...(isKladno || isRefresher
+    ...(isKladno || isRefresher || isLicenceReturn
       ? []
       : [
           `<p style="font-size:15px;line-height:1.6;color:#667998;margin:0;">Na zápis si prosím vezměte občanský průkaz, originál přihlášky a zdravotní posudek.</p>`,
@@ -320,6 +331,59 @@ export function contactFormEmail(input: {
   };
 }
 
+export function christmasVoucherEmails(input: {
+  requestId: string;
+  voucherNumber: string;
+  buyer: Pick<Contact, 'firstName' | 'lastName' | 'email' | 'phone'>;
+  recipient: string;
+  dedication?: string;
+  course?: string;
+  branch: string;
+  deposit: number;
+  bonus: string;
+  internalTo: string;
+}): EmailMessage[] {
+  const details: Array<[string, string]> = [
+    ['Číslo poukazu', input.voucherNumber],
+    ['Obdarovaný', input.recipient],
+    ['Kurz', input.course ? courseLabel(input.course) : 'Dle domluvy'],
+    ['Pobočka pro vyzvednutí', branchLabel(input.branch)],
+    ['Nevratná záloha při převzetí', money(input.deposit)],
+    ['Bonus', input.bonus],
+    ...(input.dedication ? ([['Věnování', input.dedication]] as Array<[string, string]>) : []),
+  ];
+  const customerNote =
+    'Poukaz si vyzvednete během otevírací doby vybrané pobočky. Zálohu zaplatíte osobně při převzetí a započítá se do ceny kurzu. Termín převzetí s vámi upřesníme.';
+  const internalNote = 'Připravte poukaz s uvedeným číslem a domluvte se s kupujícím na převzetí.';
+  return (['customer', 'internal'] as const).map((recipient) => {
+    const internal = recipient === 'internal';
+    const subject = internal
+      ? 'Nová objednávka vánočního poukazu – Autoškola BuBu'
+      : 'Potvrzení rezervace vánočního poukazu – Autoškola BuBu';
+    const fields = internal
+      ? ([
+          ...details,
+          ['Kupující', `${input.buyer.firstName} ${input.buyer.lastName}`.trim()],
+          ['E-mail', input.buyer.email],
+          ['Telefon', input.buyer.phone],
+        ] as Array<[string, string]>)
+      : details;
+    const note = internal ? internalNote : customerNote;
+    return {
+      idempotencyKey: eventKey(`christmas-voucher-${recipient}`, input.requestId),
+      eventType: 'contact_form_notification',
+      from: ORDER_FROM,
+      replyTo: internal ? input.buyer.email : ORDER_REPLY_TO,
+      to: internal ? input.internalTo : input.buyer.email,
+      subject,
+      html: layout(subject, `${rows(fields)}<p>${escapeHtml(note)}</p>`),
+      text: [...fields.map(([label, value]) => `${label}: ${value}`), '', note].join('\n'),
+      tag: `christmas-voucher-${recipient}`,
+      metadata: { campaignId: 'vanoce', requestId: input.requestId },
+    };
+  });
+}
+
 export function examQuestionNotificationEmail(input: {
   submissionId: string;
   firstName: string;
@@ -429,13 +493,15 @@ export function appointmentReminderEmail(input: {
     ? 'Dnes vás čeká zápis do Autoškoly BuBu'
     : `Připomínka zápisu do Autoškoly BuBu – ${formatEmailDate(input.order.appointment.startsAt)}`;
   const checklist =
-    input.order.selection.course === 'kondicni'
-      ? ['občanský průkaz', 'platný řidičský průkaz skupiny B']
-      : [
-          'oboustranně vytištěnou, vyplněnou a podepsanou přihlášku k výcviku',
-          'zdravotní posudek',
-          'občanský průkaz',
-        ];
+    input.order.selection.course === 'vraceni'
+      ? licenceReturnDocuments
+      : input.order.selection.course === 'kondicni'
+        ? ['občanský průkaz', 'platný řidičský průkaz skupiny B']
+        : [
+            'oboustranně vytištěnou, vyplněnou a podepsanou přihlášku k výcviku',
+            'zdravotní posudek',
+            'občanský průkaz',
+          ];
   const body = `<p style="font-size:17px;line-height:1.65;margin:0 0 16px;">Dobrý den, ${escapeHtml(input.order.contact.firstName)}, připomínáme váš termín zápisu.</p>${rows(
     [
       ['Objednávka', input.order.publicCode],
@@ -563,6 +629,19 @@ export function adminEnrollmentEmail(input: {
     metadata: { publicCode: input.publicCode },
   };
   if (input.action === 'attend') {
+    if (input.course === 'vraceni') {
+      const subject = 'Potvrzení zápisu k přezkoušení – Autoškola BuBu';
+      const text =
+        'Dobrý den, děkujeme za návštěvu. Další postup, termín přezkoušení a případné přípravné jízdy s vámi domluvíme podle dohody ze zápisu.';
+      return {
+        ...base,
+        eventType: 'enrollment_welcome',
+        subject,
+        tag: 'enrollment-welcome',
+        html: layout(subject, `<p>${escapeHtml(text)}</p>`),
+        text,
+      };
+    }
     if (input.course === 'kondicni') {
       const subject = 'Vítejte na kondičních jízdách v Autoškole BuBu';
       const paragraphs = [

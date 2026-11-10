@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { waitUntil } from '@vercel/functions';
 import { christmasCampaign } from '../../lib/campaigns/config';
 import {
   CampaignRequestRepository,
@@ -6,8 +7,13 @@ import {
   voucherDetailsSchema,
 } from '../../lib/campaigns/requests';
 import { assertSameOrigin } from '../../lib/server/live-order';
-import { createTransactionalEmailAdapter, orderNotificationEmail } from '../../lib/server/email';
-import { contactFormEmail } from '../../lib/server/email/templates';
+import {
+  createTransactionalEmailAdapter,
+  isTransactionalEmailConfigured,
+  orderNotificationEmail,
+} from '../../lib/server/email';
+import { createOrderEmailOutbox } from '../../lib/server/email/order-outbox';
+import { christmasVoucherEmails, contactFormEmail } from '../../lib/server/email/templates';
 import { verifyRecaptcha } from '../../lib/server/recaptcha';
 
 export const prerender = false;
@@ -50,6 +56,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
     const input = parsed.data;
     const isVoucher = input.campaignId === 'vanoce';
+    let voucherDetails: ReturnType<typeof voucherDetailsSchema.parse> | undefined;
     if (isVoucher) {
       const { branch, course, deliveryMethod } = input.selection;
       if (
@@ -85,8 +92,9 @@ export const POST: APIRoute = async ({ request }) => {
         deliveryMethod: 'branch-pickup',
         bonusVariant: christmasCampaign.bonus.id,
       };
+      voucherDetails = details.data;
       input.payload = {
-        ...details.data,
+        ...voucherDetails,
         bonus: christmasCampaign.bonus,
         paymentMethod: 'at-pickup',
       };
@@ -113,39 +121,50 @@ export const POST: APIRoute = async ({ request }) => {
     });
 
     const { voucherNumber } = stored;
-    const message = contactFormEmail({
-      to: orderNotificationEmail(process.env),
-      source: `campaign:${input.campaignId}`,
-      name: `${input.contact.firstName} ${input.contact.lastName}`.trim(),
-      email: input.contact.email,
-      phone: input.contact.phone,
-      subject: isVoucher ? 'Vánoční poukaz' : 'Black Friday bonus',
-      message: [
-        `Nová campaign žádost: ${input.campaignId}`,
-        `ID: ${stored.id}`,
-        voucherNumber ? `Číslo poukazu: ${voucherNumber}` : null,
-        `Kurz: ${input.selection.course ?? 'neuvedeno'}`,
-        `Pobočka: ${input.selection.branch ?? 'neuvedeno'}`,
-        `Bonus: ${isVoucher ? christmasCampaign.bonus.title : (input.selection.bonusVariant ?? 'neuvedeno')}`,
-        amountDueCzk ? `Částka k úhradě: ${amountDueCzk} Kč` : null,
-        isVoucher ? 'Platba: nevratná záloha při osobním převzetí na vybrané pobočce.' : null,
-        '',
-        JSON.stringify(input.payload, null, 2),
-      ]
-        .filter(Boolean)
-        .join('\n'),
-      branch: input.selection.branch,
-    });
-    try {
+    if (voucherNumber && voucherDetails) {
+      const email = isTransactionalEmailConfigured(process.env)
+        ? createOrderEmailOutbox(process.env, (task) => waitUntil(task))
+        : createTransactionalEmailAdapter(process.env);
+      const messages = christmasVoucherEmails({
+        requestId: stored.id,
+        voucherNumber,
+        buyer: input.contact,
+        recipient: [voucherDetails.recipientFirstName, voucherDetails.recipientLastName]
+          .filter(Boolean)
+          .join(' '),
+        dedication: voucherDetails.message,
+        course: input.selection.course,
+        branch: input.selection.branch!,
+        deposit: christmasCampaign.depositCzk,
+        bonus: christmasCampaign.bonus.title,
+        internalTo: orderNotificationEmail(process.env),
+      });
+      const results = await Promise.allSettled(messages.map((message) => email.send(message)));
+      if (results.some((result) => result.status === 'rejected'))
+        console.error('voucher_confirmation_queue_failed', { requestId: stored.id });
+    } else {
+      const message = contactFormEmail({
+        to: orderNotificationEmail(process.env),
+        source: 'campaign:black-friday',
+        name: [input.contact.firstName, input.contact.lastName].filter(Boolean).join(' '),
+        email: input.contact.email,
+        phone: input.contact.phone,
+        subject: 'Black Friday bonus',
+        message: [
+          'Nová campaign žádost: black-friday',
+          'ID: ' + stored.id,
+          'Kurz: ' + (input.selection.course ?? 'neuvedeno'),
+          'Pobočka: ' + (input.selection.branch ?? 'neuvedeno'),
+          'Bonus: ' + (input.selection.bonusVariant ?? 'neuvedeno'),
+          JSON.stringify(input.payload, null, 2),
+        ].join('\n'),
+        branch: input.selection.branch,
+      });
       await createTransactionalEmailAdapter(process.env).send({
         ...message,
-        idempotencyKey: `campaign-${input.campaignId}-${stored.id}`,
+        idempotencyKey: 'campaign-black-friday-' + stored.id,
         metadata: { campaignId: input.campaignId, requestId: stored.id },
       });
-    } catch (error) {
-      if (!isVoucher) throw error;
-      // The reservation already exists. Avoid asking the customer to submit it again.
-      console.error('voucher_notification_failed', { requestId: stored.id });
     }
 
     return Response.json(

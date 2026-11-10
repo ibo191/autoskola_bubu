@@ -47,10 +47,20 @@ test('moto prices are visible while server-side enrollment stays paused', () => 
   if (display.ok) assert.equal(display.amount, 31900);
 });
 test('A1 displays only Moto Jistota even when applicant already holds B', () => {
-  const basic = quoteForDisplay({ course: 'a1', branch: 'strizkov', heldLicences: ['B'], package: 'moto-basic' });
+  const basic = quoteForDisplay({
+    course: 'a1',
+    branch: 'strizkov',
+    heldLicences: ['B'],
+    package: 'moto-basic',
+  });
   assert.equal(basic.ok, false);
   if (!basic.ok) assert.deepEqual(basic.allowedPackages, ['moto-confidence']);
-  const confidence = quoteForDisplay({ course: 'a1', branch: 'strizkov', heldLicences: ['B'], package: 'moto-confidence' });
+  const confidence = quoteForDisplay({
+    course: 'a1',
+    branch: 'strizkov',
+    heldLicences: ['B'],
+    package: 'moto-confidence',
+  });
   assert.equal(confidence.ok, true);
 });
 test('Moto enrollment pause applies before a direct selection can create an offer', () => {
@@ -107,4 +117,18 @@ test('Refresher blocks are priced server-side and automatic is restricted to StÅ
     quote({ course: 'kondicni', branch: 'strizkov', drivingBlocks: 2, amount: 1 }).ok,
     false,
   );
+});
+test('licence return has an optional paid driving add-on and requires a booking branch', () => {
+  const base = quote({ course: 'vraceni', branch: 'strizkov', drivingBlocks: 0 });
+  assert.equal(base.ok && base.amount, 7000);
+  const four = quote({ course: 'vraceni', branch: 'statenice', drivingBlocks: 4 });
+  assert.equal(four.ok && four.amount, 13400);
+  assert.equal(four.ok && four.addons[0]?.quantity, 4);
+  assert.equal(four.ok && four.addons[0]?.unitPrice, 1600);
+  assert.equal(quote({ course: 'vraceni', branch: 'kladno', drivingBlocks: 0 }).ok, false);
+  assert.equal(
+    quote({ course: 'vraceni', branch: 'statenice', transmission: 'automatic' }).ok,
+    false,
+  );
+  assert.equal(quote({ course: 'vraceni', branch: 'strizkov', drivingBlocks: 4.5 }).ok, false);
 });

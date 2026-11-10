@@ -5,7 +5,7 @@ export const campaignId = z.enum(['black-friday', 'vanoce']);
 export type CampaignId = z.infer<typeof campaignId>;
 
 const courseIds = courses
-  .filter((course) => course.category !== 'moto' && course.id !== 'kondicni')
+  .filter((course) => course.category !== 'moto' && !['kondicni', 'vraceni'].includes(course.id))
   .map((course) => course.id) as CourseId[];
 const branchIds = branches.map((branch) => branch.id) as BranchId[];
 
@@ -54,7 +54,7 @@ export const campaigns = {
 
 export function campaignCourseOptions() {
   return courses
-    .filter((course) => course.category !== 'moto' && course.id !== 'kondicni')
+    .filter((course) => courseIds.includes(course.id))
     .map((course) => ({ id: course.id, label: course.label, name: course.name }));
 }
 

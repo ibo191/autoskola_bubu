@@ -10,7 +10,7 @@ test('price page centers its introduction, styles editable steps, and lists ever
   const table = page
     .getByRole('region', { name: 'Tabulka cen kurzů podle pobočky' })
     .getByRole('table');
-  await expect(table.locator('tbody tr')).toHaveCount(16);
+  await expect(table.locator('tbody tr')).toHaveCount(17);
   await expect(table.getByRole('row', { name: /Skupina B manuál/ })).toContainText('20 000 Kč');
   await expect(table.getByRole('row', { name: /Skupina A1 Moto Jistota/ })).toContainText(
     '31 900 Kč',
