@@ -3,6 +3,8 @@ export const prerender = true;
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import manualCar from '../assets/courses/b-manual-fabia.png';
+import christmasVoucher from '../assets/christmas-voucher-wide.png';
+import { christmasCampaign } from '../lib/campaigns/config';
 import CourseCard from '../components/CourseCard.astro';
 import Roadmap from '../components/Roadmap.astro';
 import BranchCards from '../components/BranchCards.astro';
@@ -57,6 +59,28 @@ import { getCourse } from '../lib/catalog';
       ><span>Přívěsy B96 a B+E</span>
     </div>
   </div>
+  <section class="container christmas-offer" aria-labelledby="christmas-offer-title">
+    <a class="christmas-offer-card" href={christmasCampaign.slug}>
+      <div class="christmas-offer-copy">
+        <span class="eyebrow">Vánoce s BuBu</span>
+        <h2 id="christmas-offer-title">Darujte řidičák pod stromeček.</h2>
+        <p>
+          Vánoční poukazy už jsou v prodeji. Ke kurzu přidáme dvě výcvikové hodiny před zkouškou
+          zdarma.
+        </p>
+        <span class="btn christmas-offer-cta"
+          >Zobrazit vánoční nabídku <span aria-hidden="true">↗</span></span
+        >
+      </div>
+      <Image
+        src={christmasVoucher}
+        alt=""
+        widths={[480, 800, 1200]}
+        sizes="(max-width:700px) 90vw, 62vw"
+        format="webp"
+      />
+    </a>
+  </section>
   <section class="section tinted" data-reveal>
     <div class="container">
       <div class="section-heading">
@@ -125,6 +149,45 @@ import { getCourse } from '../lib/catalog';
   <BranchCards /><Faq compact /><FinalCta />
 </Base>
 <style>
+  .christmas-offer {
+    padding-block: clamp(24px, 4vw, 52px);
+  }
+  .christmas-offer-card {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    align-items: center;
+    overflow: hidden;
+    border: 1px solid #ead7c7;
+    border-radius: var(--radius-lg);
+    background: #fbf2e9;
+    text-decoration: none;
+  }
+  .christmas-offer-copy {
+    padding: clamp(22px, 4vw, 48px);
+  }
+  .christmas-offer-copy .eyebrow {
+    color: #8c2028;
+  }
+  .christmas-offer-copy p {
+    margin: 14px 0 18px;
+  }
+  .christmas-offer-cta {
+    background: #8c2028;
+    color: #fff;
+  }
+  .christmas-offer-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (max-width: 700px) {
+    .christmas-offer-card {
+      grid-template-columns: 1fr;
+    }
+    .christmas-offer-card img {
+      height: auto;
+    }
+  }
   .hero {
     background: linear-gradient(115deg, #f4fbf9 0%, #f4fbf9 58%, #d9f2ed 58%);
     padding: 64px 0 72px;

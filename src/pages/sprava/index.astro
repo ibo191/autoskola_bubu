@@ -9,6 +9,7 @@ import { requireLiveRepository } from '../../lib/server/live-order';
 import { appointmentReportBranches } from '../../lib/server/email/workflows';
 import { listMotoInterests } from '../../lib/moto-interest';
 import { adminGroups } from '../../lib/school-groups';
+import { CampaignRequestRepository } from '../../lib/campaigns/requests';
 import {
   isDate,
   orderPeriodRange,
@@ -21,6 +22,7 @@ const repositoryReady = Boolean(process.env.SUPABASE_URL && process.env.SUPABASE
 const repository = repositoryReady ? requireLiveRepository(process.env) : null;
 const url = new URL(Astro.request.url);
 const showSchoolGroups = url.searchParams.get('schoolGroups') === '1';
+const showChristmasVouchers = url.searchParams.get('christmasVouchers') === '1';
 const today = pragueToday();
 const requestedPeriod = url.searchParams.get('period');
 const period: OrderPeriod | 'custom' =
@@ -152,6 +154,12 @@ const schoolGroups =
   currentUser && showSchoolGroups
     ? await timeAdminQuery('school-groups', () => adminGroups(process.env)).catch(() => null)
     : null;
+const christmasVouchers =
+  currentUser && showChristmasVouchers
+    ? await timeAdminQuery('christmas-vouchers', () =>
+        new CampaignRequestRepository(process.env).listChristmasVouchers(),
+      ).catch(() => null)
+    : null;
 if (currentUser && queryTimings.length) {
   Astro.response.headers.set(
     'Server-Timing',
@@ -177,6 +185,16 @@ const orderCourseLabel = (order: { course: string; selection: unknown }) => {
 };
 const courseLabel = (id: string) => courses.find((item) => item.id === id)?.label ?? id;
 const branchLabel = (id: string) => branches.find((item) => item.id === id)?.name ?? id;
+const voucherPaymentLabel = (value: string) =>
+  ({
+    pending_offline_payment: 'Čeká na platbu',
+    pending_future_payment: 'Čeká na platbu',
+    pending: 'Čeká na platbu',
+    paid: 'Zaplaceno',
+    not_required: 'Bez platby',
+    cancelled: 'Zrušeno',
+    failed: 'Platba selhala',
+  })[value] ?? value;
 const packageLabel = (id: string, selection?: unknown) => {
   const parsed = selectionSchema.safeParse(selection);
   if (parsed.success && parsed.data.partnerSchool === 'gymnazium_manna')
@@ -456,6 +474,108 @@ const calendarDays = calendarDates.map((item) => ({
                   )}
                 </article>
               </div>
+            </section>
+
+            <section class="admin-panel" id="vanocni-poukazy" data-admin-panel="christmas-vouchers">
+              <h2>Vánoční poukazy</h2>
+              <p>Rezervace z webu pro přípravu poukazů a osobní předání.</p>
+              {!showChristmasVouchers ? (
+                <a
+                  class="btn secondary"
+                  href={`${buildAdminUrl({ christmasVouchers: '1' })}#vanocni-poukazy`}
+                >
+                  Zobrazit vánoční poukazy ↗
+                </a>
+              ) : christmasVouchers === null ? (
+                <div class="notice schedule-error" role="alert">
+                  Vánoční poukazy se nepodařilo načíst.
+                </div>
+              ) : !christmasVouchers.length ? (
+                <p>Zatím nejsou žádné rezervace vánočních poukazů.</p>
+              ) : (
+                <>
+                  {christmasVouchers.length === 100 && <p>Zobrazeno 100 nejnovějších rezervací.</p>}
+                  <div class="table-wrap">
+                    <table aria-label="Rezervace vánočních poukazů">
+                      <thead>
+                        <tr>
+                          <th scope="col">Číslo poukazu</th>
+                          <th scope="col">Kupující</th>
+                          <th scope="col">Obdarovaný</th>
+                          <th scope="col">Převzetí a kurz</th>
+                          <th scope="col">Záloha</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {christmasVouchers.map((voucher) => (
+                          <tr>
+                            <td>
+                              {voucher.voucherNumber ? (
+                                <code class="voucher-code">{voucher.voucherNumber}</code>
+                              ) : (
+                                'Starší rezervace bez kódu'
+                              )}
+                              <br />
+                              <small>{formatDateTime(voucher.created_at)}</small>
+                            </td>
+                            <td>
+                              <strong>
+                                {[voucher.contact.firstName, voucher.contact.lastName]
+                                  .filter(Boolean)
+                                  .join(' ') || 'Neuvedeno'}
+                              </strong>
+                              {voucher.contact.email && (
+                                <>
+                                  <br />
+                                  <a href={`mailto:${voucher.contact.email}`}>
+                                    {voucher.contact.email}
+                                  </a>
+                                </>
+                              )}
+                              {voucher.contact.phone && (
+                                <>
+                                  <br />
+                                  <a href={`tel:${voucher.contact.phone}`}>
+                                    {voucher.contact.phone}
+                                  </a>
+                                </>
+                              )}
+                            </td>
+                            <td>
+                              <strong>{voucher.recipient || 'Neuvedeno'}</strong>
+                              {voucher.dedication && (
+                                <p class="voucher-dedication">Věnování: {voucher.dedication}</p>
+                              )}
+                            </td>
+                            <td>
+                              {voucher.selection.deliveryMethod === 'shipping'
+                                ? 'Doručení (starší rezervace)'
+                                : voucher.selection.branch
+                                  ? branchLabel(voucher.selection.branch)
+                                  : 'Pobočka neuvedena'}
+                              <br />
+                              <small>
+                                {voucher.selection.course
+                                  ? courseLabel(voucher.selection.course)
+                                  : 'Kurz dle domluvy'}
+                              </small>
+                            </td>
+                            <td>
+                              {voucher.amount_due_czk !== null && (
+                                <>
+                                  <strong>{money(voucher.amount_due_czk)}</strong>
+                                  <br />
+                                </>
+                              )}
+                              <small>{voucherPaymentLabel(voucher.payment_status)}</small>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
             </section>
 
             <section class="admin-panel" data-admin-panel="moto-interest">
@@ -1491,6 +1611,19 @@ const calendarDays = calendarDates.map((item) => ({
     color: var(--brand-dark);
     font-weight: 800;
     text-decoration: none;
+  }
+  .voucher-code,
+  .voucher-dedication {
+    overflow-wrap: anywhere;
+  }
+  .voucher-code {
+    display: inline-block;
+    max-width: 17ch;
+    font-weight: 700;
+  }
+  .voucher-dedication {
+    margin: 6px 0 0;
+    white-space: pre-wrap;
   }
   .table-wrap {
     overflow: auto;

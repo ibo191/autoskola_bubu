@@ -34,42 +34,17 @@ export const christmasCampaign = {
   startsAt: null,
   endsAt: null,
   depositCzk: 5000,
-  pickupCzk: 0,
-  packagingAndDeliveryCzk: 200,
-  deliveryOptions: [
-    {
-      id: 'shipping',
-      label: 'Doručení na adresu',
-      priceCzk: 200,
-      note: 'Balné a poštovné za fyzický poukaz.',
-    },
-    {
-      id: 'branch-pickup',
-      label: 'Osobní převzetí na pobočce',
-      priceCzk: 0,
-      note: 'Poukaz zaplatíte a vyzvednete osobně v autoškole.',
-    },
-  ],
+  pickupBranches: ['strizkov', 'kladno'] as const,
+  bonus: {
+    id: 'extra-rides',
+    lessons: 2,
+    minutesPerLesson: 45,
+    title: '2 výcvikové hodiny před zkouškou zdarma',
+  },
   headline: 'Darujte letos řidičák bez stresu.',
-  badge: '+ Vánoční bonus až 1 600 Kč',
+  badge: '2 výcvikové hodiny před zkouškou zdarma',
   cta: 'Chci darovat řidičák',
   eligibleCourses: courseIds,
-  eligibleBranches: branchIds,
-  bonusVariants: [
-    {
-      id: 'extra-rides',
-      title: '2 × 45 min extra jízdy',
-      valueCzk: 1600,
-      description: 'Víc klidu před závěrečnou zkouškou a prostor doladit slabší místa.',
-    },
-    {
-      id: 'mock-exam-plus-ride',
-      title: '2 × 45 min extra jízdy',
-      valueCzk: 1600,
-      description:
-        'Dvě jízdy navíc, které dávají prostor soustředit se na to, co obdarovaný potřebuje doladit.',
-    },
-  ],
 };
 
 export const campaigns = {

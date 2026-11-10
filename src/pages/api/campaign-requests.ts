@@ -1,6 +1,10 @@
 import type { APIRoute } from 'astro';
 import { christmasCampaign } from '../../lib/campaigns/config';
-import { CampaignRequestRepository, campaignRequestSchema } from '../../lib/campaigns/requests';
+import {
+  CampaignRequestRepository,
+  campaignRequestSchema,
+  voucherDetailsSchema,
+} from '../../lib/campaigns/requests';
 import { assertSameOrigin } from '../../lib/server/live-order';
 import { createTransactionalEmailAdapter, orderNotificationEmail } from '../../lib/server/email';
 import { contactFormEmail } from '../../lib/server/email/templates';
@@ -44,7 +48,52 @@ export const POST: APIRoute = async ({ request }) => {
         { status: 422, headers: { 'Cache-Control': 'no-store' } },
       );
     }
-    const captchaValid = await verifyRecaptcha(parsed.data.recaptchaToken, 'campaign_request', {
+    const input = parsed.data;
+    const isVoucher = input.campaignId === 'vanoce';
+    if (isVoucher) {
+      const { branch, course, deliveryMethod } = input.selection;
+      if (
+        !christmasCampaign.pickupBranches.some((pickup) => pickup === branch) ||
+        (deliveryMethod && deliveryMethod !== 'branch-pickup')
+      ) {
+        return Response.json(
+          {
+            ok: false,
+            code: 'PICKUP_BRANCH_REQUIRED',
+            message: 'Poukaz lze vyzvednout osobně na Střížkově nebo v Kladně. Vyberte pobočku.',
+          },
+          { status: 422, headers: { 'Cache-Control': 'no-store' } },
+        );
+      }
+      const details = voucherDetailsSchema.safeParse(input.payload);
+      if (
+        !details.success ||
+        (course && !christmasCampaign.eligibleCourses.some((id) => id === course))
+      ) {
+        return Response.json(
+          {
+            ok: false,
+            code: 'INVALID_VOUCHER_DETAILS',
+            message: 'Zkontrolujte údaje obdarovaného a vybraný kurz.',
+          },
+          { status: 422, headers: { 'Cache-Control': 'no-store' } },
+        );
+      }
+      input.selection = {
+        branch,
+        course,
+        deliveryMethod: 'branch-pickup',
+        bonusVariant: christmasCampaign.bonus.id,
+      };
+      input.payload = {
+        ...details.data,
+        bonus: christmasCampaign.bonus,
+        paymentMethod: 'at-pickup',
+      };
+    }
+
+    const captchaValid = await verifyRecaptcha(input.recaptchaToken, 'campaign_request', {
+      env: process.env,
       hostname: new URL(request.url).hostname,
     });
     if (!captchaValid) {
@@ -57,88 +106,50 @@ export const POST: APIRoute = async ({ request }) => {
         { status: 403, headers: { 'Cache-Control': 'no-store' } },
       );
     }
-    const deliveryMethod =
-      parsed.data.campaignId === 'vanoce'
-        ? (parsed.data.selection.deliveryMethod ?? 'shipping')
-        : undefined;
-    const delivery = parsed.data.payload.delivery;
-    if (
-      parsed.data.campaignId === 'vanoce' &&
-      deliveryMethod === 'shipping' &&
-      (!delivery ||
-        typeof delivery !== 'object' ||
-        !('street' in delivery) ||
-        !('city' in delivery) ||
-        !('zip' in delivery) ||
-        !String(delivery.street).trim() ||
-        !String(delivery.city).trim() ||
-        !String(delivery.zip).trim())
-    ) {
-      return Response.json(
-        { ok: false, code: 'DELIVERY_ADDRESS_REQUIRED', message: 'Vyplňte doručovací adresu.' },
-        { status: 422, headers: { 'Cache-Control': 'no-store' } },
-      );
-    }
-    if (
-      parsed.data.campaignId === 'vanoce' &&
-      deliveryMethod === 'branch-pickup' &&
-      !parsed.data.selection.branch
-    ) {
-      return Response.json(
-        { ok: false, code: 'PICKUP_BRANCH_REQUIRED', message: 'Vyberte pobočku pro převzetí.' },
-        { status: 422, headers: { 'Cache-Control': 'no-store' } },
-      );
-    }
-
-    const deliveryOption =
-      parsed.data.campaignId === 'vanoce'
-        ? christmasCampaign.deliveryOptions.find((option) => option.id === deliveryMethod)
-        : undefined;
-    const amountDueCzk =
-      parsed.data.campaignId === 'vanoce'
-        ? christmasCampaign.depositCzk +
-          (deliveryOption?.priceCzk ?? christmasCampaign.packagingAndDeliveryCzk)
-        : null;
-    const stored = await new CampaignRequestRepository(process.env).create(parsed.data, {
+    const amountDueCzk = isVoucher ? christmasCampaign.depositCzk : null;
+    const stored = await new CampaignRequestRepository(process.env).create(input, {
       amountDueCzk,
       sourceUrl: request.headers.get('referer') ?? new URL(request.url).origin,
     });
 
+    const { voucherNumber } = stored;
     const message = contactFormEmail({
       to: orderNotificationEmail(process.env),
-      source: `campaign:${parsed.data.campaignId}`,
-      name: `${parsed.data.contact.firstName} ${parsed.data.contact.lastName}`.trim(),
-      email: parsed.data.contact.email,
-      phone: parsed.data.contact.phone,
-      subject: parsed.data.campaignId === 'vanoce' ? 'Vánoční poukaz' : 'Black Friday bonus',
+      source: `campaign:${input.campaignId}`,
+      name: `${input.contact.firstName} ${input.contact.lastName}`.trim(),
+      email: input.contact.email,
+      phone: input.contact.phone,
+      subject: isVoucher ? 'Vánoční poukaz' : 'Black Friday bonus',
       message: [
-        `Nová campaign žádost: ${parsed.data.campaignId}`,
-        `ID: ${stored?.id ?? 'bez ID'}`,
-        `Kurz: ${parsed.data.selection.course ?? 'neuvedeno'}`,
-        `Pobočka: ${parsed.data.selection.branch ?? 'neuvedeno'}`,
-        `Bonus: ${parsed.data.selection.bonusVariant ?? 'neuvedeno'}`,
+        `Nová campaign žádost: ${input.campaignId}`,
+        `ID: ${stored.id}`,
+        voucherNumber ? `Číslo poukazu: ${voucherNumber}` : null,
+        `Kurz: ${input.selection.course ?? 'neuvedeno'}`,
+        `Pobočka: ${input.selection.branch ?? 'neuvedeno'}`,
+        `Bonus: ${isVoucher ? christmasCampaign.bonus.title : (input.selection.bonusVariant ?? 'neuvedeno')}`,
         amountDueCzk ? `Částka k úhradě: ${amountDueCzk} Kč` : null,
-        parsed.data.campaignId === 'vanoce'
-          ? 'Platba: převodem na účet nebo osobně v autoškole; online platba není dostupná'
-          : null,
-        parsed.data.campaignId === 'vanoce'
-          ? `Převzetí/doručení: ${deliveryOption?.label ?? 'Doručení na adresu'}`
-          : null,
+        isVoucher ? 'Platba: nevratná záloha při osobním převzetí na vybrané pobočce.' : null,
         '',
-        JSON.stringify(parsed.data.payload, null, 2),
+        JSON.stringify(input.payload, null, 2),
       ]
         .filter(Boolean)
         .join('\n'),
-      branch: parsed.data.selection.branch,
+      branch: input.selection.branch,
     });
-    await createTransactionalEmailAdapter(process.env).send({
-      ...message,
-      idempotencyKey: `campaign-${parsed.data.campaignId}-${stored?.id ?? crypto.randomUUID()}`,
-      metadata: { campaignId: parsed.data.campaignId, requestId: stored?.id ?? null },
-    });
+    try {
+      await createTransactionalEmailAdapter(process.env).send({
+        ...message,
+        idempotencyKey: `campaign-${input.campaignId}-${stored.id}`,
+        metadata: { campaignId: input.campaignId, requestId: stored.id },
+      });
+    } catch (error) {
+      if (!isVoucher) throw error;
+      // The reservation already exists. Avoid asking the customer to submit it again.
+      console.error('voucher_notification_failed', { requestId: stored.id });
+    }
 
     return Response.json(
-      { ok: true, requestId: stored?.id, createdAt: stored?.created_at },
+      { ok: true, requestId: stored.id, createdAt: stored.created_at, voucherNumber },
       { headers: { 'Cache-Control': 'no-store' } },
     );
   } catch (error) {
