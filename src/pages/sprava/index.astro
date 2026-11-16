@@ -147,9 +147,23 @@ const adminData = authorizedDashboard?.ok
   : repository && currentUser && Astro.request.method === 'POST'
     ? await timeAdminQuery('dashboard', () => repository.adminDashboard(dashboardInput))
     : null;
-const motoInterests = currentUser
-  ? await timeAdminQuery('moto-interest', () => listMotoInterests(process.env)).catch(() => null)
-  : null;
+const [motoInterests, appointmentHistory] = await Promise.all([
+  currentUser
+    ? timeAdminQuery('moto-interest', () => listMotoInterests(process.env)).catch(() => null)
+    : null,
+  repository && currentUser
+    ? timeAdminQuery('appointment-history', () =>
+        repository.adminAppointmentHistory({
+          date: appointmentDate,
+          month: appointmentMonth,
+          branch: appointmentBranch || null,
+        }),
+      ).catch((error) => {
+        console.error('admin_appointment_history_failed', error);
+        return null;
+      })
+    : null,
+]);
 const schoolGroups =
   currentUser && showSchoolGroups
     ? await timeAdminQuery('school-groups', () => adminGroups(process.env)).catch(() => null)
@@ -178,6 +192,24 @@ const calendarDates = Array.from({ length: daysInMonth }, (_, index) => {
 const appointmentDays = adminData?.appointmentDays ?? [];
 const scheduleDay = adminData?.scheduleDay ?? null;
 const appointmentDayMap = new Map(appointmentDays.map((item) => [item.date, item.count]));
+const historyByDate = new Map(appointmentHistory?.days.map((item) => [item.date, item]));
+const historyEntries = appointmentHistory?.entries ?? [];
+const historySummary = (entries: readonly { kind: string; late: boolean }[]) =>
+  [
+    `Zrušené: ${entries.filter((item) => item.kind === 'cancelled').length}`,
+    `Přesunuté: ${entries.filter((item) => item.kind === 'moved').length}`,
+    `Expirované: ${entries.filter((item) => item.kind === 'expired').length}`,
+    `Změny do 24 h před zápisem: ${entries.filter((item) => item.late).length}`,
+  ].join(' · ');
+const monthHistorySummary = appointmentHistory?.days.reduce(
+  (total, day) => ({
+    cancelled: total.cancelled + day.cancelled,
+    moved: total.moved + day.moved,
+    lateMoved: total.lateMoved + day.lateMoved,
+    lateCancelled: total.lateCancelled + day.lateCancelled,
+  }),
+  { cancelled: 0, moved: 0, lateMoved: 0, lateCancelled: 0 },
+);
 
 const orderCourseLabel = (order: { course: string; selection: unknown }) => {
   const parsed = selectionSchema.safeParse(order.selection);
@@ -260,10 +292,13 @@ const buildAdminUrl = (updates: Record<string, string>) => {
   });
   return `/sprava?${params.toString()}`;
 };
-const calendarDays = calendarDates.map((item) => ({
-  ...item,
-  count: appointmentDayMap.get(item.date) ?? 0,
-}));
+const calendarDays = calendarDates.map((item) => {
+  const history = historyByDate.get(item.date);
+  const current = appointmentDayMap.get(item.date) ?? 0;
+  const changed = history ? history.cancelled + history.moved + history.expired : 0;
+  return { ...item, changed, count: current + changed };
+});
+const populatedCalendarDays = calendarDays.filter((item) => item.count > 0);
 ---
 
 <Base title="Interní správa" description="Interní správa Autoškoly BuBu." noindex>
@@ -328,6 +363,9 @@ const calendarDays = calendarDates.map((item) => ({
                 Objednávka byla zrušena a skryta z běžného přehledu. Záznam zůstává v historii.
                 Neutrální e-mail byl zařazen k odeslání.
               </div>
+            )}
+            {actionResult === 'rescheduled' && (
+              <div class="notice">Zápis byl přeplánován. Potvrzení bylo zařazeno k odeslání.</div>
             )}
             {actionResult === 'email_failed' && (
               <div class="notice schedule-error" role="alert">
@@ -1016,11 +1054,18 @@ const calendarDays = calendarDates.map((item) => ({
                 <div class="appointment-calendar-header">
                   <div>
                     <strong>Zápisové dny v měsíci</strong>
-                    <span>Číslo v políčku ukazuje počet rezervovaných zápisů.</span>
+                    <span>Počet zápisů zahrnuje i zrušené, přesunuté a expirované termíny.</span>
+                    {monthHistorySummary && (
+                      <span>
+                        Zrušené: {monthHistorySummary.cancelled} ({monthHistorySummary.lateCancelled}
+                        {' '}do 24 h před zápisem) · Přesunuté: {monthHistorySummary.moved}
+                        {' '}({monthHistorySummary.lateMoved} do 24 h před zápisem)
+                      </span>
+                    )}
                   </div>
-                  {appointmentDays.length > 0 && (
+                  {populatedCalendarDays.length > 0 && (
                     <div class="appointment-day-chips" aria-label="Rychlé otevření zápisových dnů">
-                      {appointmentDays.map((item) => (
+                      {populatedCalendarDays.map((item) => (
                         <a
                           href={buildAdminUrl({
                             appointmentDate: item.date,
@@ -1062,89 +1107,178 @@ const calendarDays = calendarDates.map((item) => ({
                         item.date === appointmentDate && 'selected',
                       ]}
                       href={buildAdminUrl({ appointmentDate: item.date, appointmentMonth })}
-                      aria-label={`Otevřít ${item.date}, zápisů: ${item.count}`}
+                      aria-label={`Otevřít ${item.date}, zápisů: ${item.count}, v historii: ${item.changed}`}
                     >
                       <span>{item.day}</span>
                       {item.count > 0 && <strong>{item.count}</strong>}
+                      {item.changed > 0 && (
+                        <small class="calendar-history-count">{item.changed} v historii</small>
+                      )}
                     </a>
                   ))}
                 </div>
               </div>
               <p class="lead small-lead">
-                Na zvolený den čeká <strong>{appointments.length}</strong> zápisů.
+                Zápisy na zvolený den ·{' '}
+                <strong>{appointments.length + historyEntries.length}</strong>
               </p>
+              {appointmentHistory ? (
+                <p class="small-lead">{historySummary(historyEntries)}</p>
+              ) : (
+                <div class="notice schedule-error" role="alert">
+                  Historii termínů se nepodařilo načíst.
+                </div>
+              )}
               <div class="appointment-list">
-                {appointments.length ? (
-                  appointments.map((item) => (
-                    <article>
-                      <time>
-                        {formatTime(item.startsAt)}–{formatTime(item.endsAt)}
-                      </time>
-                      <div>
-                        <strong>
-                          {item.contact.firstName} {item.contact.lastName}
-                        </strong>
-                        <br />
-                        {courseLabel(item.course)} ·{' '}
-                        <span class:list={['branch-badge', `branch-${item.branch}`]}>
-                          {branchLabel(item.branch)}
-                        </span>{' '}
-                        · {item.publicCode}
-                        <br />
-                        <a href={`tel:${item.contact.phone}`}>{item.contact.phone}</a> ·{' '}
-                        <a href={`mailto:${item.contact.email}`}>{item.contact.email}</a>
-                      </div>
-                      <span class={`status-chip status-${item.status}`}>
-                        {statusLabel(item.status)}
-                      </span>
-                      <div class="admin-actions">
-                        {['confirmed', 'rescheduled'].includes(item.status) && (
-                          <form method="post" action="/sprava/action">
-                            <input type="hidden" name="orderId" value={item.orderId} />
-                            <input type="hidden" name="intent" value="attend" />
-                            <input
-                              type="hidden"
-                              name="returnTo"
-                              value={Astro.url.pathname + Astro.url.search}
-                            />
-                            <button type="submit">Dorazil/a – potvrdit nástup</button>
-                          </form>
-                        )}
-                        {['confirmed', 'rescheduled'].includes(item.status) &&
-                          new Date(item.endsAt).getTime() <= Date.now() && (
-                            <form method="post" action="/sprava/action" data-no-show-order>
+                {appointments.length
+                  ? appointments.map((item) => (
+                      <article>
+                        <time>
+                          {formatTime(item.startsAt)}–{formatTime(item.endsAt)}
+                        </time>
+                        <div>
+                          <strong>
+                            {item.contact.firstName} {item.contact.lastName}
+                          </strong>
+                          <br />
+                          {courseLabel(item.course)} ·{' '}
+                          <span class:list={['branch-badge', `branch-${item.branch}`]}>
+                            {branchLabel(item.branch)}
+                          </span>{' '}
+                          · {item.publicCode}
+                          <br />
+                          <a href={`tel:${item.contact.phone}`}>{item.contact.phone}</a> ·{' '}
+                          <a href={`mailto:${item.contact.email}`}>{item.contact.email}</a>
+                        </div>
+                        <span class={`status-chip status-${item.status}`}>
+                          {statusLabel(item.status)}
+                        </span>
+                        <div class="admin-actions">
+                          {['provisional', 'confirmed', 'rescheduled', 'no_show'].includes(
+                            item.status,
+                          ) && (
+                            <details class="admin-reschedule">
+                              <summary>Přeplánovat zápis</summary>
+                              <form
+                                method="post"
+                                action="/sprava/reschedule"
+                                data-reschedule-branch={item.branch}
+                              >
+                                <input type="hidden" name="orderId" value={item.orderId} />
+                                <input
+                                  type="hidden"
+                                  name="expectedStartsAt"
+                                  value={item.startsAt}
+                                />
+                                <input
+                                  type="hidden"
+                                  name="returnTo"
+                                  value={Astro.url.pathname + Astro.url.search}
+                                />
+                                <label>
+                                  Nový den
+                                  <input type="date" name="newDate" min={today} required />
+                                </label>
+                                <label>
+                                  Volný čas
+                                  <select name="slotId" disabled required>
+                                    <option value="">Nejprve vyberte den</option>
+                                  </select>
+                                </label>
+                                <span role="status" data-slot-status />
+                                <button type="submit" disabled>
+                                  Uložit nový termín
+                                </button>
+                              </form>
+                            </details>
+                          )}
+                          {['confirmed', 'rescheduled'].includes(item.status) && (
+                            <form method="post" action="/sprava/action">
                               <input type="hidden" name="orderId" value={item.orderId} />
-                              <input type="hidden" name="intent" value="no_show" />
+                              <input type="hidden" name="intent" value="attend" />
+                              <input
+                                type="hidden"
+                                name="returnTo"
+                                value={Astro.url.pathname + Astro.url.search}
+                              />
+                              <button type="submit">Dorazil/a – potvrdit nástup</button>
+                            </form>
+                          )}
+                          {['confirmed', 'rescheduled'].includes(item.status) &&
+                            new Date(item.endsAt).getTime() <= Date.now() && (
+                              <form method="post" action="/sprava/action" data-no-show-order>
+                                <input type="hidden" name="orderId" value={item.orderId} />
+                                <input type="hidden" name="intent" value="no_show" />
+                                <input
+                                  type="hidden"
+                                  name="returnTo"
+                                  value={Astro.url.pathname + Astro.url.search}
+                                />
+                                <button type="submit" class="danger">
+                                  Nedorazil/a
+                                </button>
+                              </form>
+                            )}
+                          {!['cancelled', 'expired'].includes(item.status) && (
+                            <form method="post" action="/sprava/action" data-cancel-order>
+                              <input type="hidden" name="orderId" value={item.orderId} />
+                              <input type="hidden" name="intent" value="cancel" />
                               <input
                                 type="hidden"
                                 name="returnTo"
                                 value={Astro.url.pathname + Astro.url.search}
                               />
                               <button type="submit" class="danger">
-                                Nedorazil/a
+                                Zrušit objednávku
                               </button>
                             </form>
                           )}
-                        {!['cancelled', 'expired'].includes(item.status) && (
-                          <form method="post" action="/sprava/action" data-cancel-order>
-                            <input type="hidden" name="orderId" value={item.orderId} />
-                            <input type="hidden" name="intent" value="cancel" />
-                            <input
-                              type="hidden"
-                              name="returnTo"
-                              value={Astro.url.pathname + Astro.url.search}
-                            />
-                            <button type="submit" class="danger">
-                              Zrušit objednávku
-                            </button>
-                          </form>
-                        )}
-                      </div>
-                    </article>
-                  ))
-                ) : (
-                  <div class="notice">Na tento den není rezervovaný žádný zápis.</div>
-                )}
+                        </div>
+                      </article>
+                    ))
+                  : historyEntries.length === 0 && (
+                      <div class="notice">Na tento den nejsou žádné zápisy.</div>
+                    )}
+                {historyEntries.map((item) => (
+                  <article>
+                    <time datetime={item.startsAt}>
+                      {formatTime(item.startsAt)}–{formatTime(item.endsAt)}
+                    </time>
+                    <div>
+                      <strong>
+                        {item.contact.firstName} {item.contact.lastName}
+                      </strong>
+                      <br />
+                      {courseLabel(item.course)} ·{' '}
+                      <span class:list={['branch-badge', `branch-${item.branch}`]}>
+                        {branchLabel(item.branch)}
+                      </span>{' '}
+                      · {item.publicCode}
+                      <br />
+                      <a href={`tel:${item.contact.phone}`}>{item.contact.phone}</a> ·{' '}
+                      <a href={`mailto:${item.contact.email}`}>{item.contact.email}</a>
+                      <br />
+                      {item.kind === 'moved'
+                        ? 'Přesunuto'
+                        : item.kind === 'cancelled'
+                          ? 'Zrušeno'
+                          : 'Expirováno'}{' '}
+                      {formatDateTime(item.changedAt)}
+                      {item.newStartsAt && (
+                        <div>Nový termín: {formatDateTime(item.newStartsAt)}</div>
+                      )}
+                      {item.late && <strong>Do 24 h před zápisem</strong>}
+                    </div>
+                    <span
+                      class:list={[
+                        'status-chip',
+                        `status-${item.kind === 'moved' ? 'rescheduled' : item.kind}`,
+                      ]}
+                    >
+                      {item.kind === 'moved' ? 'Přesunuté' : statusLabel(item.kind)}
+                    </span>
+                  </article>
+                ))}
               </div>
               <div class="schedule-manager" id="sprava-terminu">
                 <h3>Správa termínů zápisu</h3>
@@ -1774,6 +1908,7 @@ const calendarDays = calendarDates.map((item) => ({
   }
   .calendar-day {
     display: flex;
+    flex-wrap: wrap;
     align-items: flex-start;
     justify-content: space-between;
     gap: 6px;
@@ -1828,6 +1963,35 @@ const calendarDays = calendarDates.map((item) => ({
   .appointment-list time {
     font-weight: 800;
     color: var(--brand-dark);
+  }
+  .calendar-history-count {
+    flex-basis: 100%;
+    font-size: 0.7rem;
+    line-height: 1.1;
+  }
+  .admin-reschedule {
+    width: 100%;
+  }
+  .admin-reschedule summary {
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .admin-reschedule form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .admin-reschedule label {
+    display: grid;
+    gap: 4px;
+  }
+  .admin-reschedule [data-slot-status] {
+    width: 100%;
+  }
+  .admin-reschedule [data-slot-status]:empty {
+    display: none;
   }
   .order-card {
     border: 1px solid var(--line);

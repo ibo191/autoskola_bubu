@@ -1,5 +1,4 @@
-// Progressive enhancement for the private dashboard. Every link and form still
-// works as a regular request when JavaScript is unavailable.
+// Keep dashboard navigation and actions in place while replacing the panel contents.
 const dashboardSelector = '.admin-section[data-admin-enhance="true"]';
 let pending = false;
 let statusTimer: number | undefined;
@@ -55,6 +54,8 @@ function resultMessage(url: URL, next: HTMLElement, wasPost: boolean) {
     };
   if (result === 'cancelled')
     return { text: 'Objednávka zrušena. E-mail byl zařazen k odeslání.', error: false };
+  if (result === 'rescheduled')
+    return { text: 'Zápis přeplánován. Potvrzení bylo zařazeno k odeslání.', error: false };
   const scheduleResult = url.searchParams.get('scheduleResult');
   if (scheduleResult) {
     const notice = next.querySelector<HTMLElement>('[data-schedule-result]');
@@ -199,6 +200,80 @@ function confirmAction(form: HTMLFormElement) {
     return window.confirm(form.dataset.scheduleConfirm ?? 'Potvrdit změnu termínu?');
   return true;
 }
+
+const slotRequests = new WeakMap<HTMLFormElement, AbortController>();
+const slotTime = new Intl.DateTimeFormat('cs-CZ', {
+  hour: '2-digit',
+  minute: '2-digit',
+  timeZone: 'Europe/Prague',
+});
+const slotDate = new Intl.DateTimeFormat('sv-SE', {
+  dateStyle: 'short',
+  timeZone: 'Europe/Prague',
+});
+
+document.addEventListener('change', async (event) => {
+  const field = event.target;
+  if (!(field instanceof HTMLInputElement || field instanceof HTMLSelectElement)) return;
+  const form = field.form;
+  const branch = form?.dataset.rescheduleBranch;
+  if (!form || !branch) return;
+
+  const select = form.querySelector<HTMLSelectElement>('[name="slotId"]')!;
+  const save = form.querySelector<HTMLButtonElement>('[type="submit"]')!;
+  const status = form.querySelector<HTMLElement>('[data-slot-status]')!;
+  if (field === select) {
+    save.disabled = !select.value;
+    return;
+  }
+  if (field.name !== 'newDate') return;
+
+  slotRequests.get(form)?.abort();
+  select.disabled = true;
+  save.disabled = true;
+  status.textContent = '';
+  select.replaceChildren(new Option('Nejprve vyberte den', ''));
+  if (!field.value || !field.validity.valid) return;
+
+  const controller = new AbortController();
+  slotRequests.set(form, controller);
+  const date = field.value;
+  const params = new URLSearchParams({ branch, from: date, to: date });
+  const currentStart = Date.parse(String(new FormData(form).get('expectedStartsAt')));
+  select.replaceChildren(new Option('Načítám volné časy…', ''));
+  try {
+    const response = await fetch(`/api/slots?${params}`, { signal: controller.signal });
+    if (!response.ok) throw new Error('Unavailable');
+    const data = (await response.json()) as {
+      slots: { id: string; startsAt: string; endsAt: string; remaining: number }[];
+    };
+    if (controller.signal.aborted || !form.isConnected) return;
+    const options = data.slots
+      .filter((slot) => {
+        const start = new Date(slot.startsAt);
+        return (
+          slot.remaining > 0 && start.getTime() !== currentStart && slotDate.format(start) === date
+        );
+      })
+      .map(
+        (slot) =>
+          new Option(
+            `${slotTime.format(new Date(slot.startsAt))}–${slotTime.format(new Date(slot.endsAt))}`,
+            slot.id,
+          ),
+      );
+    select.replaceChildren(new Option('Vyberte čas', ''), ...options);
+    select.disabled = options.length === 0;
+    if (!options.length) {
+      select.replaceChildren(new Option('Žádný volný čas', ''));
+      status.textContent = 'Na tento den není volný termín. Vyberte jiný den.';
+    }
+  } catch {
+    if (controller.signal.aborted || !form.isConnected) return;
+    select.replaceChildren(new Option('Časy nejsou dostupné', ''));
+    status.textContent = 'Volné časy se nepodařilo načíst. Zkuste vybrat den znovu.';
+  }
+});
 
 document.addEventListener('submit', (event) => {
   const form = event.target;

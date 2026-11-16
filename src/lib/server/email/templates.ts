@@ -442,6 +442,7 @@ export function appointmentChangedEmail(input: {
   order: PublicOrderOverview;
   manageUrl: string;
   kind: 'rescheduled' | 'cancelled';
+  revision?: number;
 }): EmailMessage {
   const isCancelled = input.kind === 'cancelled';
   const appointment = input.order.appointment;
@@ -467,6 +468,7 @@ export function appointmentChangedEmail(input: {
       input.order.orderId,
       appointment?.id,
       appointment?.startsAt,
+      ...(input.revision === undefined ? [] : [input.revision]),
     ),
     eventType: isCancelled ? 'appointment_cancelled' : 'appointment_rescheduled',
     orderId: input.order.orderId,

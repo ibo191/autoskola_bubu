@@ -1,11 +1,8 @@
 import type { APIRoute } from 'astro';
-import { waitUntil } from '@vercel/functions';
 import { z } from 'zod';
 import { assertSameOrigin, requireLiveRepository } from '../../../../lib/server/live-order';
-import { createOrderEmailOutbox } from '../../../../lib/server/email/order-outbox';
-import { appointmentChangedEmail } from '../../../../lib/server/email/templates';
+import { queueRescheduledAppointmentEmail } from '../../../../lib/server/email/rescheduled-appointment';
 import { verifyRecaptcha } from '../../../../lib/server/recaptcha';
-import { publicAppOrigin } from '../../../../lib/config';
 
 export const prerender = false;
 const bodySchema = z
@@ -37,41 +34,16 @@ export const POST: APIRoute = async ({ request, params }) => {
       publicCode: params.code,
       slotId: parsed.data.slotId,
     });
-    let emailQueued = false;
-    if (result.ok) {
-      try {
-        const order = await repository.getPublicOrder(params.code);
-        if (!order) throw new Error('Order was not found after rescheduling');
-        const manageUrl = new URL('/spravovat-termin', publicAppOrigin(process.env));
-        manageUrl.searchParams.set('kod', order.publicCode);
-        const confirmedOrder = {
-          ...order,
-          appointment: {
-            id: result.appointmentId,
-            branch: order.selection.branch,
-            status: 'rescheduled',
-            startsAt: result.startsAt,
-            endsAt: result.endsAt,
-          },
-        };
-        await createOrderEmailOutbox(process.env, (task) => waitUntil(task)).send(
-          appointmentChangedEmail({
-            order: confirmedOrder,
-            manageUrl: manageUrl.href,
-            kind: 'rescheduled',
-          }),
-        );
-        emailQueued = true;
-      } catch (error) {
-        console.warn('appointment_rescheduled_email_queue_failed', {
-          error: error instanceof Error ? error.message : 'unknown',
-        });
-      }
-    }
-    return Response.json(result.ok ? { ...result, emailQueued } : result, {
-      status: result.ok ? 200 : 422,
-      headers: { 'Cache-Control': 'no-store' },
-    });
+    if (!result.ok)
+      return Response.json(result, { status: 422, headers: { 'Cache-Control': 'no-store' } });
+    const { revision: _revision, ...publicResult } = result;
+    const emailQueued = await queueRescheduledAppointmentEmail(repository, params.code, result);
+    return Response.json(
+      { ...publicResult, emailQueued },
+      {
+        headers: { 'Cache-Control': 'no-store' },
+      },
+    );
   } catch {
     return Response.json({ ok: false }, { status: 503, headers: { 'Cache-Control': 'no-store' } });
   }

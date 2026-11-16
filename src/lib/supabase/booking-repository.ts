@@ -149,6 +149,49 @@ const adminAppointmentSchema = z.object({
 const nextAppointmentDaySchema = z
   .object({ date: z.string(), count: z.number().int().nonnegative() })
   .nullable();
+const appointmentHistorySchema = z.object({
+  days: z.array(
+    z.object({
+      date: z.string(),
+      moved: z.number(),
+      cancelled: z.number(),
+      expired: z.number(),
+      lateMoved: z.number(),
+      lateCancelled: z.number(),
+    }),
+  ),
+  entries: z.array(
+    adminAppointmentSchema
+      .pick({
+        branch: true,
+        startsAt: true,
+        endsAt: true,
+        publicCode: true,
+        course: true,
+        contact: true,
+      })
+      .extend({
+        kind: z.enum(['moved', 'cancelled', 'expired']),
+        changedAt: z.iso.datetime({ offset: true }),
+        newStartsAt: z.iso.datetime({ offset: true }).nullable(),
+        late: z.boolean(),
+      }),
+  ),
+});
+const rescheduleResultSchema = z.discriminatedUnion('ok', [
+  z.object({
+    ok: z.literal(true),
+    appointmentId: z.uuid(),
+    startsAt: z.iso.datetime({ offset: true }),
+    endsAt: z.iso.datetime({ offset: true }),
+    revision: z.number().int().positive().optional(),
+  }),
+  z.object({ ok: z.literal(false) }),
+]);
+const adminRescheduleResultSchema = z.discriminatedUnion('ok', [
+  rescheduleResultSchema.options[0].extend({ publicCode: z.string() }),
+  rescheduleResultSchema.options[1].extend({ reason: z.literal('unauthorized').optional() }),
+]);
 const adminScheduleDaySchema = z.object({
   closed: z.boolean(),
   managedClosure: z.boolean().default(false),
@@ -231,6 +274,8 @@ export class SupabaseBookingRepository implements BookingRepository {
       | 'bubu_admin_summary'
       | 'bubu_public_order'
       | 'bubu_reschedule_appointment'
+      | 'bubu_admin_reschedule_appointment'
+      | 'bubu_admin_appointment_history'
       | 'bubu_cancel_appointment'
       | 'bubu_admin_login'
       | 'bubu_admin_session'
@@ -341,22 +386,34 @@ export class SupabaseBookingRepository implements BookingRepository {
     return parsed as PublicOrderOverview | null;
   }
   async rescheduleAppointment(input: { publicCode: string; slotId: string }) {
-    return z
-      .union([
-        z.object({
-          ok: z.literal(true),
-          appointmentId: z.uuid(),
-          startsAt: z.iso.datetime({ offset: true }),
-          endsAt: z.iso.datetime({ offset: true }),
-        }),
-        z.object({ ok: z.literal(false) }),
-      ])
-      .parse(
-        await this.rpc('bubu_reschedule_appointment', {
-          p_public_code: input.publicCode,
-          p_slot: input.slotId,
-        }),
-      );
+    return rescheduleResultSchema.parse(
+      await this.rpc('bubu_reschedule_appointment', {
+        p_public_code: input.publicCode,
+        p_slot: input.slotId,
+      }),
+    );
+  }
+  async adminRescheduleAppointment(
+    token: string,
+    input: { orderId: string; slotId: string; expectedStartsAt: string },
+  ) {
+    return adminRescheduleResultSchema.parse(
+      await this.rpc('bubu_admin_reschedule_appointment', {
+        p_token: token,
+        p_order_id: input.orderId,
+        p_slot: input.slotId,
+        p_expected_starts_at: input.expectedStartsAt,
+      }),
+    );
+  }
+  async adminAppointmentHistory(input: { date: string; month: string; branch: string | null }) {
+    return appointmentHistorySchema.parse(
+      await this.rpc('bubu_admin_appointment_history', {
+        p_date: input.date,
+        p_month: `${input.month}-01`,
+        p_branch: input.branch,
+      }),
+    );
   }
   async cancelAppointment(publicCode: string) {
     return z
