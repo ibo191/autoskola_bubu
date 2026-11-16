@@ -51,6 +51,7 @@ export type PublicOrderOverview = {
   orderId: string;
   publicCode: string;
   status: string;
+  canRebookCancelled?: boolean;
   contact: Contact;
   selection: Selection;
   price: Extract<Quote, { ok: true }>;
@@ -59,6 +60,7 @@ export type PublicOrderOverview = {
     id: string;
     branch: string;
     status: string;
+    revision?: number;
     startsAt: string;
     endsAt: string;
   } | null;

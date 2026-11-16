@@ -443,11 +443,13 @@ export function appointmentChangedEmail(input: {
   manageUrl: string;
   kind: 'rescheduled' | 'cancelled';
   revision?: number;
+  canRebook?: boolean;
 }): EmailMessage {
   const isCancelled = input.kind === 'cancelled';
   const appointment = input.order.appointment;
   const title = isCancelled ? 'Termín zápisu byl zrušen' : 'Potvrzení nového termínu zápisu';
   const appointmentText = appointment ? formatEmailDateTime(appointment.startsAt) : 'bez termínu';
+  const action = isCancelled ? (input.canRebook ? 'Vybrat nový termín' : '') : 'Spravovat termín';
   const body = `<p style="font-size:17px;line-height:1.65;margin:0 0 16px;">Dobrý den, ${escapeHtml(input.order.contact.firstName)}, ${isCancelled ? 'potvrzujeme zrušení termínu zápisu.' : 'potvrzujeme změnu termínu zápisu.'}</p>${rows(
     [
       ['Objednávka', input.order.publicCode],
@@ -461,7 +463,7 @@ export function appointmentChangedEmail(input: {
         ? [['Adresa zápisu', branchAddress(appointment.branch)] as [string, string]]
         : []),
     ],
-  )}<p style="margin:24px 0;"><a href="${escapeHtml(input.manageUrl)}" style="display:inline-block;background:#4daeb6;color:#ffffff;text-decoration:none;padding:13px 18px;border-radius:999px;font-weight:700;">Spravovat termín</a></p>`;
+  )}${action ? `<p style="margin:24px 0;"><a href="${escapeHtml(input.manageUrl)}" style="display:inline-block;background:#4daeb6;color:#ffffff;text-decoration:none;padding:13px 18px;border-radius:999px;font-weight:700;">${action}</a></p>` : ''}`;
   return {
     idempotencyKey: eventKey(
       `appointment-${input.kind}`,
@@ -478,9 +480,37 @@ export function appointmentChangedEmail(input: {
     to: input.order.contact.email,
     subject: `${title} – Autoškola BuBu`,
     html: layout(title, body),
-    text: `${title}\n\nObjednávka: ${input.order.publicCode}\nKurz: ${selectionLabel(input.order.selection)}\nPobočka: ${branchLabel(input.order.selection.branch)}\n${isCancelled ? 'Termín zápisu: zrušený' : `Nový termín zápisu: ${appointmentText}${appointment ? `\nAdresa zápisu: ${branchAddress(appointment.branch)}` : ''}`}\n\nSpráva termínu: ${input.manageUrl}`,
+    text: `${title}\n\nObjednávka: ${input.order.publicCode}\nKurz: ${selectionLabel(input.order.selection)}\nPobočka: ${branchLabel(input.order.selection.branch)}\n${isCancelled ? 'Termín zápisu: zrušený' : `Nový termín zápisu: ${appointmentText}${appointment ? `\nAdresa zápisu: ${branchAddress(appointment.branch)}` : ''}`}${action ? `\n\n${action}: ${input.manageUrl}` : ''}`,
     tag: `appointment-${input.kind}`,
     metadata: { publicCode: input.order.publicCode },
+  };
+}
+
+export function cancellationFollowUpEmail(input: {
+  order: PublicOrderOverview;
+  manageUrl: string;
+  revision: number;
+}): EmailMessage {
+  const { order, manageUrl, revision } = input;
+  const subject = 'Připomenutí výběru nového termínu zápisu – Autoškola BuBu';
+  const content =
+    'Před třemi dny jste zrušil/a svůj termín zápisu. Pokud máte o kurz stále zájem, můžete si vybrat nový termín na stejné pobočce.';
+  return {
+    idempotencyKey: eventKey('appointment-cancelled-follow-up', order.orderId, revision),
+    eventType: 'appointment_cancelled',
+    orderId: order.orderId,
+    appointmentId: order.appointment?.id,
+    from: ORDER_FROM,
+    replyTo: ORDER_REPLY_TO,
+    to: order.contact.email,
+    subject,
+    html: layout(
+      subject,
+      `<p>Dobrý den,</p><p>${content}</p><p><a href="${escapeHtml(manageUrl)}">Vybrat nový termín</a></p><p>S pozdravem<br>Autoškola BuBu</p>`,
+    ),
+    text: `Dobrý den,\n\n${content}\n\nVybrat nový termín: ${manageUrl}\n\nS pozdravem\nAutoškola BuBu`,
+    tag: 'appointment-cancelled-follow-up',
+    metadata: { publicCode: order.publicCode, cancelledAppointmentRevision: revision },
   };
 }
 

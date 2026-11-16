@@ -160,27 +160,42 @@ if (root) {
     cursor.setMonth(cursor.getMonth() + 1);
     void load();
   });
-  document.querySelector('#cancel-appointment')!.addEventListener('click', async () => {
-    if (!confirm('Opravdu chcete zrušit termín zápisu? Objednávka zůstane v systému.')) return;
+  const cancelForm = root.querySelector<HTMLFormElement>('#cancel-appointment');
+  cancelForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const reason = new FormData(cancelForm).get('reason');
+    const submit = cancelForm.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    submit.disabled = true;
     message.textContent = 'Rušíme termín…';
     try {
       const recaptchaToken = await getRecaptchaToken('reservation');
       const response = await fetch(`/api/orders/${encodeURIComponent(code)}/cancel`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ recaptchaToken }),
+        body: JSON.stringify({
+          recaptchaToken,
+          reason,
+          revision: Number(cancelForm.dataset.revision),
+        }),
       });
       const result = await response.json().catch(() => ({ ok: false }));
+      if (response.ok && result.ok) {
+        const next = new URL('/spravovat-termin', window.location.origin);
+        next.searchParams.set('kod', code);
+        if (result.emailQueued === false) next.searchParams.set('potvrzeni', 'chyba');
+        window.location.replace(next);
+        return;
+      }
       message.textContent =
-        response.ok && result.ok
-          ? result.emailQueued === false
-            ? 'Termín zápisu byl zrušen, ale potvrzovací e-mail se nepodařilo zařadit k odeslání.'
-            : 'Termín zápisu byl zrušen.'
-          : result.code === 'CAPTCHA_FAILED'
-            ? 'Odeslání se nepodařilo. Zkuste to prosím znovu.'
+        result.code === 'CAPTCHA_FAILED'
+          ? 'Odeslání se nepodařilo. Zkuste to prosím znovu.'
+          : response.status === 409
+            ? 'Termín se mezitím změnil. Obnovte stránku.'
             : 'Termín se nepodařilo zrušit.';
     } catch {
       message.textContent = 'Odeslání se nepodařilo. Zkuste to prosím znovu.';
+    } finally {
+      submit.disabled = false;
     }
   });
   void load(true);

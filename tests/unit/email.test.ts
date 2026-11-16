@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   appointmentReminderEmail,
   appointmentChangedEmail,
+  cancellationFollowUpEmail,
   appointmentDayReportEmail,
   adminEnrollmentEmail,
   noShowFollowUpEmail,
@@ -552,6 +553,65 @@ test('reschedule confirmation names the new appointment and can be retried from 
   assert.equal(await outbox.deliver(event.id), 'sent');
   assert.equal(delivered?.eventType, 'appointment_rescheduled');
   assert.match(delivered?.text ?? '', /Nový termín zápisu/);
+});
+
+test('cancellation recovery link and reminder respect the current appointment revision', async () => {
+  const order: PublicOrderOverview = {
+    orderId: orderInput.orderId,
+    publicCode: orderInput.publicCode,
+    status: 'confirmed',
+    contact: orderInput.contact,
+    selection: orderInput.selection,
+    price: orderInput.price,
+    addons: [],
+    appointment: { ...orderInput.appointment, branch: 'strizkov', status: 'confirmed' },
+    createdAt: orderInput.createdAt.toISOString(),
+  };
+  const input = { order, manageUrl: orderInput.manageUrl, kind: 'cancelled' as const };
+  assert.match(
+    appointmentChangedEmail({ ...input, canRebook: true }).html ?? '',
+    /Vybrat nový termín/,
+  );
+  assert.doesNotMatch(
+    appointmentChangedEmail({ ...input, canRebook: false }).text,
+    /Vybrat nový termín|https?:\/\//,
+  );
+  const reminder = cancellationFollowUpEmail({ ...input, revision: 4 });
+  const event: EmailEventRow = {
+    id: '44444444-4444-4444-8444-444444444444',
+    idempotency_key: reminder.idempotencyKey,
+    status: 'pending',
+    metadata: { outboxMessage: reminder },
+  };
+  let canRebook = true;
+  let sent = 0;
+  let skipped = 0;
+  const outbox = new OrderEmailOutbox(
+    {
+      async send() {
+        sent++;
+        return { status: 'sent' };
+      },
+    },
+    {
+      async claimDue() {
+        return event;
+      },
+      async isRebookableCancellation(orderId: string, revision: number) {
+        assert.equal(orderId, order.orderId);
+        assert.equal(revision, 4);
+        return canRebook;
+      },
+      async markSent() {},
+      async markSkipped() {
+        skipped++;
+      },
+    } as unknown as ConstructorParameters<typeof OrderEmailOutbox>[1],
+  );
+  assert.equal(await outbox.deliver(event.id), 'sent');
+  canRebook = false;
+  assert.equal(await outbox.deliver(event.id), 'skipped');
+  assert.deepEqual({ sent, skipped }, { sent: 1, skipped: 1 });
 });
 
 test('idempotency keys are stable and unique by logical event', () => {

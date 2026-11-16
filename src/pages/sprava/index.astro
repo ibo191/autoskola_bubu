@@ -4,6 +4,7 @@ Astro.response.headers.set('Cache-Control', 'no-store');
 import { selectionSchema } from '../../lib/pricing/quote';
 import { selectionLabel } from '../../lib/order-display';
 import Base from '../../layouts/Base.astro';
+import { cancellationReasons } from '../../lib/booking/cancellation-reasons';
 import { branches, courses, money } from '../../lib/catalog';
 import { requireLiveRepository } from '../../lib/server/live-order';
 import { appointmentReportBranches } from '../../lib/server/email/workflows';
@@ -1264,6 +1265,9 @@ const populatedCalendarDays = calendarDays.filter((item) => item.count > 0);
                           ? 'Zrušeno'
                           : 'Expirováno'}{' '}
                       {formatDateTime(item.changedAt)}
+                      {item.cancellationReason && (
+                        <div>Důvod zrušení: {cancellationReasons[item.cancellationReason]}</div>
+                      )}
                       {item.newStartsAt && (
                         <div>Nový termín: {formatDateTime(item.newStartsAt)}</div>
                       )}

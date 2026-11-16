@@ -109,6 +109,24 @@ export class SupabaseEmailEventStore {
     await this.patch(id, { status: 'skipped' });
   }
 
+  async isRebookableCancellation(orderId: string, revision: number): Promise<boolean> {
+    const params = new URLSearchParams({
+      order_id: `eq.${orderId}`,
+      revision: `eq.${revision}`,
+      status: 'eq.cancelled',
+      customer_cancel_reason: 'neq.no_longer_interested',
+      select: 'id',
+      limit: '1',
+    });
+    const response = await fetch(`${this.restBase}appointments?${params}`, {
+      headers: this.headers(),
+      signal: AbortSignal.timeout(10000),
+      redirect: 'error',
+    });
+    if (!response.ok) throw new Error(`Cancellation status lookup failed: ${response.status}`);
+    return ((await response.json()) as { id: string }[]).length > 0;
+  }
+
   async listDue(now: Date, limit = 20): Promise<EmailEventRow[]> {
     const params = new URLSearchParams({
       select: 'id,idempotency_key,status,metadata',

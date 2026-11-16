@@ -15,6 +15,7 @@ export const POST: APIRoute = async ({ request, params }) => {
     const parsed = bodySchema.safeParse(await request.json());
     if (!parsed.success || !params.code) return Response.json({ ok: false }, { status: 400 });
     const captchaValid = await verifyRecaptcha(parsed.data.recaptchaToken, 'reservation', {
+      env: process.env,
       hostname: new URL(request.url).hostname,
     });
     if (!captchaValid) {

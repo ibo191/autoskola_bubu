@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { requireLiveRepository } from '../lib/server/live-order';
 import { branchLabel, selectionLabel, formatDateTime } from '../lib/order-display';
+import { cancellationReasonCodes, cancellationReasons } from '../lib/booking/cancellation-reasons';
 
 export const prerender = false;
 const code = Astro.url.searchParams.get('kod')?.trim() ?? '';
@@ -14,6 +15,16 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
     message = 'Objednávku se nepodařilo načíst.';
   }
 }
+Astro.response.headers.set('Cache-Control', 'no-store');
+const canReschedule = Boolean(
+  order?.canRebookCancelled ||
+  (order?.appointment &&
+    ['confirmed', 'rescheduled', 'provisional', 'no_show'].includes(order.status)),
+);
+const canCancel = Boolean(
+  order?.appointment?.revision &&
+  ['confirmed', 'rescheduled', 'provisional'].includes(order.status),
+);
 ---
 
 <Base
@@ -38,7 +49,7 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
         order ? (
           <div
             class="summary-card"
-            data-manage-order={order.publicCode}
+            data-manage-order={canReschedule ? order.publicCode : undefined}
             data-branch={order.selection.branch}
           >
             <h2>{selectionLabel(order.selection)}</h2>
@@ -47,15 +58,32 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
             </p>
             <p>
               <strong>Aktuální termín:</strong>{' '}
-              {order.appointment ? formatDateTime(order.appointment.startsAt) : 'bez termínu'}
+              {order.status === 'cancelled'
+                ? 'zrušený'
+                : order.status === 'no_show'
+                  ? 'nevyužitý'
+                  : order.appointment
+                    ? formatDateTime(order.appointment.startsAt)
+                    : 'bez termínu'}
             </p>
             <div class="notice strong">
               Kurz lze uhradit v hotovosti při zápisu nebo převodem na účet do 5 dnů od zápisu.
               Platbu lze rozdělit do tří přibližně stejných částí; poslední část je potřeba uhradit
               nejpozději při poslední jízdě nebo před závěrečnou zkouškou.
             </div>
-            {order.appointment ? (
+            {order.status === 'cancelled' && (
+              <div class="notice" role="status">
+                Termín zápisu byl zrušen.
+                {Astro.url.searchParams.get('potvrzeni') === 'chyba' &&
+                  ' Potvrzovací e-mail se nepodařilo zařadit k odeslání.'}
+              </div>
+            )}
+            {canReschedule ? (
               <div class="booking-calendar" aria-live="polite">
+                {(order.canRebookCancelled || order.status === 'no_show') && (
+                  <h3>Vyberte nový termín zápisu</h3>
+                )}
+                {order.canRebookCancelled && <p>Údaje z vaší objednávky zůstanou zachované.</p>}
                 <div class="calendar-head">
                   <button type="button" class="btn secondary" id="manage-prev">
                     ‹
@@ -84,23 +112,35 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
                   Termín zatím není vybraný.
                 </p>
               </div>
-            ) : (
+            ) : !order.appointment && order.status !== 'cancelled' ? (
               <div class="notice">
                 Termín zápisu vám pro tuto objednávku domluví vedoucí pobočky individuálně.
               </div>
-            )}
-            {order.appointment && order.status !== 'no_show' ? (
-              <>
-                <p id="manage-message" class="error" role="alert" />
-                <div class="actions">
-                  <button type="button" id="cancel-appointment" class="btn secondary">
-                    Zrušit termín zápisu
-                  </button>
-                </div>
-              </>
-            ) : order.appointment ? (
-              <p id="manage-message" class="error" role="alert" />
             ) : null}
+            {canReschedule && <p id="manage-message" class="error" role="alert" />}
+            {canCancel && (
+              <details class="cancel-appointment">
+                <summary class="btn secondary">Zrušit termín zápisu</summary>
+                <form
+                  id="cancel-appointment"
+                  method="post"
+                  data-revision={order.appointment?.revision}
+                >
+                  <fieldset>
+                    <legend>Proč rušíte termín zápisu?</legend>
+                    {cancellationReasonCodes.map((reason) => (
+                      <label>
+                        <input type="radio" name="reason" value={reason} required />
+                        <span>{cancellationReasons[reason]}</span>
+                      </label>
+                    ))}
+                  </fieldset>
+                  <button type="submit" class="btn secondary">
+                    Potvrdit zrušení termínu
+                  </button>
+                </form>
+              </details>
+            )}
           </div>
         ) : code ? (
           <div class="notice">{message || 'Objednávka s tímto číslem nebyla nalezena.'}</div>
@@ -120,6 +160,32 @@ if (code && process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
   .manage-grid {
     display: grid;
     gap: 24px;
+  }
+  .cancel-appointment summary {
+    cursor: pointer;
+  }
+  .cancel-appointment form,
+  .cancel-appointment fieldset {
+    display: grid;
+    gap: 10px;
+  }
+  .cancel-appointment form {
+    justify-items: start;
+    margin-top: 14px;
+  }
+  .cancel-appointment fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+  }
+  .cancel-appointment legend {
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .cancel-appointment label {
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    font-weight: 500;
   }
   .summary-card {
     border: 1px solid var(--line);

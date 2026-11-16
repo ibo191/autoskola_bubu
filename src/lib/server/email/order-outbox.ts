@@ -43,8 +43,14 @@ type OutboxStore = Pick<
   | 'markFailed'
   | 'markSkipped'
   | 'isNoShowOrder'
+  | 'isRebookableCancellation'
   | 'retryLater'
 >;
+
+export function orderEmailMetadata(message: EmailMessage) {
+  const { attachments: _attachments, scheduledFor: _scheduledFor, ...snapshot } = message;
+  return { ...message.metadata, outboxMessage: snapshot, outboxAttempts: 0 };
+}
 
 export class OrderEmailOutbox implements EmailAdapter {
   constructor(
@@ -68,16 +74,11 @@ export class OrderEmailOutbox implements EmailAdapter {
       )
     )
       throw new Error('Unsupported order outbox event');
-    const { attachments: _attachments, scheduledFor: _scheduledFor, ...snapshot } = message;
     const event = await this.store.createPending({
       ...message,
       attachments: undefined,
       scheduledFor: message.scheduledFor ?? new Date().toISOString(),
-      metadata: {
-        ...message.metadata,
-        outboxMessage: snapshot,
-        outboxAttempts: 0,
-      },
+      metadata: orderEmailMetadata(message),
     });
     if (!event) return { status: 'duplicate-skipped' };
     if (this.schedule && (!message.scheduledFor || new Date(message.scheduledFor) <= new Date())) {
@@ -102,6 +103,15 @@ export class OrderEmailOutbox implements EmailAdapter {
           await this.store.markSkipped(id);
           return 'skipped';
         }
+      }
+      const cancellationRevision = message.metadata?.cancelledAppointmentRevision;
+      if (
+        typeof cancellationRevision === 'number' &&
+        (!message.orderId ||
+          !(await this.store.isRebookableCancellation(message.orderId, cancellationRevision)))
+      ) {
+        await this.store.markSkipped(id);
+        return 'skipped';
       }
       if (
         message.eventType === 'order_confirmation' &&

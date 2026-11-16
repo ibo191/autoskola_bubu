@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { readConfig } from '../config';
+import { cancellationReasonCodes, type CancellationReason } from '../booking/cancellation-reasons';
 import type {
   AdminSummary,
   AvailableSlot,
@@ -39,6 +40,7 @@ const publicOrderSchema = z
     orderId: z.uuid(),
     publicCode: z.string(),
     status: z.string(),
+    canRebookCancelled: z.boolean().optional(),
     contact: z.object({
       firstName: z.string(),
       lastName: z.string(),
@@ -61,6 +63,7 @@ const publicOrderSchema = z
         id: z.uuid(),
         branch: z.string(),
         status: z.string(),
+        revision: z.number().int().positive().optional(),
         startsAt: z.iso.datetime({ offset: true }),
         endsAt: z.iso.datetime({ offset: true }),
       })
@@ -172,6 +175,7 @@ const appointmentHistorySchema = z.object({
       })
       .extend({
         kind: z.enum(['moved', 'cancelled', 'expired']),
+        cancellationReason: z.enum(cancellationReasonCodes).nullish(),
         changedAt: z.iso.datetime({ offset: true }),
         newStartsAt: z.iso.datetime({ offset: true }).nullable(),
         late: z.boolean(),
@@ -277,6 +281,7 @@ export class SupabaseBookingRepository implements BookingRepository {
       | 'bubu_admin_reschedule_appointment'
       | 'bubu_admin_appointment_history'
       | 'bubu_cancel_appointment'
+      | 'bubu_customer_cancel_appointment'
       | 'bubu_admin_login'
       | 'bubu_admin_session'
       | 'bubu_admin_logout'
@@ -419,6 +424,30 @@ export class SupabaseBookingRepository implements BookingRepository {
     return z
       .object({ ok: z.boolean() })
       .parse(await this.rpc('bubu_cancel_appointment', { p_public_code: publicCode }));
+  }
+  async customerCancelAppointment(
+    publicCode: string,
+    reason: CancellationReason,
+    revision: number,
+    followUp: { idempotencyKey: string; subject: string; metadata: unknown } | null,
+  ) {
+    return z
+      .discriminatedUnion('ok', [
+        z.object({
+          ok: z.literal(true),
+          revision: z.number().int().positive(),
+          canRebook: z.boolean(),
+        }),
+        z.object({ ok: z.literal(false) }),
+      ])
+      .parse(
+        await this.rpc('bubu_customer_cancel_appointment', {
+          p_public_code: publicCode,
+          p_reason: reason,
+          p_expected_revision: revision,
+          p_follow_up: followUp,
+        }),
+      );
   }
   async adminSummary(input: { from: string; to: string; course?: string | null }) {
     return adminSummarySchema.parse(
