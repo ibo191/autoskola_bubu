@@ -166,16 +166,18 @@ test('admin enrollment actions produce distinct customer emails without duplicat
     origin: 'https://www.autoskolabubu.cz',
     course: 'b',
   };
-  const welcome = adminEnrollmentEmail({ ...base, action: 'attend' });
+  const welcome = adminEnrollmentEmail({ ...base, action: 'attend', coursePriceCzk: 20000 });
   const noShow = adminEnrollmentEmail({ ...base, action: 'no_show' });
   const cancelled = adminEnrollmentEmail({ ...base, action: 'cancel' });
   assert.equal(welcome.eventType, 'enrollment_welcome');
-  assert.match(welcome.text, /třetí přednášce.*připouštěcí test/);
-  assert.match(welcome.text, /dohody o splátkách/);
-  assert.match(welcome.text, /Zbývající přednášky si naplánujte v aplikaci Moje Autoškola/);
+  assert.match(welcome.text, /třetí přednášce.*50 otázek/);
+  assert.match(welcome.text, /tři splátky/);
+  assert.match(welcome.text, /20\s000\sKč/);
+  assert.match(welcome.text, /28 vyučovacích hodin/);
+  assert.match(welcome.text, /zdravovědu/);
   assert.match(welcome.text, /nejpozději 24 hodin/);
   assert.match(welcome.text, /info@autoskolabubu\.cz/);
-  assert.match(welcome.text, /K eTestům se dostanete také prostřednictvím aplikace/);
+  assert.match(welcome.text, /Moje Autoškola a cvičné eTesty/);
   assert.match(welcome.text, /apps\.apple\.com\/cz\/app\/moje-auto%C5%A1kola\/id1449593403/);
   assert.match(
     welcome.text,
@@ -183,6 +185,14 @@ test('admin enrollment actions produce distinct customer emails without duplicat
   );
   assert.match(welcome.html ?? '', /href="https:\/\/apps\.apple\.com/);
   assert.match(welcome.html ?? '', /href="https:\/\/play\.google\.com/);
+  assert.match(welcome.html ?? '', /bgcolor="#2c56a0"/);
+  for (const content of [welcome.text, welcome.html ?? '']) {
+    assert.doesNotMatch(content, /Moje první přednáška|Při zápisu Vám byl sdělen termín|25\s900/i);
+  }
+  assert.match(
+    adminEnrollmentEmail({ ...base, action: 'attend' }).text,
+    /Výši kurzovného najdete v potvrzení objednávky/,
+  );
   const refresher = adminEnrollmentEmail({ ...base, course: 'kondicni', action: 'attend' });
   assert.equal(refresher.subject, 'Vítejte na kondičních jízdách v Autoškole BuBu');
   assert.match(refresher.text, /napište mu prosím přes WhatsApp/);

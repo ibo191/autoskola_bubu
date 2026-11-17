@@ -7,6 +7,11 @@ import { money } from '../../format';
 import { branchLabel, courseLabel, selectionLabel, packageLabel } from '../../order-display';
 import { licenceReturnDocuments } from '../../licence-return';
 import {
+  autoSchoolAppLinks,
+  categoryBEnrollmentGuide,
+  isCategoryBCourse,
+} from './enrollment-guide';
+import {
   escapeHtml,
   eventKey,
   formatEmailDate,
@@ -36,8 +41,11 @@ export type CreatedOrderEmailInput = {
   notificationEmail?: string;
 };
 
-function layout(title: string, body: string) {
-  return `<!doctype html><html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title></head><body style="margin:0;background:#f4faf9;font-family:Arial,Helvetica,sans-serif;color:#17345d;"><div style="display:none;max-height:0;overflow:hidden;opacity:0;">Řidičák bez stresu – Autoškola BuBu</div><main style="max-width:680px;margin:0 auto;padding:28px 16px;"><section style="background:#ffffff;border:1px solid #dcebea;border-radius:24px;padding:28px;box-shadow:0 16px 40px rgba(23,52,93,.08);"><p style="margin:0 0 12px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#4daeb6;font-weight:700;">Autoškola BuBu</p><h1 style="margin:0 0 20px;font-size:28px;line-height:1.15;color:#17345d;">${escapeHtml(title)}</h1>${body}</section><p style="margin:18px 4px 0;font-size:13px;line-height:1.6;color:#667998;">Tento e-mail se týká objednávky nebo dotazu na webu Autoškoly BuBu. Pokud jste ho nečekali, napište nám prosím na objednavky@autoskolabubu.cz.</p></main></body></html>`;
+function layout(title: string, body: string, logoUrl?: string) {
+  const brand = logoUrl
+    ? `<img src="${escapeHtml(logoUrl)}" alt="Autoškola BuBu" width="150" style="display:block;width:150px;max-width:100%;height:auto;margin:0 0 20px;border:0;">`
+    : '<p style="margin:0 0 12px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#4daeb6;font-weight:700;">Autoškola BuBu</p>';
+  return `<!doctype html><html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title></head><body style="margin:0;background:#f4faf9;font-family:Arial,Helvetica,sans-serif;color:#17345d;"><div style="display:none;max-height:0;overflow:hidden;opacity:0;">Řidičák bez stresu – Autoškola BuBu</div><main style="max-width:680px;margin:0 auto;padding:28px 16px;"><section style="background:#ffffff;border:1px solid #dcebea;border-radius:24px;padding:28px;box-shadow:0 16px 40px rgba(23,52,93,.08);">${brand}<h1 style="margin:0 0 20px;font-size:28px;line-height:1.15;color:#17345d;">${escapeHtml(title)}</h1>${body}</section><p style="margin:18px 4px 0;font-size:13px;line-height:1.6;color:#667998;">Tento e-mail se týká objednávky nebo dotazu na webu Autoškoly BuBu. Pokud jste ho nečekali, napište nám prosím na objednavky@autoskolabubu.cz.</p></main></body></html>`;
 }
 
 function rows(items: Array<[string, string]>) {
@@ -648,6 +656,7 @@ export function adminEnrollmentEmail(input: {
   to: string;
   action: 'attend' | 'no_show' | 'cancel';
   course?: string;
+  coursePriceCzk?: number;
   origin: string;
 }): EmailMessage {
   const courseUrl = new URL('/kurzy', input.origin).href;
@@ -694,11 +703,25 @@ export function adminEnrollmentEmail(input: {
       };
     }
     const subject = 'Vítejte v Autoškole BuBu – informace po zápisu';
-    const appStoreUrl = 'https://apps.apple.com/cz/app/moje-auto%C5%A1kola/id1449593403';
-    const googlePlayUrl = 'https://play.google.com/store/apps/details?id=cz.moje_autoskola&hl=cs';
+    if (isCategoryBCourse(input.course)) {
+      const guide = categoryBEnrollmentGuide(input.origin, input.coursePriceCzk);
+      return {
+        ...base,
+        eventType: 'enrollment_welcome',
+        subject,
+        tag: 'enrollment-welcome',
+        html: layout(
+          'Průvodce kurzem skupiny B',
+          guide.html,
+          new URL('/brand/logo.png', input.origin).href,
+        ),
+        text: guide.text,
+      };
+    }
+    const [[, appStoreUrl], [, googlePlayUrl]] = autoSchoolAppLinks;
     const paragraphs = [
       'právě jste se zapsal/a do Autoškoly BuBu. Posíláme Vám několik organizačních informací, aby vše od začátku probíhalo hladce.',
-      'Při zápisu Vám byl sdělen termín zahájení Vašeho kurzu a zároveň jste byl/a přihlášen/a na první přednášku. Zbývající přednášky si naplánujte v aplikaci Moje Autoškola. Přihlaste se údaji, které Vám byly vygenerovány a zaslány ze systému.',
+      'Přednášky si naplánujte v aplikaci Moje Autoškola. Přihlaste se údaji, které Vám byly vygenerovány a zaslány ze systému.',
       'Z přednášky se můžete odhlásit nejpozději 24 hodin před jejím začátkem. Myslete na to prosím při plánování. Pokud jste se nestihli odhlásit, pošlete omluvenku na info@autoskolabubu.cz.',
       'Na třetí přednášce budete psát připouštěcí test do provozu, proto je důležité začít s přípravou co nejdříve. K eTestům se dostanete také prostřednictvím aplikace Moje Autoškola. Doporučujeme si aplikaci eTesty stáhnout přímo do mobilu a otázky pravidelně procvičovat.',
       'Doporučujeme se předem dobře seznámit zejména s dopravními značkami a dopravními situacemi. Připouštěcí test bude rovněž probíhat prostřednictvím eTestů. Pokud test napoprvé nezvládnete, budete mít možnost přijít si jej opravit.',

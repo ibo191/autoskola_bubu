@@ -6,6 +6,7 @@ import { assertSameOrigin, requireLiveRepository } from '../../lib/server/live-o
 import { isTransactionalEmailConfigured } from '../../lib/server/email';
 import { createOrderEmailOutbox } from '../../lib/server/email/order-outbox';
 import { adminEnrollmentEmail, noShowFollowUpEmail } from '../../lib/server/email/templates';
+import { isCategoryBCourse } from '../../lib/server/email/enrollment-guide';
 
 export const prerender = false;
 
@@ -48,6 +49,11 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   let emailQueued = false;
   if (result.recipient && result.publicCode && (parsed.data.intent !== 'attend' || result.course)) {
     try {
+      const order =
+        parsed.data.intent === 'attend' && isCategoryBCourse(result.course)
+          ? await repository.getPublicOrder(result.publicCode).catch(() => null)
+          : null;
+      const basePrice = order?.price?.baseAmount;
       const email = adminEnrollmentEmail({
         orderId: parsed.data.orderId,
         appointmentId: result.appointmentId,
@@ -55,6 +61,10 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
         to: result.recipient,
         action: parsed.data.intent,
         course: result.course,
+        coursePriceCzk:
+          typeof basePrice === 'number' && Number.isSafeInteger(basePrice) && basePrice > 0
+            ? basePrice
+            : undefined,
         origin: publicAppOrigin(process.env),
       });
       const outbox = createOrderEmailOutbox(process.env, (task) => waitUntil(task));
