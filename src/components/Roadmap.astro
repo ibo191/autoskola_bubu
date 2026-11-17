@@ -1,4 +1,9 @@
 ---
+interface Props {
+  mobileCarousel?: boolean;
+}
+const { mobileCarousel = false } = Astro.props;
+
 const steps = [
   {
     title: 'Online objednávka',
@@ -47,7 +52,11 @@ const steps = [
         </h2>
       </div><a class="text-link" href="/jak-probiha-vyuka">Jak probíhá výuka ↗</a>
     </div>
-    <ol class="roadmap" data-road-progress="0">
+    <ol
+      class:list={['roadmap', { 'roadmap-carousel': mobileCarousel }]}
+      id={mobileCarousel ? 'learning-roadmap-steps' : undefined}
+      data-road-progress="0"
+    >
       {
         steps.map((step, i) => (
           <li class:list={{ active: i === 0 }}>
@@ -77,6 +86,31 @@ const steps = [
         ))
       }
     </ol>
+    {
+      mobileCarousel && (
+        <div class="roadmap-controls" role="group" aria-label="Ovládání kroků">
+          <button
+            type="button"
+            data-road-direction="-1"
+            aria-label="Předchozí krok"
+            aria-controls="learning-roadmap-steps"
+            aria-disabled="true"
+          >
+            <span aria-hidden="true">←</span>
+          </button>
+          <span data-road-position>1 / {steps.length}</span>
+          <button
+            type="button"
+            data-road-direction="1"
+            aria-label="Další krok"
+            aria-controls="learning-roadmap-steps"
+            aria-disabled="false"
+          >
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      )
+    }
     <div class="roadmap-details" aria-live="polite">
       {
         steps.map((step, i) => (
@@ -100,21 +134,87 @@ const steps = [
   document.querySelectorAll<HTMLOListElement>('.roadmap').forEach((roadmap) => {
     const buttons = roadmap.querySelectorAll<HTMLButtonElement>('[data-road-step]');
     const details = roadmap.parentElement?.querySelectorAll<HTMLElement>('[data-road-detail]');
-    buttons.forEach((button, index) => {
-      button.addEventListener('click', () => {
-        buttons.forEach((step, stepIndex) => {
-          const active = stepIndex === index;
-          step.setAttribute('aria-pressed', String(active));
-          step.setAttribute('aria-expanded', String(active));
-          step.closest('li')?.classList.toggle('active', active);
-        });
-        details?.forEach((detail, detailIndex) => (detail.hidden = detailIndex !== index));
-        roadmap.dataset.roadProgress = String(index);
+    const controls = roadmap.parentElement?.querySelector<HTMLElement>('.roadmap-controls');
+    const directions = controls?.querySelectorAll<HTMLButtonElement>('[data-road-direction]');
+    const position = controls?.querySelector<HTMLElement>('[data-road-position]');
+    const isMobile = window.matchMedia('(max-width: 767px)');
+    let activeIndex = 0;
+
+    function activate(index: number) {
+      activeIndex = index;
+      buttons.forEach((step, stepIndex) => {
+        const active = stepIndex === index;
+        step.setAttribute('aria-pressed', String(active));
+        step.setAttribute('aria-expanded', String(active));
+        step.closest('li')?.classList.toggle('active', active);
+        if (controls && isMobile.matches) step.tabIndex = active ? 0 : -1;
       });
+      details?.forEach((detail, detailIndex) => (detail.hidden = detailIndex !== index));
+      roadmap.dataset.roadProgress = String(index);
+      if (position) position.textContent = `${index + 1} / ${buttons.length}`;
+      directions?.[0]?.setAttribute('aria-disabled', String(index === 0));
+      directions?.[1]?.setAttribute('aria-disabled', String(index === buttons.length - 1));
+    }
+
+    function moveTo(index: number, focusStep = false) {
+      if (index < 0 || index >= buttons.length) return;
+      activate(index);
+      if (!controls || !isMobile.matches) return;
+      roadmap.scrollLeft = roadmap.clientWidth * index;
+      if (focusStep) buttons[index]?.focus({ preventScroll: true });
+    }
+
+    buttons.forEach((button, index) => {
+      button.addEventListener('click', () => moveTo(index));
     });
+
+    if (!controls) return;
+    directions?.forEach((button) => {
+      button.addEventListener('click', () =>
+        moveTo(activeIndex + Number(button.dataset.roadDirection)),
+      );
+    });
+    roadmap.addEventListener('keydown', (event) => {
+      if (!isMobile.matches) return;
+      const indexByKey: Record<string, number> = {
+        ArrowLeft: activeIndex - 1,
+        ArrowRight: activeIndex + 1,
+        Home: 0,
+        End: buttons.length - 1,
+      };
+      const index = indexByKey[event.key];
+      if (typeof index !== 'number') return;
+      event.preventDefault();
+      moveTo(index, true);
+    });
+    roadmap.addEventListener(
+      'scroll',
+      () => {
+        if (!isMobile.matches || !roadmap.clientWidth) return;
+        const index = Math.round(roadmap.scrollLeft / roadmap.clientWidth);
+        if (index >= 0 && index < buttons.length && index !== activeIndex) {
+          const stepHadFocus = document.activeElement === buttons[activeIndex];
+          activate(index);
+          if (stepHadFocus) buttons[index]?.focus({ preventScroll: true });
+        }
+      },
+      { passive: true },
+    );
+    function syncViewport() {
+      if (isMobile.matches) {
+        moveTo(activeIndex);
+      } else {
+        buttons.forEach((button) => button.removeAttribute('tabindex'));
+      }
+    }
+    isMobile.addEventListener('change', syncViewport);
+    syncViewport();
   });
 </script>
 <style>
+  .roadmap-controls {
+    display: none;
+  }
   .roadmap {
     --road-progress: 0%;
     position: relative;
@@ -289,6 +389,57 @@ const steps = [
       grid-template-columns: 1fr;
       gap: 14px;
       padding: 23px;
+    }
+  }
+  @media (max-width: 767px) {
+    .roadmap-carousel {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: 100%;
+      gap: 0;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      overscroll-behavior-x: contain;
+    }
+    .roadmap-carousel li {
+      min-width: 0;
+      padding: 4px;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+    }
+    .roadmap-carousel button:hover {
+      transform: none;
+    }
+    .roadmap-carousel button:focus-visible {
+      outline-offset: -3px;
+    }
+    .roadmap-controls {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+      text-align: center;
+      font-weight: 750;
+      color: var(--brand-dark);
+    }
+    .roadmap-controls button {
+      min-width: 44px;
+      min-height: 44px;
+      border: 1px solid var(--brand);
+      border-radius: 12px;
+      background: var(--brand-soft);
+      color: var(--brand-dark);
+      font-size: 1.3rem;
+    }
+    .roadmap-controls button[aria-disabled='true'] {
+      opacity: 0.55;
+      cursor: default;
+    }
+    .roadmap-carousel + .roadmap-controls + .roadmap-details {
+      min-height: auto;
+      margin-top: 12px;
     }
   }
 </style>

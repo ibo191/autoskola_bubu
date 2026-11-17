@@ -5,6 +5,9 @@ import Roadmap from '../components/Roadmap.astro';
 import Faq from '../components/Faq.astro';
 import FinalCta from '../components/FinalCta.astro';
 import { faqGroups } from '../lib/faqs';
+import { Image } from 'astro:assets';
+import manualCar from '../assets/courses/b-manual-fabia.png';
+import automaticCar from '../assets/courses/b-automatic-scala.png';
 
 const schema = [
   {
@@ -39,8 +42,8 @@ const schema = [
 ---
 
 <Base
-  title="Jak probíhá výuka"
-  description="Pět kroků k řidičáku v Autoškole BuBu: online objednávka, osobní zápis, teorie, praktické jízdy a závěrečná zkouška."
+  title="Jak probíhá autoškola? Od přihlášky ke zkoušce"
+  description="Zjisti, jak probíhá autoškola skupiny B v BuBu. Co si připravit k zápisu, jak funguje teorie a zdravověda a co tě čeká při prvních jízdách a závěrečné zkoušce."
   schema={schema}
   ><section class="page-hero learning-hero">
     <div class="learning-hero-shape learning-hero-shape-left" aria-hidden="true"></div>
@@ -61,14 +64,496 @@ const schema = [
         V klidu krok<br />za krokem.
       </p>
     </div>
-  </section><Roadmap /><section class="section">
+  </section><Roadmap mobileCarousel />
+
+  <section class="section learning-section" aria-labelledby="enrollment">
+    <div class="container learning-split">
+      <div class="learning-copy">
+        <h2 id="enrollment">První krok k řidičáku? Přihlásit se.</h2>
+        <p>
+          Začít s autoškolou není nic složitého. Na našem webu si <a href="/kurzy">vybereš kurz</a>,
+          který ti vyhovuje, a vyplníš online objednávku. Pak společně vyřídíme potřebné dokumenty a
+          vysvětlíme ti, jak bude výuka probíhat.
+        </p>
+        <p>
+          Chceme, abys od začátku věděl, co tě čeká, co si máš připravit a jak bude celý kurz
+          pokračovat. Pokud míříš na řidičák na auto, prohlédni si <a
+            href="/kurzy/ridicak-skupina-b">kurz skupiny B</a
+          >.
+        </p>
+        <h3>Zápis na Střížkově</h3>
+        <p>
+          Pokud se hlásíš na pobočku <a href="/strizkov">Praha 8 – Střížkov</a>, v online objednávce
+          si vybereš termín osobního zápisu. Na místě zkontrolujeme dokumenty, dokončíme přihlášení
+          a vysvětlíme ti organizaci teorie i praktických jízd.
+        </p>
+        <h3>Zápis ve Statenicích</h3>
+        <p>
+          Ve <a href="/statenice">Statenicích</a> si při objednávce také rezervuješ termín osobního zápisu
+          na pobočce.
+        </p>
+        <h3>Zápis na Kladně</h3>
+        <p>
+          Na <a href="/kladno">Kladně</a> můžeš zápis vyřídit online, bez nutnosti osobní návštěvy. Po
+          odeslání objednávky od nás e-mailem dostaneš pokyny k dokumentům a dalšímu postupu.
+        </p>
+      </div>
+      <aside
+        class="learning-card learning-checklist learning-copy"
+        aria-labelledby="checklist-title"
+      >
+        <h3 id="checklist-title">Co si připravit k zápisu?</h3>
+        <ul>
+          <li>
+            <strong
+              ><a href="/dokumenty/prihlaska-k-vycviku.pdf"
+                >Žádost o přijetí k výuce a výcviku (PDF)</a
+              ></strong
+            ><p>
+              Připrav si vyplněnou a podepsanou žádost o přijetí do autoškoly. Formulář můžeš
+              vyplnit předem podle našich pokynů.
+            </p>
+          </li>
+          <li>
+            <strong>Lékařský posudek</strong><p>
+              Potřebuješ posudek o zdravotní způsobilosti k řízení pro příslušnou skupinu řidičského
+              oprávnění. Při podání žádosti nesmí být starší než tři měsíce.
+            </p>
+          </li>
+          <li>
+            <strong>Doklad totožnosti</strong><p>
+              Připrav si platný občanský průkaz nebo jiný uznávaný doklad totožnosti.
+            </p>
+          </li>
+        </ul>
+        <p>
+          Nevíš si s některým dokumentem rady? Podrobné informace dostaneš při přihlášení a s
+          administrativou ti pomůžeme.
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section learning-section learning-mint" aria-labelledby="materials">
     <div class="container">
-      <p class="lead">
-        V Kladně probíhá přihlášení online bez osobního zápisu. Další postup a potřebné dokumenty
-        dořešíme e-mailem. Na Střížkově a ve Statenicích zůstává osobní zápis součástí přihlášení.
+      <div class="learning-intro learning-copy">
+        <span class="eyebrow">Víc než jen povinná výuka</span>
+        <h2 id="materials">Na učení nebudeš sám. Všechno potřebné máš v ceně.</h2>
+        <p>
+          Dobrá autoškola by tě měla připravovat i mimo přednášky a jízdy. Je důležité, abys měl
+          možnost se k jednotlivým tématům vracet, procvičovat si je a učit se vlastním tempem.
+        </p>
+        <p>
+          V ceně základního kurzu skupiny B proto získáš vedle výuky a výcviku také tištěnou
+          učebnici, plný přístup do online učebny a možnost neomezeně procvičovat eTesty během
+          kurzu.
+        </p>
+      </div>
+      <div class="learning-grid learning-grid-three">
+        <article class="learning-card learning-copy learning-benefit">
+          <img
+            class="learning-book"
+            src="/images/products/autoskola-pohodlne.jpg"
+            width="360"
+            height="450"
+            loading="lazy"
+            decoding="async"
+            alt="Obálka učebnice Autoškola? Pohodlně! od Zdeňka Schrötera"
+          />
+          <h3>Vlastní učebnice, ke které se můžeš vracet.</h3>
+          <p>
+            Na začátku kurzu od nás dostaneš tištěnou učebnici <em>Autoškola? Pohodlně!</em> Najdeš v
+            ní přehledně vysvětlená pravidla silničního provozu, dopravní značky a další důležité informace
+            k výuce i závěrečným zkouškám.
+          </p>
+          <p>
+            Můžeš se do ní kdykoliv podívat, dělat si poznámky a opakovat si učivo podle toho, co
+            právě potřebuješ.
+          </p>
+          <strong class="learning-benefit-note">Tištěná učebnice v ceně kurzu</strong>
+        </article>
+        <article class="learning-card learning-copy learning-benefit">
+          <img
+            class="learning-material-icon"
+            src="/icons/ui/blue-classroom-outline.webp"
+            width="72"
+            height="72"
+            loading="lazy"
+            alt=""
+          />
+          <h3>Nestihl sis něco zapamatovat? Pusť si to znovu.</h3>
+          <p>
+            V aplikaci Moje Autoškola máš plný přístup do online učebny, kde jsou jednotlivá témata
+            přehledně zpracovaná pomocí výukových videí a názorných vysvětlení.
+          </p>
+          <p>
+            Můžeš se vrátit k dopravním značkám, křižovatkám, pravidlům přednosti nebo dalším
+            situacím, které ti zatím nejsou úplně jasné.
+          </p>
+          <p>
+            Online učebnu máš i na mobilu, takže si můžeš zopakovat, co ti na přednášce uniklo,
+            třeba doma nebo cestou autobusem. Doporučujeme projít si všechny výukové materiály.
+          </p>
+          <strong class="learning-benefit-note">Výuková videa a online studijní materiály</strong>
+        </article>
+        <article class="learning-card learning-copy learning-benefit">
+          <img
+            class="learning-material-icon"
+            src="/icons/ui/blue-target.webp"
+            width="72"
+            height="72"
+            loading="lazy"
+            alt=""
+          />
+          <h3>Na závěrečný test se připravíš vlastním tempem.</h3>
+          <p>
+            Součástí kurzu je přístup ke cvičným eTestům v systému Moje Autoškola. Otázky vycházejí
+            z oficiální databáze Ministerstva dopravy ČR, takže si procvičíš témata, se kterými se
+            setkáš i při závěrečné zkoušce.
+          </p>
+          <p>
+            Testy můžeš během kurzu opakovat bez omezení počtu pokusů. Postupně tak zjistíš, co už
+            zvládáš a kterým tématům se ještě potřebuješ věnovat.
+          </p>
+          <strong class="learning-benefit-note">Neomezené procvičování během kurzu</strong>
+        </article>
+      </div>
+      <p class="learning-note">
+        Učebnice, výuková videa i eTesty jsou součástí ceny základního kurzu skupiny B. Za tyto
+        studijní materiály nic dalšího nepřiplácíš. Celkovou cenu najdeš v <a href="/cenik"
+          >ceníku kurzů</a
+        >.
       </p>
     </div>
-  </section><Faq quiet /><FinalCta /></Base
+  </section>
+
+  <section class="section learning-section" aria-labelledby="theory">
+    <div class="container">
+      <div class="learning-intro learning-copy">
+        <span class="eyebrow">Teorie, která dává smysl</span>
+        <h2 id="theory">Neučíme tě jen správné odpovědi. Učíme tě rozumět provozu.</h2>
+        <p>
+          Dopravní značky, přednosti nebo složité křižovatky mohou na začátku působit jako spousta
+          pravidel, ve kterých se nedá vyznat. Když pochopíš, proč existují a jak fungují v reálných
+          situacích, začne ti provoz dávat větší smysl.
+        </p>
+        <p>
+          V teorii postupně poznáš pravidla silničního provozu i zásady bezpečné jízdy. Na
+          konkrétních dopravních situacích si ukážeme, jak vyhodnotit přednost, na co si dát pozor
+          při odbočování a jak včas reagovat na ostatní. Získané znalosti pak využiješ při skutečném
+          řízení.
+        </p>
+        <p>
+          První tři bloky absolvuješ v uvedeném pořadí. Zdravovědu si můžeš naplánovat samostatně už
+          po prvním bloku.
+        </p>
+      </div>
+      <ol class="learning-timeline">
+        <li class="learning-copy">
+          <h3>První přednáška</h3><p>
+            Zahájíš teoretickou výuku. Jakmile první blok dokončíš, můžeš se přihlásit na navazující
+            přednášku i na zdravovědu.
+          </p>
+        </li>
+        <li class="learning-copy">
+          <h3>Navazující přednáška</h3><p>
+            Pokračuješ v teorii a propojuješ pravidla s příklady z provozu. Tento blok absolvuješ
+            před třetí přednáškou.
+          </p>
+        </li>
+        <li class="learning-copy">
+          <h3>Třetí přednáška</h3><p>
+            Dokončíš třetí blok teorie. Potom absolvuješ interní ověření znalostí pro vstup do
+            běžného provozu.
+          </p>
+        </li>
+        <li class="learning-copy">
+          <h3>Zdravověda a první pomoc</h3><p>
+            První pomoc si skutečně vyzkoušíš na resuscitačních figurínách s technologií, která ti
+            při nácviku dává zpětnou vazbu. <strong
+              >Zdravovědu můžeš absolvovat po prvním bloku. Na třetí přednášku čekat nemusíš.</strong
+            >
+          </p>
+        </li>
+      </ol>
+      <div class="learning-grid learning-grid-two learning-followups">
+        <article class="learning-card learning-copy learning-accent">
+          <h3>Interní test do provozu</h3>
+          <p>
+            Po třetím bloku si ověříme, že rozumíš dopravním značkám, přednostem a základním
+            pravidlům silničního provozu. Jde o interní ověření, které musíš zvládnout před jízdou v
+            běžném provozu.
+          </p>
+          <p>
+            Pokud ti některé téma ještě není úplně jasné, víme, na co se při další přípravě zaměřit.
+            Při jízdách se pak můžeš soustředit na používání pravidel v reálných situacích.
+          </p>
+          <ul class="learning-tags">
+            <li>Ověření znalostí</li><li>Lepší připravenost</li><li>
+              Bezpečnější začátky v provozu
+            </li>
+          </ul>
+        </article>
+        <article class="learning-card learning-copy">
+          <h3>Zkušenosti z provozu, ne jen z učebnice.</h3>
+          <p>
+            Na pobočce Praha 8 – Střížkov vede teoretickou výuku Zdeněk Buřič, který do přednášek
+            přináší zkušenosti z policejní praxe.
+          </p>
+          <p>
+            Díky konkrétním příkladům a skutečným dopravním situacím dokáže vysvětlit i pravidla,
+            která se na první pohled zdají složitá. Na přednáškách se tak učíš pochopit, co se na
+            silnici děje.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section learning-section learning-blue" aria-labelledby="first-aid">
+    <div class="container">
+      <div class="learning-intro learning-copy">
+        <span class="eyebrow">První pomoc v praxi</span>
+        <h2 id="first-aid">První pomoc si u nás opravdu vyzkoušíš.</h2>
+        <p>
+          Při dopravní nehodě mohou rozhodovat vteřiny. Vědět, co udělat, může být stejně důležité
+          jako umět správně řídit.
+        </p>
+        <p>
+          Proto si při zdravotnické přípravě důležité postupy prakticky vyzkoušíš. Chceme, abys
+          věděl, jak reagovat, když bude tvoji pomoc někdo potřebovat.
+        </p>
+      </div>
+      <div class="learning-aid-list">
+        <article class="learning-copy">
+          <h3>Výuka pod vedením lékařky</h3><p>
+            Zdravovědu v Autoškole BuBu primárně vede MUDr. Kristína Buřičová, lékařka a
+            spolumajitelka autoškoly. Vysvětlí ti postupy první pomoci, jejich význam i správné
+            použití v konkrétních situacích.
+          </p>
+        </article>
+        <article class="learning-copy">
+          <h3>Resuscitační figuríny</h3><p>
+            Při výuce používáme figuríny dospělého muže, ženy i malého dítěte. Na různých typech
+            figurín si vyzkoušíš nácvik resuscitace a lépe pochopíš rozdíly, se kterými je při první
+            pomoci potřeba počítat.
+          </p>
+        </article>
+        <article class="learning-copy">
+          <h3>Technologie se zpětnou vazbou</h3><p>
+            Při nácviku používáme technologii, která vyhodnocuje kvalitu stlačení hrudníku. Na
+            tabletu vidíš, co děláš správně a co potřebuješ zlepšit. Postup si pak můžeš znovu
+            vyzkoušet a zlepšovat.
+          </p>
+        </article>
+      </div>
+      <p class="learning-note">
+        <strong>První pomoc se nejlépe učí tím, že si ji opravdu vyzkoušíš.</strong>
+      </p>
+    </div>
+  </section>
+
+  <section class="section learning-section" aria-labelledby="driving">
+    <div class="container">
+      <div class="learning-intro learning-copy">
+        <span class="eyebrow">Od prvního rozjezdu</span>
+        <h2 id="driving">
+          Nejdřív cvičiště. Potom klidnější silnice. A nakonec skutečný městský provoz.
+        </h2>
+        <p>
+          V základním kurzu skupiny B tě čeká 28 vyučovacích hodin praktického řízení. Jedna
+          vyučovací hodina trvá 45 minut a výcvik se běžně organizuje do delších jízdních lekcí.
+        </p>
+        <p>
+          Výcvik začíná mimo rušný provoz. Postupně přidáváme náročnější situace podle toho, jak se
+          za volantem zlepšuješ.
+        </p>
+      </div>
+      <ol class="learning-phases learning-grid learning-grid-two">
+        <li class="learning-card learning-copy">
+          <span class="learning-phase-label">Cvičiště</span>
+          <h3>Poprvé za volantem? Začneme v klidu.</h3>
+          <p>
+            První praktická jízda proběhne na cvičišti. Nastavíš si sedadlo a zrcátka, seznámíš se s
+            ovládacími prvky a vyzkoušíš si rozjezdy, zastavování a jednoduché manévrování.
+          </p>
+          <p>
+            Pokud jezdíš na manuálu, seznámíš se také se spojkou a řazením. V klidném prostředí máš
+            prostor získat první jistotu, než vyjedeš mezi ostatní auta.
+          </p>
+        </li>
+        <li class="learning-card learning-copy">
+          <span class="learning-phase-label">Klidnější silnice</span>
+          <h3>Z cvičiště postupně mezi ostatní auta.</h3>
+          <p>
+            Jakmile zvládneš základy ovládání vozidla, postupně vyjedeme do provozu. Začínáme na
+            klidnějších silnicích, třeba v menších obcích a místech s nižší intenzitou dopravy.
+          </p>
+          <p>
+            Procvičíš rozjezdy, zastavování, odbočování, práci s rychlostí a jednodušší křižovatky.
+            Právě tady propojíš teorii se skutečným řízením.
+          </p>
+        </li>
+        <li class="learning-card learning-copy">
+          <span class="learning-phase-label">Hustší provoz</span>
+          <h3>Každou jízdou zvládneš o něco víc.</h3>
+          <p>
+            Až získáš jistotu, přidáme větší křižovatky, kruhové objezdy, změny pruhů, vícepruhové
+            silnice, parkování a hustší městský provoz.
+          </p>
+          <p>
+            Naučíš se sledovat dění kolem auta, předvídat chování ostatních řidičů a rozhodovat se
+            samostatněji. Instruktor ti pomůže nové situace zvládat.
+          </p>
+        </li>
+        <li class="learning-card learning-copy">
+          <span class="learning-phase-label">Příprava na závěrečnou jízdu</span>
+          <h3>Ke zkoušce pojedeš s dovednostmi do běžného provozu.</h3>
+          <p>
+            Na konci výcviku upevníš získané dovednosti a zaměříš se na situace, které ti ještě
+            dělají potíže. Procvičíš bezpečnou a plynulou jízdu, rozhodování, parkování i jízdu v
+            náročnějších podmínkách.
+          </p>
+          <p>
+            Cílem je, abys své dovednosti předvedl u zkoušky a mohl se po získání řidičáku dál
+            rozvíjet jako bezpečný a samostatný řidič.
+          </p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section learning-section learning-mint" aria-labelledby="training-grounds">
+    <div class="container">
+      <div class="learning-intro learning-copy">
+        <h2 id="training-grounds">První rozjezdy na vlastním cvičišti.</h2>
+        <p>
+          První zkušenost s řízením má probíhat v prostředí, kde se můžeš soustředit především na
+          samotné auto. Proto máme pro první praktické lekce vlastní cvičné plochy v Praze a na
+          Kladně.
+        </p>
+      </div>
+      <div class="learning-grid learning-grid-two">
+        <article class="learning-card learning-copy">
+          <h3>Praha – Čakovice</h3><p>
+            Studenti <a href="/strizkov">pražské pobočky na Střížkově</a> začínají praktický výcvik na
+            našem cvičišti v Čakovicích. Vyzkoušíš si ovládání auta, rozjezdy a základní manévry, než
+            se přesuneš do provozu.
+          </p>
+        </article>
+        <article class="learning-card learning-copy">
+          <h3>Kladno</h3><p>
+            Také <a href="/kladno">pobočka v Kladně</a> má vlastní cvičnou plochu. Na prvních praktických
+            lekcích si tam osvojíš základy ovládání auta, než začneš jezdit mezi ostatními účastníky provozu.
+          </p>
+        </article>
+      </div>
+      <p class="learning-note">
+        <strong>Nejdřív zvládneš auto. Pak se postupně naučíš zvládat provoz.</strong>
+      </p>
+    </div>
+  </section>
+
+  <section class="section learning-section" aria-labelledby="vehicles">
+    <div class="container">
+      <div class="learning-intro learning-copy">
+        <span class="eyebrow">Na čem budeš jezdit</span>
+        <h2 id="vehicles">Auta, na kterých se naučíš řídit.</h2>
+        <p>
+          Při výcviku používáme vozy Škoda, které jsou součástí našeho každodenního provozu. Podle
+          zvoleného kurzu můžeš jezdit s manuální nebo automatickou převodovkou.
+        </p>
+      </div>
+      <div class="learning-grid learning-grid-two">
+        <article class="learning-car learning-copy">
+          <Image
+            src={manualCar}
+            widths={[400, 640, 960]}
+            sizes="(max-width: 767px) 92vw, 46vw"
+            format="webp"
+            alt="Výcviková Škoda Fabia Autoškoly BuBu s manuální převodovkou"
+            loading="lazy"
+          />
+          <h3>Škoda Fabia III – manuální převodovka</h3>
+          <p>
+            Na našich Fabiích se naučíš správně pracovat se spojkou, řadit a získávat cit pro
+            ovládání auta v různých dopravních situacích.
+          </p>
+          <p><strong>Dostupnost:</strong> Praha 8 – Střížkov, Kladno a Statenice.</p>
+        </article>
+        <article class="learning-car learning-copy">
+          <Image
+            src={automaticCar}
+            widths={[400, 640, 960]}
+            sizes="(max-width: 767px) 92vw, 46vw"
+            format="webp"
+            alt="Výcviková Škoda Scala Autoškoly BuBu s automatickou převodovkou"
+            loading="lazy"
+          />
+          <h3>Škoda Scala – automatická převodovka</h3>
+          <p>
+            Pokud si vybereš kurz na automatu, čeká tě Škoda Scala. Při jízdách se můžeš víc
+            soustředit na sledování provozu, správné rozhodování a samotné řízení.
+          </p>
+          <p><strong>Dostupnost:</strong> Praha 8 – Střížkov.</p>
+        </article>
+      </div>
+      <p class="learning-note">
+        Nevíš, kterou převodovku zvolit? Porovnej si <a href="/blog/ridicak-na-automat-nebo-manual"
+          >výcvik na manuálu a na automatu</a
+        > nebo se podívej na <a href="/kurzy/ridicak-skupina-b-automat"
+          >kurz skupiny B na automatu</a
+        >.
+      </p>
+    </div>
+  </section>
+
+  <section class="section learning-section learning-blue" aria-labelledby="final-exam">
+    <div class="container">
+      <div class="learning-intro learning-copy">
+        <span class="eyebrow">Poslední krok k řidičáku</span>
+        <h2 id="final-exam">A pak už tě čeká závěrečná zkouška.</h2>
+        <p>
+          Po dokončení předepsané výuky a praktického výcviku tě čeká závěrečná zkouška. Ověří,
+          jestli znáš pravidla silničního provozu a dokážeš je používat při skutečném řízení.
+        </p>
+      </div>
+      <div class="learning-grid learning-grid-two">
+        <article class="learning-card learning-copy">
+          <h3>Teoretický test</h3><p>
+            Nejprve absolvuješ oficiální elektronický test z pravidel silničního provozu. Díky
+            přednáškám, vlastní učebnici, online materiálům a cvičným eTestům se můžeš připravovat
+            průběžně už během kurzu.
+          </p>
+        </article>
+        <article class="learning-card learning-copy">
+          <h3>Praktická zkouška</h3><p>
+            Při praktické zkoušce předvedeš své dovednosti v reálném provozu. Komisař hodnotí,
+            jestli dokážeš bezpečně ovládat auto, reagovat na dopravní situace a dodržovat pravidla.
+          </p>
+        </article>
+      </div>
+      <p class="learning-note">
+        <strong>Termín závěrečné zkoušky přiděluje příslušný úřad.</strong> Přesné datum proto nelze předem
+        garantovat. Další podrobnosti najdeš v <a href="/zkousky">přehledu závěrečných zkoušek</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section learning-section" aria-labelledby="learning-cta">
+    <div class="container">
+      <div class="learning-cta learning-copy">
+        <h2 id="learning-cta">Teď už víš, co tě u nás čeká.</h2>
+        <p>
+          Od prvních pravidel a rozjezdů na cvičišti až po jízdu v reálném provozu. V Autoškole BuBu
+          tě celým kurzem provedeme krok za krokem.
+        </p>
+        <p>Vyber si kurz, který ti vyhovuje, a začni svou cestu k řidičáku.</p>
+        <a class="btn primary" href="/kurzy">Vybrat kurz a přihlásit se</a>
+      </div>
+    </div>
+  </section>
+  <Faq quiet /><FinalCta /></Base
 >
 <style>
   .learning-hero {
@@ -134,6 +619,215 @@ const schema = [
     top: 72px;
     transform: rotate(-8deg);
     z-index: 3;
+  }
+  .learning-mint {
+    background: #edf8f6;
+  }
+  .learning-blue {
+    background: #f2f6fc;
+  }
+  .learning-intro {
+    max-width: 820px;
+    margin-bottom: clamp(24px, 4vw, 42px);
+  }
+  .learning-copy h2 {
+    margin: 0 0 16px;
+  }
+  .learning-copy h3 {
+    margin: 0 0 10px;
+    font-size: clamp(1.13rem, 2vw, 1.45rem);
+    line-height: 1.32;
+  }
+  .learning-copy p,
+  .learning-note {
+    line-height: 1.68;
+  }
+  .learning-copy p + p {
+    margin-top: 10px;
+  }
+  .learning-copy p + h3 {
+    margin-top: 24px;
+  }
+  .learning-copy a:not(.btn),
+  .learning-note a {
+    color: var(--brand-dark);
+    font-weight: 650;
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+  .learning-grid,
+  .learning-split {
+    display: grid;
+    gap: clamp(16px, 2.5vw, 30px);
+  }
+  .learning-grid-two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .learning-grid-three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .learning-split {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    align-items: start;
+  }
+  .learning-card,
+  .learning-cta {
+    padding: clamp(20px, 3vw, 32px);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: #fff;
+  }
+  .learning-checklist,
+  .learning-accent {
+    background: var(--brand-soft);
+  }
+  .learning-checklist ul,
+  .learning-tags {
+    margin: 0 0 18px;
+    padding: 0;
+    list-style: none;
+  }
+  .learning-checklist li {
+    position: relative;
+    padding: 12px 0 12px 30px;
+  }
+  .learning-checklist li + li {
+    border-top: 1px solid var(--line);
+  }
+  .learning-checklist li::before {
+    content: '';
+    position: absolute;
+    top: 17px;
+    left: 5px;
+    width: 12px;
+    height: 7px;
+    border: solid var(--brand-dark);
+    border-width: 0 0 2px 2px;
+    transform: rotate(-45deg);
+  }
+  .learning-benefit {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .learning-book,
+  .learning-material-icon {
+    object-fit: contain;
+    object-position: left center;
+    width: auto;
+    height: 112px;
+    margin-bottom: 16px;
+  }
+  .learning-book {
+    border-radius: 6px;
+  }
+  .learning-material-icon {
+    padding: 20px 0;
+  }
+  .learning-benefit-note {
+    margin-top: auto;
+    padding-top: 16px;
+    color: var(--brand-dark);
+  }
+  .learning-note {
+    max-width: 820px;
+    margin: 22px 0 0;
+  }
+  .learning-timeline {
+    counter-reset: theory;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-left: 2px solid var(--line);
+  }
+  .learning-timeline li {
+    position: relative;
+    max-width: 780px;
+    padding: 0 0 24px 44px;
+    counter-increment: theory;
+  }
+  .learning-timeline li::before {
+    content: counter(theory);
+    position: absolute;
+    top: 0;
+    left: -16px;
+    display: grid;
+    width: 30px;
+    height: 30px;
+    place-items: center;
+    border-radius: 50%;
+    background: #2f5aa6;
+    color: white;
+    font-weight: 700;
+  }
+  .learning-timeline,
+  .learning-aid-list {
+    margin-left: 16px;
+  }
+  .learning-followups {
+    margin-top: 12px;
+  }
+  .learning-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 14px 0 0;
+  }
+  .learning-tags li,
+  .learning-phase-label {
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: #edf4ff;
+    color: #234c91;
+    font-size: 0.85rem;
+    font-weight: 750;
+  }
+  .learning-aid-list {
+    display: grid;
+    gap: 22px;
+    max-width: 780px;
+    padding-left: 20px;
+    border-left: 3px solid var(--brand);
+  }
+  .learning-phases {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .learning-phases li {
+    border-top: 3px solid var(--brand);
+  }
+  .learning-phase-label {
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+  .learning-car img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-lg);
+    object-fit: cover;
+    margin-bottom: 16px;
+  }
+  .learning-cta {
+    text-align: center;
+    background: var(--brand-soft);
+  }
+  .learning-cta .btn {
+    margin-top: 18px;
+  }
+  @media (max-width: 1000px) {
+    .learning-grid-three {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 767px) {
+    .learning-grid-two,
+    .learning-grid-three,
+    .learning-split {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
   @media (max-width: 760px) {
     .learning-hero,
