@@ -104,6 +104,8 @@ Nemusíte jezdit v luxusním autě. Výcvikové auto by ale mělo být technicky
 - Je možné si vybrat typ převodovky?
 - Jsou auta podobná těm, ve kterých budu jezdit po získání řidičáku? Auto samo o sobě neudělá dobrý výcvik. Špatné auto ale může výcvik zbytečně zkomplikovat.
 
+Před přihlášením si porovnejte, [co můžete řídit po zkoušce na automatu a na manuálu](/blog/ridicak-na-automat-nebo-manual).
+
 ## 8. Je komunikace jednoduchá a rychlá?
 
 Komunikace je podceňovaný faktor. Pokud autoškola pomalu odpovídá už před přihláškou, pravděpodobně se to výrazně nezlepší ani po zaplacení. Před výběrem si všimněte:

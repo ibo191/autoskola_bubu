@@ -22,6 +22,8 @@ Chystáte se do autoškoly a nevíte, co vás čeká? To je úplně normální. 
 
 Prvním krokem je výběr autoškoly a odeslání přihlášky. V této fázi byste si neměli vybírat jen podle nejnižší ceny. Levnější kurz může na první pohled vypadat výhodně, ale důležité je sledovat i dostupnost jízd, přístup instruktorů, komunikaci, lokalitu a to, jestli se v autoškole budete cítit dobře. BESIP upozorňuje, že příjemné a klidné prostředí může výrazně pomoct učení, protože žák je otevřenější novým informacím a dovednostem, když se cítí v bezpečí. U nás v Autoškole BuBu se snažíme, aby přihlášení bylo jednoduché a aby od začátku bylo jasné, co vás čeká. Žádné zbytečné strašení. Žádný chaos.
 
+Při výběru kurzu si ujasněte také převodovku. Náš průvodce [řidičákem na automat a na manuál](/blog/ridicak-na-automat-nebo-manual) vysvětluje, jak výběr ovlivní auta, která po zkoušce můžete řídit.
+
 ## 2. Lékařský posudek
 
 Než kurz začne, budete potřebovat potvrzení od lékaře, že jste zdravotně způsobilí k řízení. Většinou jde o praktického lékaře. Bez tohoto potvrzení není možné výcvik zahájit. Proto doporučujeme řešit ho co nejdříve po přihlášení, ať se kurz zbytečně nezdržuje.
