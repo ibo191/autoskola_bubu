@@ -177,7 +177,12 @@ test('admin enrollment actions produce distinct customer emails without duplicat
   assert.match(welcome.text, /zdravovědu/);
   assert.match(welcome.text, /nejpozději 24 hodin/);
   assert.match(welcome.text, /info@autoskolabubu\.cz/);
-  assert.match(welcome.text, /Moje Autoškola a cvičné eTesty/);
+  for (const content of [welcome.text, welcome.html ?? '']) {
+    assert.match(content, /Moje Autoškola najdete online studovnu s výukovými materiály/);
+    assert.match(content, /plný a neomezený přístup do této online učebny/);
+    assert.match(content, /Doporučujeme projít si všechny výukové materiály/);
+    assert.match(content, /cvičné eTesty/);
+  }
   assert.match(welcome.text, /apps\.apple\.com\/cz\/app\/moje-auto%C5%A1kola\/id1449593403/);
   assert.match(
     welcome.text,

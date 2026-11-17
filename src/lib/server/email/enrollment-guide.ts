@@ -49,7 +49,8 @@ export function categoryBEnrollmentGuide(origin: string, coursePriceCzk?: number
     {
       title: 'Učebnice a online studovna',
       paragraphs: [
-        'V ceně kurzu je tištěná učebnice, přístup do aplikace Moje Autoškola a cvičné eTesty. Výsledky cvičných testů může autoškola sledovat.',
+        'V aplikaci Moje Autoškola najdete online studovnu s výukovými materiály. Od autoškoly máte plný a neomezený přístup do této online učebny. Doporučujeme projít si všechny výukové materiály.',
+        'V ceně kurzu je také tištěná učebnice a cvičné eTesty. Výsledky cvičných testů může autoškola sledovat.',
         'Přístupové údaje vám přijdou e-mailem po zpracování zápisu. Pokud e-mail nenajdete, zkontrolujte i složku Spam.',
       ],
       links: autoSchoolAppLinks,
