@@ -59,7 +59,8 @@ export function categoryBEnrollmentGuide(origin: string, coursePriceCzk?: number
       title: 'Praktické jízdy',
       paragraphs: [
         'Výcvik skupiny B zahrnuje 28 vyučovacích hodin. První dvě probíhají na cvičišti, potom přejdete od jednoduššího k náročnějšímu provozu.',
-        'Po splnění podmínek vám přidělíme instruktora. Termíny si domlouváte přímo s ním podle vzájemných možností, proto se počet jízd za týden může lišit. Další jízdy si můžete dokoupit.',
+        'Po splnění podmínek vám přidělíme instruktora a termíny si domluvíte přímo s ním. Počet jízd za týden není omezený. Pokud má instruktor volnou kapacitu, můžete se domluvit i na více jízdách týdně.',
+        'Pokud vám jízdy v ceně kurzu nestačí nebo si chcete před zkouškou ještě něco procvičit, můžete si dokoupit další jízdy.',
       ],
     },
     {

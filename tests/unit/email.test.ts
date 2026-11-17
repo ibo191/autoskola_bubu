@@ -174,6 +174,11 @@ test('admin enrollment actions produce distinct customer emails without duplicat
   assert.match(welcome.text, /tři splátky/);
   assert.match(welcome.text, /20\s000\sKč/);
   assert.match(welcome.text, /28 vyučovacích hodin/);
+  assert.match(
+    welcome.text,
+    /Pokud má instruktor volnou kapacitu, můžete se domluvit i na více jízdách týdně/,
+  );
+  assert.match(welcome.text, /před zkouškou ještě něco procvičit, můžete si dokoupit další jízdy/);
   assert.match(welcome.text, /zdravovědu/);
   assert.match(welcome.text, /nejpozději 24 hodin/);
   assert.match(welcome.text, /info@autoskolabubu\.cz/);
