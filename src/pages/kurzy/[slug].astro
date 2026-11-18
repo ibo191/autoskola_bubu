@@ -12,7 +12,6 @@ import {
   money,
   type Course,
   motoEnrollmentPaused,
-  motoEnrollmentPausedMessage,
 } from '../../lib/catalog';
 import manualCar from '../../assets/courses/b-manual-fabia.png';
 import automaticCar from '../../assets/courses/b-automatic-scala.png';
@@ -263,7 +262,7 @@ const faqSchema = {
               isMoto && motoEnrollmentPaused ? (
                 <>
                   <span class="moto-pause" role="status">
-                    {motoEnrollmentPausedMessage}
+                    Pro sezonu 2027 už můžete projevit předběžný zájem.
                   </span>
                   <a class="btn primary" href={`/motorky-2027?skupina=${course.id}&zdroj=course`}>
                     Mám předběžný zájem ↗
@@ -452,7 +451,8 @@ const faqSchema = {
                   {isMoto && motoEnrollmentPaused ? (
                     <>
                       <span class="moto-pause" role="status">
-                        {motoEnrollmentPausedMessage}
+                        Zajímá vás tento kurz? Nechte nám kontakt a ozveme se vám, až otevřeme
+                        objednávky.
                       </span>
                       <a
                         class="btn primary"
@@ -496,7 +496,7 @@ const faqSchema = {
           </h2><p>
             {
               isMoto
-                ? 'Přihlášky na sezonu 2027 jsou zatím pozastavené. Zanechte nám kontakt a po otevření přihlášek vás vyzveme k vytvoření objednávky.'
+                ? 'Až otevřeme objednávky, dáme vám vědět.'
                 : 'Pokud vám kurz sedí, objednávka vás provede výběrem pobočky a termínu zápisu.'
             }
           </p>
@@ -505,9 +505,6 @@ const faqSchema = {
             {
               isMoto && motoEnrollmentPaused ? (
                 <>
-                  <span class="moto-pause" role="status">
-                    {motoEnrollmentPausedMessage}
-                  </span>
                   <a class="btn primary" href={`/motorky-2027?skupina=${course.id}&zdroj=course`}>
                     Mám předběžný zájem ↗
                   </a>

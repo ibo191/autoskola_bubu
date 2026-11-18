@@ -12,6 +12,7 @@ import Faq from '../components/Faq.astro';
 import FinalCta from '../components/FinalCta.astro';
 import GoogleReviewsBanner from '../components/GoogleReviewsBanner.astro';
 import { getCourse } from '../lib/catalog';
+import { motoInterestAnnouncement } from '../lib/moto-interest-copy';
 ---
 
 <Base
@@ -59,6 +60,10 @@ import { getCourse } from '../lib/catalog';
       ><span>Přívěsy B96 a B+E</span>
     </div>
   </div>
+  <section class="container moto-interest-offer" aria-label="Motorky 2027 na Střížkově">
+    <p>{motoInterestAnnouncement}</p>
+    <a class="btn secondary" href="/motorky-2027">Mám předběžný zájem</a>
+  </section>
   <section class="container christmas-offer" aria-labelledby="christmas-offer-title">
     <a class="christmas-offer-card" href={christmasCampaign.slug}>
       <div class="christmas-offer-copy">
@@ -149,6 +154,20 @@ import { getCourse } from '../lib/catalog';
   <BranchCards /><Faq compact /><FinalCta />
 </Base>
 <style>
+  .moto-interest-offer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-block: 22px;
+  }
+  .moto-interest-offer p {
+    color: var(--brand-dark);
+    font-weight: 700;
+    margin: 0;
+    flex: 1 1 260px;
+  }
   .christmas-offer {
     padding-block: clamp(24px, 4vw, 52px);
   }

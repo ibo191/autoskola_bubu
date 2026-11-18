@@ -1,6 +1,7 @@
 ---
 import { branches, courses, drivingBlockPrice, money } from '../lib/catalog';
 import { licenceReturnDocuments } from '../lib/licence-return';
+import { motoInterestAnnouncement } from '../lib/moto-interest-copy';
 interface Props {
   recaptchaSiteKey?: string;
   captchaRequired?: boolean;
@@ -103,6 +104,10 @@ const { recaptchaSiteKey = '', captchaRequired = false } = Astro.props;
               <option value="single">Jednotná cena</option>
             </select>
           </label>
+        </div>
+        <div class="notice" id="order-moto-interest" hidden>
+          <p>{motoInterestAnnouncement}</p>
+          <a href="/motorky-2027" class="text-link">Mám předběžný zájem</a>
         </div>
         <div id="moto-package-cards" class="moto-package-cards" hidden aria-live="polite">
           <div class="moto-package-intro">

@@ -1,4 +1,4 @@
-import { motoEnrollmentPausedMessage, type Course } from './catalog';
+import { type Course } from './catalog';
 
 export type CourseFaq = readonly [question: string, answer: string];
 
@@ -77,7 +77,10 @@ export function courseFaqs(course: Course): CourseFaq[] {
   }
   if (course.category === 'moto') {
     return [
-      [`Je možné se nyní přihlásit do kurzu ${course.label}?`, motoEnrollmentPausedMessage],
+      [
+        `Můžu už projevit zájem o skupinu ${course.id.toUpperCase()} na sezonu 2027?`,
+        'Ano. Ve formuláři nám můžete nechat kontakt. Až otevřeme objednávky, ozveme se vám.',
+      ],
       [
         'Kde motocyklový výcvik probíhá?',
         'Motocyklový výcvik poskytujeme na pobočce Praha 8 – Střížkov.',

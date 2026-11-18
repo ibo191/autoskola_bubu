@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { motoEnrollmentPausedMessage } from '../lib/catalog';
+import { motoInterestAnnouncement, motoInterestExplanation } from '../lib/moto-interest-copy';
 ---
 
 <Base
@@ -18,16 +18,11 @@ import { motoEnrollmentPausedMessage } from '../lib/catalog';
         <section class="interest-copy">
           <span class="eyebrow">Praha 8 – Střížkov · sezona 2027</span>
           <h1>Na motorku příští sezonu? Dejte nám vědět.</h1>
-          <p class="lead">{motoEnrollmentPausedMessage}</p>
+          <p class="lead">{motoInterestAnnouncement}</p>
+          <p>{motoInterestExplanation}</p>
           <p>
-            Ceny a varianty si můžete v klidu projít v <a href="/cenik">ceníku</a>. Zatím stačí
-            zanechat kontakt. Jakmile přihlašování otevřeme, ozveme se vám s výzvou k vytvoření
-            objednávky.
+            Ceny a varianty si můžete v klidu projít v <a href="/cenik">ceníku</a>.
           </p>
-          <div class="notice">
-            <strong>Jde pouze o předběžný zájem.</strong> Odesláním formuláře nevzniká objednávka, rezervace
-            místa ani termín zápisu.
-          </div>
         </section>
         <section class="interest-card" aria-labelledby="interest-title">
           <span class="eyebrow">Předběžný zájem</span>
@@ -50,7 +45,8 @@ import { motoEnrollmentPausedMessage } from '../lib/catalog';
                   required
                   minlength="2"
                   maxlength="80"
-                /></label>
+                /></label
+              >
             </div>
             <label
               >E-mail<input
@@ -245,11 +241,12 @@ import { motoEnrollmentPausedMessage } from '../lib/catalog';
             recaptchaToken,
           }),
         });
-        if (!response.ok) throw new Error('SUBMISSION_FAILED');
+        const result = await response.json().catch(() => ({ ok: false }));
+        if (!response.ok || result.ok !== true) throw new Error('SUBMISSION_FAILED');
         form.reset();
         updateChoices();
         status.textContent =
-          'Děkujeme. Váš předběžný zájem jsme uložili. Až otevřeme přihlášky, vyzveme vás k vytvoření objednávky.';
+          'Děkujeme. Váš předběžný zájem jsme uložili. Až otevřeme objednávky motocyklových kurzů, ozveme se vám.';
         status.classList.add('success');
       } catch {
         status.textContent = 'Zájem se nepodařilo odeslat. Zkuste to prosím znovu.';

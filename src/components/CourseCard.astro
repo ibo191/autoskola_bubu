@@ -4,13 +4,8 @@ import manualCar from '../assets/courses/b-manual-fabia.png';
 import automaticCar from '../assets/courses/b-automatic-scala.png';
 import moto from '../assets/moto.jpeg';
 import trailer from '../assets/trailer.jpeg';
-import {
-  displayPrice,
-  money,
-  motoEnrollmentPausedMessage,
-  type Course,
-  type BranchId,
-} from '../lib/catalog';
+import { displayPrice, money, type Course, type BranchId } from '../lib/catalog';
+import { motoInterestAnnouncement } from '../lib/moto-interest-copy';
 interface Props {
   course: Course;
   branch?: BranchId;
@@ -60,14 +55,14 @@ const asset =
     </div><p class="small">
       {
         course.category === 'moto'
-          ? motoEnrollmentPausedMessage
+          ? motoInterestAnnouncement
           : 'Jedna cena kurzu. Bez volby balíčku.'
       }
     </p><div class="card-actions">
       {
         course.category === 'moto' ? (
-          <a class="btn secondary" href={`/kurzy/${course.slug}`}>
-            Přihlašování pozastaveno
+          <a class="btn secondary" href={`/motorky-2027?skupina=${course.id}&zdroj=course`}>
+            Mám předběžný zájem
           </a>
         ) : (
           <button

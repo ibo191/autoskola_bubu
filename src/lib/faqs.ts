@@ -15,7 +15,9 @@ function formatAnswer(value: string) {
   const lines = value.trim().split(/\n{2,}/);
   return lines
     .map((block) => {
-      const text = escapeHtml(removeBoldMarkers(block)).replace(/\n/g, '<br />');
+      const text = escapeHtml(removeBoldMarkers(block))
+        .replace(/\n/g, '<br />')
+        .replace(/\[([^\]]+)\]\((\/[a-z0-9/-]+)\)/g, '<a href="$2">$1</a>');
       if (block.split('\n').every((line) => /^\* /.test(line))) {
         return `<ul>${block
           .split('\n')

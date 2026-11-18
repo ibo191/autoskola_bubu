@@ -547,11 +547,9 @@ Rozsah teoretické výuky se ale může lišit od žadatele, který už jiné ř
 
 ## Kdy začíná sezóna autoškoly na motorku?
 
-Zájemce o motocyklové kurzy začínáme přijímat už **od podzimu předchozího roku**.
+Předběžný zájem o sezonu 2027 můžete na Střížkově projevit už teď. Až otevřeme objednávky, ozveme se vám.
 
-Od října vypisujeme přihlašování do kurzů na následující motocyklovou sezónu.
-
-Počet míst je omezený podle dostupné kapacity instruktorů a motocyklů.
+[Mám předběžný zájem](/motorky-2027).
 
 Motocyklové kurzy poskytujeme pouze na pobočce **Praha 8 – Střížkov**.
 

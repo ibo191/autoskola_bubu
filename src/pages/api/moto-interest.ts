@@ -19,6 +19,7 @@ export const POST: APIRoute = async ({ request }) => {
     if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY)
       return Response.json({ ok: false, code: 'UNAVAILABLE' }, { status: 503 });
     const captchaValid = await verifyRecaptcha(parsed.data.recaptchaToken, 'contact', {
+      env: process.env,
       hostname: new URL(request.url).hostname,
     });
     if (!captchaValid) return Response.json({ ok: false, code: 'CAPTCHA_FAILED' }, { status: 403 });

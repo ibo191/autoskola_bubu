@@ -185,6 +185,8 @@ function syncAvailableCourses() {
       (branch === 'kladno' && option.value === 'vraceni');
   }
   if (course.selectedOptions[0]?.hidden) course.value = '';
+  document.querySelector<HTMLElement>('#order-moto-interest')!.hidden =
+    branch !== 'strizkov' || course.value !== '';
 }
 
 function requiresAppointment() {

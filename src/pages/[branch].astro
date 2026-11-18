@@ -204,6 +204,12 @@ const breadcrumbSchema = {
               zahájení kurzu dostanete e-mailem.
             </p>
           )}
+          {isStrizkov && (
+            <div class="notice">
+              <p>Motorky 2027 na Střížkově – předběžný zájem je otevřený.</p>
+              <a class="text-link" href="/motorky-2027">Mám předběžný zájem</a>
+            </div>
+          )}
         </div><div class:list={['branch-hero-image', { 'kladno-hero-image': isKladno, 'strizkov-hero-image': isStrizkov }]}><Image
           src={manualCar}
           alt="Bílá Škoda Fabia Autoškoly BuBu pro manuální výcvik"

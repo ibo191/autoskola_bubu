@@ -3,15 +3,8 @@ export const prerender = true;
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import FinalCta from '../../components/FinalCta.astro';
-import {
-  branches,
-  courses,
-  availableAt,
-  displayPrice,
-  money,
-  prices,
-  motoEnrollmentPausedMessage,
-} from '../../lib/catalog';
+import { branches, courses, availableAt, displayPrice, money, prices } from '../../lib/catalog';
+import { motoInterestAnnouncement } from '../../lib/moto-interest-copy';
 import automaticScala from '../../assets/courses/b-automatic-scala.png';
 import manualFabia from '../../assets/courses/b-manual-fabia.png';
 
@@ -94,7 +87,9 @@ const courseIcons = {
         }
       </div>
       <p class="branch-context-links">
-        Chcete znát místo výcviku? Prohlédněte si <a href="/strizkov">autoškolu na Praze 8 – Střížkově</a>
+        Chcete znát místo výcviku? Prohlédněte si <a href="/strizkov"
+          >autoškolu na Praze 8 – Střížkově</a
+        >
         nebo <a href="/kladno">kurzy autoškoly v Kladně</a>.
       </p>
       <div class="tabs course-filter" role="group" aria-label="Filtrovat kurzy podle typu">
@@ -103,8 +98,9 @@ const courseIcons = {
         <button type="button" data-course-category="moto" aria-pressed="false">Motorky</button>
         <button type="button" data-course-category="prives" aria-pressed="false">Přívěsy</button>
       </div>
-      <p id="moto-enrollment-notice" class="moto-notice" hidden role="status">
-        {motoEnrollmentPausedMessage}
+      <p id="moto-enrollment-notice" class="moto-notice" role="status">
+        {motoInterestAnnouncement}
+        <a href="/motorky-2027">Mám předběžný zájem</a>
       </p>
       <div class="course-tile-grid" id="course-tile-grid">
         {
@@ -177,8 +173,11 @@ const courseIcons = {
                     Detail kurzu →
                   </a>
                   {course.category === 'moto' ? (
-                    <a class="btn secondary" href={`/kurzy/${course.slug}`}>
-                      Zjistit více
+                    <a
+                      class="btn secondary"
+                      href={`/motorky-2027?skupina=${course.id}&zdroj=course`}
+                    >
+                      Mám předběžný zájem
                     </a>
                   ) : (
                     <button
@@ -269,7 +268,9 @@ const courseIcons = {
         const order = tile.querySelector<HTMLButtonElement>('[data-order]');
         if (order) order.dataset.branch = selectedBranch;
       });
-      if (motoNotice) motoNotice.hidden = selectedCategory !== 'moto';
+      if (motoNotice)
+        motoNotice.hidden =
+          selectedBranch !== 'strizkov' || !['all', 'moto'].includes(selectedCategory);
     };
     branchButtons.forEach((button) => {
       button.addEventListener('click', () => {
@@ -290,8 +291,14 @@ const courseIcons = {
   </script>
 </Base>
 <style>
-  .branch-context-links { margin: -12px 0 24px; font-size: 0.85rem; }
-  .branch-context-links a { color: var(--brand-dark); text-underline-offset: 3px; }
+  .branch-context-links {
+    margin: -12px 0 24px;
+    font-size: 0.85rem;
+  }
+  .branch-context-links a {
+    color: var(--brand-dark);
+    text-underline-offset: 3px;
+  }
   .course-filter {
     margin-bottom: 28px;
   }
