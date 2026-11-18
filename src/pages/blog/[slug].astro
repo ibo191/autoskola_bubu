@@ -151,9 +151,13 @@ const breadcrumbSchema = {
               }
             </div>
           </section>
-          <p class="source small">
-            Text článku je převzat v původním znění z archivu Autoškoly BuBu.
-          </p>
+          {
+            a.reviewStatus === 'imported' && (
+              <p class="source small">
+                Text článku je převzat v původním znění z archivu Autoškoly BuBu.
+              </p>
+            )
+          }
         </div>
       </div>
     </div>
@@ -324,6 +328,15 @@ const breadcrumbSchema = {
     grid-template-columns: 220px minmax(0, 760px);
     gap: 65px;
     justify-content: center;
+  }
+  .article-body {
+    grid-column: 2;
+    min-width: 0;
+    width: 100%;
+  }
+  .article-body:only-child {
+    grid-column: 1 / -1;
+    justify-self: center;
   }
   .article-aside {
     position: sticky;
@@ -591,6 +604,9 @@ const breadcrumbSchema = {
     .article-layout-grid {
       grid-template-columns: 1fr;
       gap: 32px;
+    }
+    .article-body {
+      grid-column: 1;
     }
     .article-aside {
       position: static;
