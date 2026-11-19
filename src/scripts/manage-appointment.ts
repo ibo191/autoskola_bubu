@@ -161,9 +161,25 @@ if (root) {
     void load();
   });
   const cancelForm = root.querySelector<HTMLFormElement>('#cancel-appointment');
+  const reasonDetail = cancelForm?.querySelector<HTMLTextAreaElement>('[name="reasonDetail"]');
+  cancelForm?.addEventListener('change', () => {
+    if (!reasonDetail) return;
+    const other = new FormData(cancelForm).get('reason') === 'other';
+    reasonDetail.closest<HTMLElement>('#cancel-reason-detail')!.hidden = !other;
+    reasonDetail.disabled = !other;
+    reasonDetail.required = other;
+    reasonDetail.setCustomValidity('');
+  });
+  reasonDetail?.addEventListener('input', () => reasonDetail.setCustomValidity(''));
   cancelForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const reason = new FormData(cancelForm).get('reason');
+    const explanation = reason === 'other' ? reasonDetail?.value.trim() : undefined;
+    if (reason === 'other' && !explanation) {
+      reasonDetail?.setCustomValidity('Napište prosím stručně důvod zrušení.');
+      reasonDetail?.reportValidity();
+      return;
+    }
     const submit = cancelForm.querySelector<HTMLButtonElement>('button[type="submit"]')!;
     submit.disabled = true;
     message.textContent = 'Rušíme termín…';
@@ -175,6 +191,7 @@ if (root) {
         body: JSON.stringify({
           recaptchaToken,
           reason,
+          ...(reason === 'other' ? { reasonDetail: explanation } : {}),
           revision: Number(cancelForm.dataset.revision),
         }),
       });

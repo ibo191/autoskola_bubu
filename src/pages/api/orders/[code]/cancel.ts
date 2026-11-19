@@ -19,9 +19,19 @@ const bodySchema = z
   .object({
     recaptchaToken: z.string().max(4096).optional(),
     reason: z.enum(cancellationReasonCodes),
+    reasonDetail: z.string().trim().max(500).optional(),
     revision: z.number().int().positive(),
   })
-  .strict();
+  .strict()
+  .superRefine((value, context) => {
+    if (value.reason === 'other' && !value.reasonDetail) {
+      context.addIssue({
+        code: 'custom',
+        path: ['reasonDetail'],
+        message: 'Upřesněte důvod zrušení.',
+      });
+    }
+  });
 
 export const POST: APIRoute = async ({ request, params }) => {
   try {
@@ -72,6 +82,7 @@ export const POST: APIRoute = async ({ request, params }) => {
         subject: followUp.subject,
         metadata: orderEmailMetadata(followUp),
       },
+      parsed.data.reason === 'other' ? parsed.data.reasonDetail : undefined,
     );
     if (!result.ok) {
       return Response.json(result, { status: 409, headers: { 'Cache-Control': 'no-store' } });

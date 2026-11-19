@@ -135,6 +135,17 @@ const canCancel = Boolean(
                       </label>
                     ))}
                   </fieldset>
+                  <div id="cancel-reason-detail" hidden>
+                    <label for="cancel-reason-text">Upřesněte prosím důvod zrušení</label>
+                    <textarea
+                      id="cancel-reason-text"
+                      name="reasonDetail"
+                      rows="3"
+                      maxlength="500"
+                      disabled
+                    />
+                    <small>Stačí stručně, nejvýše 500 znaků.</small>
+                  </div>
                   <button type="submit" class="btn secondary">
                     Potvrdit zrušení termínu
                   </button>
@@ -186,6 +197,27 @@ const canCancel = Boolean(
     grid-template-columns: auto 1fr;
     align-items: start;
     font-weight: 500;
+  }
+  #cancel-reason-detail {
+    width: 100%;
+  }
+  #cancel-reason-detail[hidden] {
+    display: none;
+  }
+  #cancel-reason-detail label {
+    display: block;
+    font-weight: 700;
+  }
+  #cancel-reason-text {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 6px 0;
+    padding: 10px;
+    border: 1px solid #9aada5;
+    border-radius: 8px;
+    resize: vertical;
+    font: inherit;
   }
   .summary-card {
     border: 1px solid var(--line);

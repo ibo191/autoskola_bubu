@@ -176,6 +176,7 @@ const appointmentHistorySchema = z.object({
       .extend({
         kind: z.enum(['moved', 'cancelled', 'expired']),
         cancellationReason: z.enum(cancellationReasonCodes).nullish(),
+        cancellationDetail: z.string().nullish(),
         changedAt: z.iso.datetime({ offset: true }),
         newStartsAt: z.iso.datetime({ offset: true }).nullable(),
         late: z.boolean(),
@@ -282,6 +283,7 @@ export class SupabaseBookingRepository implements BookingRepository {
       | 'bubu_admin_appointment_history'
       | 'bubu_cancel_appointment'
       | 'bubu_customer_cancel_appointment'
+      | 'bubu_customer_cancel_appointment_with_detail'
       | 'bubu_admin_login'
       | 'bubu_admin_session'
       | 'bubu_admin_logout'
@@ -430,6 +432,7 @@ export class SupabaseBookingRepository implements BookingRepository {
     reason: CancellationReason,
     revision: number,
     followUp: { idempotencyKey: string; subject: string; metadata: unknown } | null,
+    reasonDetail?: string,
   ) {
     return z
       .discriminatedUnion('ok', [
@@ -441,11 +444,12 @@ export class SupabaseBookingRepository implements BookingRepository {
         z.object({ ok: z.literal(false) }),
       ])
       .parse(
-        await this.rpc('bubu_customer_cancel_appointment', {
+        await this.rpc('bubu_customer_cancel_appointment_with_detail', {
           p_public_code: publicCode,
           p_reason: reason,
           p_expected_revision: revision,
           p_follow_up: followUp,
+          p_reason_detail: reason === 'other' ? (reasonDetail ?? null) : null,
         }),
       );
   }
